@@ -146,8 +146,7 @@ export default async function DashboardPage() {
               titulo="Anúncios"
               descricao="Gerencie suas campanhas"
               href="/dashboard/anuncios"
-              disponivel={false}
-              badge="em breve"
+              disponivel={true}
             />
           </div>
         </section>
