@@ -101,9 +101,9 @@ export async function getPagesWithInstagram(userToken: string): Promise<Page[]> 
 export async function getInstagramAccountInfo(
   igAccountId: string,
   pageToken: string,
-): Promise<{ id: string; username: string; account_type?: string }> {
+): Promise<{ id: string; username: string; profile_picture_url?: string; followers_count?: number }> {
   const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${igAccountId}`);
-  url.searchParams.set("fields", "id,username,account_type");
+  url.searchParams.set("fields", "id,username,profile_picture_url,followers_count");
   url.searchParams.set("access_token", pageToken);
 
   const res = await fetch(url);

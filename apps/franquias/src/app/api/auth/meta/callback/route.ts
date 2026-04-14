@@ -84,7 +84,7 @@ export async function GET(request: Request) {
         instagram_access_token: encrypt(pageWithIG.access_token),
         instagram_conta_id: igAccount.id,
         instagram_handle: igAccount.username,
-        instagram_tipo_conta: igAccount.account_type?.toLowerCase() ?? "business",
+        instagram_tipo_conta: "business",
         instagram_token_expiry: expiryDate,
         facebook_pagina_id: pageWithIG.id,
       })
