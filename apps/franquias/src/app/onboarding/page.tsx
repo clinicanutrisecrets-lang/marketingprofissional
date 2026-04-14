@@ -24,9 +24,8 @@ export default async function OnboardingPage({ searchParams }: PageProps) {
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
-  if (franqueada?.onboarding_completo) {
-    redirect("/dashboard");
-  }
+  // Remove o redirect pra permitir edicao depois de completo.
+  // A nutri pode sempre voltar e editar qualquer campo.
 
   const initialData =
     franqueada ??

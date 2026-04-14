@@ -85,9 +85,19 @@ export function Wizard({ initialData, initialStep = 1 }: WizardProps) {
     }
   }
 
+  const jaCompleto = !!initialData.onboarding_completo;
+
   return (
     <main className="min-h-screen bg-brand-muted">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
+        {jaCompleto && (
+          <a
+            href="/dashboard"
+            className="mb-4 inline-block text-sm text-brand-text/60 hover:text-brand-primary"
+          >
+            ← Voltar ao dashboard
+          </a>
+        )}
         {/* Barra de progresso */}
         <div className="mb-8 rounded-2xl bg-white p-5 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
