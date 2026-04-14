@@ -1,27 +1,48 @@
-export default function OnboardingPage() {
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { Wizard } from "@/components/onboarding/Wizard";
+
+export const dynamic = "force-dynamic";
+
+type PageProps = {
+  searchParams: Promise<{ step?: string; conectado?: string; erro?: string }>;
+};
+
+export default async function OnboardingPage({ searchParams }: PageProps) {
+  const { step: stepParam } = await searchParams;
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: franqueada } = await supabase
+    .from("franqueadas")
+    .select("*")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+  if (franqueada?.onboarding_completo) {
+    redirect("/dashboard");
+  }
+
+  const initialData =
+    franqueada ??
+    ({
+      email: user.email ?? "",
+      nome_completo: "",
+    } as Record<string, unknown>);
+
+  const initialStep = stepParam
+    ? Math.max(1, Math.min(10, parseInt(stepParam, 10)))
+    : 1;
+
   return (
-    <main className="min-h-screen bg-brand-muted p-8">
-      <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-bold text-brand-text">
-          Onboarding da Franqueada
-        </h1>
-        <p className="mb-6 text-brand-text/70">
-          Wizard de 10 etapas — em construção. Próxima entrega: formulário
-          completo com salvamento automático e conexão OAuth do Instagram.
-        </p>
-        <ul className="space-y-2 text-sm text-brand-text/60">
-          <li>1. Sobre você (identidade)</li>
-          <li>2. Sua especialidade</li>
-          <li>3. Atendimento e valores</li>
-          <li>4. Sua história</li>
-          <li>5. Identidade visual</li>
-          <li>6. Redes sociais + OAuth Instagram</li>
-          <li>7. Voz e comunicação</li>
-          <li>8. Depoimentos e prova social</li>
-          <li>9. Configurações de automação + CTA da Sofia</li>
-          <li>10. Revisão e finalização</li>
-        </ul>
-      </div>
-    </main>
+    <Wizard
+      initialData={initialData as Record<string, unknown>}
+      initialStep={initialStep}
+    />
   );
 }
