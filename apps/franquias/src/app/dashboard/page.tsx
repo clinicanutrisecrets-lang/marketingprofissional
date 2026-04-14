@@ -16,19 +16,8 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   if (!franqueada) {
-    return (
-      <main className="min-h-screen bg-brand-muted p-8">
-        <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
-          <h1 className="mb-2 text-2xl font-bold text-brand-text">
-            Conta ainda não configurada
-          </h1>
-          <p className="text-brand-text/70">
-            Nossa equipe está finalizando seu cadastro. Em breve você receberá
-            um email com o próximo passo.
-          </p>
-        </div>
-      </main>
-    );
+    // Usuário novo — envia pro onboarding (que cria a linha automaticamente)
+    redirect("/onboarding");
   }
 
   if (!franqueada.onboarding_completo) {
