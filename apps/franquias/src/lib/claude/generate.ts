@@ -121,19 +121,18 @@ function parseJSON<T>(raw: string): T {
 }
 
 /**
- * Planeja uma semana de posts (7-10 posts) balanceando ângulos.
- * Retorna array de { tipo, angulo, dia, horario } pra depois gerar cada um.
+ * Planeja uma semana de posts (7-10 itens) balanceando ângulos e tipos.
+ * Inclui FEED, CARROSSEL, REELS e STORIES.
+ * Retorna array de { tipo, angulo, dia } pra depois gerar cada um.
  */
 export function planejarSemana(params: {
   diasPostSemana?: number[];
-  frequenciaReels?: string;
-  frequenciaStories?: string;
+  frequenciaReels?: string;   // 'semanal' | '2x_semana' | 'nenhum'
+  frequenciaStories?: string; // 'diario' | 'dias_uteis' | '3x_semana' | 'semanal'
 }): Array<{ dia: number; tipo: TipoPost; angulo: AnguloPost }> {
-  const dias = params.diasPostSemana ?? [1, 3, 5]; // seg, qua, sex
-
+  const dias = params.diasPostSemana ?? [1, 3, 5];
   const plano: Array<{ dia: number; tipo: TipoPost; angulo: AnguloPost }> = [];
 
-  // Feed posts nos dias escolhidos, distribuindo ângulos
   const angulosRotacao: AnguloPost[] = [
     "educativo_ciencia",
     "dor_do_paciente",
@@ -144,12 +143,50 @@ export function planejarSemana(params: {
     "chamada_direta",
   ];
 
+  // FEED: cada dia escolhido vira 1 post de feed
+  // Mistura tipos: 1º dia = reels (se semanal), 2º dia = carrossel, demais = imagem
   dias.forEach((dia, i) => {
-    const ehReels = params.frequenciaReels === "semanal" && i === 0;
+    const ehReels =
+      (params.frequenciaReels === "semanal" && i === 0) ||
+      (params.frequenciaReels === "2x_semana" && (i === 0 || i === Math.floor(dias.length / 2)));
     const ehCarrossel = !ehReels && i === 1;
-    const tipo: TipoPost = ehReels ? "reels" : ehCarrossel ? "feed_carrossel" : "feed_imagem";
+    const tipo: TipoPost = ehReels
+      ? "reels"
+      : ehCarrossel
+        ? "feed_carrossel"
+        : "feed_imagem";
     const angulo = angulosRotacao[i % angulosRotacao.length];
     plano.push({ dia, tipo, angulo });
+  });
+
+  // STORIES: dias separados (não nos dias de post de feed pra não saturar)
+  const diasStories = (() => {
+    switch (params.frequenciaStories) {
+      case "diario":
+        return [0, 1, 2, 3, 4, 5, 6];
+      case "dias_uteis":
+        return [1, 2, 3, 4, 5];
+      case "3x_semana":
+        return [1, 3, 5];
+      case "semanal":
+        return [3];
+      default:
+        return [1, 3, 5];
+    }
+  })();
+
+  // 1 stories por dia escolhido, ângulo educativo/bastidor
+  const angulosStories: AnguloPost[] = [
+    "bastidor_da_nutri",
+    "educativo_ciencia",
+    "mito_vs_verdade",
+  ];
+  diasStories.forEach((dia, i) => {
+    plano.push({
+      dia,
+      tipo: "stories",
+      angulo: angulosStories[i % angulosStories.length],
+    });
   });
 
   return plano;
