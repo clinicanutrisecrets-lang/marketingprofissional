@@ -125,16 +125,14 @@ export default async function DashboardPage() {
               titulo="Aprovar semana"
               descricao="Revise os 7-10 posts da semana"
               href="/dashboard/aprovar"
-              disponivel={false}
-              badge="em breve"
+              disponivel={true}
             />
             <ActionCard
               icone="✨"
               titulo="Criar post manual"
               descricao="Sobe seu vídeo + IA faz a legenda"
               href="/dashboard/posts/novo"
-              disponivel={false}
-              badge="em breve"
+              disponivel={true}
             />
             <ActionCard
               icone="📊"
