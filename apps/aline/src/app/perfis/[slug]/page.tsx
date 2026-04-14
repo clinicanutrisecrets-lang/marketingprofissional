@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { formatK, formatDate } from "@/lib/utils";
+import { GerarReelButton } from "@/components/GerarReelButton";
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +87,10 @@ export default async function PerfilPage({ params }: PageProps) {
           </div>
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>
         </header>
+
+        <section className="mb-6">
+          <GerarReelButton perfilId={perfil.id as string} corPrimaria={cor} />
+        </section>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
           <StatCard label="Posts total" value={stats.total.toString()} />

@@ -52,7 +52,8 @@ export async function updateSession(request: NextRequest) {
     const adminRow = admin as { papel?: string } | null;
     if (!adminRow || adminRow.papel !== "super_admin") {
       const url = request.nextUrl.clone();
-      url.pathname = "/login?forbidden=1";
+      url.pathname = "/login";
+      url.searchParams.set("forbidden", "1");
       return NextResponse.redirect(url);
     }
   }
