@@ -53,7 +53,7 @@ export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
             setGerando(false);
             if (r.ok) {
               setMsg(`${r.total} posts gerados! Recarregando...`);
-              setTimeout(() => router.refresh(), 800);
+              setTimeout(() => window.location.reload(), 500);
             } else {
               setErro(r.erro ?? "Erro ao gerar");
             }
