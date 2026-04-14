@@ -139,8 +139,7 @@ export default async function DashboardPage() {
               titulo="Relatório semanal"
               descricao="Performance + recomendações"
               href="/dashboard/relatorios"
-              disponivel={false}
-              badge="em breve"
+              disponivel={true}
             />
             <ActionCard
               icone="🎯"
