@@ -7,6 +7,7 @@ import {
   atualizarCopyPost,
   cancelarPost,
   gerarSemanaManual,
+  gerarPostSubstituto,
 } from "@/lib/posts/actions";
 import { formatDate } from "@/lib/utils";
 
@@ -138,6 +139,43 @@ export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
           />
         ))}
       </div>
+    </>
+  );
+}
+
+function SubstituirButton({
+  postId,
+  onSubstituido,
+}: {
+  postId: string;
+  onSubstituido: () => void;
+}) {
+  const [gerando, setGerando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function handle() {
+    setGerando(true);
+    setErro(null);
+    const r = await gerarPostSubstituto(postId);
+    setGerando(false);
+    if (r.ok) {
+      onSubstituido();
+    } else {
+      setErro(r.erro ?? "Erro");
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={handle}
+        disabled={gerando}
+        className="rounded-md border border-brand-primary bg-brand-primary/5 px-2 py-1 text-xs font-medium text-brand-primary hover:bg-brand-primary/10 disabled:opacity-60"
+      >
+        {gerando ? "Gerando..." : "✨ Gerar substituto"}
+      </button>
+      {erro && <span className="text-xs text-red-600">{erro}</span>}
     </>
   );
 }
@@ -294,9 +332,15 @@ function PostCard({
                 </span>
               )}
               {status === "cancelado" && (
-                <span className="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                  Cancelado
-                </span>
+                <>
+                  <span className="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                    Cancelado
+                  </span>
+                  <SubstituirButton
+                    postId={post.id as string}
+                    onSubstituido={() => window.location.reload()}
+                  />
+                </>
               )}
               {post.editado_pela_nutri && status !== "cancelado" && (
                 <span className="rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-700">
