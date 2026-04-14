@@ -23,30 +23,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.72.1(react@18.3.1))
-      '@scanner/bannerbear':
-        specifier: workspace:*
-        version: link:../../packages/bannerbear
-      '@scanner/benchmarks':
-        specifier: workspace:*
-        version: link:../../packages/benchmarks
-      '@scanner/claude':
-        specifier: workspace:*
-        version: link:../../packages/claude
-      '@scanner/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@scanner/heygen':
-        specifier: workspace:*
-        version: link:../../packages/heygen
-      '@scanner/instagram':
-        specifier: workspace:*
-        version: link:../../packages/instagram
-      '@scanner/meta-ads':
-        specifier: workspace:*
-        version: link:../../packages/meta-ads
-      '@scanner/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@supabase/ssr':
         specifier: ^0.5.0
         version: 0.5.2(@supabase/supabase-js@2.103.0)
@@ -129,27 +105,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.72.1(react@18.3.1))
-      '@scanner/bannerbear':
-        specifier: workspace:*
-        version: link:../../packages/bannerbear
-      '@scanner/benchmarks':
-        specifier: workspace:*
-        version: link:../../packages/benchmarks
-      '@scanner/claude':
-        specifier: workspace:*
-        version: link:../../packages/claude
-      '@scanner/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@scanner/instagram':
-        specifier: workspace:*
-        version: link:../../packages/instagram
-      '@scanner/meta-ads':
-        specifier: workspace:*
-        version: link:../../packages/meta-ads
-      '@scanner/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@supabase/ssr':
         specifier: ^0.5.0
         version: 0.5.2(@supabase/supabase-js@2.103.0)
