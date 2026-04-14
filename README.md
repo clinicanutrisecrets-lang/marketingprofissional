@@ -1,63 +1,103 @@
-# Scanner da Saúde — Plataforma Franquia Digital
+# Marketing Profissional — Monorepo
 
-SaaS de marketing automatizado para nutricionistas franqueadas. Sistema que gerencia centralmente a criação de conteúdo (LP, posts Instagram, criativos, anúncios Meta Ads) para múltiplas nutris.
+Dois produtos, um repositório, lib compartilhada.
+
+- **apps/franquias** — SaaS pago pra nutricionistas franqueadas (Scanner da Saúde)
+- **apps/aline** — sistema interno da Aline (Studio Aline: @scannerdasaude + @nutrisecrets)
+
+Dados isolados (schemas separados no mesmo projeto Supabase), código compartilhado via `packages/`.
 
 ## Stack
 
 - **Frontend/Backend**: Next.js 14 (App Router) + TypeScript + Tailwind
-- **Banco**: Supabase (PostgreSQL + Storage + Auth + RLS)
-- **IA de conteúdo**: Anthropic Claude (Sonnet 4.5 com prompt caching)
-- **Criativos**: Bannerbear API (templates com autofill)
+- **Monorepo**: pnpm workspaces + Turborepo
+- **Banco**: Supabase (PostgreSQL + Storage + Auth + RLS + pgsodium pra tokens)
+- **IA de conteúdo**: Anthropic Claude Sonnet 4.5 (prompt caching)
+- **Criativos**: Bannerbear API
+- **Vídeos (só apps/aline)**: HeyGen com avatar clonado
 - **Emails**: Resend
-- **Automação**: Make.com (scenarios agendados)
-- **Deploy**: Vercel
-- **Redes sociais**: Meta Graph API (Instagram + Facebook + Ads)
+- **Automação**: Vercel Cron + Supabase pg_cron (sem Make.com)
+- **Deploy**: Vercel (2 projetos, 1 repo)
+- **Redes**: Meta Graph API
+
+## Estrutura
+
+```
+marketingprofissional/
+├── apps/
+│   ├── franquias/              # SaaS pago (marketingprofissional.vercel.app)
+│   └── aline/                  # Sistema interno (studio-aline.vercel.app)
+│
+├── packages/
+│   ├── db/                     # Tipos Supabase + clients (browser/server/admin)
+│   ├── instagram/              # OAuth + postagem + insights (Graph API)
+│   ├── claude/                 # Geração com prompt caching + compliance CFN
+│   ├── bannerbear/             # Geração de criativos
+│   ├── meta-ads/               # Anúncios (abstração "objetivo de negócio")
+│   ├── heygen/                 # Reels com avatar (só apps/aline)
+│   ├── benchmarks/             # Avaliação CPL/CAC vs mercado
+│   └── ui/                     # Componentes compartilhados
+│
+└── supabase/migrations/
+    ├── franquias/              # Schema público (franqueadas + posts + aprovações)
+    ├── aline/                  # Schema aline (perfis + posts + anúncios)
+    └── shared/                 # pgsodium (tokens) + benchmarks de mercado
+```
 
 ## Rodar localmente
 
 ```bash
-# 1. Instalar dependências
-npm install
+# 1. Instalar pnpm se não tiver
+npm install -g pnpm
 
-# 2. Copiar variáveis de ambiente
-cp .env.example .env.local
-# preencher os valores
+# 2. Instalar dependências (raiz cuida dos workspaces)
+pnpm install
 
-# 3. Rodar em dev
-npm run dev
+# 3. Copiar variáveis de ambiente
+cp .env.example apps/franquias/.env.local
+cp .env.example apps/aline/.env.local
+
+# 4. Rodar só um dos apps
+pnpm dev:franquias   # localhost:3000
+pnpm dev:aline       # localhost:3001
+
+# Ou rodar os dois em paralelo
+pnpm dev
 ```
 
-Acesse http://localhost:3000
+## Deploy na Vercel
 
-## Estrutura de pastas
+Cada app é um projeto Vercel separado apontando pra subpasta:
 
-```
-src/
-├── app/
-│   ├── page.tsx                 # Landing
-│   ├── login/                   # Login franqueada
-│   ├── dashboard/               # Painel franqueada
-│   ├── onboarding/              # Wizard 10 etapas
-│   ├── admin/                   # Painel admin (Aline + equipe)
-│   ├── aprovar/[token]/         # Aprovação semanal pública (sem login)
-│   └── api/                     # Rotas API + webhooks
-├── lib/
-│   ├── supabase/                # Clients Supabase (browser, server, middleware)
-│   ├── types/database.ts        # Tipos gerados do schema
-│   └── utils.ts                 # Helpers (formatação, cn, etc)
-├── components/                  # Componentes compartilhados
-└── middleware.ts                # Auth + route guards
+| Projeto Vercel | Root Directory | Domínio |
+|---|---|---|
+| `marketingprofissional` | `apps/franquias` | marketingprofissional.vercel.app |
+| `studio-aline` | `apps/aline` | studio-aline.vercel.app (privado) |
 
-supabase/migrations/             # SQL de referência (já aplicado via MCP)
-```
+Env vars configuradas no painel de cada projeto.
 
-## Documentação relacionada
+## Arquitetura: por que não multi-tenant único
 
-- Guia da nutri (Gamma) — enviar antes do onboarding
-- Manual de operação do time — passo a passo da reunião
-- Roteiro Meta App Review — scripts dos vídeos demonstrativos
+**Franquias** = produto pago (customers externos).
+**Aline** = ferramenta interna (dono).
 
-## Branch de desenvolvimento
+Misturar isso no mesmo schema significa que bugs da ferramenta interna podem afetar
+clientes pagantes (e vice-versa). Solução: schemas isolados + libs compartilhadas.
 
-- `main` — produção (Vercel faz deploy automático)
-- Features desenvolvidas em branches separadas com PR
+Se amanhã as libs divergirem (raro), é trivial forkar um package.
+
+## Decisões técnicas
+
+- **Make.com CORTADO** → Vercel Cron + Supabase pg_cron (economiza R$60/mês, versionado no git)
+- **Canva API CORTADO** → Bannerbear (economiza R$500+/mês)
+- **WhatsApp Z-API CORTADO nas franquias** → email do Resend + sino in-app
+- **Tokens criptografados** via pgsodium (não plaintext)
+- **Carrossel** → tabela `post_midias` (1..N mídias por post)
+- **Loop de aprendizado IA** → preserva `copy_legenda_ia_original` separada da versão final editada
+- **Compliance CFN** → regra dura em TODO prompt de geração (`packages/claude`)
+- **Benchmarks de mercado** → avaliação automática CPL/CAC por nicho/região
+
+## Branches
+
+- `main` — produção
+- `claude/setup-vercel-deployment-zMLr6` — desenvolvimento atual
