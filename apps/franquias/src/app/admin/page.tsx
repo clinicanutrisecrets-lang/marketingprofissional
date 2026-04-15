@@ -72,14 +72,22 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               Olá, {admin.nome} · {admin.papel}
             </p>
           </div>
-          <form action="/api/auth/signout" method="POST">
-            <button
-              type="submit"
-              className="rounded-lg border border-brand-text/10 bg-white px-3 py-1.5 text-sm hover:border-brand-primary"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/franqueadas/convidar"
+              className="rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-primary/90"
             >
-              Sair
-            </button>
-          </form>
+              + Convidar franqueada
+            </Link>
+            <form action="/api/auth/signout" method="POST">
+              <button
+                type="submit"
+                className="rounded-lg border border-brand-text/10 bg-white px-3 py-1.5 text-sm hover:border-brand-primary"
+              >
+                Sair
+              </button>
+            </form>
+          </div>
         </header>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
