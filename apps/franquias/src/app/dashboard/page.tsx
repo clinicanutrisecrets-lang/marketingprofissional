@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import TendenciasCard from "@/components/TendenciasCard";
 
 export const dynamic = "force-dynamic";
 
@@ -112,6 +113,14 @@ export default async function DashboardPage() {
             <MetricCard titulo="Engajamento" valor="—" />
             <MetricCard titulo="Leads (ads)" valor="—" />
           </div>
+        </section>
+
+        {/* Tendencias + datas comemorativas */}
+        <section className="mb-6">
+          <TendenciasCard
+            nicho={(f.nicho_principal as string) ?? "saude_integrativa"}
+            corPrimaria={corPrimaria}
+          />
         </section>
 
         {/* Ações rápidas */}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { formatK } from "@/lib/utils";
+import TendenciasCard from "@/components/TendenciasCard";
 
 export const dynamic = "force-dynamic";
 
@@ -121,6 +122,10 @@ export default async function DashboardPage() {
               );
             })}
           </div>
+        </section>
+
+        <section className="mb-8">
+          <TendenciasCard />
         </section>
 
         <section>

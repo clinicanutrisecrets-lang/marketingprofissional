@@ -15,6 +15,11 @@ import {
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
 import { escolherVideoParaPost } from "@/lib/videos/actions";
+import {
+  buscarDatasProximas,
+  filtrarPorNicho,
+} from "@/lib/tendencias/datas-comemorativas";
+import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -99,6 +104,20 @@ export async function gerarPostsDaSemana(
   const logoUrl = await buscarArquivoUrl(admin, franqueadaId, "logo_principal");
   const fotoUrl = await buscarArquivoUrl(admin, franqueadaId, "foto_profissional");
 
+  // Busca inteligencia pra enriquecer os posts: datas comemorativas (14 dias a frente) + trends do dia
+  const nicho = (franqueada.nicho_principal as string) ?? "saude_integrativa";
+  const [datasRaw, tendencias] = await Promise.all([
+    buscarDatasProximas(14, new Date(semanaRef)),
+    listarTendenciasDoDia("saude_integrativa", 5),
+  ]);
+  const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
+
+  // Monta bloco de contexto extra textual que vai entrar no prompt do Claude
+  const blocoContextoExtra = montarBlocoContextoExtra(
+    datasComemorativas,
+    tendencias,
+  );
+
   // 5. Gera cada post (sequencial pra respeitar rate limits)
   let gerados = 0;
   const erros: string[] = [];
@@ -110,6 +129,7 @@ export async function gerarPostsDaSemana(
         item.tipo,
         item.angulo,
         semanaRef,
+        blocoContextoExtra,
       );
 
       // Calcula data/hora do post
@@ -323,4 +343,51 @@ function proximaSegunda(): string {
   d.setDate(d.getDate() + diasAteSegunda);
   d.setHours(0, 0, 0, 0);
   return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Monta bloco de texto com datas comemorativas + tendencias do momento
+ * pra injetar no prompt do Claude como contexto_extra.
+ * Se vazio, retorna undefined (Claude nao usa nada extra).
+ */
+function montarBlocoContextoExtra(
+  datas: Array<{
+    data_mes: number;
+    data_dia: number;
+    nome: string;
+    categoria: string;
+    descricao: string | null;
+    ideias_angulo: string | null;
+  }>,
+  tendencias: Array<Record<string, unknown>>,
+): string | undefined {
+  const partes: string[] = [];
+
+  if (datas.length > 0) {
+    partes.push("DATAS COMEMORATIVAS NAS PROXIMAS 2 SEMANAS (use se fizer sentido no calendario da semana):");
+    datas.slice(0, 5).forEach((d) => {
+      partes.push(
+        `- ${d.data_dia}/${d.data_mes} — ${d.nome}${d.ideias_angulo ? `: ${d.ideias_angulo}` : ""}`,
+      );
+    });
+    partes.push("");
+  }
+
+  if (tendencias.length > 0) {
+    partes.push("TEMAS EM ALTA HOJE NO NICHO (use como inspiracao de angulo se casar com a franqueada):");
+    tendencias.slice(0, 5).forEach((t) => {
+      partes.push(
+        `- ${t.tema as string}${t.resumo ? ` — ${t.resumo as string}` : ""}`,
+      );
+    });
+    partes.push("");
+  }
+
+  if (partes.length === 0) return undefined;
+
+  partes.push(
+    "IMPORTANTE: use esses inputs SOMENTE se forem realmente relevantes pra franqueada e pro publico-alvo dela. Nao force encaixe.",
+  );
+
+  return partes.join("\n");
 }
