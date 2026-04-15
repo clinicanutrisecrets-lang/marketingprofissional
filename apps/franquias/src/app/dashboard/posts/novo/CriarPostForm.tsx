@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CardPicker, Field, TextArea } from "@/components/ui/Field";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 import { gerarLegendaManual, criarPostManual } from "@/lib/posts/manual";
@@ -10,8 +10,21 @@ type TipoPost = "feed_imagem" | "feed_carrossel" | "reels" | "stories";
 
 export function CriarPostForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tipo, setTipo] = useState<TipoPost>("feed_imagem");
   const [briefing, setBriefing] = useState("");
+
+  // Preenche briefing via query string (vindo do TendenciasCard)
+  useEffect(() => {
+    const tema = searchParams.get("tema");
+    const angulo = searchParams.get("angulo");
+    if (tema) {
+      const extras: string[] = [];
+      extras.push(`Tema sugerido: ${tema}`);
+      if (angulo) extras.push(`Ângulo: ${angulo.replace(/_/g, " ")}`);
+      setBriefing(extras.join(" — "));
+    }
+  }, [searchParams]);
   const [legenda, setLegenda] = useState("");
   const [cta, setCta] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);

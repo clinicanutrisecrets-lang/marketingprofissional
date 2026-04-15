@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { CriarPostForm } from "./CriarPostForm";
 
@@ -36,7 +37,9 @@ export default async function NovoPostPage() {
           </p>
         </header>
 
-        <CriarPostForm />
+        <Suspense fallback={<div className="rounded-2xl bg-white p-6 text-sm text-brand-text/60">Carregando...</div>}>
+          <CriarPostForm />
+        </Suspense>
       </div>
     </main>
   );
