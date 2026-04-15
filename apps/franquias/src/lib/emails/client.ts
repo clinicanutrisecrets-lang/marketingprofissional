@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 
-const FROM_DEFAULT = "Scanner da Saúde <noreply@scannerdasaude.com>";
+function getFromDefault(): string {
+  return (
+    process.env.RESEND_FROM_EMAIL ?? "Scanner da Saúde <noreply@scannerdasaude.com>"
+  );
+}
 
 export function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
@@ -28,7 +32,7 @@ export async function enviarEmail(params: {
 
   try {
     const r = await resend.emails.send({
-      from: params.de ?? FROM_DEFAULT,
+      from: params.de ?? getFromDefault(),
       to: Array.isArray(params.para) ? params.para : [params.para],
       subject: params.assunto,
       html: params.html,
