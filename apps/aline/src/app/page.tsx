@@ -16,26 +16,28 @@ export default function Home() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <PerfilCard
+            slug="scannerdasaude"
             nome="@scannerdasaude"
             cor="#0BB8A8"
             descricao="Vender o software Scanner da Saúde. Público: nutricionistas."
           />
           <PerfilCard
-            nome="@nutrisecrets"
+            slug="nutri_secrets"
+            nome="@nutri_secrets"
             cor="#D946EF"
             descricao="Educar sobre nutrição de precisão. 250k seguidores."
           />
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <QuickLink href="/aprovar" title="Aprovar a semana" />
-          <QuickLink href="/anuncios" title="Gestão de anúncios" />
-          <QuickLink href="/relatorios" title="Relatório unificado" />
+          <QuickLink href="/dashboard" title="Aprovar a semana" />
+          <QuickLink href="/dashboard" title="Gestão de anúncios" />
+          <QuickLink href="/dashboard" title="Relatório unificado" />
         </div>
 
         <Link
           href="/login"
-          className="mt-12 inline-block text-sm text-aline-text/60 hover:text-aline-scanner"
+          className="mt-12 inline-block rounded-lg bg-aline-scanner px-5 py-2.5 text-sm font-semibold text-white hover:bg-aline-scanner/90"
         >
           Entrar no painel →
         </Link>
@@ -45,17 +47,20 @@ export default function Home() {
 }
 
 function PerfilCard({
+  slug,
   nome,
   cor,
   descricao,
 }: {
+  slug: string;
   nome: string;
   cor: string;
   descricao: string;
 }) {
   return (
-    <div
-      className="rounded-2xl border bg-white p-6 shadow-sm"
+    <Link
+      href={`/perfis/${slug}`}
+      className="block rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-md"
       style={{ borderColor: `${cor}33` }}
     >
       <div
@@ -64,7 +69,10 @@ function PerfilCard({
       />
       <h2 className="text-xl font-semibold">{nome}</h2>
       <p className="mt-1 text-sm text-aline-text/60">{descricao}</p>
-    </div>
+      <p className="mt-3 text-xs font-medium" style={{ color: cor }}>
+        Abrir perfil →
+      </p>
+    </Link>
   );
 }
 
