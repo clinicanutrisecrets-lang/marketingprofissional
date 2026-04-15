@@ -255,6 +255,37 @@ export async function gerarPostsDaSemana(
     .update({ total_posts: gerados })
     .eq("id", aprovacaoId);
 
+  // 7. Email notificando franqueada (se configurado Resend)
+  if (gerados > 0 && franqueada.email) {
+    try {
+      const { enviarEmail } = await import("@/lib/emails/client");
+      const { emailSemanaProntaAprovacao } = await import("@/lib/emails/templates");
+      const nome =
+        (franqueada.nome_comercial as string) ||
+        ((franqueada.nome_completo as string) ?? "").split(" ")[0] ||
+        "Dra.";
+      const deadlineStr = deadline.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+      });
+      const tpl = emailSemanaProntaAprovacao(
+        nome,
+        gerados,
+        `${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.scannerdasaude.com"}/dashboard/aprovar`,
+        deadlineStr,
+      );
+      await enviarEmail({
+        para: franqueada.email as string,
+        assunto: tpl.assunto,
+        html: tpl.html,
+        texto: tpl.texto,
+      });
+    } catch (emailErr) {
+      console.warn("[semanal] email nao enviado:", emailErr);
+    }
+  }
+
   revalidatePath("/dashboard");
   revalidatePath("/admin");
 

@@ -35,7 +35,7 @@ export async function publicarPost(
 
   const { data: fData } = await admin
     .from("franqueadas")
-    .select("id, instagram_conta_id, instagram_access_token, instagram_token_expiry")
+    .select("id, instagram_conta_id, instagram_access_token, instagram_token_expiry, email, nome_comercial, nome_completo, instagram_handle")
     .eq("id", post.franqueada_id)
     .maybeSingle();
 
@@ -137,6 +137,31 @@ export async function publicarPost(
       })
       .eq("id", postId);
 
+    // Email de sucesso (best effort)
+    if (f.email) {
+      try {
+        const { enviarEmail } = await import("@/lib/emails/client");
+        const { emailPostPublicado } = await import("@/lib/emails/templates");
+        const nome =
+          (f.nome_comercial as string) ||
+          ((f.nome_completo as string) ?? "").split(" ")[0] ||
+          "Dra.";
+        const tpl = emailPostPublicado(
+          nome,
+          (post.tipo_post as string) ?? "post",
+          `https://www.instagram.com/${(f.instagram_handle as string) ?? ""}`,
+        );
+        await enviarEmail({
+          para: f.email as string,
+          assunto: tpl.assunto,
+          html: tpl.html,
+          texto: tpl.texto,
+        });
+      } catch (e) {
+        console.warn("[publisher] email sucesso falhou:", e);
+      }
+    }
+
     return { ok: true, instagramPostId: published.id };
   } catch (e) {
     const msg = (e as Error).message;
@@ -144,6 +169,32 @@ export async function publicarPost(
       .from("posts_agendados")
       .update({ status: "erro" })
       .eq("id", postId);
+
+    // Email de erro (best effort)
+    if (f.email) {
+      try {
+        const { enviarEmail } = await import("@/lib/emails/client");
+        const { emailErroPublicacao } = await import("@/lib/emails/templates");
+        const nome =
+          (f.nome_comercial as string) ||
+          ((f.nome_completo as string) ?? "").split(" ")[0] ||
+          "Dra.";
+        const tpl = emailErroPublicacao(
+          nome,
+          msg,
+          `${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.scannerdasaude.com"}/dashboard`,
+        );
+        await enviarEmail({
+          para: f.email as string,
+          assunto: tpl.assunto,
+          html: tpl.html,
+          texto: tpl.texto,
+        });
+      } catch (emailErr) {
+        console.warn("[publisher] email erro falhou:", emailErr);
+      }
+    }
+
     return { ok: false, erro: msg };
   }
 }
