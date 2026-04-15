@@ -8,6 +8,13 @@ import {
   buildModifications,
   resolveTemplateId,
 } from "@/lib/bannerbear/client";
+import {
+  renderTemplate,
+  pollUntilReady as pollCreatomate,
+  montarModifications as montarModsCreatomate,
+  resolveTemplateCreatomate,
+} from "@/lib/creatomate/client";
+import { escolherVideoParaPost } from "@/lib/videos/actions";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -112,29 +119,78 @@ export async function gerarPostsDaSemana(
         (franqueada.horario_preferido_post as string) ?? "08:00",
       );
 
-      // Gera criativo (se Bannerbear config'd). Se não, salva sem URL.
+      // Gera criativo: prioridade Creatomate > Bannerbear > nenhum
       let urlImagem: string | null = null;
-      let bannerbearId: string | null = null;
+      let urlVideo: string | null = null;
+      let designId: string | null = null;
 
-      try {
-        const templateId = resolveTemplateId(item.tipo);
-        const img = await generateImage({
-          templateId,
-          modifications: buildModifications({
-            headline: post.headline,
-            subtitle: post.subtitle,
-            cta: post.copy_cta,
-            cor_primaria_hex: franqueada.cor_primaria_hex as string,
-            logo_url: logoUrl ?? undefined,
-            foto_nutri_url: fotoUrl ?? undefined,
-          }),
-          synchronous: true,
-        });
-        urlImagem = img.image_url;
-        bannerbearId = img.uid;
-      } catch (bbErr) {
-        // Bannerbear opcional: loga mas segue
-        console.warn("Bannerbear falhou, seguindo sem criativo:", bbErr);
+      // 1. Tenta Creatomate primeiro (suporta vídeo + estático)
+      const ctmTemplateId = resolveTemplateCreatomate(item.tipo);
+      if (ctmTemplateId && process.env.CREATOMATE_API_KEY) {
+        try {
+          // Pra reels: busca vídeo de fundo (biblioteca > Pexels)
+          let videoFundoUrl: string | undefined;
+          if (item.tipo === "reels") {
+            const ehSemana = post.angulo_copy ?? item.angulo;
+            // Keywords simples baseadas em ângulo + nicho
+            const keywords = [
+              (franqueada.nicho_principal as string)?.replace(/_/g, " ") || "healthy",
+              ehSemana.includes("dor") ? "wellness" : "nutrition",
+              "natural food",
+            ];
+            const v = await escolherVideoParaPost(franqueadaId, keywords);
+            if (v.url) videoFundoUrl = v.url;
+          }
+
+          const renders = await renderTemplate({
+            templateId: ctmTemplateId,
+            modifications: montarModsCreatomate({
+              headline: post.headline,
+              subtitle: post.subtitle,
+              cta: post.copy_cta,
+              copy_legenda: post.copy_legenda,
+              cor_primaria: franqueada.cor_primaria_hex as string,
+              cor_secundaria: franqueada.cor_secundaria_hex as string,
+              logo_url: logoUrl ?? undefined,
+              foto_nutri_url: fotoUrl ?? undefined,
+              video_fundo_url: videoFundoUrl,
+            }),
+          });
+          if (renders.length > 0) {
+            const ready = await pollCreatomate(renders[0].id);
+            if (item.tipo === "reels") {
+              urlVideo = ready.url;
+            } else {
+              urlImagem = ready.url;
+            }
+            designId = renders[0].id;
+          }
+        } catch (e) {
+          console.warn("Creatomate falhou, tentando Bannerbear:", e);
+        }
+      }
+
+      // 2. Fallback: Bannerbear (só estático)
+      if (!urlImagem && !urlVideo && process.env.BANNERBEAR_API_KEY) {
+        try {
+          const templateId = resolveTemplateId(item.tipo);
+          const img = await generateImage({
+            templateId,
+            modifications: buildModifications({
+              headline: post.headline,
+              subtitle: post.subtitle,
+              cta: post.copy_cta,
+              cor_primaria_hex: franqueada.cor_primaria_hex as string,
+              logo_url: logoUrl ?? undefined,
+              foto_nutri_url: fotoUrl ?? undefined,
+            }),
+            synchronous: true,
+          });
+          urlImagem = img.image_url;
+          designId = img.uid;
+        } catch (bbErr) {
+          console.warn("Bannerbear falhou, seguindo sem criativo:", bbErr);
+        }
       }
 
       // Salva post
@@ -156,8 +212,9 @@ export async function gerarPostsDaSemana(
         ia_tokens_input: post._usage?.input_tokens,
         ia_tokens_output: post._usage?.output_tokens,
         ia_tokens_cached: post._usage?.cache_read_input_tokens,
-        bannerbear_design_id: bannerbearId,
+        bannerbear_design_id: designId,
         url_imagem_final: urlImagem,
+        url_video_final: urlVideo,
         data_hora_agendada: dataHora,
         legenda_gerada_ia: true,
       });

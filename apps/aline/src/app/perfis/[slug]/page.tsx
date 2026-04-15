@@ -88,8 +88,14 @@ export default async function PerfilPage({ params }: PageProps) {
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>
         </header>
 
-        <section className="mb-6">
+        <section className="mb-6 flex flex-wrap gap-3">
           <GerarReelButton perfilId={perfil.id as string} corPrimaria={cor} />
+          <Link
+            href={`/perfis/${perfil.slug}/biblioteca-videos`}
+            className="rounded-lg border border-aline-text/10 bg-white px-4 py-2 text-sm font-medium hover:border-aline-scanner"
+          >
+            🎬 Biblioteca de vídeos
+          </Link>
         </section>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">

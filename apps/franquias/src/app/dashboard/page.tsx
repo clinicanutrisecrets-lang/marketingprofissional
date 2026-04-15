@@ -181,7 +181,7 @@ export default async function DashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Configurações
           </h2>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/onboarding?step=1"
               className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
@@ -189,6 +189,15 @@ export default async function DashboardPage() {
               <div className="text-sm font-medium text-brand-text">Editar meus dados</div>
               <div className="mt-1 text-xs text-brand-text/60">
                 Atualizar informações da ficha
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/biblioteca-videos"
+              className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
+            >
+              <div className="text-sm font-medium text-brand-text">🎬 Biblioteca de vídeos</div>
+              <div className="mt-1 text-xs text-brand-text/60">
+                Vídeos seus + Pexels pra reels
               </div>
             </Link>
             <Link
