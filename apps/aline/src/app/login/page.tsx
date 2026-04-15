@@ -18,14 +18,25 @@ function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const forbidden = searchParams.get("forbidden") === "1";
-  const supabase = useMemo(() => createClient(), []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch (e) {
+      setInitError((e as Error).message);
+      return null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!supabase) return;
     setLoading(true);
     setErro(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -36,6 +47,21 @@ function LoginInner() {
     }
     router.push("/dashboard");
     router.refresh();
+  }
+
+  if (initError) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-aline-bg p-6">
+        <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-sm">
+          <div className="mb-4 text-2xl">⚠️</div>
+          <h1 className="mb-2 text-xl font-bold text-aline-text">Studio indisponível</h1>
+          <p className="text-sm text-aline-text/70">
+            Configuração pendente. Verifique as variáveis de ambiente na Vercel e refaça o deploy.
+          </p>
+          <p className="mt-3 font-mono text-xs text-aline-text/40">{initError}</p>
+        </div>
+      </main>
+    );
   }
 
   return (
