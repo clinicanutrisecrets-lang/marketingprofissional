@@ -119,7 +119,7 @@ export default async function DashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Ações rápidas
           </h2>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
             <ActionCard
               icone="✅"
               titulo="Aprovar semana"
@@ -132,6 +132,13 @@ export default async function DashboardPage() {
               titulo="Criar post manual"
               descricao="Sobe seu vídeo + IA faz a legenda"
               href="/dashboard/posts/novo"
+              disponivel={true}
+            />
+            <ActionCard
+              icone="🎬"
+              titulo="Biblioteca de vídeos"
+              descricao="Seus vídeos + Pexels pra reels"
+              href="/dashboard/biblioteca-videos"
               disponivel={true}
             />
             <ActionCard
@@ -160,7 +167,7 @@ export default async function DashboardPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-lg font-semibold text-brand-text">
-                  marketingprofissional.vercel.app/
+                  app.scannerdasaude.com/lp/
                   {(f.instagram_handle as string) ||
                     (f.nome_comercial as string)?.toLowerCase().replace(/\s+/g, "-") ||
                     "sua-url"}
@@ -189,15 +196,6 @@ export default async function DashboardPage() {
               <div className="text-sm font-medium text-brand-text">Editar meus dados</div>
               <div className="mt-1 text-xs text-brand-text/60">
                 Atualizar informações da ficha
-              </div>
-            </Link>
-            <Link
-              href="/dashboard/biblioteca-videos"
-              className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
-            >
-              <div className="text-sm font-medium text-brand-text">🎬 Biblioteca de vídeos</div>
-              <div className="mt-1 text-xs text-brand-text/60">
-                Vídeos seus + Pexels pra reels
               </div>
             </Link>
             <Link
