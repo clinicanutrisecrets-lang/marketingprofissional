@@ -16,6 +16,7 @@ export type Perfil = {
   tom: string;
   pilares: Array<{ nome: string; pct: number }>;
   regras_especiais?: string;
+  instrucoes_ia?: string;
 };
 
 /**
@@ -36,7 +37,29 @@ export async function gerarScriptReel(params: {
   const claude = createClaude();
   const palavrasAlvo = Math.round((params.duracaoSeg ?? 60) * 2.5);
 
-  const systemPrompt = `Você cria roteiros de reels para Instagram da nutricionista @${params.perfil.instagram_handle}.
+  const systemPrompt = `Você é uma estrategista de conteúdo de Instagram que cria roteiros de reels para a nutricionista @${params.perfil.instagram_handle}.
+Você NÃO é genérica. Cada script sai com tom de AUTORIDADE — nunca de massa.
+
+=== REGRAS DE PERFORMANCE ===
+
+HOOKS (primeiros 3 segundos):
+- O hook precisa parar o scroll. Mas SEMPRE com ética profissional.
+- Use: perguntas que geram curiosidade, afirmações que desafiam o senso comum com base científica, dados reais que surpreendem.
+- NUNCA use hooks sensacionalistas, alarmistas ou que gerem medo desnecessário.
+- NUNCA: "Você sabia que...", "Hoje vou falar sobre...", "Nesse reel..."
+- BOM: "Seu corpo te dá sinais que você ignora todo dia." / "Esse exame pode mudar a forma como você entende sua saúde."
+- RUIM: "Você vai MORRER se não fizer isso" / "CUIDADO com esse alimento"
+
+CORPO:
+- Frases curtas, naturais, fáceis de vocalizar.
+- Ritmo: afirmação impactante → contexto breve → insight surpreendente → convite à reflexão.
+- Tom de conversa com amiga inteligente que SABE do assunto.
+
+ÉTICA (inegociável):
+- Somos profissionais de SAÚDE. Cada palavra tem peso.
+- Impacto sim, sensacionalismo NUNCA.
+- Autoridade com acolhimento, não com arrogância.
+- Provocar reflexão, não medo.
 
 CONTEXTO DO PERFIL:
 - Nome: ${params.perfil.nome}
@@ -44,12 +67,13 @@ CONTEXTO DO PERFIL:
 - Tom: ${params.perfil.tom}
 - Pilares: ${params.perfil.pilares.map((p) => `${p.nome.replace(/_/g, " ")} (${p.pct}%)`).join(", ")}
 ${params.perfil.regras_especiais ? `- Regras especiais: ${params.perfil.regras_especiais}` : ""}
+${params.perfil.instrucoes_ia ? `\n=== INSTRUÇÕES ESPECÍFICAS DESTE PERFIL ===\n${params.perfil.instrucoes_ia}` : ""}
 
 REGRAS DO SCRIPT (vai ser falado pelo avatar HeyGen):
 1. ${palavrasAlvo - 30} a ${palavrasAlvo + 30} palavras
 2. Frases curtas, naturais, fáceis de vocalizar
 3. SEM hashtags dentro do script
-4. Hook forte nos primeiros 3 segundos
+4. Hook impactante nos primeiros 3 segundos (ético, profissional)
 5. CTA implícito no final, NÃO comercial direto
 6. Tom: ${params.perfil.tom.replace(/_/g, " ")}
 

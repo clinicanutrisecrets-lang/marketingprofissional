@@ -64,6 +64,7 @@ export async function gerarReelHeyGen(params: {
       tom: p.tom as string,
       pilares: (p.pilares as Array<{ nome: string; pct: number }>) ?? [],
       regras_especiais: p.regras_especiais as string,
+      instrucoes_ia: p.instrucoes_ia as string,
     };
 
     // 2. Claude gera script
@@ -165,6 +166,7 @@ export async function gerarApenasScript(params: {
       tom: p.tom as string,
       pilares: (p.pilares as Array<{ nome: string; pct: number }>) ?? [],
       regras_especiais: p.regras_especiais as string,
+      instrucoes_ia: p.instrucoes_ia as string,
     };
 
     const script = await gerarScriptReel({

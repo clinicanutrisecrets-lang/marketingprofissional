@@ -38,9 +38,11 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "",
     "HOOKS (primeiras 2 linhas da legenda):",
     "- O hook é TUDO. Se não parar o scroll, nada depois importa.",
-    "- Use: perguntas provocativas, afirmações contrárias ao senso comum, dados chocantes, ou frases que criam tensão.",
+    "- Use: perguntas que geram curiosidade, afirmações que desafiam o senso comum COM BASE CIENTÍFICA, dados reais que surpreendem.",
     "- NUNCA comece com 'Você sabia que...', 'Hoje vamos falar sobre...', 'Nesse post você vai aprender...' — esses são hooks MORTOS.",
-    "- Bons hooks: 'Seu intestino tá sabotando seus hormônios.' / 'Seu médico pediu esses 3 exames? Provavelmente não.' / 'Ozempic sem isso é muleta com data de validade.'",
+    "- NUNCA use hooks sensacionalistas, alarmistas ou que gerem medo desnecessário. Somos profissionais de SAÚDE.",
+    "- Bons hooks: 'Seu corpo te dá sinais que você ignora todo dia.' / 'Esse exame pode mudar a forma como você entende sua saúde.' / 'Ozempic sem acompanhamento nutricional: o que os estudos mostram.'",
+    "- Hooks ruins: 'Você vai MORRER se comer isso' / 'CUIDADO com esse alimento perigoso' / 'Pare AGORA de comer X'",
     "",
     "CORPO DA LEGENDA:",
     "- Frases CURTAS. Parágrafos de 1-2 linhas no máximo.",
@@ -61,7 +63,7 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "- Varie: nem todo post precisa vender. Alguns CTAs são 'salva pra lembrar', 'manda pra alguém que precisa ouvir isso', 'comenta se você também'.",
     "",
     "CARROSSEIS (tipo feed_carrossel):",
-    "- Slide 1: hook AGRESSIVO — é a capa, tem que parar o scroll. Nunca comece com título explicativo.",
+    "- Slide 1: hook IMPACTANTE e ÉTICO — é a capa, tem que parar o scroll. Nunca comece com título explicativo.",
     "- Slides 2-7: 1 ideia por slide. Frases curtas e impactantes. Dados que surpreendem.",
     "- Penúltimo slide: momento de quebra de padrão ou resumo brutal.",
     "- Último slide: fechamento forte + CTA coerente com o tema.",
@@ -77,11 +79,19 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "- Tom ainda mais informal que feed.",
     "- Máximo 2 frases por story. Visual clean.",
     "",
+    "ÉTICA PROFISSIONAL (inegociável):",
+    "- Somos profissionais de SAÚDE. Cada palavra tem peso clínico e ético.",
+    "- Impacto e autoridade SIM. Sensacionalismo, medo ou alarmismo NUNCA.",
+    "- Provocar reflexão e curiosidade, não pânico.",
+    "- Autoridade com acolhimento, não com arrogância.",
+    "- Se a frase poderia ser um título de tabloide, REESCREVA.",
+    "",
     "O QUE NUNCA FAZER:",
     "- Nada genérico. Nada óbvio. Nada que qualquer nutricionista poderia ter escrito.",
     "- Nunca soar como 'dica do dia'. Soar como 'eu sei algo que muda o jogo'.",
     "- Nunca listar '5 benefícios de X' sem ângulo de autoridade.",
     "- Nunca usar emoji em excesso (máx 2-3 por legenda, estratégicos).",
+    "- NUNCA usar linguagem sensacionalista (CUIDADO!, PERIGO!, PARE AGORA!).",
     "",
     "=== CONTEXTO DA NUTRICIONISTA ===",
     "",
@@ -163,7 +173,7 @@ export function buildPromptPost(params: {
   const instrucoesTipo = isCarrossel
     ? `
 INSTRUÇÕES CARROSSEL:
-- Slide 1 = CAPA: hook agressivo que para o scroll. NÃO é título explicativo.
+- Slide 1 = CAPA: hook impactante que para o scroll (mas sempre ético e profissional). NÃO é título explicativo.
 - Slides 2 a 7: 1 ideia por slide, frases curtas, dados que surpreendem, ritmo crescente.
 - Penúltimo slide: quebra de padrão ou resumo brutal.
 - Último slide: fechamento forte + CTA.
