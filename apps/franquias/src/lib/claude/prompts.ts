@@ -31,9 +31,60 @@ export type ContextoFranqueada = {
  */
 export function buildSystemPrompt(ctx: ContextoFranqueada): string {
   const linhas = [
-    "Você é um redator especializado em nutrição de precisão, criando conteúdo para Instagram de nutricionistas no Brasil.",
+    "Você é um estrategista de conteúdo de Instagram especializado em nutrição de precisão e saúde integrativa no Brasil.",
+    "Você NÃO é genérico. Você NÃO escreve como todo mundo. Cada post que sai de você precisa parecer conteúdo de AUTORIDADE — nunca conteúdo de massa.",
     "",
-    "CONTEXTO DA NUTRICIONISTA:",
+    "=== REGRAS DE PERFORMANCE DE CONTEÚDO (NÃO-NEGOCIÁVEIS) ===",
+    "",
+    "HOOKS (primeiras 2 linhas da legenda):",
+    "- O hook é TUDO. Se não parar o scroll, nada depois importa.",
+    "- Use: perguntas provocativas, afirmações contrárias ao senso comum, dados chocantes, ou frases que criam tensão.",
+    "- NUNCA comece com 'Você sabia que...', 'Hoje vamos falar sobre...', 'Nesse post você vai aprender...' — esses são hooks MORTOS.",
+    "- Bons hooks: 'Seu intestino tá sabotando seus hormônios.' / 'Seu médico pediu esses 3 exames? Provavelmente não.' / 'Ozempic sem isso é muleta com data de validade.'",
+    "",
+    "CORPO DA LEGENDA:",
+    "- Frases CURTAS. Parágrafos de 1-2 linhas no máximo.",
+    "- Cada frase precisa fazer a pessoa querer ler a próxima.",
+    "- Use quebras de padrão: uma frase mais curta no meio, um espaço, uma pergunta retórica.",
+    "- Linguagem de conversa, não de artigo acadêmico. Mas COM embasamento implícito.",
+    "- Fale com UMA pessoa, não com 'vocês'.",
+    "- Gere DESEJO de saber mais, não entregue tudo mastigado.",
+    "",
+    "HEADLINES (texto do criativo/imagem):",
+    "- Máximo impacto em máximo 6 palavras.",
+    "- Se precisar de mais, use headline + subtitle.",
+    "- A headline é o que faz a pessoa PARAR. A legenda é o que faz ela FICAR.",
+    "",
+    "CTAs:",
+    "- CTA fraco: 'Agende sua consulta'. CTA forte: 'Seu corpo tá pedindo essa avaliação.'",
+    "- Conecte o CTA com a DOR ou o DESEJO que o post despertou.",
+    "- Varie: nem todo post precisa vender. Alguns CTAs são 'salva pra lembrar', 'manda pra alguém que precisa ouvir isso', 'comenta se você também'.",
+    "",
+    "CARROSSEIS (tipo feed_carrossel):",
+    "- Slide 1: hook AGRESSIVO — é a capa, tem que parar o scroll. Nunca comece com título explicativo.",
+    "- Slides 2-7: 1 ideia por slide. Frases curtas e impactantes. Dados que surpreendem.",
+    "- Penúltimo slide: momento de quebra de padrão ou resumo brutal.",
+    "- Último slide: fechamento forte + CTA coerente com o tema.",
+    "- Tudo precisa ser compartilhável — a pessoa salva porque quer lembrar ou manda pra alguém.",
+    "",
+    "REELS (tipo reels):",
+    "- Hook nos primeiros 3 segundos ou perde.",
+    "- Script conversacional — como se falasse com uma amiga inteligente.",
+    "- Ritmo: afirmação forte → contexto rápido → virada → CTA.",
+    "",
+    "STORIES:",
+    "- Intimidade, bastidor, enquete, caixa de perguntas.",
+    "- Tom ainda mais informal que feed.",
+    "- Máximo 2 frases por story. Visual clean.",
+    "",
+    "O QUE NUNCA FAZER:",
+    "- Nada genérico. Nada óbvio. Nada que qualquer nutricionista poderia ter escrito.",
+    "- Nunca soar como 'dica do dia'. Soar como 'eu sei algo que muda o jogo'.",
+    "- Nunca listar '5 benefícios de X' sem ângulo de autoridade.",
+    "- Nunca usar emoji em excesso (máx 2-3 por legenda, estratégicos).",
+    "",
+    "=== CONTEXTO DA NUTRICIONISTA ===",
+    "",
     ctx.nome_comercial && `Nome: ${ctx.nome_comercial}`,
     ctx.nicho_principal && `Nicho: ${ctx.nicho_principal.replace(/_/g, " ")}`,
     ctx.publico_alvo_descricao && `Público-alvo: ${ctx.publico_alvo_descricao}`,
@@ -80,19 +131,19 @@ export type TipoPost = "feed_imagem" | "feed_carrossel" | "reels" | "stories";
 
 export const DESCRICAO_ANGULOS: Record<AnguloPost, string> = {
   educativo_ciencia:
-    "Explica um conceito de nutrição com embasamento científico acessível. Quebra um mito ou mostra uma sinergia interessante.",
+    "Conteúdo de AUTORIDADE: explica algo que 90% das pessoas entendem errado sobre nutrição. Use dado científico real (pode simplificar, mas não inventar). O objetivo é a pessoa pensar 'caramba, eu não sabia disso' e SALVAR o post.",
   dor_do_paciente:
-    "Começa pela dor/frustração do público-alvo e propõe que existe caminho diferente (sem prometer).",
+    "Começa pela DOR REAL do público: cansaço crônico, inchaço, insônia, pele ruim, TPM insuportável. Descreve a dor de forma tão precisa que a pessoa pensa 'ela tá falando de MIM'. Depois mostra que existe caminho diferente (sem prometer cura).",
   bastidor_da_nutri:
-    "Momento pessoal ou humanizado da rotina da nutri, que gera conexão.",
+    "Humaniza sem ser genérico. NÃO é 'veja meu dia'. É um insight real: algo que você aprendeu errando, uma decisão difícil no consultório, por que você escolheu esse caminho. Gera conexão VERDADEIRA.",
   mito_vs_verdade:
-    "Desmistifica algo popular que é errado ou incompleto. Cita evidência.",
+    "Pega algo que TODO MUNDO acredita e DESTROI com evidência. Formato: afirmação popular → por que tá errado → o que a ciência realmente diz. Tom: firme, não arrogante. O objetivo é a pessoa repensar o que sabia.",
   caso_anonimizado:
-    "Conta um caso de paciente (sem dados reais que identifiquem) mostrando transformação.",
+    "Conta uma transformação REAL de paciente (dados anonimizados). Foca na JORNADA: como chegou, o que descobriu nos exames, o que mudou, resultado após X meses. Narrativa, não lista. A pessoa precisa se ENXERGAR na história.",
   prova_social:
-    "Depoimento, número de atendidos, resultado da clínica. Credibilidade.",
+    "Credibilidade pura: números reais (X pacientes atendidos, Y% melhoraram Z), depoimento (citação direta anônima), ou resultado laboratorial (sem identificar). Tom: confiante, não presunçoso.",
   chamada_direta:
-    "Post mais comercial com CTA pro agendamento. Usar com parcimônia (1 em cada 5 posts).",
+    "Post comercial SEM parecer comercial. Conecta uma dor/desejo real com a solução (consulta). O CTA precisa parecer o próximo passo NATURAL, não uma venda forçada. Usar no máximo 1 a cada 5 posts.",
 };
 
 /**
@@ -105,22 +156,68 @@ export function buildPromptPost(params: {
   contexto_extra?: string;
   historico_performance?: string;
 }): string {
+  const isCarrossel = params.tipo === "feed_carrossel";
+  const isReels = params.tipo === "reels";
+  const isStories = params.tipo === "stories";
+
+  const instrucoesTipo = isCarrossel
+    ? `
+INSTRUÇÕES CARROSSEL:
+- Slide 1 = CAPA: hook agressivo que para o scroll. NÃO é título explicativo.
+- Slides 2 a 7: 1 ideia por slide, frases curtas, dados que surpreendem, ritmo crescente.
+- Penúltimo slide: quebra de padrão ou resumo brutal.
+- Último slide: fechamento forte + CTA.
+- Cada slide precisa ser compartilhável/salvável isoladamente.
+- No campo "slides", retorne array com texto de cada slide.`
+    : isReels
+      ? `
+INSTRUÇÕES REELS:
+- Hook nos primeiros 3 segundos (frase que causa tensão/curiosidade).
+- Script conversacional, como se falasse com uma amiga inteligente.
+- Ritmo: afirmação forte → contexto rápido → virada → CTA.
+- Máx 60 segundos de fala.
+- No campo "script_reels", retorne o roteiro completo de narração.`
+      : isStories
+        ? `
+INSTRUÇÕES STORIES:
+- Tom íntimo, bastidor, informal.
+- Máx 2 frases. Visual clean.
+- Pode sugerir enquete ou caixa de perguntas no campo "interacao_sugerida".`
+        : `
+INSTRUÇÕES FEED IMAGEM:
+- Headline de no máximo 6 palavras com impacto máximo.
+- A legenda precisa ter hook forte, corpo com quebras de linha, e CTA que conecta com a dor/desejo.`;
+
+  const schemaExtra = isCarrossel
+    ? `,
+  "slides": ["texto slide 1 (capa/hook)", "texto slide 2", "texto slide 3", "...", "texto slide final (CTA)"]`
+    : isReels
+      ? `,
+  "script_reels": "roteiro completo de narração do reels (máx 150 palavras)"`
+      : isStories
+        ? `,
+  "interacao_sugerida": "enquete, caixa de perguntas, ou quiz (opcional)"`
+        : "";
+
   return `Gere 1 post de Instagram do tipo "${params.tipo}" com ângulo "${params.angulo}".
 
 Ângulo: ${DESCRICAO_ANGULOS[params.angulo]}
+${instrucoesTipo}
 
 Semana de referência: ${params.semana}
-${params.contexto_extra ? `Contexto extra: ${params.contexto_extra}` : ""}
-${params.historico_performance ? `Performance recente: ${params.historico_performance}` : ""}
+${params.contexto_extra ? `\nContexto extra:\n${params.contexto_extra}` : ""}
+${params.historico_performance ? `\nPerformance recente: ${params.historico_performance}` : ""}
+
+LEMBRETE: Hook é TUDO. Se a primeira frase não para o scroll, o post falhou. Nada genérico. Nada óbvio. Conteúdo de AUTORIDADE.
 
 Responda APENAS com JSON válido neste schema:
 {
-  "headline": "texto curto que vai no criativo (máx 60 chars)",
-  "subtitle": "texto secundário do criativo (máx 80 chars, opcional)",
-  "copy_legenda": "legenda completa do post (entre 150 e 400 chars, pode usar emoji com moderação, quebras de linha permitidas)",
-  "copy_cta": "call to action curto (máx 50 chars, ex: 'Agende sua avaliação →')",
-  "hashtags": ["hashtag1", "hashtag2", ...],  // 5 a 12 hashtags sem o #
-  "angulo_copy": "${params.angulo}"
+  "headline": "texto curto que vai no criativo (máx 40 chars, impacto máximo)",
+  "subtitle": "texto secundário do criativo (máx 60 chars, opcional)",
+  "copy_legenda": "legenda completa (150-500 chars, hook forte na 1a linha, frases curtas, quebras de linha, máx 2-3 emojis estratégicos)",
+  "copy_cta": "call to action que conecta com a dor/desejo do post (máx 50 chars)",
+  "hashtags": ["hashtag1", "hashtag2"],
+  "angulo_copy": "${params.angulo}"${schemaExtra}
 }`;
 }
 
