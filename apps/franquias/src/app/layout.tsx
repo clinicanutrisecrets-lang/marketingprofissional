@@ -17,13 +17,22 @@ export default function RootLayout({
       <body>
         {children}
         <footer className="border-t border-brand-text/5 bg-white py-4 px-6 text-center text-xs text-brand-text/40">
-          <span>© {new Date().getFullYear()} Scanner da Saúde · Clínica Nutri Secrets LTDA</span>
-          <span className="mx-2">·</span>
-          <a href="/privacidade" className="hover:underline">Privacidade</a>
-          <span className="mx-2">·</span>
-          <a href="/termos" className="hover:underline">Termos</a>
-          <span className="mx-2">·</span>
-          <a href="/deletar-dados" className="hover:underline">Excluir meus dados</a>
+          <div>© {new Date().getFullYear()} Scanner da Saúde · Clínica Nutri Secrets LTDA</div>
+          <div className="mt-1">
+            <a href="/privacidade" className="hover:underline">Privacidade</a>
+            <span className="mx-2">·</span>
+            <a href="/termos" className="hover:underline">Termos</a>
+            <span className="mx-2">·</span>
+            <a href="/deletar-dados" className="hover:underline">Excluir meus dados</a>
+          </div>
+          <div className="mt-1 text-brand-text/30">
+            English:{" "}
+            <a href="/en/privacy" className="hover:underline">Privacy</a>
+            <span className="mx-2">·</span>
+            <a href="/en/terms" className="hover:underline">Terms</a>
+            <span className="mx-2">·</span>
+            <a href="/en/data-deletion" className="hover:underline">Delete data</a>
+          </div>
         </footer>
       </body>
     </html>
