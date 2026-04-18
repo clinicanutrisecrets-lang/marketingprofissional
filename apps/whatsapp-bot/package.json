@@ -1,0 +1,30 @@
+{
+  "name": "@marketingprofissional/whatsapp-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bot que a cada 3 dias gera um ebook científico no Gamma e posta num grupo de WhatsApp via número pessoal (Baileys).",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "list-groups": "tsx src/whatsapp/list-groups.ts",
+    "send-now": "tsx src/index.ts --now",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^6.7.9",
+    "dotenv": "^16.4.5",
+    "pino": "^9.5.0",
+    "qrcode-terminal": "^0.12.0",
+    "undici": "^6.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/qrcode-terminal": "^0.12.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.4.5"
+  }
+}

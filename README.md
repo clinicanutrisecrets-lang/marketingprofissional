@@ -4,6 +4,7 @@ Dois produtos, um repositório, lib compartilhada.
 
 - **apps/franquias** — SaaS pago pra nutricionistas franqueadas (Scanner da Saúde)
 - **apps/aline** — sistema interno da Aline (Studio Aline: @scannerdasaude + @nutrisecrets)
+- **apps/whatsapp-bot** — bot que roda no PC da Aline, gera ebook científico no Gamma a cada 2-4 dias e posta num grupo do WhatsApp via número pessoal (Baileys). Ver `apps/whatsapp-bot/README.md`.
 
 Dados isolados (schemas separados no mesmo projeto Supabase), código compartilhado via `packages/`.
 
