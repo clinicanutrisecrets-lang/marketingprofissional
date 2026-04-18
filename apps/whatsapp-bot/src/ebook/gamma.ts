@@ -57,19 +57,10 @@ export async function generateEbookPdf(
     numCards: opts?.numCards ?? 12,
     exportAs: "pdf",
     textOptions: { language: "pt-br", amount: "detailed" },
-    imageOptions: {
-      source: "aiGenerated",
-      stylePreset: "abstract",
-      // Cores sólidas da paleta Scanner, sem fotografia realista.
-      style:
-        "Minimal editorial composition. Solid block colors from the Scanner palette only: teal #0BB8A8, deep purple #7C3AED, amber #F59E0B, dark navy #1A2E45, pure white #FFFFFF. Clean geometric shapes, generous negative space, no photorealistic elements, no busy textures, no gradients mixing outside this palette. Elegant, quiet, scientific.",
-    },
-    additionalInstructions: [
-      "Capa (primeiro card): layout ultra limpo. SEM imagem de fundo atrás do título.",
-      "Só tipografia forte + um bloco geométrico sólido sutil nas cores da paleta Scanner (teal/roxo/âmbar) se quiser algum elemento visual.",
-      "Nos demais cards, use ilustrações abstratas minimalistas da paleta Scanner — nunca fotografias de alimentos, cápsulas ou pessoas.",
-      "Layout sempre elegante, hierarquia clara, respiro generoso.",
-    ].join(" "),
+    // Deixa o tema "Scanner" dirigir o visual — ele já é editorial, clean e na
+    // paleta certa. A única trava é na capa: nada de fotografia de produto.
+    additionalInstructions:
+      "Capa (primeiro card): layout editorial e minimalista. NÃO use fotografia realista de produtos, cápsulas, alimentos ou pessoas atrás do título. Prefira tipografia bem hierarquizada, respiro generoso e, no máximo, um elemento gráfico sutil (ícone linear, bloco de cor da paleta do tema ou abstração sóbria). Nos demais cards, deixe o tema ditar o estilo visual — elegante e sóbrio.",
   });
 
   const result = await pollUntilReady(genId, 20 * 60 * 1000);
