@@ -29,27 +29,47 @@ export async function generateEbookPdf(
 ): Promise<GammaResult> {
   fs.mkdirSync(config.paths.ebooks, { recursive: true });
 
-  const footer = [
+  const fixedEnding = [
     "",
-    "---",
+    "## Sobre a autora",
     "",
-    `**Feito por ${config.brand.author}**`,
+    config.brand.aboutAuthor,
+    "",
+    "## Sobre o Scanner da Saúde",
+    "",
+    config.brand.aboutScanner,
+    "",
+    "## Contato",
+    "",
+    `**${config.brand.author}**`,
     "",
     `Instagram: [@nutri_secrets](${config.brand.instaNutri}) · [@scannerdasaude.d](${config.brand.instaScanner})`,
     "",
   ].join("\n");
 
-  const fullInput = `${markdownInput}\n${footer}`;
+  const fullInput = `${markdownInput}\n${fixedEnding}`;
 
   const genId = await createGeneration({
     inputText: fullInput,
     textMode: "preserve", // usa o conteúdo como está, sem reinventar
     format: "document",
     themeName: config.gamma.themeId,
-    numCards: opts?.numCards ?? 10,
+    numCards: opts?.numCards ?? 12,
     exportAs: "pdf",
     textOptions: { language: "pt-br", amount: "detailed" },
-    imageOptions: { source: "aiGenerated", style: "photorealistic" },
+    imageOptions: {
+      source: "aiGenerated",
+      stylePreset: "abstract",
+      // Cores sólidas da paleta Scanner, sem fotografia realista.
+      style:
+        "Minimal editorial composition. Solid block colors from the Scanner palette only: teal #0BB8A8, deep purple #7C3AED, amber #F59E0B, dark navy #1A2E45, pure white #FFFFFF. Clean geometric shapes, generous negative space, no photorealistic elements, no busy textures, no gradients mixing outside this palette. Elegant, quiet, scientific.",
+    },
+    additionalInstructions: [
+      "Capa (primeiro card): layout ultra limpo. SEM imagem de fundo atrás do título.",
+      "Só tipografia forte + um bloco geométrico sólido sutil nas cores da paleta Scanner (teal/roxo/âmbar) se quiser algum elemento visual.",
+      "Nos demais cards, use ilustrações abstratas minimalistas da paleta Scanner — nunca fotografias de alimentos, cápsulas ou pessoas.",
+      "Layout sempre elegante, hierarquia clara, respiro generoso.",
+    ].join(" "),
   });
 
   const result = await pollUntilReady(genId, 20 * 60 * 1000);
