@@ -2,9 +2,19 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://app.scannerdasaude.com"),
   title: "Scanner da Saúde — Plataforma Franquia Digital",
   description:
     "Marketing automatizado para nutricionistas franqueadas. LP personalizada, posts no Instagram, criativos e relatórios semanais — tudo gerenciado centralmente.",
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "https://app.scannerdasaude.com",
+    siteName: "Scanner da Saúde",
+    title: "Scanner da Saúde — Plataforma Franquia Digital",
+    description:
+      "Marketing automatizado para nutricionistas franqueadas. LP personalizada, posts no Instagram, criativos e relatórios semanais — tudo gerenciado centralmente.",
+  },
 };
 
 export default function RootLayout({
