@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mockup — LP Nutri (Scanner da Saúde)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Fraunces', 'Georgia', 'serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          cream: '#F7F3ED',
+          sand: '#EDE4D6',
+          ink: '#1F1D1A',
+          graphite: '#4A4843',
+          muted: '#8A857D',
+          accent: '#2F5D50',
+          wa: '#25D366',
+          waDark: '#1FAF52',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .display { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
+  .hero-photo {
+    box-shadow: 0 40px 80px -20px rgba(31, 29, 26, 0.25);
+  }
+  .step-line {
+    background: linear-gradient(to bottom, #EDE4D6 0%, #EDE4D6 50%, transparent 50%, transparent 100%);
+    background-size: 2px 12px;
+  }
+</style>
+</head>
+<body class="bg-cream text-ink antialiased">
+
+<!-- ============ TOPBAR MINIMAL ============ -->
+<header class="border-b border-ink/5 bg-cream/95 backdrop-blur sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center">
+        <span class="display text-accent text-lg font-semibold">A</span>
+      </div>
+      <div>
+        <div class="display text-base font-semibold leading-tight">Dra. Ana Lima</div>
+        <div class="text-xs text-muted tracking-wide">Nutrição de Precisão · Curitiba</div>
+      </div>
+    </div>
+    <a href="#cta" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wa text-white text-sm font-medium hover:bg-waDark transition">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+      Agendar consulta
+    </a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="max-w-6xl mx-auto px-6 pt-16 sm:pt-24 pb-20 sm:pb-28">
+  <div class="grid md:grid-cols-12 gap-12 items-center">
+    <div class="md:col-span-7">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-6">Nutrição de Precisão</div>
+      <h1 class="display text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.05] tracking-tight text-ink">
+        Descubra a versão da sua saúde<br class="hidden sm:block"/>
+        que sua <em class="italic text-accent font-normal">genética</em> sempre soube.
+      </h1>
+      <p class="mt-7 text-lg text-graphite leading-relaxed max-w-xl">
+        Nutrição personalizada com base em ciência, escuta clínica profunda e o mapa único do seu corpo. Sem modismos. Sem promessas milagrosas. Só o seu caminho.
+      </p>
+      <div class="mt-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <a href="#cta" class="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-wa text-white font-medium hover:bg-waDark transition shadow-lg shadow-wa/25">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+          Agendar consulta pelo WhatsApp
+        </a>
+        <div class="text-sm text-muted">
+          Atendimento presencial e online
+        </div>
+      </div>
+    </div>
+    <div class="md:col-span-5">
+      <div class="hero-photo aspect-[4/5] rounded-sm overflow-hidden bg-gradient-to-br from-sand to-accent/20 flex items-center justify-center">
+        <!-- Placeholder — substituído por foto profissional da nutri -->
+        <div class="text-center p-10">
+          <div class="display text-7xl text-accent/30 italic mb-4">A</div>
+          <div class="text-xs uppercase tracking-[0.25em] text-muted">Foto profissional</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ISSO É PRA VOCÊ ============ -->
+<section class="bg-sand/40 py-20 sm:py-28">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="max-w-2xl">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Isso é pra você se…</div>
+      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
+        Você chegou até aqui porque sente que algo precisa mudar — mas não mais um começo zerado.
+      </h2>
+    </div>
+    <div class="mt-16 grid sm:grid-cols-2 gap-x-12 gap-y-10">
+      <div class="flex gap-5">
+        <div class="display text-accent text-3xl font-light shrink-0 leading-none">01</div>
+        <p class="text-graphite leading-relaxed pt-1">
+          Você já tentou <span class="text-ink">várias dietas</span> e nenhuma sustentou resultado. Seu corpo parece responder diferente do que dizem os manuais.
+        </p>
+      </div>
+      <div class="flex gap-5">
+        <div class="display text-accent text-3xl font-light shrink-0 leading-none">02</div>
+        <p class="text-graphite leading-relaxed pt-1">
+          Seu <span class="text-ink">histórico familiar</span> te preocupa — diabetes, colesterol, câncer — e você quer agir antes, não depois.
+        </p>
+      </div>
+      <div class="flex gap-5">
+        <div class="display text-accent text-3xl font-light shrink-0 leading-none">03</div>
+        <p class="text-graphite leading-relaxed pt-1">
+          Você sente <span class="text-ink">cansaço, inchaço, gordura abdominal</span> que não saem nem com treino nem com força de vontade.
+        </p>
+      </div>
+      <div class="flex gap-5">
+        <div class="display text-accent text-3xl font-light shrink-0 leading-none">04</div>
+        <p class="text-graphite leading-relaxed pt-1">
+          Você quer <span class="text-ink">entender o próprio corpo</span> com embasamento científico — não mais uma tentativa, um entendimento.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUEM É ============ -->
+<section class="max-w-6xl mx-auto px-6 py-20 sm:py-28">
+  <div class="grid md:grid-cols-12 gap-12 items-start">
+    <div class="md:col-span-5">
+      <div class="aspect-square rounded-sm overflow-hidden bg-sand/60 flex items-center justify-center">
+        <div class="display text-8xl text-accent/30 italic">A</div>
+      </div>
+    </div>
+    <div class="md:col-span-7 md:pl-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Quem atende você</div>
+      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
+        Dra. Ana Lima
+      </h2>
+      <p class="mt-4 text-sm text-muted tracking-wide">CRN-8 XXXXX · Curitiba, PR</p>
+      <div class="mt-8 space-y-5 text-graphite leading-relaxed">
+        <p>
+          Nutricionista clínica com <span class="text-ink">mais de 12 anos de atendimento</span>, especialização em Nutrição Funcional e Nutrigenética pela Unicamp. Atuação focada em <span class="text-ink">saúde da mulher adulta</span> — emagrecimento sustentável, metabolismo, saúde hormonal.
+        </p>
+        <p>
+          "Eu escuto primeiro. Antes de qualquer plano, antes de qualquer exame, eu quero entender a sua história. Porque nutrição que funciona é a que cabe na sua vida, não a que cabe no livro."
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JORNADA (esquemática) ============ -->
+<section class="bg-ink text-cream py-24 sm:py-32 relative overflow-hidden">
+  <!-- textura sutil -->
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+
+  <div class="max-w-5xl mx-auto px-6 relative">
+    <div class="text-center max-w-2xl mx-auto mb-20">
+      <div class="text-xs uppercase tracking-[0.2em] text-wa mb-5">Sua jornada</div>
+      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15]">
+        Do primeiro olá no WhatsApp<br/>
+        até uma versão sua que você ainda não conhece.
+      </h2>
+    </div>
+
+    <!-- Steps horizontais (desktop) / verticais (mobile) -->
+    <div class="relative">
+      <!-- linha conectora -->
+      <div class="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-cream/15"></div>
+
+      <div class="grid md:grid-cols-3 gap-12 md:gap-8 relative">
+        <!-- PASSO 1 -->
+        <div class="text-center">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
+            <div class="absolute inset-0 rounded-full bg-wa/20"></div>
+            <div class="relative w-10 h-10 rounded-full bg-wa flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
+            </div>
+          </div>
+          <div class="display text-xs uppercase tracking-[0.2em] text-wa mb-3">Passo 01</div>
+          <h3 class="display text-xl font-normal mb-4">Você fala com a gente</h3>
+          <p class="text-sm text-cream/70 leading-relaxed">
+            Pelo WhatsApp, nossa equipe entende sua história antes de agendar. Sem formulário frio. Sem pressa.
+          </p>
+        </div>
+
+        <!-- PASSO 2 -->
+        <div class="text-center">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
+            <div class="absolute inset-0 rounded-full bg-cream/10"></div>
+            <div class="relative w-10 h-10 rounded-full border border-cream/30 flex items-center justify-center">
+              <svg class="w-5 h-5 text-cream" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <div class="display text-xs uppercase tracking-[0.2em] text-cream/60 mb-3">Passo 02</div>
+          <h3 class="display text-xl font-normal mb-4">Primeira consulta</h3>
+          <p class="text-sm text-cream/70 leading-relaxed">
+            60 minutos de avaliação profunda — escuta, exames que você já tem, histórico. Aqui desenhamos sua rota.
+          </p>
+        </div>
+
+        <!-- PASSO 3 -->
+        <div class="text-center">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
+            <div class="absolute inset-0 rounded-full bg-cream/10"></div>
+            <div class="relative w-10 h-10 rounded-full border border-cream/30 flex items-center justify-center">
+              <svg class="w-5 h-5 text-cream" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <div class="display text-xs uppercase tracking-[0.2em] text-cream/60 mb-3">Passo 03</div>
+          <h3 class="display text-xl font-normal mb-4">Plano que cabe em você</h3>
+          <p class="text-sm text-cream/70 leading-relaxed">
+            Nutrição ajustada à sua realidade. Quando faz sentido, sua nutri indica o teste nutrigenético — análise do seu DNA que refina o plano com precisão ainda maior.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-20 text-center">
+      <a href="#cta" class="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-wa text-white font-medium hover:bg-waDark transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+        Começar a sua jornada
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROVA SOCIAL ============ -->
+<section class="max-w-5xl mx-auto px-6 py-24 sm:py-32">
+  <div class="text-center max-w-2xl mx-auto mb-20">
+    <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Histórias que contam</div>
+    <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
+      Mulheres que entenderam o próprio corpo pela primeira vez.
+    </h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8">
+    <blockquote class="border-t border-ink/10 pt-6">
+      <div class="display text-accent text-4xl leading-none mb-4">"</div>
+      <p class="text-graphite leading-relaxed mb-6">
+        A primeira consulta já foi diferente de tudo que vivi. Pela primeira vez entendi <span class="text-ink">por que meu corpo reage</span> do jeito que reage.
+      </p>
+      <footer class="text-sm text-muted">— Marina, 42</footer>
+    </blockquote>
+    <blockquote class="border-t border-ink/10 pt-6">
+      <div class="display text-accent text-4xl leading-none mb-4">"</div>
+      <p class="text-graphite leading-relaxed mb-6">
+        Achei que era só mais uma dieta. É outra coisa. É <span class="text-ink">entender seu próprio corpo</span> com quem estudou a vida toda pra te explicar.
+      </p>
+      <footer class="text-sm text-muted">— Patrícia, 51</footer>
+    </blockquote>
+    <blockquote class="border-t border-ink/10 pt-6">
+      <div class="display text-accent text-4xl leading-none mb-4">"</div>
+      <p class="text-graphite leading-relaxed mb-6">
+        O <span class="text-ink">teste nutrigenético</span> foi um divisor. Virou um antes e depois de autoconhecimento — não de dieta.
+      </p>
+      <footer class="text-sm text-muted">— Juliana, 38</footer>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="bg-sand/40 py-24 sm:py-28">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Perguntas frequentes</div>
+      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
+        O que costuma passar pela sua cabeça antes de agendar.
+      </h2>
+    </div>
+
+    <div class="divide-y divide-ink/10 border-t border-b border-ink/10">
+      <details class="group py-6">
+        <summary class="flex justify-between items-center cursor-pointer list-none">
+          <span class="display text-lg text-ink pr-8">Atende presencial ou online?</span>
+          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-4 text-graphite leading-relaxed">Os dois. O consultório fica em Curitiba; também atendo online para pacientes de todo o Brasil. No primeiro contato no WhatsApp você escolhe o formato.</p>
+      </details>
+
+      <details class="group py-6">
+        <summary class="flex justify-between items-center cursor-pointer list-none">
+          <span class="display text-lg text-ink pr-8">Como funciona o acompanhamento depois da primeira consulta?</span>
+          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-4 text-graphite leading-relaxed">Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo de acompanhamento depende do seu caso — alguns precisam de revisão quinzenal, outros mensal.</p>
+      </details>
+
+      <details class="group py-6">
+        <summary class="flex justify-between items-center cursor-pointer list-none">
+          <span class="display text-lg text-ink pr-8">O que é o teste nutrigenético?</span>
+          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-4 text-graphite leading-relaxed">É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos — usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.</p>
+      </details>
+
+      <details class="group py-6">
+        <summary class="flex justify-between items-center cursor-pointer list-none">
+          <span class="display text-lg text-ink pr-8">Atende plano de saúde?</span>
+          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-4 text-graphite leading-relaxed">O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista — emito recibo com código próprio pra você solicitar.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section id="cta" class="py-24 sm:py-32 bg-cream">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <div class="text-xs uppercase tracking-[0.2em] text-accent mb-6">O próximo passo</div>
+    <h2 class="display text-4xl sm:text-5xl font-light leading-[1.1] text-ink mb-8">
+      Uma conversa no WhatsApp<br/>
+      <span class="italic text-accent">pode mudar o jeito que você se cuida.</span>
+    </h2>
+    <p class="text-graphite leading-relaxed max-w-xl mx-auto mb-12">
+      Mande uma mensagem pra nossa equipe. Sem formulário. Sem pressa. A gente te ouve e te orienta pro próximo passo — seja agendar agora ou tirar dúvidas antes.
+    </p>
+    <a href="https://wa.me/5541999999999?text=Oi!%20Vim%20pela%20página%20da%20Dra.%20Ana%20e%20quero%20agendar%20uma%20consulta." class="inline-flex items-center gap-3 px-9 py-5 rounded-full bg-wa text-white font-medium hover:bg-waDark transition shadow-2xl shadow-wa/30 text-lg">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+      Agendar consulta pelo WhatsApp
+    </a>
+    <p class="mt-6 text-xs text-muted">Resposta em até 2h no horário comercial</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-ink/10 bg-cream">
+  <div class="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-8 text-sm">
+    <div>
+      <div class="display text-lg text-ink mb-3">Dra. Ana Lima</div>
+      <div class="text-muted leading-relaxed">
+        CRN-8 XXXXX<br/>
+        Rua Exemplo, 123 — Curitiba, PR<br/>
+        contato@dranutri.com.br
+      </div>
+    </div>
+    <div>
+      <div class="display text-lg text-ink mb-3">Nos encontre</div>
+      <div class="space-y-2 text-muted">
+        <a href="#" class="block hover:text-accent transition">@dra.ana.nutri</a>
+        <a href="#" class="block hover:text-accent transition">WhatsApp</a>
+      </div>
+    </div>
+    <div>
+      <div class="display text-lg text-ink mb-3">Legal</div>
+      <div class="space-y-2 text-muted">
+        <a href="/privacidade" class="block hover:text-accent transition">Política de privacidade</a>
+        <a href="/termos" class="block hover:text-accent transition">Termos de uso</a>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-ink/5">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-muted flex flex-col sm:flex-row justify-between gap-3">
+      <div>© 2026 Dra. Ana Lima. Todos os direitos reservados.</div>
+      <div>Nutrição de Precisão · Scanner da Saúde</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
