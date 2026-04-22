@@ -128,7 +128,7 @@ export default async function DashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Ações rápidas
           </h2>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             <ActionCard
               icone="✅"
               titulo="Aprovar semana"
@@ -163,6 +163,14 @@ export default async function DashboardPage() {
               descricao="Gerencie suas campanhas"
               href="/dashboard/anuncios"
               disponivel={true}
+            />
+            <ActionCard
+              icone="📸"
+              titulo="Perfil Instagram"
+              descricao="Foto, bio, seguidores e publicações"
+              href="/dashboard/perfil-instagram"
+              disponivel={instagramConectado}
+              badge={instagramConectado ? undefined : "conecte"}
             />
           </div>
         </section>
