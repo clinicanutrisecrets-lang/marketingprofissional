@@ -110,3 +110,61 @@ export async function getInstagramAccountInfo(
   if (!res.ok) throw new Error(`getIGAccount: ${res.status} ${await res.text()}`);
   return res.json();
 }
+
+export type InstagramProfile = {
+  id: string;
+  username: string;
+  name?: string;
+  biography?: string;
+  profile_picture_url?: string;
+  followers_count?: number;
+  follows_count?: number;
+  media_count?: number;
+};
+
+export async function getInstagramProfileFull(
+  igAccountId: string,
+  pageToken: string,
+): Promise<InstagramProfile> {
+  const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${igAccountId}`);
+  url.searchParams.set(
+    "fields",
+    "id,username,name,biography,profile_picture_url,followers_count,follows_count,media_count",
+  );
+  url.searchParams.set("access_token", pageToken);
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`getIGProfile: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+export type InstagramMedia = {
+  id: string;
+  caption?: string;
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink: string;
+  timestamp: string;
+  like_count?: number;
+  comments_count?: number;
+};
+
+export async function getInstagramMedia(
+  igAccountId: string,
+  pageToken: string,
+  limit = 9,
+): Promise<InstagramMedia[]> {
+  const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${igAccountId}/media`);
+  url.searchParams.set(
+    "fields",
+    "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count",
+  );
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("access_token", pageToken);
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`getIGMedia: ${res.status} ${await res.text()}`);
+  const data = await res.json();
+  return (data.data ?? []) as InstagramMedia[];
+}

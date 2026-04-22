@@ -164,6 +164,13 @@ export default async function DashboardPage() {
               href="/dashboard/anuncios"
               disponivel={true}
             />
+            <ActionCard
+              icone="📸"
+              titulo="Perfil Instagram"
+              descricao="Foto, bio, seguidores e últimos posts"
+              href="/dashboard/perfil-instagram"
+              disponivel={true}
+            />
           </div>
         </section>
 
