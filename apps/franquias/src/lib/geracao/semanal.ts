@@ -14,6 +14,7 @@ import {
   montarModifications as montarModsCreatomate,
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
+import { gerarEUploadImagem } from "@/lib/ai-image/render";
 import { escolherVideoParaPost } from "@/lib/videos/actions";
 import {
   buscarDatasProximas,
@@ -139,14 +140,50 @@ export async function gerarPostsDaSemana(
         (franqueada.horario_preferido_post as string) ?? "08:00",
       );
 
-      // Gera criativo: prioridade Creatomate > Bannerbear > nenhum
+      // Gera criativo: prioridade AI-Image (imagens) > Creatomate (video+estático) > Bannerbear
       let urlImagem: string | null = null;
       let urlVideo: string | null = null;
       let designId: string | null = null;
 
-      // 1. Tenta Creatomate primeiro (suporta vídeo + estático)
+      // 1. Tenta AI-Image primeiro (só pra imagens estáticas single-image)
+      //    Reels e carrossel continuam no fluxo Creatomate por enquanto.
+      const podeTentarAiImagem =
+        (item.tipo === "feed_imagem" || item.tipo === "stories") &&
+        (process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
+
+      if (podeTentarAiImagem) {
+        try {
+          const r = await gerarEUploadImagem({
+            franqueadaId,
+            tipo: item.tipo as "feed_imagem" | "stories",
+            brand: {
+              nomeMarca:
+                (franqueada.nome_comercial as string) ||
+                (franqueada.nome_completo as string),
+              corPrimariaHex: (franqueada.cor_primaria_hex as string) || "#2F5D50",
+              corSecundariaHex: franqueada.cor_secundaria_hex as string | undefined,
+              logoUrl: logoUrl ?? undefined,
+              fotoProfissionalUrl: fotoUrl ?? undefined,
+              tomVisual: "editorial premium health clinic, sophisticated, calm",
+              nicho: (franqueada.nicho_principal as string) || "nutrição funcional",
+            },
+            conteudo: {
+              eyebrow: "Nutrição de Precisão",
+              headline: post.headline,
+              subtitle: post.subtitle,
+              cta: post.copy_cta,
+            },
+          });
+          urlImagem = r.url;
+        } catch (aiErr) {
+          console.warn("AI-Image falhou, tentando Creatomate:", aiErr);
+        }
+      }
+
+      // 2. Creatomate (suporta vídeo + estático) — se AI-Image não gerou
       const ctmTemplateId = resolveTemplateCreatomate(item.tipo);
-      if (ctmTemplateId && process.env.CREATOMATE_API_KEY) {
+      const precisaCreatomate = !urlImagem && !urlVideo;
+      if (precisaCreatomate && ctmTemplateId && process.env.CREATOMATE_API_KEY) {
         try {
           // Pra reels: busca vídeo de fundo (biblioteca > Pexels)
           let videoFundoUrl: string | undefined;
