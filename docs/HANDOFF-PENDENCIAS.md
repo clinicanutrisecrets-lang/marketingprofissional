@@ -2,130 +2,259 @@
 
 Documento vivo de o que falta fazer, em qual ordem, quem faz, e o que está aguardando input.
 
-Atualizado: encerramento da sessão de build dos agentes (orgânico + ads).
+Atualizado: sessão de integração cross-projeto (Scanner SaaS ↔ Marketing).
+
+---
+
+## 🏗️ Arquitetura: 2 projetos conversando
+
+**Importante entender antes de qualquer coisa:**
+
+| Projeto | Vercel | Supabase | Domínio | Repositório |
+|---|---|---|---|---|
+| **Scanner SaaS** (clínica/paciente) | `scanner-saude-b1jf` | `clinicanutrisecrets-scanner-da-saude` (us-west-2) | `scannerdasaude.com` | `clinicanutrisecrets-lang/scanner-saude` |
+| **Marketing + Franquia** (onboarding, vendas, app) | `marketingprofissional` | `scanner-franquia-plataforma` (sa-east-1) | `app.scannerdasaude.com` | `clinicanutrisecrets-lang/marketingprofissional` |
+
+**São 2 bancos Supabase separados.** Nunca fazer query cross-DB — toda troca é via webhooks assinados (HMAC SHA256).
+
+---
+
+## 🤖 Agentes de WhatsApp: Fernanda ≠ Sofia (NÃO CONFUNDIR)
+
+Dois números, dois papéis, dois lados.
+
+### 🎯 Fernanda (Scanner SaaS — lado do PO)
+
+- **Número:** +55 41 9277-2344 (oficial WhatsApp Business Meta aprovado)
+- **Onde mora:** Scanner SaaS (scannerdasaude.com)
+- **Atende:** clientes diretos da marca Scanner — 2 modos:
+  - **Lead novo** (número NÃO está em `nutricionistas.whatsapp`): modo sales → converte em franquia OU vende teste Kiwify direto
+  - **Cliente assinante** (número está em `nutricionistas.whatsapp`): modo suporte → responde dúvida, abre ticket
+- **Webhook:** `/api/webhooks/whatsapp` no Scanner SaaS
+- **NÃO chama endpoints do Marketing.** Opera isolada no SaaS.
+
+### 🎯 Sofia (Marketing/Franquias — lado da nutri franqueada)
+
+- **Número:** outro, um por nutri (ou um central por enquanto, roteamento por `[ref:frq_X]`)
+- **Onde mora:** conceitualmente no Marketing/Franquias
+- **Atende:** pacientes das nutris franqueadas — qualifica, agenda, oferece teste via upsell
+- **Endpoint que chama:** `POST /api/conversions/schedule` (no Marketing) quando confirma consulta → dispara CAPI `Schedule` R$650 pro Meta
+- **Auth:** header `x-sofia-token` com `SOFIA_INTERNAL_TOKEN`
+
+### Por que a distinção importa
+
+- Fernanda roda no domínio `scannerdasaude.com`, Sofia no fluxo de ads do `app.scannerdasaude.com/nutri/[slug]`
+- Fernanda dispara eventos no Scanner SaaS (CRM, franquia_pipeline); Sofia dispara CAPI Meta pelo Marketing
+- Fernanda NUNCA confunde com Sofia mesmo se um lead conversar com as duas — são números diferentes e códigos diferentes
+
+---
+
+## 🔗 Pontos de integração cross-projeto (3 fluxos)
+
+### 1. Upgrade → virar franqueada (SaaS → Marketing)
+
+**Trigger:** nutri clica "Virar franqueada" em `scannerdasaude.com/nutri/perfil?tab=plano`.
+
+**Fluxo:**
+```
+Scanner SaaS
+  ├─ Atualiza nutricionistas.plano = 'franquia'
+  ├─ Gera onboarding_token (UUID)
+  └─ POST app.scannerdasaude.com/api/onboarding/iniciar  ✅ IMPLEMENTADO (Marketing lado)
+       body: { scanner_user_id, onboarding_token, nome, email, whatsapp, plano_anterior }
+       header: X-Scanner-Signature (HMAC)
+```
+
+**Marketing responde:**
+- Grava em `franquia_onboardings` (tabela nova, migration 011)
+- Retorna link `app.scannerdasaude.com/onboarding?token=X` pro SaaS enviar pra nutri
+- **TODO:** página `/onboarding?token=X` validar token antes de liberar wizard
+- **TODO:** email de boas-vindas via queue (hoje retorna link, SaaS que envia)
+
+### 2. Kiwify produto → mapeamento nutri (SaaS → Marketing)
+
+**Trigger:** Aline salva `kiwify_product_id` de uma nutri na tela `scannerdasaude.com/admin/exames-precisao`.
+
+**Fluxo:**
+```
+Scanner SaaS
+  └─ POST app.scannerdasaude.com/api/webhooks/scanner-saas/produto-kiwify-sync  ✅ IMPLEMENTADO
+       body: { scanner_user_id, email, kiwify_product_id, exame_precisao_ativo }
+       header: X-Scanner-Signature (HMAC)
+```
+
+**Marketing responde:**
+- `UPDATE franqueadas SET kiwify_product_id = X WHERE email = Y`
+- Se email não existe (nutri ainda não finalizou onboarding no Marketing): retorna 404 — SaaS reenvia quando ela finalizar
+
+### 3. Venda Kiwify → SaaS (Marketing → SaaS)
+
+**Trigger:** Kiwify aprovou compra do teste.
+
+**Fluxo:**
+```
+Kiwify webhook
+  → POST app.scannerdasaude.com/api/webhooks/kiwify  ✅ IMPLEMENTADO
+       ├─ Valida HMAC Kiwify
+       ├─ Resolve franqueada via kiwify_product_id local
+       ├─ Grava em conversoes_registradas (tipo=Purchase)
+       ├─ Dispara CAPI Meta (event Purchase R$1800)
+       ├─ Incrementa contador no anuncio
+       └─ POST scannerdasaude.com/api/webhooks/venda-externa  ✅ REPASSE IMPLEMENTADO
+            body: { kiwify_product_id, kiwify_order_id, franqueada_id, anuncio_id,
+                    valor, currency, customer_email, customer_name, customer_phone, fbclid }
+            header: X-Marketing-Signature (HMAC SCANNER_WEBHOOK_SECRET)
+```
+
+**Scanner SaaS deve implementar** (outra sessão — lado dele):
+- `POST /api/webhooks/venda-externa` que valida assinatura e grava em `vendas_externas` (DB SaaS)
+- Atualizar `nutricionistas.total_pacientes_pagos`
+- Espelhar no dashboard dela `/nutri/dashboard`
+
+---
+
+## 🔐 Env vars cross-projeto
+
+Configurar em **ambos** Vercels com o mesmo valor (pra HMAC coincidir nos 2 lados):
+
+**Vercel Marketing** (`marketingprofissional`):
+- `SCANNER_SAAS_URL=https://scannerdasaude.com`
+- `SCANNER_WEBHOOK_SECRET=<gerar random 64 chars>` ← compartilhado com SaaS
+- `MARKETING_WEBHOOK_SECRET=<gerar random 64 chars>` ← compartilhado com SaaS (reservado futuro)
+
+**Vercel Scanner SaaS** (`scanner-saude-b1jf`):
+- `MARKETING_APP_URL=https://app.scannerdasaude.com`
+- `SCANNER_WEBHOOK_SECRET=<mesmo valor>`
+- `MARKETING_WEBHOOK_SECRET=<mesmo valor>`
+
+**Rotacionar a cada 90 dias**, atualizando os 2 Vercels no mesmo deploy.
 
 ---
 
 ## 🔴 Bloqueadores antes de cada nutri ir ao ar
 
-Itens que precisam ser feitos **uma vez por nutri** quando ela for ativada:
-
-- [ ] **Compartilhar pixel Scanner com o ad account dela** (`business.facebook.com → Business Settings → Pixels → Add Assets → Ad Accounts`). Sem isso, ads dela rodam mas Meta não otimiza pelos eventos da LP.
-- [ ] **Cadastrar `kiwify_product_id` da nutri no banco** (campo a adicionar — ver bloco "Migrations futuras" abaixo). Precisa ter o produto criado no Kiwify dela primeiro.
-- [ ] **Conectar Instagram da nutri** via OAuth no onboarding (fluxo já existe em `packages/instagram`).
-- [ ] **Subir foto profissional + logo** no onboarding (campos `arquivos_franqueada`, tipos `foto_profissional` e `logo_principal`).
-- [ ] **Configurar redirect do ad CTWA pro número da Sofia** com parâmetro `[ref:frq_<franqueadaId>]` no link wa.me.
-- [ ] **Inscrever ad account dela no webhook Kiwify** (1 secret só, mas conferir que produto da nutri tem webhook ativo).
+- [ ] **Compartilhar pixel Scanner com o ad account dela** (via Meta Business Settings)
+- [ ] **Aline salvar `kiwify_product_id` da nutri na tela do Scanner SaaS** (`/admin/exames-precisao`) — sincroniza pro Marketing automaticamente via webhook
+- [ ] **Conectar Instagram da nutri** via OAuth no onboarding
+- [ ] **Subir foto profissional + logo** no onboarding
+- [ ] **Configurar redirect do ad CTWA pro número da Sofia** com `[ref:frq_<id>]`
 
 ---
 
 ## 📚 Materiais didáticos a criar (Gamma)
 
-Por ordem de prioridade — entrega à nutri no momento do onboarding:
-
-1. **"Como conectar seu Instagram ao Scanner"** — primeiro toque da nutri no sistema. OAuth + autorização Meta + verificação de conta business.
-2. **"Como compartilhar o Pixel Scanner com seu ad account"** — passo a passo com prints do Meta Business Settings. Foco: pra ela rodar ads otimizados sem ter que entender CAPI.
-3. **"Como configurar seu produto do teste nutrigenético no Kiwify"** — checklist (preço R$ 1.800, vídeo de boas-vindas personalizado, custom fields obrigatórios pro tracking funcionar: `franqueada_id`, `fbclid`, `anuncio_id`).
-4. **"Como criar seu primeiro anúncio no Scanner"** — só fazer depois que UI de ads no painel da nutri estiver pronta (ver bloco "UIs faltando").
+1. **"Como conectar seu Instagram ao Scanner"**
+2. **"Como compartilhar o Pixel Scanner com seu ad account"** — Business Settings com prints
+3. **"Como configurar seu produto do teste nutrigenético no Kiwify"** — custom fields obrigatórios
+4. **"Como criar seu primeiro anúncio no Scanner"** (quando UI existir)
 
 ---
 
 ## 🔌 Pendências de integração (médio prazo)
 
-### Sofia (WhatsApp IA)
-- [ ] **Stack da Sofia** — confirmar provider (Cloud API / Z-API / Evolution / Twilio)
-- [ ] Endpoint `/api/conversions/schedule` no app franquias está pronto esperando ela chamar com header `x-sofia-token`
-- [ ] Sofia precisa: ler `ctwa_clid` da primeira mensagem, parsear `[ref:frq_X]` do texto, ativar persona da nutri correta, disparar `Schedule` quando confirma agendamento
-- [ ] Quando Sofia tiver código, conectar via webhook pra cada conversa qualificada
+### Scanner SaaS (lado dele, outra sessão)
+- [ ] `POST /api/webhooks/venda-externa` — recebe venda Kiwify do Marketing
+- [ ] Admin `/admin/exames-precisao` disparar webhook `/produto-kiwify-sync` no Marketing quando Aline salva
+- [ ] `POST /api/plano/upgrade-franquia` gerar token e chamar `/api/onboarding/iniciar` no Marketing
+- [ ] `/api/webhooks/onboarding-concluido` receber quando Marketing confirma onboarding completo (fluxo de volta)
+- [ ] Fernanda webhook continuar dual-mode (sales/suporte)
 
-### CRM Fernanda (sessão separada)
-- [ ] Notificação automática "nutri X finalizou onboarding" → integração com CRM interno da Fernanda
-- [ ] Hook de extensão preparado em `apps/franquias/src/lib/onboarding/actions.ts:73` — só falta plugar URL/payload
+### Marketing (lado nosso)
+- [ ] Página `/onboarding?token=X` validar token de `franquia_onboardings` antes de liberar wizard
+- [ ] Email queue com delays (LP em 24h, posts em 48h)
+- [ ] `finalizarOnboarding()` disparar `gerarPostsDaSemana()` em background imediatamente
+- [ ] Callback pro SaaS quando onboarding concluído (`POST scannerdasaude.com/api/webhooks/onboarding-concluido`)
 
-### Email queue + delays (princípio "parecer trabalho humano")
-- [ ] Tabela `email_queue` com `enviar_em timestamp`
-- [ ] Cron `processar-email-queue` a cada 30min
-- [ ] Email "sua LP está no ar" → delay aleatório 18-24h após `finalizarOnboarding()`
-- [ ] Email "primeira semana pronta pra aprovar" → delay aleatório 30-46h
-- [ ] `finalizarOnboarding()` dispara `gerarPostsDaSemana()` em background imediatamente (não espera cron de segunda)
+### UIs de ads faltando
+- [ ] Tela "criar campanha" com 3 variações geradas pelo agente
+- [ ] Botão grande vermelho "Pausar tudo" no dashboard nutri
+- [ ] Dashboard métricas vivas por campanha (CPL, CTR, ROAS, vs benchmark)
 
-### Anúncios — UIs faltando
-- [ ] **Tela "criar campanha"** com 3 variações geradas pelo agente (já temos endpoint `/api/agentes/ads/gerar-copy`, falta só UI)
-- [ ] **Botão grande vermelho "Pausar tudo"** no dashboard da nutri (endpoint `/api/ads/kill-switch` pronto)
-- [ ] **Dashboard de métricas vivas por campanha** (CPL, CTR, ROAS, vs benchmark) — dados já chegam via cron `coletar-metricas-ads`
-
-### Skills 2/3/5 no Aline
-- [ ] Replicar Skills 2 (Mecanismo), 3 (Posicionamento), 5 (Funil) no app Aline. Hoje só estão no app Franquias.
-- [ ] Migration `aline.planejamentos_estrategicos` + lib + endpoint + UI por perfil.
+### Skills 2/3/5 no Aline (baixa prioridade)
+- [ ] Replicar Skills 2 (Mecanismo), 3 (Posicionamento), 5 (Funil) no app Aline
 
 ---
 
-## 📦 Migrations futuras (a fazer quando aparecer demanda)
+## 📦 Migrations aplicadas / futuras
 
-- [ ] `011_kiwify_product_id.sql` em franquias: `ALTER TABLE franqueadas ADD COLUMN kiwify_product_id TEXT UNIQUE;` — mapear produto Kiwify de cada nutri pra resolver no webhook
-- [ ] `012_meta_pixel_id.sql` em franquias: `ALTER TABLE franqueadas ADD COLUMN meta_pixel_id TEXT;` — pra quando uma nutri quiser pixel próprio (em vez do guarda-chuva Scanner)
-- [ ] `005_meta_pixel_id.sql` em aline: `ALTER TABLE aline.perfis ADD COLUMN meta_pixel_id TEXT;` — pixels próprios dos perfis @scannerdasaude e @nutrisecrets quando ativar ads pessoais
-- [ ] `005_planejamentos_estrategicos.sql` em aline: replicar Skills 2/3/5
+### ✅ Aplicadas nesta sessão
+- `franquias/006_diagnosticos_perfil.sql`
+- `franquias/007_auditorias_conteudo.sql`
+- `franquias/008_storytelling.sql`
+- `franquias/009_planejamentos_estrategicos.sql`
+- `franquias/010_anuncios_completo.sql`
+- `franquias/011_integracao_scanner_saas.sql` ← NOVA (kiwify_product_id + franquia_onboardings)
+- `aline/002_diagnosticos_depoimentos.sql`
+- `aline/003_auditorias_conteudo.sql`
+- `aline/004_storytellings_gerados.sql`
+
+### 🟡 Aplicar quando preciso
+- `franquias/012_meta_pixel_id_por_nutri.sql` — se alguma nutri grande quiser pixel próprio
+- `aline/005_meta_pixel_id.sql` — ativar ads no Studio (pixels scanner + nutrisecrets)
+- `aline/005_planejamentos_estrategicos.sql` — replicar Skills 2/3/5
 
 ---
 
-## 🧹 Limpezas técnicas (após validação em produção)
+## 🧹 Limpezas técnicas
 
-- [ ] **Aposentar Bannerbear** após 1 semana validando AI-Image em produção:
-  - Remover `packages/bannerbear/`
-  - Remover `apps/franquias/src/lib/bannerbear/`
-  - Remover env vars `BANNERBEAR_*` em todos `.env.example` e Vercels
-  - Remover fallback Bannerbear em `apps/franquias/src/lib/geracao/semanal.ts`
-  - Cancelar plano Bannerbear ($49/mês economizados)
-- [ ] **Reorganizar Creatomate** — manter SÓ pra reels (vídeo). Estáticos/carrossel/stories devem ir todos pra AI-Image.
+- [ ] Aposentar Bannerbear após 1 semana validando AI-Image em produção
+- [ ] Creatomate manter SÓ pra reels (vídeo). Estáticos/carrossel/stories todos na AI-Image.
 
 ---
 
 ## 📥 Inputs aguardando do PO
 
-Coisas que dependem de decisão/dado teu pra liberar trabalho:
-
 | Item | Quando | Como |
 |---|---|---|
-| **Pixel ID Scanner da Saúde** (BM Scanner) | Quando você criar/pegar no Events Manager | Sobe na Vercel Marketing como `NEXT_PUBLIC_META_PIXEL_ID` + `META_PIXEL_ID` (mesmo valor) |
-| **CAPI Access Token** do Pixel Scanner | Idem | Sobe como `META_CAPI_ACCESS_TOKEN` no Vercel Marketing |
-| **Pixel ID @scannerdasaude** (Studio, BM Scanner) | Quando ativar ads no Studio | Eu salvo em `aline.perfis.meta_pixel_id` pelo painel — não precisa env var |
-| **Pixel ID @nutrisecrets** (Studio, BM Nutri Secrets) | Quando ativar ads no Studio | Idem |
-| **Stack Sofia** (provider WhatsApp) | Quando começar integração | Provider + URL base + token |
-| **Kiwify webhook secret** | Quando configurar webhook no Kiwify | Sobe como `KIWIFY_WEBHOOK_SECRET` no Vercel Marketing |
-| **Kiwify product_id** de cada nutri | Quando primeira nutri tiver produto criado | Eu salvo em `franqueadas.kiwify_product_id` (após migration 011) |
+| **Pixel ID Scanner** (BM Scanner, guarda-chuva) | Quando criar no Events Manager | `NEXT_PUBLIC_META_PIXEL_ID` + `META_PIXEL_ID` no Vercel Marketing |
+| **CAPI Access Token** do Pixel Scanner | Idem | `META_CAPI_ACCESS_TOKEN` no Vercel Marketing |
+| **Pixel ID @scannerdasaude** (Studio) | Quando ativar ads no Studio | Salvo em `aline.perfis.meta_pixel_id` (pendente migration) |
+| **Pixel ID @nutrisecrets** (Studio) | Idem | Idem |
+| **Kiwify webhook secret** | Quando configurar webhook no Kiwify | `KIWIFY_WEBHOOK_SECRET` no Vercel Marketing |
+| **SCANNER_WEBHOOK_SECRET** (cross-projeto) | Quando fizer handoff com sessão SaaS | Gerar 64 chars random, subir nos 2 Vercels |
+| **MARKETING_WEBHOOK_SECRET** (cross-projeto) | Idem | Idem |
+| **Pixel IDs pra tabela `aline.perfis.meta_pixel_id`** | Quando ativar ads Studio | Eu salvo via painel admin |
 
 ---
 
-## ✅ Decisões já tomadas nesta sessão
+## ✅ Decisões já tomadas
 
-- **Pixel Scanner como guarda-chuva** das franquias (centralizado), nutri compartilha pixel via Business Settings ao invés de criar próprio. Permite lookalike global de "leads de nutricionista" como ativo de longo prazo da marca-mãe.
-- **Kiwify produto por nutri** (não unificado). Cada nutri tem produto próprio com vídeo de boas-vindas dela. Sistema resolve via `kiwify_product_id` no webhook.
-- **Studio Aline NÃO precisa de pixel agora** (não tem LP nem ads). Pixels dos perfis @scannerdasaude e @nutrisecrets são pendência futura via tabela `aline.perfis`.
-- **Cores corretas dos perfis Aline:** `@scannerdasaude` paleta multicolor (cores do S da logo) com roxo `#8B5CF6` default; `@nutrisecrets` verde tiffany `#0D9488` + magenta `#D946EF` contrastante.
-- **Modo B (Sharp overlay) é default** pra geração de imagem — IA gera só visual, Sharp insere texto pixel-perfect. Zero risco de acento errado em PT-BR.
-- **2 agentes** (Orgânico + Ads), sem dividir mais.
+- **Pixel Scanner como guarda-chuva** das franquias (centralizado) — nutri compartilha pixel via Business Settings
+- **Kiwify produto por nutri** (não unificado) — Scanner SaaS é source of truth do `kiwify_product_id`, Marketing recebe via webhook
+- **Studio Aline NÃO precisa de pixel agora** (pendência futura via `aline.perfis`)
+- **Cores corretas**: `@scannerdasaude` multicolor (roxo default); `@nutrisecrets` verde tiffany `#0D9488` + magenta `#D946EF`
+- **Modo B (Sharp overlay) default** pra AI-Image — zero risco de acento errado em PT-BR
+- **2 agentes**: Orgânico (6 skills) + Ads (1 skill de copy, crons de otimização)
+- **Fernanda (SaaS) ≠ Sofia (Marketing/nutri)** — dois números, dois papéis, dois lados
+- **2 bancos Supabase separados** — nunca query cross-DB, só webhooks assinados
+- **Número oficial da Fernanda aprovado pelo Meta** — pode usar WhatsApp Cloud API
 
 ---
 
 ## 🗂️ Arquitetura de referência (estado atual)
 
 ```
-Marketing/Franquias (Vercel "marketing")
-├── Pixel: 1 da marca Scanner (guarda-chuva)
-├── Webhook Kiwify: 1 endpoint, secret único
-├── CAPI: dispara Schedule (Sofia) e Purchase (Kiwify)
-├── LP: /nutri/[slug] com Pixel + WhatsApp tracking
-├── Agentes: Orgânico (6 skills) + Ads
+Scanner SaaS (scannerdasaude.com)
+├── Clientes diretos + paciente + CRM interno
+├── Fernanda WhatsApp (oficial Meta) — sales + suporte
+├── Admin /admin/exames-precisao — Aline gerencia kiwify_product_id
+├── Dispara webhooks pro Marketing:
+│   ├── /api/onboarding/iniciar (upgrade nutri)
+│   └── /api/webhooks/scanner-saas/produto-kiwify-sync (Kiwify mapping)
+└── Recebe webhook do Marketing:
+    └── /api/webhooks/venda-externa (Kiwify processada)
+
+Marketing/Franquia (app.scannerdasaude.com)
+├── LP /nutri/[slug] com Pixel Scanner (guarda-chuva)
+├── Onboarding wizard
+├── Agente Orgânico (6 skills) + Agente Ads
+├── Webhook Kiwify (valida HMAC, CAPI Purchase, repassa pro SaaS)
+├── /api/conversions/schedule (Sofia dispara Schedule R$650)
+├── /api/ads/kill-switch (nutri/admin pausa tudo)
 └── Crons: gerar-semanas, publicar, coletar-metricas-ads, verificar-budget-ads
 
-Studio Aline (Vercel "studio")
-├── Sem pixel (ainda)
-├── Sem webhook (ainda)
-├── 2 perfis fixos: @scannerdasaude + @nutrisecrets
-├── Agentes: Orgânico (Skills 1, 4, 6 — falta 2, 3, 5)
-└── AI-Image: GPT-Image-1 (qualidade premium, baixo volume)
-
-Sofia (sistema separado — projeto próprio do PO)
-└── Chama /api/conversions/schedule no Marketing quando marca consulta
+Sofia (por nutri) — sistema separado
+├── Número diferente da Fernanda
+├── Atende pacientes da nutri (qualificação + upsell)
+└── Chama /api/conversions/schedule no Marketing
 ```

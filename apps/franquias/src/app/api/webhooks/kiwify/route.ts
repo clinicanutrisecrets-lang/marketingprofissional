@@ -162,10 +162,51 @@ export async function POST(req: Request) {
     });
   }
 
+  // Repassa venda pro Scanner SaaS (CRM interno + dashboard nutri)
+  // Fire-and-forget: se SaaS estiver fora, não trava resposta pro Kiwify.
+  const scannerUrl = process.env.SCANNER_SAAS_URL;
+  const scannerSecret = process.env.SCANNER_WEBHOOK_SECRET;
+  let saasSyncOk: boolean | null = null;
+
+  if (scannerUrl && scannerSecret) {
+    try {
+      const saasBody = JSON.stringify({
+        kiwify_product_id: (dados.product_id ?? (dados as Record<string, unknown>).Product_id) ?? null,
+        kiwify_order_id: orderId,
+        franqueada_id: franqueadaId,
+        anuncio_id: anuncioId,
+        valor: value,
+        currency: "BRL",
+        customer_email: customerEmail,
+        customer_name: (dados.customer as { name?: string } | undefined)?.name,
+        customer_phone: customerPhone,
+        fbclid,
+        event_time: new Date().toISOString(),
+      });
+      const saasSig = (await import("node:crypto"))
+        .createHmac("sha256", scannerSecret)
+        .update(saasBody)
+        .digest("hex");
+      const resp = await fetch(`${scannerUrl}/api/webhooks/venda-externa`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Marketing-Signature": saasSig,
+        },
+        body: saasBody,
+        signal: AbortSignal.timeout(8_000),
+      });
+      saasSyncOk = resp.ok;
+    } catch {
+      saasSyncOk = false;
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     eventId,
     capi: capiResult.ok,
+    saas_sync: saasSyncOk,
     anuncioId,
   });
 }
