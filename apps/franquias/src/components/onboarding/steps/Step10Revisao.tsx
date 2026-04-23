@@ -76,7 +76,7 @@ export function Step10Revisao({ dados, onFinalizar }: Props) {
       </button>
 
       <p className="text-center text-xs text-brand-text/60">
-        Em até 48h sua LP e primeiros posts estarão prontos.
+        Sua LP fica pronta em até 24h e os primeiros posts em até 48h.
       </p>
     </FormWrapper>
   );
