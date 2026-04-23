@@ -3,235 +3,536 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mockup — LP Nutri (Scanner da Saúde)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          display: ['Fraunces', 'Georgia', 'serif'],
-          sans: ['Inter', 'system-ui', 'sans-serif'],
-        },
-        colors: {
-          cream: '#F7F3ED',
-          sand: '#EDE4D6',
-          ink: '#1F1D1A',
-          graphite: '#4A4843',
-          muted: '#8A857D',
-          accent: '#2F5D50',
-          wa: '#25D366',
-          waDark: '#1FAF52',
-        },
-      },
-    },
-  };
-</script>
+<title>Dra. Ana Lima — Nutrição de Precisão</title>
 <style>
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', system-ui, sans-serif; }
-  .display { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
-  .hero-photo {
-    box-shadow: 0 40px 80px -20px rgba(31, 29, 26, 0.25);
+  /* ============ RESET ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; background: none; border: 0; }
+  details summary { list-style: none; cursor: pointer; }
+  details summary::-webkit-details-marker { display: none; }
+
+  /* ============ TOKENS ============ */
+  :root {
+    --cream: #F7F3ED;
+    --sand: #EDE4D6;
+    --ink: #1F1D1A;
+    --graphite: #4A4843;
+    --muted: #8A857D;
+    --accent: #2F5D50;
+    --accent-soft: rgba(47, 93, 80, 0.08);
+    --wa: #25D366;
+    --wa-dark: #1FAF52;
+    --line: rgba(31, 29, 26, 0.08);
   }
-  .step-line {
-    background: linear-gradient(to bottom, #EDE4D6 0%, #EDE4D6 50%, transparent 50%, transparent 100%);
-    background-size: 2px 12px;
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .display {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    background: var(--wa);
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 15px;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.25);
+  }
+  .btn-wa:hover { background: var(--wa-dark); transform: translateY(-1px); }
+  .btn-wa.sm { padding: 9px 18px; font-size: 13px; box-shadow: none; }
+  .btn-wa.lg { padding: 18px 34px; font-size: 17px; box-shadow: 0 12px 36px rgba(37, 211, 102, 0.32); }
+
+  /* ============ TOPBAR ============ */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(247, 243, 237, 0.92);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 12px; }
+  .topbar-logo {
+    width: 36px; height: 36px; border-radius: 999px;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 18px; font-weight: 600;
+  }
+  .topbar-name { font-family: "Iowan Old Style", Palatino, Georgia, serif; font-size: 15px; font-weight: 600; line-height: 1.2; }
+  .topbar-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  .topbar .btn-wa { display: none; }
+  @media (min-width: 640px) { .topbar .btn-wa { display: inline-flex; } }
+
+  /* ============ HERO ============ */
+  .hero { padding: 72px 0 96px; }
+  @media (min-width: 768px) { .hero { padding: 112px 0 140px; } }
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr;
+    gap: 48px; align-items: center;
+  }
+  @media (min-width: 900px) {
+    .hero-grid { grid-template-columns: 1.15fr 1fr; gap: 72px; }
+  }
+  .hero-h1 {
+    font-size: 40px;
+    margin-top: 20px;
+    color: var(--ink);
+  }
+  @media (min-width: 640px) { .hero-h1 { font-size: 52px; } }
+  @media (min-width: 1024px) { .hero-h1 { font-size: 64px; } }
+  .hero-h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 18px;
+    color: var(--graphite);
+    max-width: 540px;
+    line-height: 1.55;
+  }
+  .hero-cta {
+    margin-top: 40px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 20px;
+  }
+  .hero-cta-note { font-size: 14px; color: var(--muted); }
+  .hero-photo {
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(135deg, var(--sand) 0%, rgba(47,93,80,0.22) 100%);
+    box-shadow: 0 40px 80px -20px rgba(31, 29, 26, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+  }
+  .hero-photo-inner {
+    text-align: center; padding: 40px;
+  }
+  .hero-photo-mono {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 120px;
+    font-style: italic;
+    color: rgba(47, 93, 80, 0.3);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .hero-photo-label {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ============ SECTION: PRA VOCÊ SE ============ */
+  .section-sand { background: rgba(237, 228, 214, 0.45); padding: 80px 0; }
+  @media (min-width: 768px) { .section-sand { padding: 112px 0; } }
+
+  .section-head { max-width: 640px; }
+  .section-h2 {
+    margin-top: 20px;
+    font-size: 30px;
+    color: var(--ink);
+  }
+  @media (min-width: 640px) { .section-h2 { font-size: 38px; } }
+
+  .dores-grid {
+    margin-top: 64px;
+    display: grid; grid-template-columns: 1fr;
+    gap: 40px 48px;
+  }
+  @media (min-width: 700px) { .dores-grid { grid-template-columns: 1fr 1fr; } }
+  .dor-item { display: flex; gap: 20px; align-items: flex-start; }
+  .dor-num {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    color: var(--accent);
+    font-size: 32px; font-weight: 300;
+    line-height: 1; flex-shrink: 0;
+  }
+  .dor-text { color: var(--graphite); padding-top: 2px; line-height: 1.55; }
+  .dor-text strong { color: var(--ink); font-weight: 500; }
+
+  /* ============ SECTION: QUEM ATENDE ============ */
+  .section-default { padding: 80px 0; }
+  @media (min-width: 768px) { .section-default { padding: 112px 0; } }
+
+  .quem-grid {
+    display: grid; grid-template-columns: 1fr;
+    gap: 48px; align-items: flex-start;
+  }
+  @media (min-width: 900px) {
+    .quem-grid { grid-template-columns: 5fr 7fr; gap: 72px; }
+  }
+  .quem-foto {
+    aspect-ratio: 1 / 1;
+    background: rgba(237, 228, 214, 0.6);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+  }
+  .quem-foto-mono {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 140px;
+    font-style: italic;
+    color: rgba(47, 93, 80, 0.28);
+  }
+  .quem-name { font-size: 32px; color: var(--ink); }
+  @media (min-width: 640px) { .quem-name { font-size: 38px; } }
+  .quem-crn {
+    margin-top: 10px;
+    font-size: 13px; color: var(--muted); letter-spacing: 0.03em;
+  }
+  .quem-bio {
+    margin-top: 28px;
+    color: var(--graphite);
+    line-height: 1.65;
+  }
+  .quem-bio p + p { margin-top: 18px; }
+  .quem-bio strong { color: var(--ink); font-weight: 500; }
+
+  /* ============ JORNADA (DARK) ============ */
+  .jornada {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 100px 0;
+    position: relative; overflow: hidden;
+  }
+  @media (min-width: 768px) { .jornada { padding: 140px 0; } }
+  .jornada::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+  .jornada-head { text-align: center; max-width: 620px; margin: 0 auto 80px; position: relative; }
+  .jornada-eyebrow { color: var(--wa); }
+  .jornada-h2 { color: var(--cream); font-size: 30px; margin-top: 20px; }
+  @media (min-width: 640px) { .jornada-h2 { font-size: 38px; } }
+
+  .steps {
+    position: relative;
+    display: grid; grid-template-columns: 1fr;
+    gap: 56px;
+  }
+  @media (min-width: 900px) {
+    .steps { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .steps::before {
+      content: ""; position: absolute;
+      top: 32px; left: 16.66%; right: 16.66%;
+      height: 1px; background: rgba(247, 243, 237, 0.15);
+    }
+  }
+  .step { text-align: center; position: relative; }
+  .step-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 999px;
+    margin-bottom: 24px; position: relative;
+  }
+  .step-icon-bg {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: rgba(247, 243, 237, 0.08);
+  }
+  .step-icon-fg {
+    position: relative;
+    width: 40px; height: 40px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-1 .step-icon-bg { background: rgba(37, 211, 102, 0.18); }
+  .step-1 .step-icon-fg { background: var(--wa); }
+  .step-2 .step-icon-fg, .step-3 .step-icon-fg {
+    background: transparent; border: 1px solid rgba(247, 243, 237, 0.3);
+  }
+  .step-eyebrow {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(247, 243, 237, 0.6); margin-bottom: 12px;
+  }
+  .step-1 .step-eyebrow { color: var(--wa); }
+  .step-title {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 21px; margin-bottom: 14px;
+  }
+  .step-desc {
+    font-size: 15px; color: rgba(247, 243, 237, 0.72); line-height: 1.6;
+    max-width: 280px; margin: 0 auto;
+  }
+  .jornada-cta { text-align: center; margin-top: 80px; position: relative; }
+
+  /* ============ PROVA SOCIAL ============ */
+  .prova-head { text-align: center; max-width: 620px; margin: 0 auto 64px; }
+  .prova-h2 { font-size: 30px; margin-top: 20px; }
+  @media (min-width: 640px) { .prova-h2 { font-size: 38px; } }
+
+  .depoimentos {
+    display: grid; grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  @media (min-width: 800px) { .depoimentos { grid-template-columns: repeat(3, 1fr); } }
+  .depoimento {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+  .depoimento-quote {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 42px; line-height: 1; color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .depoimento-text {
+    color: var(--graphite); line-height: 1.65; margin-bottom: 20px;
+  }
+  .depoimento-text strong { color: var(--ink); font-weight: 500; }
+  .depoimento-autor { font-size: 13px; color: var(--muted); }
+
+  /* ============ FAQ ============ */
+  .faq-head { text-align: center; margin-bottom: 56px; }
+  .faq-list {
+    max-width: 760px; margin: 0 auto;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--line);
+    padding: 24px 0;
+  }
+  .faq-item:last-child { border-bottom: 0; }
+  .faq-question {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 24px;
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 19px; color: var(--ink);
+  }
+  .faq-plus {
+    color: var(--accent); font-size: 22px; flex-shrink: 0;
+    transition: transform 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  details[open] .faq-plus { transform: rotate(45deg); }
+  .faq-answer {
+    margin-top: 16px; color: var(--graphite); line-height: 1.65;
+  }
+
+  /* ============ CTA FINAL ============ */
+  .cta-final { padding: 100px 0; text-align: center; }
+  @media (min-width: 768px) { .cta-final { padding: 140px 0; } }
+  .cta-final-h2 {
+    font-size: 36px; margin-top: 24px; margin-bottom: 28px;
+  }
+  @media (min-width: 640px) { .cta-final-h2 { font-size: 48px; } }
+  .cta-final-h2 em { color: var(--accent); font-style: italic; font-weight: 400; }
+  .cta-final-p {
+    color: var(--graphite); max-width: 560px;
+    margin: 0 auto 44px; line-height: 1.65;
+  }
+  .cta-final-note { margin-top: 22px; font-size: 13px; color: var(--muted); }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 48px 0;
+    font-size: 14px;
+  }
+  @media (min-width: 700px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+  .footer-title {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 17px; color: var(--ink); margin-bottom: 12px;
+  }
+  .footer-text { color: var(--muted); line-height: 1.7; }
+  .footer-text a { display: block; transition: color 0.15s; }
+  .footer-text a:hover { color: var(--accent); }
+  .footer-bottom {
+    border-top: 1px solid var(--line);
+    padding: 22px 0; font-size: 12px; color: var(--muted);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  @media (min-width: 700px) {
+    .footer-bottom { flex-direction: row; justify-content: space-between; }
   }
 </style>
 </head>
-<body class="bg-cream text-ink antialiased">
+<body>
 
-<!-- ============ TOPBAR MINIMAL ============ -->
-<header class="border-b border-ink/5 bg-cream/95 backdrop-blur sticky top-0 z-50">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center">
-        <span class="display text-accent text-lg font-semibold">A</span>
-      </div>
+<!-- ============ TOPBAR ============ -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-brand">
+      <div class="topbar-logo">A</div>
       <div>
-        <div class="display text-base font-semibold leading-tight">Dra. Ana Lima</div>
-        <div class="text-xs text-muted tracking-wide">Nutrição de Precisão · Curitiba</div>
+        <div class="topbar-name">Dra. Ana Lima</div>
+        <div class="topbar-sub">Nutrição de Precisão · Curitiba</div>
       </div>
     </div>
-    <a href="#cta" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wa text-white text-sm font-medium hover:bg-waDark transition">
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+    <a href="#cta" class="btn-wa sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
       Agendar consulta
     </a>
   </div>
 </header>
 
 <!-- ============ HERO ============ -->
-<section class="max-w-6xl mx-auto px-6 pt-16 sm:pt-24 pb-20 sm:pb-28">
-  <div class="grid md:grid-cols-12 gap-12 items-center">
-    <div class="md:col-span-7">
-      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-6">Nutrição de Precisão</div>
-      <h1 class="display text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.05] tracking-tight text-ink">
-        Descubra a versão da sua saúde<br class="hidden sm:block"/>
-        que sua <em class="italic text-accent font-normal">genética</em> sempre soube.
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow">Nutrição de Precisão</div>
+      <h1 class="display hero-h1">
+        Descubra a versão da sua saúde que sua <em>genética</em> sempre soube.
       </h1>
-      <p class="mt-7 text-lg text-graphite leading-relaxed max-w-xl">
+      <p class="hero-sub">
         Nutrição personalizada com base em ciência, escuta clínica profunda e o mapa único do seu corpo. Sem modismos. Sem promessas milagrosas. Só o seu caminho.
       </p>
-      <div class="mt-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <a href="#cta" class="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-wa text-white font-medium hover:bg-waDark transition shadow-lg shadow-wa/25">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+      <div class="hero-cta">
+        <a href="#cta" class="btn-wa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
           Agendar consulta pelo WhatsApp
         </a>
-        <div class="text-sm text-muted">
-          Atendimento presencial e online
-        </div>
+        <div class="hero-cta-note">Atendimento presencial e online</div>
       </div>
     </div>
-    <div class="md:col-span-5">
-      <div class="hero-photo aspect-[4/5] rounded-sm overflow-hidden bg-gradient-to-br from-sand to-accent/20 flex items-center justify-center">
-        <!-- Placeholder — substituído por foto profissional da nutri -->
-        <div class="text-center p-10">
-          <div class="display text-7xl text-accent/30 italic mb-4">A</div>
-          <div class="text-xs uppercase tracking-[0.25em] text-muted">Foto profissional</div>
-        </div>
+    <div class="hero-photo">
+      <div class="hero-photo-inner">
+        <div class="hero-photo-mono">A</div>
+        <div class="hero-photo-label">Foto profissional</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ ISSO É PRA VOCÊ ============ -->
-<section class="bg-sand/40 py-20 sm:py-28">
-  <div class="max-w-5xl mx-auto px-6">
-    <div class="max-w-2xl">
-      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Isso é pra você se…</div>
-      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
+<!-- ============ DORES ICP ============ -->
+<section class="section-sand">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Isso é pra você se…</div>
+      <h2 class="display section-h2">
         Você chegou até aqui porque sente que algo precisa mudar — mas não mais um começo zerado.
       </h2>
     </div>
-    <div class="mt-16 grid sm:grid-cols-2 gap-x-12 gap-y-10">
-      <div class="flex gap-5">
-        <div class="display text-accent text-3xl font-light shrink-0 leading-none">01</div>
-        <p class="text-graphite leading-relaxed pt-1">
-          Você já tentou <span class="text-ink">várias dietas</span> e nenhuma sustentou resultado. Seu corpo parece responder diferente do que dizem os manuais.
-        </p>
+    <div class="dores-grid">
+      <div class="dor-item">
+        <div class="dor-num">01</div>
+        <p class="dor-text">Você já tentou <strong>várias dietas</strong> e nenhuma sustentou resultado. Seu corpo parece responder diferente do que dizem os manuais.</p>
       </div>
-      <div class="flex gap-5">
-        <div class="display text-accent text-3xl font-light shrink-0 leading-none">02</div>
-        <p class="text-graphite leading-relaxed pt-1">
-          Seu <span class="text-ink">histórico familiar</span> te preocupa — diabetes, colesterol, câncer — e você quer agir antes, não depois.
-        </p>
+      <div class="dor-item">
+        <div class="dor-num">02</div>
+        <p class="dor-text">Seu <strong>histórico familiar</strong> te preocupa — diabetes, colesterol, câncer — e você quer agir antes, não depois.</p>
       </div>
-      <div class="flex gap-5">
-        <div class="display text-accent text-3xl font-light shrink-0 leading-none">03</div>
-        <p class="text-graphite leading-relaxed pt-1">
-          Você sente <span class="text-ink">cansaço, inchaço, gordura abdominal</span> que não saem nem com treino nem com força de vontade.
-        </p>
+      <div class="dor-item">
+        <div class="dor-num">03</div>
+        <p class="dor-text">Você sente <strong>cansaço, inchaço, gordura abdominal</strong> que não saem nem com treino nem com força de vontade.</p>
       </div>
-      <div class="flex gap-5">
-        <div class="display text-accent text-3xl font-light shrink-0 leading-none">04</div>
-        <p class="text-graphite leading-relaxed pt-1">
-          Você quer <span class="text-ink">entender o próprio corpo</span> com embasamento científico — não mais uma tentativa, um entendimento.
-        </p>
+      <div class="dor-item">
+        <div class="dor-num">04</div>
+        <p class="dor-text">Você quer <strong>entender o próprio corpo</strong> com embasamento científico — não mais uma tentativa, um entendimento.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ QUEM É ============ -->
-<section class="max-w-6xl mx-auto px-6 py-20 sm:py-28">
-  <div class="grid md:grid-cols-12 gap-12 items-start">
-    <div class="md:col-span-5">
-      <div class="aspect-square rounded-sm overflow-hidden bg-sand/60 flex items-center justify-center">
-        <div class="display text-8xl text-accent/30 italic">A</div>
-      </div>
+<!-- ============ QUEM ATENDE ============ -->
+<section class="section-default">
+  <div class="container quem-grid">
+    <div class="quem-foto">
+      <div class="quem-foto-mono">A</div>
     </div>
-    <div class="md:col-span-7 md:pl-6">
-      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Quem atende você</div>
-      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
-        Dra. Ana Lima
-      </h2>
-      <p class="mt-4 text-sm text-muted tracking-wide">CRN-8 XXXXX · Curitiba, PR</p>
-      <div class="mt-8 space-y-5 text-graphite leading-relaxed">
-        <p>
-          Nutricionista clínica com <span class="text-ink">mais de 12 anos de atendimento</span>, especialização em Nutrição Funcional e Nutrigenética pela Unicamp. Atuação focada em <span class="text-ink">saúde da mulher adulta</span> — emagrecimento sustentável, metabolismo, saúde hormonal.
-        </p>
-        <p>
-          "Eu escuto primeiro. Antes de qualquer plano, antes de qualquer exame, eu quero entender a sua história. Porque nutrição que funciona é a que cabe na sua vida, não a que cabe no livro."
-        </p>
+    <div>
+      <div class="eyebrow">Quem atende você</div>
+      <h2 class="display quem-name">Dra. Ana Lima</h2>
+      <div class="quem-crn">CRN-8 XXXXX · Curitiba, PR</div>
+      <div class="quem-bio">
+        <p>Nutricionista clínica com <strong>mais de 12 anos de atendimento</strong>, especialização em Nutrição Funcional e Nutrigenética pela Unicamp. Atuação focada em <strong>saúde da mulher adulta</strong> — emagrecimento sustentável, metabolismo, saúde hormonal.</p>
+        <p>"Eu escuto primeiro. Antes de qualquer plano, antes de qualquer exame, eu quero entender a sua história. Porque nutrição que funciona é a que cabe na sua vida, não a que cabe no livro."</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ JORNADA (esquemática) ============ -->
-<section class="bg-ink text-cream py-24 sm:py-32 relative overflow-hidden">
-  <!-- textura sutil -->
-  <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
-
-  <div class="max-w-5xl mx-auto px-6 relative">
-    <div class="text-center max-w-2xl mx-auto mb-20">
-      <div class="text-xs uppercase tracking-[0.2em] text-wa mb-5">Sua jornada</div>
-      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15]">
-        Do primeiro olá no WhatsApp<br/>
-        até uma versão sua que você ainda não conhece.
+<!-- ============ JORNADA ============ -->
+<section class="jornada">
+  <div class="container">
+    <div class="jornada-head">
+      <div class="eyebrow jornada-eyebrow">Sua jornada</div>
+      <h2 class="display jornada-h2">
+        Do primeiro olá no WhatsApp até uma versão sua que você ainda não conhece.
       </h2>
     </div>
 
-    <!-- Steps horizontais (desktop) / verticais (mobile) -->
-    <div class="relative">
-      <!-- linha conectora -->
-      <div class="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-cream/15"></div>
-
-      <div class="grid md:grid-cols-3 gap-12 md:gap-8 relative">
-        <!-- PASSO 1 -->
-        <div class="text-center">
-          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
-            <div class="absolute inset-0 rounded-full bg-wa/20"></div>
-            <div class="relative w-10 h-10 rounded-full bg-wa flex items-center justify-center">
-              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
-            </div>
+    <div class="steps">
+      <div class="step step-1">
+        <div class="step-icon">
+          <div class="step-icon-bg"></div>
+          <div class="step-icon-fg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
           </div>
-          <div class="display text-xs uppercase tracking-[0.2em] text-wa mb-3">Passo 01</div>
-          <h3 class="display text-xl font-normal mb-4">Você fala com a gente</h3>
-          <p class="text-sm text-cream/70 leading-relaxed">
-            Pelo WhatsApp, nossa equipe entende sua história antes de agendar. Sem formulário frio. Sem pressa.
-          </p>
         </div>
+        <div class="step-eyebrow">Passo 01</div>
+        <h3 class="step-title">Você fala com a gente</h3>
+        <p class="step-desc">Pelo WhatsApp, nossa equipe entende sua história antes de agendar. Sem formulário frio. Sem pressa.</p>
+      </div>
 
-        <!-- PASSO 2 -->
-        <div class="text-center">
-          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
-            <div class="absolute inset-0 rounded-full bg-cream/10"></div>
-            <div class="relative w-10 h-10 rounded-full border border-cream/30 flex items-center justify-center">
-              <svg class="w-5 h-5 text-cream" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </div>
+      <div class="step step-2">
+        <div class="step-icon">
+          <div class="step-icon-bg"></div>
+          <div class="step-icon-fg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F7F3ED" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
           </div>
-          <div class="display text-xs uppercase tracking-[0.2em] text-cream/60 mb-3">Passo 02</div>
-          <h3 class="display text-xl font-normal mb-4">Primeira consulta</h3>
-          <p class="text-sm text-cream/70 leading-relaxed">
-            60 minutos de avaliação profunda — escuta, exames que você já tem, histórico. Aqui desenhamos sua rota.
-          </p>
         </div>
+        <div class="step-eyebrow">Passo 02</div>
+        <h3 class="step-title">Primeira consulta</h3>
+        <p class="step-desc">60 minutos de avaliação profunda — escuta, exames que você já tem, histórico. Aqui desenhamos sua rota.</p>
+      </div>
 
-        <!-- PASSO 3 -->
-        <div class="text-center">
-          <div class="relative inline-flex items-center justify-center w-16 h-16 mx-auto mb-6">
-            <div class="absolute inset-0 rounded-full bg-cream/10"></div>
-            <div class="relative w-10 h-10 rounded-full border border-cream/30 flex items-center justify-center">
-              <svg class="w-5 h-5 text-cream" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
+      <div class="step step-3">
+        <div class="step-icon">
+          <div class="step-icon-bg"></div>
+          <div class="step-icon-fg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F7F3ED" stroke-width="1.5" aria-hidden="true"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg>
           </div>
-          <div class="display text-xs uppercase tracking-[0.2em] text-cream/60 mb-3">Passo 03</div>
-          <h3 class="display text-xl font-normal mb-4">Plano que cabe em você</h3>
-          <p class="text-sm text-cream/70 leading-relaxed">
-            Nutrição ajustada à sua realidade. Quando faz sentido, sua nutri indica o teste nutrigenético — análise do seu DNA que refina o plano com precisão ainda maior.
-          </p>
         </div>
+        <div class="step-eyebrow">Passo 03</div>
+        <h3 class="step-title">Plano que cabe em você</h3>
+        <p class="step-desc">Nutrição ajustada à sua realidade. Quando faz sentido, sua nutri indica o teste nutrigenético — análise do seu DNA que refina o plano com precisão ainda maior.</p>
       </div>
     </div>
 
-    <div class="mt-20 text-center">
-      <a href="#cta" class="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-wa text-white font-medium hover:bg-waDark transition">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+    <div class="jornada-cta">
+      <a href="#cta" class="btn-wa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
         Começar a sua jornada
       </a>
     </div>
@@ -239,135 +540,122 @@
 </section>
 
 <!-- ============ PROVA SOCIAL ============ -->
-<section class="max-w-5xl mx-auto px-6 py-24 sm:py-32">
-  <div class="text-center max-w-2xl mx-auto mb-20">
-    <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Histórias que contam</div>
-    <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
-      Mulheres que entenderam o próprio corpo pela primeira vez.
-    </h2>
-  </div>
-
-  <div class="grid md:grid-cols-3 gap-8">
-    <blockquote class="border-t border-ink/10 pt-6">
-      <div class="display text-accent text-4xl leading-none mb-4">"</div>
-      <p class="text-graphite leading-relaxed mb-6">
-        A primeira consulta já foi diferente de tudo que vivi. Pela primeira vez entendi <span class="text-ink">por que meu corpo reage</span> do jeito que reage.
-      </p>
-      <footer class="text-sm text-muted">— Marina, 42</footer>
-    </blockquote>
-    <blockquote class="border-t border-ink/10 pt-6">
-      <div class="display text-accent text-4xl leading-none mb-4">"</div>
-      <p class="text-graphite leading-relaxed mb-6">
-        Achei que era só mais uma dieta. É outra coisa. É <span class="text-ink">entender seu próprio corpo</span> com quem estudou a vida toda pra te explicar.
-      </p>
-      <footer class="text-sm text-muted">— Patrícia, 51</footer>
-    </blockquote>
-    <blockquote class="border-t border-ink/10 pt-6">
-      <div class="display text-accent text-4xl leading-none mb-4">"</div>
-      <p class="text-graphite leading-relaxed mb-6">
-        O <span class="text-ink">teste nutrigenético</span> foi um divisor. Virou um antes e depois de autoconhecimento — não de dieta.
-      </p>
-      <footer class="text-sm text-muted">— Juliana, 38</footer>
-    </blockquote>
+<section class="section-default">
+  <div class="container">
+    <div class="prova-head">
+      <div class="eyebrow">Histórias que contam</div>
+      <h2 class="display prova-h2">
+        Mulheres que entenderam o próprio corpo pela primeira vez.
+      </h2>
+    </div>
+    <div class="depoimentos">
+      <blockquote class="depoimento">
+        <div class="depoimento-quote">&ldquo;</div>
+        <p class="depoimento-text">A primeira consulta já foi diferente de tudo que vivi. Pela primeira vez entendi <strong>por que meu corpo reage</strong> do jeito que reage.</p>
+        <footer class="depoimento-autor">— Marina, 42</footer>
+      </blockquote>
+      <blockquote class="depoimento">
+        <div class="depoimento-quote">&ldquo;</div>
+        <p class="depoimento-text">Achei que era só mais uma dieta. É outra coisa. É <strong>entender seu próprio corpo</strong> com quem estudou a vida toda pra te explicar.</p>
+        <footer class="depoimento-autor">— Patrícia, 51</footer>
+      </blockquote>
+      <blockquote class="depoimento">
+        <div class="depoimento-quote">&ldquo;</div>
+        <p class="depoimento-text">O <strong>teste nutrigenético</strong> foi um divisor. Virou um antes e depois de autoconhecimento — não de dieta.</p>
+        <footer class="depoimento-autor">— Juliana, 38</footer>
+      </blockquote>
+    </div>
   </div>
 </section>
 
 <!-- ============ FAQ ============ -->
-<section class="bg-sand/40 py-24 sm:py-28">
-  <div class="max-w-3xl mx-auto px-6">
-    <div class="text-center mb-16">
-      <div class="text-xs uppercase tracking-[0.2em] text-accent mb-5">Perguntas frequentes</div>
-      <h2 class="display text-3xl sm:text-4xl font-light leading-[1.15] text-ink">
-        O que costuma passar pela sua cabeça antes de agendar.
-      </h2>
+<section class="section-sand">
+  <div class="container">
+    <div class="faq-head">
+      <div class="eyebrow">Perguntas frequentes</div>
+      <h2 class="display section-h2" style="margin-top:20px;">O que costuma passar pela sua cabeça antes de agendar.</h2>
     </div>
-
-    <div class="divide-y divide-ink/10 border-t border-b border-ink/10">
-      <details class="group py-6">
-        <summary class="flex justify-between items-center cursor-pointer list-none">
-          <span class="display text-lg text-ink pr-8">Atende presencial ou online?</span>
-          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-question">
+          <span>Atende presencial ou online?</span>
+          <span class="faq-plus">+</span>
         </summary>
-        <p class="mt-4 text-graphite leading-relaxed">Os dois. O consultório fica em Curitiba; também atendo online para pacientes de todo o Brasil. No primeiro contato no WhatsApp você escolhe o formato.</p>
+        <p class="faq-answer">Os dois. O consultório fica em Curitiba; também atendo online para pacientes de todo o Brasil. No primeiro contato no WhatsApp você escolhe o formato.</p>
       </details>
-
-      <details class="group py-6">
-        <summary class="flex justify-between items-center cursor-pointer list-none">
-          <span class="display text-lg text-ink pr-8">Como funciona o acompanhamento depois da primeira consulta?</span>
-          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+      <details class="faq-item">
+        <summary class="faq-question">
+          <span>Como funciona o acompanhamento depois da primeira consulta?</span>
+          <span class="faq-plus">+</span>
         </summary>
-        <p class="mt-4 text-graphite leading-relaxed">Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo de acompanhamento depende do seu caso — alguns precisam de revisão quinzenal, outros mensal.</p>
+        <p class="faq-answer">Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo depende do seu caso — alguns precisam de revisão quinzenal, outros mensal.</p>
       </details>
-
-      <details class="group py-6">
-        <summary class="flex justify-between items-center cursor-pointer list-none">
-          <span class="display text-lg text-ink pr-8">O que é o teste nutrigenético?</span>
-          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+      <details class="faq-item">
+        <summary class="faq-question">
+          <span>O que é o teste nutrigenético?</span>
+          <span class="faq-plus">+</span>
         </summary>
-        <p class="mt-4 text-graphite leading-relaxed">É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos — usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.</p>
+        <p class="faq-answer">É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos — usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.</p>
       </details>
-
-      <details class="group py-6">
-        <summary class="flex justify-between items-center cursor-pointer list-none">
-          <span class="display text-lg text-ink pr-8">Atende plano de saúde?</span>
-          <span class="text-accent text-xl shrink-0 transition-transform group-open:rotate-45">+</span>
+      <details class="faq-item">
+        <summary class="faq-question">
+          <span>Atende plano de saúde?</span>
+          <span class="faq-plus">+</span>
         </summary>
-        <p class="mt-4 text-graphite leading-relaxed">O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista — emito recibo com código próprio pra você solicitar.</p>
+        <p class="faq-answer">O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista — emito recibo com código próprio pra você solicitar.</p>
       </details>
     </div>
   </div>
 </section>
 
 <!-- ============ CTA FINAL ============ -->
-<section id="cta" class="py-24 sm:py-32 bg-cream">
-  <div class="max-w-3xl mx-auto px-6 text-center">
-    <div class="text-xs uppercase tracking-[0.2em] text-accent mb-6">O próximo passo</div>
-    <h2 class="display text-4xl sm:text-5xl font-light leading-[1.1] text-ink mb-8">
+<section id="cta" class="cta-final">
+  <div class="container">
+    <div class="eyebrow">O próximo passo</div>
+    <h2 class="display cta-final-h2">
       Uma conversa no WhatsApp<br/>
-      <span class="italic text-accent">pode mudar o jeito que você se cuida.</span>
+      <em>pode mudar o jeito que você se cuida.</em>
     </h2>
-    <p class="text-graphite leading-relaxed max-w-xl mx-auto mb-12">
+    <p class="cta-final-p">
       Mande uma mensagem pra nossa equipe. Sem formulário. Sem pressa. A gente te ouve e te orienta pro próximo passo — seja agendar agora ou tirar dúvidas antes.
     </p>
-    <a href="https://wa.me/5541999999999?text=Oi!%20Vim%20pela%20página%20da%20Dra.%20Ana%20e%20quero%20agendar%20uma%20consulta." class="inline-flex items-center gap-3 px-9 py-5 rounded-full bg-wa text-white font-medium hover:bg-waDark transition shadow-2xl shadow-wa/30 text-lg">
-      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8zm5.6-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+    <a href="https://wa.me/5541999999999?text=Oi!%20Vim%20pela%20página%20da%20Dra.%20Ana%20e%20quero%20agendar%20uma%20consulta." class="btn-wa lg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
       Agendar consulta pelo WhatsApp
     </a>
-    <p class="mt-6 text-xs text-muted">Resposta em até 2h no horário comercial</p>
+    <div class="cta-final-note">Resposta em até 2h no horário comercial</div>
   </div>
 </section>
 
 <!-- ============ FOOTER ============ -->
-<footer class="border-t border-ink/10 bg-cream">
-  <div class="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-8 text-sm">
+<footer class="footer">
+  <div class="container footer-grid">
     <div>
-      <div class="display text-lg text-ink mb-3">Dra. Ana Lima</div>
-      <div class="text-muted leading-relaxed">
+      <div class="footer-title">Dra. Ana Lima</div>
+      <div class="footer-text">
         CRN-8 XXXXX<br/>
         Rua Exemplo, 123 — Curitiba, PR<br/>
         contato@dranutri.com.br
       </div>
     </div>
     <div>
-      <div class="display text-lg text-ink mb-3">Nos encontre</div>
-      <div class="space-y-2 text-muted">
-        <a href="#" class="block hover:text-accent transition">@dra.ana.nutri</a>
-        <a href="#" class="block hover:text-accent transition">WhatsApp</a>
+      <div class="footer-title">Nos encontre</div>
+      <div class="footer-text">
+        <a href="#">@dra.ana.nutri</a>
+        <a href="#">WhatsApp</a>
       </div>
     </div>
     <div>
-      <div class="display text-lg text-ink mb-3">Legal</div>
-      <div class="space-y-2 text-muted">
-        <a href="/privacidade" class="block hover:text-accent transition">Política de privacidade</a>
-        <a href="/termos" class="block hover:text-accent transition">Termos de uso</a>
+      <div class="footer-title">Legal</div>
+      <div class="footer-text">
+        <a href="/privacidade">Política de privacidade</a>
+        <a href="/termos">Termos de uso</a>
       </div>
     </div>
   </div>
-  <div class="border-t border-ink/5">
-    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-muted flex flex-col sm:flex-row justify-between gap-3">
-      <div>© 2026 Dra. Ana Lima. Todos os direitos reservados.</div>
-      <div>Nutrição de Precisão · Scanner da Saúde</div>
-    </div>
+  <div class="container footer-bottom">
+    <div>© 2026 Dra. Ana Lima. Todos os direitos reservados.</div>
+    <div>Nutrição de Precisão · Scanner da Saúde</div>
   </div>
 </footer>
 
