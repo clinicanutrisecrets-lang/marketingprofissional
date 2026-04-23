@@ -35,12 +35,12 @@ const PRESETS_CONTEUDO = {
 
 const PRESETS_MARCA: Record<string, { cor: string; tom: string }> = {
   scannerdasaude: {
-    cor: "#0F2D4A",
-    tom: "editorial premium, fundo escuro sofisticado, iluminação neon sutil, feeling científico e elegante",
+    cor: "#8B5CF6",
+    tom: "editorial tech/saude, fundo claro, cores solidas em blocos vibrantes (roxo, azul, verde tiffany, amarelo, vermelho, magenta — rotacionando entre elas), tipografia sans contemporanea, feeling software premium pra profissionais de saude",
   },
   nutrisecrets: {
-    cor: "#8B1E3F",
-    tom: "editorial caloroso premium, paleta vinho/bordô com tons quentes, feeling boutique clínico",
+    cor: "#0D9488",
+    tom: "editorial elegante, verde tiffany escuro dominante com magenta como contraste em destaques (CTAs, numeros, bullets), fundo creme neutro, tipografia serifada premium, feeling boutique clinica",
   },
 };
 
