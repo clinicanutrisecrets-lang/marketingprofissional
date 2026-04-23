@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { LPViewNutri } from "./LPViewNutri";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export const revalidate = 3600;
 
@@ -38,8 +39,18 @@ export default async function NutriLPPage({ params }: PageProps) {
   const franqueadaId = franqueada.id as string;
   const logoUrl = await buscarArquivoUrl(franqueadaId, "logo_principal");
   const fotoUrl = await buscarArquivoUrl(franqueadaId, "foto_profissional");
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
 
-  return <LPViewNutri franqueada={franqueada} logoUrl={logoUrl} fotoUrl={fotoUrl} />;
+  return (
+    <>
+      {pixelId && <MetaPixel pixelId={pixelId} franqueadaId={franqueadaId} />}
+      <LPViewNutri
+        franqueada={franqueada}
+        logoUrl={logoUrl}
+        fotoUrl={fotoUrl}
+      />
+    </>
+  );
 }
 
 export async function generateMetadata({ params }: PageProps) {

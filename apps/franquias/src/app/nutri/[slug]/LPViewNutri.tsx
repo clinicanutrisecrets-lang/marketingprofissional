@@ -1,3 +1,5 @@
+import { WhatsAppLink } from "./WhatsAppLink";
+
 type Props = {
   franqueada: Record<string, unknown>;
   logoUrl: string | null;
@@ -89,15 +91,15 @@ export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
               )}
             </div>
           </div>
-          <a
+          <WhatsAppLink
             href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            franqueadaId={franqueadaId}
+            source="topbar"
             className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:inline-flex"
             style={{ background: WA }}
           >
             <WhatsappIcon size={14} /> Agendar consulta
-          </a>
+          </WhatsAppLink>
         </div>
       </header>
 
@@ -124,15 +126,15 @@ export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
               único do seu corpo.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-5">
-              <a
+              <WhatsAppLink
                 href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
+                franqueadaId={franqueadaId}
+                source="hero"
                 className="inline-flex items-center gap-2.5 rounded-full px-7 py-4 text-[15px] font-medium text-white transition hover:opacity-90"
                 style={{ background: WA, boxShadow: "0 8px 24px rgba(37,211,102,0.25)" }}
               >
                 <WhatsappIcon size={18} /> Agendar consulta pelo WhatsApp
-              </a>
+              </WhatsAppLink>
               <div className="text-sm" style={{ color: MUTED }}>
                 Atendimento presencial e online
               </div>
@@ -383,15 +385,15 @@ export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
             ))}
           </div>
           <div className="relative mt-20 text-center">
-            <a
+            <WhatsAppLink
               href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
+              franqueadaId={franqueadaId}
+              source="jornada"
               className="inline-flex items-center gap-2.5 rounded-full px-7 py-4 text-[15px] font-medium text-white transition hover:opacity-90"
               style={{ background: WA, boxShadow: "0 8px 24px rgba(37,211,102,0.25)" }}
             >
               <WhatsappIcon size={18} /> Começar a sua jornada
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
       </section>
@@ -548,15 +550,15 @@ export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
             mensagem pra nossa equipe — sem formulário, sem pressa. A gente te ouve e te
             orienta pro próximo passo.
           </p>
-          <a
+          <WhatsAppLink
             href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            franqueadaId={franqueadaId}
+            source="cta_final"
             className="inline-flex items-center gap-3 rounded-full px-9 py-5 text-[17px] font-medium text-white transition hover:opacity-90"
             style={{ background: WA, boxShadow: "0 12px 36px rgba(37,211,102,0.32)" }}
           >
             <WhatsappIcon size={22} /> Agendar consulta pelo WhatsApp
-          </a>
+          </WhatsAppLink>
           <div className="mt-5 text-[13px]" style={{ color: MUTED }}>
             Resposta em até 2h no horário comercial
           </div>
