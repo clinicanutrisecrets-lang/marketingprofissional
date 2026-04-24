@@ -248,7 +248,9 @@ Não queimar lead — só não avançar agora. Talvez ele volte depois mais madu
 | Pitch | Quando | Conversão esperada |
 |---|---|---|
 | `discovery` (default) | Maior parte do tráfego | Oferta R$ 1.500 (Diagnóstico Inicial) → upsell anual na consulta |
-| `premium_direct` | Tráfego de público mais qualificado (lookalike de quem já comprou) | Oferta direta R$ 4.700 anual em 12x |
+| `premium_direct` | Tráfego de público mais qualificado (lookalike dos próprios pacientes da nutri após 60d de campanha) | Oferta direta R$ 4.700 anual em 12x |
+
+**Nota sobre seed de lookalike:** lookalike só funciona bem com **público próprio da nutri** (pacientes dela que compraram via Conversions API, acumulados nos primeiros 60-90 dias). NÃO usar pixel Scanner geral como seed — o público acumulado lá não converte pra essa estratégia premium (validado em testes anteriores quando Scanner abriu pra escala).
 
 Sofia detecta `utm_pitch` no parâmetro de entrada e ajusta abertura.
 

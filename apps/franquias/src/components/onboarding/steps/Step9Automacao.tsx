@@ -197,6 +197,41 @@ export function Step9Automacao({ dados, atualizar }: StepFormProps) {
             </div>
           </div>
         )}
+
+        {!fazAnuncio && (
+          <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 text-sm text-emerald-900 leading-relaxed">
+            <div className="font-semibold mb-2">
+              🌱 Ótima escolha pra começar — vamos focar 100% em orgânico
+            </div>
+            <p>
+              Quando você não roda anúncios, o agente direciona toda a energia pra:
+            </p>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>
+                <strong>Conteúdo de alta tração</strong> — posts desenhados pra ser
+                compartilhados (mulher manda pra amiga, nutri manda no grupo
+                profissional)
+              </li>
+              <li>
+                <strong>Análise estratégica do seu perfil</strong> — diagnóstico de
+                bio, destaques, padrões dos seus posts atuais e 10 mudanças
+                priorizadas (especialmente útil se seu Instagram ainda é pequeno)
+              </li>
+              <li>
+                <strong>20 ideias de conteúdo por mês</strong> baseadas em gaps que o
+                agente identifica no seu nicho
+              </li>
+              <li>
+                <strong>Calendário 70% autoridade + 30% tração</strong> pra crescer
+                sem perder posicionamento premium
+              </li>
+            </ul>
+            <p className="mt-3">
+              Você pode ativar ads depois, a qualquer momento, conforme tiver fluxo de
+              caixa pra investir.
+            </p>
+          </div>
+        )}
       </div>
     </FormWrapper>
   );

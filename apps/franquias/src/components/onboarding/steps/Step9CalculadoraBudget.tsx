@@ -181,6 +181,24 @@ export function CalculadoraBudget({ budgetAtual, onChangeBudget }: Props) {
         </div>
       </div>
 
+      {/* Disclaimer crítico: pra onde vai o dinheiro */}
+      <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-sm text-blue-900">
+        <div className="font-semibold mb-2">💡 Esse valor é pago direto ao Facebook</div>
+        <p className="leading-relaxed">
+          O budget que você escolher acima vai <strong>100% pro Meta (Facebook/Instagram)</strong>{" "}
+          como pagamento de mídia. <strong>Scanner não cobra comissão sobre ad spend</strong> —
+          nosso plano de assinatura já cobre o gerenciamento. Você paga só o que o Meta
+          consumir.
+        </p>
+        <p className="mt-2 leading-relaxed">
+          O piso de R$ 1.500-3.000/mês não é nosso interesse — é uma{" "}
+          <strong>limitação técnica do algoritmo do Meta</strong>: abaixo desse volume ele
+          não consegue otimizar entrega e custo por conversão fica artificialmente alto.
+          Se você prefere começar sem ads, perfeitamente possível —{" "}
+          <strong>desmarque a opção acima</strong> e o sistema foca 100% em orgânico.
+        </p>
+      </div>
+
       {/* Projeção em tempo real */}
       <div className="rounded-xl border border-brand-text/10 bg-white p-5">
         <h4 className="mb-3 text-sm font-semibold text-brand-text">
