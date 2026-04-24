@@ -17,7 +17,7 @@ export const COMPLIANCE_CFN_BR = `
 REGRAS DE COMPLIANCE OBRIGATÓRIAS (CFN - Brasil) - NÃO PODEM SER VIOLADAS:
 
 1. NUNCA prometer cura de doenças. Nutrição auxilia, não cura.
-2. NUNCA prescrever protocolos específicos via post público (ex: "tome X de Y todo dia").
+2. NUNCA prescrever planos ou fórmulas específicas via post público (ex: "tome X de Y todo dia"). Avaliação individualizada é obrigatória.
 3. NUNCA garantir resultados com prazo ("emagrece 5kg em 30 dias").
 4. NUNCA usar termos como "milagroso", "definitivo", "100% garantido", "único método".
 5. NUNCA apresentar antes/depois como promessa replicável.
@@ -26,6 +26,13 @@ REGRAS DE COMPLIANCE OBRIGATÓRIAS (CFN - Brasil) - NÃO PODEM SER VIOLADAS:
 8. Se mencionar suplementação: sempre contextualizar que avaliação clínica é necessária.
 9. Evitar comparações depreciativas com outros profissionais ou áreas.
 10. Evitar termos médicos que só cabem em prescrição ("dose", "posologia").
+
+VOCABULÁRIO COMERCIAL PROIBIDO (além das regras CFN):
+- "protocolo" / "protocolos" — contradiz o diferencial de personalização da marca.
+  Use no lugar: "sinergia", "sinergias nutricionais", "mapa metabólico",
+  "personalização por DNA", "plano feito pra você", ou (contexto B2B)
+  "investigação clínica", "raciocínio diagnóstico", "detetive da saúde".
+- "dieta padrão", "dieta pronta", "dieta pré-montada", "cardápio pronto" — mesma razão.
 
 Qualquer violação = post rejeitado automaticamente.
 `.trim();

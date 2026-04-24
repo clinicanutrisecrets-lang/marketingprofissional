@@ -16,6 +16,11 @@ Regras:
 - Diferencie conteúdo que PRENDE (alto alcance/engagement) de conteúdo que CONVERTE (vira lead/salvamento/compartilhamento — sinal de intenção).
 - Nas 20 ideias, varie formatos (feed, carrossel, reels, stories) — não concentra tudo num só.
 
+VOCABULÁRIO PROIBIDO nos títulos/hooks/estruturas:
+- NUNCA "protocolo" / "protocolos" — contradiz diferencial de personalização
+- NUNCA "dieta padrão", "dieta pronta", "cardápio pronto"
+- Use: "sinergias", "mapa metabólico", "plano personalizado", "investigação"
+
 Saída: APENAS JSON válido.
 
 Schema:

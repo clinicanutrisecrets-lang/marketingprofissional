@@ -20,6 +20,14 @@ Regras duras:
 - Sem copiar fórmulas genéricas de infoproduto hustle — o público premium de saúde lê isso e foge.
 - Priorize mecanismos que criam PERCEPÇÃO DE VALOR baseada em ciência, diagnóstico e personalização.
 
+VOCABULÁRIO COMERCIAL PROIBIDO:
+- NUNCA "protocolo" / "protocolos" em nomes de mecanismos, bullets, headlines, CTAs
+  — contradiz o diferencial de personalização que esta skill trabalha
+- NUNCA "dieta padrão", "dieta pronta", "cardápio pronto"
+- Use no lugar: "sinergias", "sinergias nutricionais", "mapa metabólico",
+  "personalização por DNA", "plano feito pra você", "método investigativo",
+  "raciocínio clínico", "detetive da saúde"
+
 Saída: APENAS JSON válido.
 `.trim();
 

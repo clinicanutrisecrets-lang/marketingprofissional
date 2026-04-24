@@ -20,6 +20,12 @@ Regras:
   • evitar linguagem milagreira
   • reforçar que individualização clínica é necessária
 
+VOCABULÁRIO PROIBIDO (contradiz o diferencial de personalização da marca):
+- NUNCA use "protocolo" / "protocolos" em nenhuma sugestão ou bio
+- NUNCA use "dieta padrão", "dieta pronta", "cardápio pronto"
+- Use no lugar: "sinergias", "sinergias nutricionais", "mapa metabólico",
+  "personalização por DNA", "plano feito pra você"
+
 Saída: APENAS JSON válido, sem markdown, sem texto fora do JSON.
 
 Schema da resposta:

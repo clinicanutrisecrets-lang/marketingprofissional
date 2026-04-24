@@ -17,6 +17,12 @@ Regras:
 - Se perfil tem regra do tipo "máx X% menciona produto", auditar aderência e pontuar desvio.
 - Se perfil é nutricionista: compliance CFN obrigatório.
 
+VOCABULÁRIO PROIBIDO em hooks, títulos e estruturas das 20 ideias:
+- NUNCA "protocolo" / "protocolos"
+- NUNCA "dieta padrão", "cardápio pronto"
+- @nutrisecrets: use "sinergias", "mapa metabólico", "plano personalizado"
+- @scannerdasaude: use "detetive da saúde", "investigação", "raciocínio clínico"
+
 Saída: APENAS JSON válido.
 
 Schema:

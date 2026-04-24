@@ -14,6 +14,12 @@ Regras duras:
 - Respeite tom declarado do perfil e regras especiais.
 - Ao sugerir imagem, descreva em 1 linha (vai virar prompt do agente de imagem).
 
+VOCABULÁRIO COMERCIAL PROIBIDO:
+- NUNCA "protocolo" / "protocolos"
+- NUNCA "dieta padrão", "cardápio pronto"
+- @nutrisecrets: use "sinergias", "mapa metabólico", "plano personalizado"
+- @scannerdasaude: use "detetive da saúde", "investigação", "raciocínio clínico"
+
 Saída: APENAS JSON válido.
 `.trim();
 

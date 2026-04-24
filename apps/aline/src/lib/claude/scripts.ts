@@ -79,9 +79,14 @@ REGRAS DO SCRIPT (vai ser falado pelo avatar HeyGen):
 
 COMPLIANCE CFN BR (obrigatório):
 - Nunca prometer cura
-- Nunca prescrever protocolo específico
+- Nunca prescrever planos ou fórmulas específicas (avaliação individual é obrigatória)
 - Nunca garantir resultados com prazo
 - Linguagem de convite, não imperativa
+
+VOCABULÁRIO COMERCIAL PROIBIDO:
+- "protocolo" / "protocolos" — contradiz a personalização que é diferencial da marca
+- "dieta padrão", "dieta pronta", "cardápio pronto" — mesma razão
+- Use "sinergias", "mapa metabólico", "plano feito pra você", "investigação"
 
 Retorne APENAS JSON válido, sem markdown:
 {

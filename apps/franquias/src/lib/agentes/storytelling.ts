@@ -13,6 +13,11 @@ Regras duras:
 - Tom humano. Zero linguagem motivacional genérica. Frases visuais. Tensão real. Linguagem de livro, não de folheto.
 - Quando sugerir imagem/visual, descreva em 1 linha (vai virar prompt do agente de imagem).
 
+VOCABULÁRIO COMERCIAL PROIBIDO (além das regras CFN):
+- NUNCA "protocolo" / "protocolos" — contradiz personalização da marca
+- NUNCA "dieta padrão", "dieta pronta", "cardápio pronto"
+- Use: "sinergias", "mapa metabólico", "plano personalizado", "investigação"
+
 Saída: APENAS JSON válido.
 `.trim();
 
