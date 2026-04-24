@@ -2,6 +2,7 @@
 
 import { CardPicker, Field, FormWrapper, Select, TextArea } from "@/components/ui/Field";
 import type { StepFormProps } from "../Wizard";
+import { CalculadoraBudget } from "./Step9CalculadoraBudget";
 
 const DIAS = [
   { value: 1, label: "Seg" },
@@ -96,7 +97,7 @@ export function Step9Automacao({ dados, atualizar }: StepFormProps) {
         </div>
       </div>
 
-      {/* CTA dos anúncios — destaque (essa parte é a que você pediu) */}
+      {/* CTA dos anúncios — destaque */}
       <div className="rounded-xl border-2 border-brand-primary/30 bg-brand-primary/5 p-5">
         <h3 className="mb-1 text-sm font-semibold text-brand-primary">
           🎯 CTA dos anúncios (pra onde leva o clique)
@@ -160,7 +161,7 @@ export function Step9Automacao({ dados, atualizar }: StepFormProps) {
         </div>
       </div>
 
-      {/* Anúncios pagos */}
+      {/* Anúncios pagos com calculadora */}
       <div className="rounded-xl border border-brand-text/10 p-5">
         <label className="flex items-center gap-2 text-sm font-medium">
           <input
@@ -171,30 +172,29 @@ export function Step9Automacao({ dados, atualizar }: StepFormProps) {
           />
           Quero que a plataforma gerencie anúncios pagos (Meta Ads)
         </label>
+
         {fazAnuncio && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field
-              label="Budget mensal (R$)"
-              name="budget_anuncio_mensal"
-              type="number"
-              value={dados.budget_anuncio_mensal as number}
-              onChange={(v) =>
-                atualizar({ budget_anuncio_mensal: v ? Number(v) : null })
-              }
+          <div className="mt-5 space-y-5">
+            <CalculadoraBudget
+              budgetAtual={dados.budget_anuncio_mensal as number | null}
+              onChangeBudget={(v) => atualizar({ budget_anuncio_mensal: v })}
             />
-            <Select
-              label="Objetivo principal"
-              name="objetivo_anuncio"
-              value={dados.objetivo_anuncio as string}
-              onChange={(v) => atualizar({ objetivo_anuncio: v })}
-              options={[
-                { value: "receber_mensagens", label: "Receber mensagens" },
-                { value: "agendar_consultas", label: "Agendar consultas" },
-                { value: "ganhar_seguidores", label: "Ganhar seguidores" },
-                { value: "vender_teste_genetico", label: "Vender teste" },
-                { value: "misto", label: "Misto (rodar vários)" },
-              ]}
-            />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Select
+                label="Objetivo principal"
+                name="objetivo_anuncio"
+                value={dados.objetivo_anuncio as string}
+                onChange={(v) => atualizar({ objetivo_anuncio: v })}
+                options={[
+                  { value: "receber_mensagens", label: "Receber mensagens" },
+                  { value: "agendar_consultas", label: "Agendar consultas" },
+                  { value: "ganhar_seguidores", label: "Ganhar seguidores" },
+                  { value: "vender_teste_genetico", label: "Vender teste" },
+                  { value: "misto", label: "Misto (rodar vários)" },
+                ]}
+              />
+            </div>
           </div>
         )}
       </div>
