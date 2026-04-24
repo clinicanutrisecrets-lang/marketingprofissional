@@ -304,68 +304,86 @@ export function LPViewNutri({
       </section>
 
       {/* LINHA DO TEMPO 12 MESES */}
-      <section className="py-20 sm:py-[112px]" style={{ background: "rgba(237,228,214,0.45)" }}>
-        <div className="mx-auto max-w-[1180px] px-6">
-          <div className="mx-auto max-w-[640px] text-center">
+      <section className="py-16 sm:py-[112px]" style={{ background: "rgba(237,228,214,0.45)" }}>
+        <div className="mx-auto max-w-[1180px] px-5 sm:px-6">
+          <div className="mx-auto max-w-[720px] text-center">
             <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
               Sua transformação ao longo de 12 meses
             </div>
             <h2
               style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.1, color: INK }}
-              className="text-[28px] font-normal sm:text-[36px]"
+              className="text-[26px] font-normal sm:text-[34px]"
             >
-              Resultado real não vem de uma consulta isolada — vem de um ano de acompanhamento próximo.
+              Silenciar genes de doença, ativar genes de saúde — uma jornada anual de longevidade.
             </h2>
           </div>
 
-          <div className="mt-16 grid gap-6 md:grid-cols-5">
+          <div className="mt-12 grid gap-8 sm:gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {[
               {
                 marco: "Mês 1",
                 titulo: "Diagnóstico Inicial",
-                desc: "Primeira consulta + teste nutrigenético + plano alimentar personalizado pra você",
+                desc: "Primeira consulta + coleta do teste nutrigenético + plano alimentar personalizado conforme sua história.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
+                    <path d="M8 2c0 4 8 6 8 10s-8 6-8 10" />
+                    <path d="M16 2c0 4-8 6-8 10s8 6 8 10" />
+                    <path d="M8 6h8M8 18h8M9 10h6M9 14h6" />
+                  </svg>
+                ),
               },
               {
-                marco: "Mês 2-3",
-                titulo: "Adaptação",
-                desc: "WhatsApp ativo todo dia + 1 retorno + ajustes finos no plano conforme seu corpo responde",
+                marco: "Dia 45",
+                titulo: "Retorno com o Teste",
+                desc: "Leitura completa do seu teste genético. Entendimento real de como seu corpo responde a alimentos e nutrientes.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                  </svg>
+                ),
               },
               {
-                marco: "Mês 4-6",
-                titulo: "Aprofundamento",
-                desc: "1 retorno presencial + leitura dos novos exames + refinamento do mapa metabólico",
+                marco: "Mês 3-5",
+                titulo: "Silenciamento Genético",
+                desc: "3 consultas mensais de tratamento nutrigenético: silenciar predisposições, ativar genes protetivos.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
+                    <path d="M4 20c4 0 6-16 16-16" />
+                    <path d="M4 20h4M4 20v-4" />
+                    <circle cx="20" cy="4" r="1.5" fill="currentColor" />
+                  </svg>
+                ),
               },
               {
-                marco: "Mês 7-9",
-                titulo: "Consolidação",
-                desc: "Hábitos viraram rotina. Plano evolui pra fase de manutenção. Você sente o corpo diferente",
+                marco: "Mês 6",
+                titulo: "Avaliação Semestral",
+                desc: "Check completo da saúde: como seu corpo responde ao novo padrão + manutenção dos resultados alcançados.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
+                    <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                ),
               },
               {
-                marco: "Mês 10-12",
-                titulo: "Manutenção + Checkup",
-                desc: "Balanço anual completo + ajuste de longo prazo + planejamento do próximo ciclo",
+                marco: "Mês 12",
+                titulo: "Checkup Anual",
+                desc: "Correlação sintomas atuais + exames de sangue + genética. Cronograma anual de alimentos e suplementos pra longevidade ativa.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                    <path d="M12 2l2.4 5.8 6.2.6-4.7 4.2 1.4 6.1-5.3-3.2-5.3 3.2 1.4-6.1L3.4 8.4l6.2-.6L12 2z" />
+                  </svg>
+                ),
               },
             ].map((m, i) => (
               <div key={i} className="relative">
-                {/* Linha conectora desktop */}
-                {i < 4 && (
-                  <div
-                    className="absolute hidden md:block"
-                    style={{
-                      top: "20px",
-                      left: "calc(50% + 30px)",
-                      right: "calc(-50% + 30px)",
-                      height: "1px",
-                      background: "rgba(47,93,80,0.25)",
-                    }}
-                  />
-                )}
                 <div className="text-center">
                   <div
-                    className="relative mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-bold"
+                    className="relative mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white"
                     style={{ background: "#2F5D50" }}
                   >
-                    {i + 1}
+                    {m.icon}
                   </div>
                   <div
                     className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]"
@@ -375,11 +393,11 @@ export function LPViewNutri({
                   </div>
                   <h3
                     style={{ fontFamily: SERIF, color: INK }}
-                    className="mb-2 text-[18px]"
+                    className="mb-2 text-[18px] sm:text-[17px] lg:text-[18px]"
                   >
                     {m.titulo}
                   </h3>
-                  <p className="text-[13px] leading-[1.5]" style={{ color: GRAPHITE }}>
+                  <p className="text-[13px] leading-[1.5] sm:text-[12.5px] lg:text-[13px]" style={{ color: GRAPHITE }}>
                     {m.desc}
                   </p>
                 </div>
@@ -387,8 +405,8 @@ export function LPViewNutri({
             ))}
           </div>
 
-          <p className="mt-14 text-center text-[14px] italic" style={{ color: MUTED }}>
-            Todo mês a sua nutri ajusta o plano com base nos seus dados — não é receita pronta, é evolução constante.
+          <p className="mt-12 text-center text-[14px] italic px-4" style={{ color: MUTED }}>
+            Todo mês seu plano evolui com base nos seus dados — não é receita pronta, é engenharia de longevidade aplicada a você.
           </p>
         </div>
       </section>
@@ -505,15 +523,15 @@ export function LPViewNutri({
       </section>
 
       {/* COMPARAÇÃO: CONSULTA AVULSA vs PLANO ANUAL */}
-      <section className="py-24 sm:py-[128px]">
-        <div className="mx-auto max-w-[1180px] px-6">
-          <div className="mx-auto mb-14 max-w-[640px] text-center">
+      <section className="py-20 sm:py-[128px]">
+        <div className="mx-auto max-w-[1180px] px-5 sm:px-6">
+          <div className="mx-auto mb-12 max-w-[640px] text-center">
             <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
               Como você quer começar
             </div>
             <h2
               style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.1, color: INK }}
-              className="text-[28px] font-normal sm:text-[36px]"
+              className="text-[26px] font-normal sm:text-[36px]"
             >
               Duas formas de cuidar da sua saúde com a {primeiroNome}.
             </h2>
@@ -522,13 +540,13 @@ export function LPViewNutri({
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             {/* Card 1 — Consulta Avulsa */}
-            <div className="rounded-2xl border bg-white p-8" style={{ borderColor: `${INK}14` }}>
+            <div className="rounded-2xl border bg-white p-6 sm:p-8" style={{ borderColor: `${INK}14` }}>
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: MUTED }}>
                 Opção 1
               </div>
-              <h3 style={{ fontFamily: SERIF, color: INK }} className="mb-3 text-[26px]">
+              <h3 style={{ fontFamily: SERIF, color: INK }} className="mb-3 text-[24px] sm:text-[26px]">
                 Consulta Avulsa
               </h3>
               <p className="mb-6 text-[14px] leading-[1.55]" style={{ color: GRAPHITE }}>
@@ -539,7 +557,7 @@ export function LPViewNutri({
                   "1 consulta de avaliação inicial (60 min)",
                   "Plano alimentar personalizado",
                   "1 retorno opcional em 30 dias (à parte)",
-                  "Sem teste laboratorial incluso",
+                  "Sem teste nutrigenético incluso",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span style={{ color: MUTED }}>•</span>
@@ -554,7 +572,7 @@ export function LPViewNutri({
 
             {/* Card 2 — Plano Anual (DESTAQUE) */}
             <div
-              className="relative rounded-2xl p-8"
+              className="relative rounded-2xl p-6 sm:p-8 mt-4 lg:mt-0"
               style={{
                 background: INK,
                 color: CREAM,
@@ -563,7 +581,7 @@ export function LPViewNutri({
             >
               {/* Badge */}
               <div
-                className="absolute -top-3 right-8 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-white"
+                className="absolute -top-3 right-6 sm:right-8 rounded-full px-3 sm:px-4 py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] text-white"
                 style={{ background: "#2F5D50" }}
               >
                 ★ Recomendado
@@ -575,24 +593,25 @@ export function LPViewNutri({
               >
                 Opção 2
               </div>
-              <h3 style={{ fontFamily: SERIF }} className="mb-3 text-[26px]">
-                Plano de Acompanhamento Anual
+              <h3 style={{ fontFamily: SERIF }} className="mb-3 text-[24px] sm:text-[26px] leading-tight">
+                Plano Anual de Longevidade Genética
               </h3>
               <p className="mb-6 text-[14px] leading-[1.55]" style={{ color: "rgba(247,243,237,0.8)" }}>
-                Pra quem quer transformação real ao longo de 12 meses, com suporte contínuo e ajuste constante.
+                Pra quem quer silenciar genes de doença, ativar genes de saúde e construir longevidade real ao longo de 12 meses.
               </p>
               <ul className="space-y-3 text-[14px]" style={{ color: "rgba(247,243,237,0.92)" }}>
                 {[
-                  { texto: "Diagnóstico inicial completo", destaque: false },
+                  { texto: "Consulta inicial completa (60 min)", destaque: false },
                   { texto: "Teste nutrigenético incluso", destaque: true },
-                  { texto: "4 consultas distribuídas no ano (a cada 3 meses)", destaque: true },
-                  { texto: "WhatsApp ativo todo dia (suporte da equipe)", destaque: true },
-                  { texto: "Mapa metabólico evolutivo (atualizado a cada consulta)", destaque: false },
-                  { texto: "Checkup anual completo no mês 12", destaque: false },
-                  { texto: "Acesso prioritário a novos exames lançados", destaque: false },
+                  { texto: "Retorno com resultados do teste (45 dias)", destaque: true },
+                  { texto: "3 meses de tratamento de silenciamento genético (1 consulta/mês)", destaque: true },
+                  { texto: "Avaliação semestral de saúde + manutenção dos resultados", destaque: false },
+                  { texto: "Checkup anual: correlação sintomas + exames + genética", destaque: true },
+                  { texto: "Cronograma anual de alimentos e suplementos pra longevidade ativa", destaque: true },
+                  { texto: "Acesso prioritário a novos testes (epigenético em breve)", destaque: false },
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span style={{ color: "#25D366" }}>✓</span>
+                    <span style={{ color: "#25D366", marginTop: 2 }}>✓</span>
                     <span style={item.destaque ? { fontWeight: 500, color: CREAM } : {}}>
                       {item.texto}
                     </span>
@@ -613,7 +632,7 @@ export function LPViewNutri({
               href={waLink}
               franqueadaId={franqueadaId}
               source="jornada"
-              className="inline-flex items-center gap-2.5 rounded-full px-7 py-4 text-[15px] font-medium text-white transition hover:opacity-90"
+              className="inline-flex items-center gap-2.5 rounded-full px-6 sm:px-7 py-4 text-[14px] sm:text-[15px] font-medium text-white transition hover:opacity-90"
               style={{ background: WA, boxShadow: "0 8px 24px rgba(37,211,102,0.25)" }}
             >
               <WhatsappIcon size={18} /> Conversar sobre qual faz mais sentido pra mim

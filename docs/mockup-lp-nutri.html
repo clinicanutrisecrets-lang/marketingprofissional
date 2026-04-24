@@ -223,6 +223,63 @@
   .quem-bio p + p { margin-top: 18px; }
   .quem-bio strong { color: var(--ink); font-weight: 500; }
 
+  /* ============ TIMELINE ============ */
+  .timeline-section { padding: 64px 0; }
+  @media (min-width: 768px) { .timeline-section { padding: 112px 0; } }
+  .timeline-grid {
+    margin-top: 48px;
+    display: grid;
+    gap: 32px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  @media (min-width: 1024px) { .timeline-grid { grid-template-columns: repeat(5, 1fr); margin-top: 56px; } }
+  .timeline-item { text-align: center; }
+  .timeline-icon {
+    width: 48px; height: 48px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .timeline-marco {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .timeline-titulo {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 18px; color: var(--ink); margin-bottom: 8px;
+  }
+  .timeline-desc { font-size: 13px; color: var(--graphite); line-height: 1.5; }
+
+  /* ============ COMPARAÇÃO (responsive) ============ */
+  .comparacao-grid {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 1024px) {
+    .comparacao-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .card-opcao {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+  }
+  @media (min-width: 640px) { .card-opcao { padding: 32px; } }
+  .card-premium {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 30px 60px -20px rgba(31,29,26,0.35);
+  }
+  @media (min-width: 640px) { .card-premium { padding: 32px; } }
+
   /* ============ JORNADA (DARK) ============ */
   .jornada {
     background: var(--ink);
@@ -483,49 +540,58 @@
 </section>
 
 <!-- ============ LINHA DO TEMPO 12 MESES ============ -->
-<section class="section-sand">
+<section class="section-sand timeline-section">
   <div class="container">
-    <div style="max-width:640px;margin:0 auto;text-align:center;">
+    <div style="max-width:720px;margin:0 auto;text-align:center;">
       <div class="eyebrow">Sua transformação ao longo de 12 meses</div>
       <h2 class="display section-h2" style="margin-top:20px;">
-        Resultado real não vem de uma consulta isolada — vem de um ano de acompanhamento próximo.
+        Silenciar genes de doença, ativar genes de saúde — uma jornada anual de longevidade.
       </h2>
     </div>
-    <div style="margin-top:64px;display:grid;gap:24px;grid-template-columns:repeat(5,1fr);">
-      <!-- Marcos -->
-      <div style="text-align:center;position:relative;">
-        <div style="width:40px;height:40px;background:var(--accent);color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 16px;font-size:14px;">1</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Mês 1</div>
-        <div class="display" style="font-size:18px;color:var(--ink);margin-bottom:8px;">Diagnóstico Inicial</div>
-        <div style="font-size:13px;color:var(--graphite);line-height:1.5;">Primeira consulta + teste nutrigenético + plano alimentar personalizado pra você</div>
+    <div class="timeline-grid">
+      <div class="timeline-item">
+        <div class="timeline-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><path d="M8 2c0 4 8 6 8 10s-8 6-8 10"/><path d="M16 2c0 4-8 6-8 10s8 6 8 10"/><path d="M8 6h8M8 18h8M9 10h6M9 14h6"/></svg>
+        </div>
+        <div class="timeline-marco">Mês 1</div>
+        <div class="timeline-titulo">Diagnóstico Inicial</div>
+        <div class="timeline-desc">Primeira consulta + coleta do teste nutrigenético + plano alimentar personalizado conforme sua história.</div>
       </div>
-      <div style="text-align:center;position:relative;">
-        <div style="width:40px;height:40px;background:var(--accent);color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 16px;font-size:14px;">2</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Mês 2-3</div>
-        <div class="display" style="font-size:18px;color:var(--ink);margin-bottom:8px;">Adaptação</div>
-        <div style="font-size:13px;color:var(--graphite);line-height:1.5;">WhatsApp ativo todo dia + 1 retorno + ajustes finos no plano conforme seu corpo responde</div>
+      <div class="timeline-item">
+        <div class="timeline-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <div class="timeline-marco">Dia 45</div>
+        <div class="timeline-titulo">Retorno com o Teste</div>
+        <div class="timeline-desc">Leitura completa do seu teste genético. Entendimento real de como seu corpo responde a alimentos e nutrientes.</div>
       </div>
-      <div style="text-align:center;position:relative;">
-        <div style="width:40px;height:40px;background:var(--accent);color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 16px;font-size:14px;">3</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Mês 4-6</div>
-        <div class="display" style="font-size:18px;color:var(--ink);margin-bottom:8px;">Aprofundamento</div>
-        <div style="font-size:13px;color:var(--graphite);line-height:1.5;">1 retorno presencial + leitura de novos exames + refinamento do mapa metabólico</div>
+      <div class="timeline-item">
+        <div class="timeline-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><path d="M4 20c4 0 6-16 16-16"/><path d="M4 20h4M4 20v-4"/><circle cx="20" cy="4" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <div class="timeline-marco">Mês 3-5</div>
+        <div class="timeline-titulo">Silenciamento Genético</div>
+        <div class="timeline-desc">3 consultas mensais de tratamento nutrigenético: silenciar predisposições, ativar genes protetivos.</div>
       </div>
-      <div style="text-align:center;position:relative;">
-        <div style="width:40px;height:40px;background:var(--accent);color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 16px;font-size:14px;">4</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Mês 7-9</div>
-        <div class="display" style="font-size:18px;color:var(--ink);margin-bottom:8px;">Consolidação</div>
-        <div style="font-size:13px;color:var(--graphite);line-height:1.5;">Hábitos viraram rotina. Plano evolui pra fase de manutenção. Você sente o corpo diferente</div>
+      <div class="timeline-item">
+        <div class="timeline-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div class="timeline-marco">Mês 6</div>
+        <div class="timeline-titulo">Avaliação Semestral</div>
+        <div class="timeline-desc">Check completo da saúde: como seu corpo responde ao novo padrão + manutenção dos resultados alcançados.</div>
       </div>
-      <div style="text-align:center;position:relative;">
-        <div style="width:40px;height:40px;background:var(--accent);color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 16px;font-size:14px;">5</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Mês 10-12</div>
-        <div class="display" style="font-size:18px;color:var(--ink);margin-bottom:8px;">Manutenção + Checkup</div>
-        <div style="font-size:13px;color:var(--graphite);line-height:1.5;">Balanço anual completo + ajuste de longo prazo + planejamento do próximo ciclo</div>
+      <div class="timeline-item">
+        <div class="timeline-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12 2l2.4 5.8 6.2.6-4.7 4.2 1.4 6.1-5.3-3.2-5.3 3.2 1.4-6.1L3.4 8.4l6.2-.6L12 2z"/></svg>
+        </div>
+        <div class="timeline-marco">Mês 12</div>
+        <div class="timeline-titulo">Checkup Anual</div>
+        <div class="timeline-desc">Correlação sintomas atuais + exames de sangue + genética. Cronograma anual de alimentos e suplementos pra longevidade ativa.</div>
       </div>
     </div>
-    <p style="margin-top:56px;text-align:center;font-style:italic;color:var(--muted);font-size:14px;">
-      Todo mês a sua nutri ajusta o plano com base nos seus dados — não é receita pronta, é evolução constante.
+    <p style="margin-top:48px;text-align:center;font-style:italic;color:var(--muted);font-size:14px;padding:0 16px;">
+      Todo mês seu plano evolui com base nos seus dados — não é receita pronta, é engenharia de longevidade aplicada a você.
     </p>
   </div>
 </section>
@@ -590,7 +656,7 @@
 <!-- ============ COMPARAÇÃO CONSULTA vs PLANO ANUAL ============ -->
 <section class="section-default">
   <div class="container">
-    <div style="max-width:640px;margin:0 auto 56px;text-align:center;">
+    <div style="max-width:640px;margin:0 auto 48px;text-align:center;">
       <div class="eyebrow">Como você quer começar</div>
       <h2 class="display section-h2" style="margin-top:20px;">Duas formas de cuidar da sua saúde com a Dra. Ana.</h2>
       <p style="margin-top:16px;color:var(--graphite);font-size:15px;line-height:1.6;">
@@ -598,43 +664,44 @@
       </p>
     </div>
 
-    <div style="display:grid;gap:24px;grid-template-columns:1fr 1fr;">
+    <div class="comparacao-grid">
       <!-- Card 1: Consulta Avulsa -->
-      <div style="border:1px solid var(--line);background:#fff;border-radius:16px;padding:32px;">
+      <div class="card-opcao">
         <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Opção 1</div>
-        <h3 class="display" style="font-size:26px;color:var(--ink);margin-bottom:12px;">Consulta Avulsa</h3>
-        <p style="font-size:14px;line-height:1.55;color:var(--graphite);margin-bottom:24px;">
+        <h3 class="display" style="font-size:24px;color:var(--ink);margin-bottom:12px;">Consulta Avulsa</h3>
+        <p style="font-size:14px;line-height:1.55;color:var(--graphite);margin-bottom:20px;">
           Pra quem quer experimentar a abordagem antes de se comprometer com acompanhamento longo.
         </p>
         <ul style="list-style:none;padding:0;font-size:14px;color:var(--graphite);">
           <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:var(--muted);">•</span><span>1 consulta de avaliação inicial (60 min)</span></li>
           <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:var(--muted);">•</span><span>Plano alimentar personalizado</span></li>
           <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:var(--muted);">•</span><span>1 retorno opcional em 30 dias (à parte)</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:var(--muted);">•</span><span>Sem teste laboratorial incluso</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:var(--muted);">•</span><span>Sem teste nutrigenético incluso</span></li>
         </ul>
-        <div style="margin-top:32px;font-size:13px;color:var(--muted);font-style:italic;">
+        <div style="margin-top:28px;font-size:13px;color:var(--muted);font-style:italic;">
           Investimento: pontual, sob consulta no WhatsApp
         </div>
       </div>
 
       <!-- Card 2: Plano Anual (DESTAQUE) -->
-      <div style="background:var(--ink);color:var(--cream);border-radius:16px;padding:32px;position:relative;box-shadow:0 30px 60px -20px rgba(31,29,26,0.35);">
-        <div style="position:absolute;top:-12px;right:32px;background:var(--accent);color:#fff;padding:6px 16px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;">★ Recomendado</div>
+      <div class="card-premium">
+        <div style="position:absolute;top:-12px;right:24px;background:var(--accent);color:#fff;padding:6px 14px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;">★ Recomendado</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,243,237,0.6);margin-bottom:8px;">Opção 2</div>
-        <h3 class="display" style="font-size:26px;margin-bottom:12px;">Plano de Acompanhamento Anual</h3>
-        <p style="font-size:14px;line-height:1.55;color:rgba(247,243,237,0.8);margin-bottom:24px;">
-          Pra quem quer transformação real ao longo de 12 meses, com suporte contínuo e ajuste constante.
+        <h3 class="display" style="font-size:24px;margin-bottom:12px;line-height:1.15;">Plano Anual de Longevidade Genética</h3>
+        <p style="font-size:14px;line-height:1.55;color:rgba(247,243,237,0.8);margin-bottom:20px;">
+          Pra quem quer silenciar genes de doença, ativar genes de saúde e construir longevidade real ao longo de 12 meses.
         </p>
         <ul style="list-style:none;padding:0;font-size:14px;color:rgba(247,243,237,0.92);">
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span>Diagnóstico inicial completo</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span style="font-weight:500;color:var(--cream);">Teste nutrigenético incluso</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span style="font-weight:500;color:var(--cream);">4 consultas distribuídas no ano (a cada 3 meses)</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span style="font-weight:500;color:var(--cream);">WhatsApp ativo todo dia (suporte da equipe)</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span>Mapa metabólico evolutivo (atualizado a cada consulta)</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span>Checkup anual completo no mês 12</span></li>
-          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;">✓</span><span>Acesso prioritário a novos exames lançados</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span>Consulta inicial completa (60 min)</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span style="font-weight:500;color:var(--cream);">Teste nutrigenético incluso</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span style="font-weight:500;color:var(--cream);">Retorno com resultados do teste (45 dias)</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span style="font-weight:500;color:var(--cream);">3 meses de tratamento de silenciamento genético (1 consulta/mês)</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span>Avaliação semestral de saúde + manutenção dos resultados</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span style="font-weight:500;color:var(--cream);">Checkup anual: correlação sintomas + exames + genética</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span style="font-weight:500;color:var(--cream);">Cronograma anual de alimentos e suplementos pra longevidade ativa</span></li>
+          <li style="display:flex;gap:12px;margin-bottom:12px;"><span style="color:#25D366;margin-top:2px;">✓</span><span>Acesso prioritário a novos testes (epigenético em breve)</span></li>
         </ul>
-        <div style="margin-top:32px;font-size:13px;color:rgba(247,243,237,0.7);font-style:italic;">
+        <div style="margin-top:28px;font-size:13px;color:rgba(247,243,237,0.7);font-style:italic;">
           Investimento: parcelável em até 12x — proporcional à sua jornada
         </div>
       </div>
