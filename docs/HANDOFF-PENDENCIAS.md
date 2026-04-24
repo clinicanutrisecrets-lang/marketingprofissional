@@ -19,13 +19,14 @@ Atualizado: sessão de integração cross-projeto (Scanner SaaS ↔ Marketing).
 
 ---
 
-## 🤖 Agentes de WhatsApp: Fernanda ≠ Sofia (NÃO CONFUNDIR)
+## 🤖 Agentes de conversação: Fernanda ≠ Sofia (NÃO CONFUNDIR)
 
-Dois números, dois papéis, dois lados.
+Dois agentes, dois papéis, dois canais diferentes.
 
-### 🎯 Fernanda (Scanner SaaS — lado do PO)
+### 🎯 Fernanda (WhatsApp oficial — Scanner SaaS)
 
-- **Número:** +55 41 9277-2344 (oficial WhatsApp Business Meta aprovado)
+- **Canal:** WhatsApp Business Cloud API
+- **Número:** +55 41 9277-2344 (oficial Meta aprovado)
 - **Onde mora:** Scanner SaaS (scannerdasaude.com)
 - **Atende:** clientes diretos da marca Scanner — 2 modos:
   - **Lead novo** (número NÃO está em `nutricionistas.whatsapp`): modo sales → converte em franquia OU vende teste Kiwify direto
@@ -33,19 +34,28 @@ Dois números, dois papéis, dois lados.
 - **Webhook:** `/api/webhooks/whatsapp` no Scanner SaaS
 - **NÃO chama endpoints do Marketing.** Opera isolada no SaaS.
 
-### 🎯 Sofia (Marketing/Franquias — lado da nutri franqueada)
+### 🎯 Sofia (URL tipo-WhatsApp — Scanner SaaS multi-tenant)
 
-- **Número:** outro, um por nutri (ou um central por enquanto, roteamento por `[ref:frq_X]`)
-- **Onde mora:** conceitualmente no Marketing/Franquias
-- **Atende:** pacientes das nutris franqueadas — qualifica, agenda, oferece teste via upsell
-- **Endpoint que chama:** `POST /api/conversions/schedule` (no Marketing) quando confirma consulta → dispara CAPI `Schedule` R$650 pro Meta
-- **Auth:** header `x-sofia-token` com `SOFIA_INTERNAL_TOKEN`
+**ARQUITETURA MUDOU:** Sofia NÃO é WhatsApp. É uma **URL por nutri** no domínio Scanner SaaS com layout que parece WhatsApp, cada URL personalizada (nome da nutri, valor consulta/teste, tom).
+
+- **URL pattern:** `scannerdasaude.com/sofia/[slug-nutri]` (ou similar — a definir com o PO)
+- **Onde mora:** Scanner SaaS (scannerdasaude.com)
+- **Inteligência:** 1 Sofia só (central), multi-tenant por URL. Evita custo de N números WhatsApp + risco de bloqueio Meta.
+- **Atende:** pacientes das nutris franqueadas (chegam via ad CTWA... não, **via ad direto na URL**) — qualifica, agenda consulta, oferece teste com upsell
+- **Pixel:** carrega pixel Scanner na própria página (cross-domain com LP funciona, mesmo pixel guarda-chuva)
+- **Eventos que Sofia dispara no Marketing (CAPI via Marketing):**
+  | Evento Sofia | Endpoint Marketing | Valor |
+  |---|---|---|
+  | Lead qualificado (paciente real, forneceu dados) | `POST /api/conversions/lead` | sem valor |
+  | Envio de link Kiwify (intenção forte) | `POST /api/conversions/initiate-checkout` | R$1.800 |
+  | Consulta agendada confirmada | `POST /api/conversions/schedule` | R$650 |
+- **Auth de todos os endpoints:** header `x-sofia-token` = `SOFIA_INTERNAL_TOKEN` (env compartilhado SaaS↔Marketing)
 
 ### Por que a distinção importa
 
-- Fernanda roda no domínio `scannerdasaude.com`, Sofia no fluxo de ads do `app.scannerdasaude.com/nutri/[slug]`
-- Fernanda dispara eventos no Scanner SaaS (CRM, franquia_pipeline); Sofia dispara CAPI Meta pelo Marketing
-- Fernanda NUNCA confunde com Sofia mesmo se um lead conversar com as duas — são números diferentes e códigos diferentes
+- Fernanda = WhatsApp B2B/B2C direto da marca Scanner, fala por Scanner mesmo
+- Sofia = URL com persona-por-nutri, fala "em nome da Dra. Ana Lima" mas é a mesma IA central
+- Fernanda roda isolada no SaaS. Sofia usa SaaS como host + Marketing como tracking hub
 
 ---
 
@@ -87,7 +97,38 @@ Scanner SaaS
 - `UPDATE franqueadas SET kiwify_product_id = X WHERE email = Y`
 - Se email não existe (nutri ainda não finalizou onboarding no Marketing): retorna 404 — SaaS reenvia quando ela finalizar
 
-### 3. Venda Kiwify → SaaS (Marketing → SaaS)
+### 3. Eventos da Sofia → CAPI via Marketing (SaaS → Marketing)
+
+**Trigger:** Sofia (URL-chat no SaaS) identifica progresso no funil.
+
+**Fluxo:**
+```
+Sofia (scannerdasaude.com/sofia/[slug])
+  ├─ Lead qualificado (forneceu email/phone)
+  │    → POST app.scannerdasaude.com/api/conversions/lead  ✅ IMPLEMENTADO
+  │         header: x-sofia-token (SOFIA_INTERNAL_TOKEN)
+  │         body: { franqueadaId, leadRef, paciente{email,phone,nome},
+  │                 fbclid, fbp, anuncioId, clientIp, userAgent }
+  │         → CAPI Lead (sem valor, sinal pra otimização)
+  │
+  ├─ Envio de link Kiwify (intenção forte)
+  │    → POST app.scannerdasaude.com/api/conversions/initiate-checkout  ✅ IMPLEMENTADO
+  │         → CAPI InitiateCheckout R$1.800
+  │
+  └─ Consulta confirmada
+       → POST app.scannerdasaude.com/api/conversions/schedule  ✅ IMPLEMENTADO
+            → CAPI Schedule R$650
+```
+
+**Scanner SaaS deve implementar** (lado dele):
+- Inserir script Meta Pixel no HTML da URL Sofia (PageView auto + ViewContent quando usuário envia primeira msg)
+- Capturar fbclid da URL em cookie `_fbclid` (90d)
+- Chamar endpoints do Marketing nos momentos chave da conversa
+- Passar `franqueadaId` resolvido via slug da URL
+
+**Purchase final** (R$1.800 efetivado) vem separado via webhook Kiwify → Marketing → repasse pro SaaS (fluxo 4 abaixo).
+
+### 4. Venda Kiwify → SaaS (Marketing → SaaS)
 
 **Trigger:** Kiwify aprovou compra do teste.
 
