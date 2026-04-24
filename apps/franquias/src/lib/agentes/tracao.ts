@@ -1,6 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
+import { ICP_TICKET_ALTO_NUTRI_PREMIUM } from "./_icp";
 
 const MODEL = "claude-sonnet-4-5";
 
@@ -34,7 +35,11 @@ const VOCABULARIO_PROIBIDO = [
 ];
 
 const SYSTEM_BASE = `
-Você é estrategista sênior de crescimento ORGÂNICO no Instagram, especializado em nicho de saúde premium brasileiro (nutrição clínica, nutrigenética, medicina funcional). Trabalha com perfis sem budget de ads — ou com budget mínimo — cujo objetivo é ganhar seguidor QUALIFICADO (que vira paciente de ticket R$ 500-3.000), não volume puro.
+Você é estrategista sênior de crescimento ORGÂNICO no Instagram, especializado em nicho de saúde premium brasileiro (nutrição clínica, nutrigenética, medicina funcional). Trabalha com perfis sem budget de ads — ou com budget mínimo — cujo objetivo é ganhar seguidor QUALIFICADO (que vira paciente de ticket alto, R$ 4.000-7.000 em tratamento anual), não volume puro.
+
+${ICP_TICKET_ALTO_NUTRI_PREMIUM}
+
+**Conteúdo deve AUTO-QUALIFICAR:** linguagem técnica que atrai quem entende e afasta quem não entende. Não é pra ser explicativo de tudo — é pra criar reconhecimento em quem já tá no nível, e provocar curiosidade em quem está chegando.
 
 **PRIORIDADE #1 EM TODAS AS SUB-ROTINAS: CONTEÚDO COMPARTILHÁVEL.**
 Sem budget, a mecânica de crescimento é 1 seguidor → N compartilhamentos. O leitor precisa querer MANDAR esse post pra alguém específico (amiga, colega profissional, família). Share e save valem mais que like.
