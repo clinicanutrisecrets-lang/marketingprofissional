@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
-type Tipo = "7a_hooks_alta_tracao" | "7b_pilares_tracao" | "7c_plano_misto" | "7d_bio_destaques" | "7e_analise_viralidade";
+type Tipo =
+  | "7a_hooks_alta_tracao"
+  | "7b_pilares_tracao"
+  | "7c_plano_misto"
+  | "7d_bio_destaques"
+  | "7e_analise_viralidade"
+  | "7f_compartilhamento_lateral"
+  | "7g_plano_reativacao";
 
 const LABELS: Record<Tipo, { titulo: string; subtitulo: string }> = {
   "7a_hooks_alta_tracao": {
@@ -11,7 +18,7 @@ const LABELS: Record<Tipo, { titulo: string; subtitulo: string }> = {
   },
   "7b_pilares_tracao": {
     titulo: "Pilares de Tração",
-    subtitulo: "3-5 ângulos que viralizam no seu nicho sem sacrificar posicionamento premium",
+    subtitulo: "3-5 ângulos compartilháveis sem sacrificar posicionamento premium",
   },
   "7c_plano_misto": {
     titulo: "Plano Misto 70/30",
@@ -24,6 +31,14 @@ const LABELS: Record<Tipo, { titulo: string; subtitulo: string }> = {
   "7e_analise_viralidade": {
     titulo: "Análise de Viralidade",
     subtitulo: "O que dos seus posts dá share/save e por quê",
+  },
+  "7f_compartilhamento_lateral": {
+    titulo: "Conteúdo de Compartilhamento",
+    subtitulo: "Post desenhado pra nutri-manda-pra-nutri ou mulher-manda-pra-amiga",
+  },
+  "7g_plano_reativacao": {
+    titulo: "Plano de Reativação 14d",
+    subtitulo: "Ressuscitar engajamento de perfil que perdeu tração",
   },
 };
 
@@ -41,7 +56,12 @@ export function TracaoView({
   const [erro, setErro] = useState<string | null>(null);
 
   const [objetivoCrescimento, setObjetivoCrescimento] = useState(
-    "2-5k seguidores qualificados em 30 dias",
+    "crescimento orgânico — foco em compartilhamentos",
+  );
+  const [assuntoEspecifico, setAssuntoEspecifico] = useState("");
+  const [formatoAlvo, setFormatoAlvo] = useState<"carrossel" | "reels" | "post_longo">("carrossel");
+  const [contextoCompartilhamento, setContextoCompartilhamento] = useState(
+    "mulher manda pra amiga",
   );
 
   async function gerar() {
@@ -50,13 +70,19 @@ export function TracaoView({
     setOutput(null);
     setViolacoes([]);
     try {
-      const baseInput = {
+      const baseInput: Record<string, unknown> = {
         perfil_tipo: "B2C_nutri",
         nicho: franqueada.nicho_principal,
         publico: franqueada.publico_alvo_descricao,
         diferenciais: franqueada.diferenciais,
         objetivo_crescimento: objetivoCrescimento,
       };
+
+      if (tipo === "7f_compartilhamento_lateral") {
+        baseInput.dor_ou_assunto_especifico = assuntoEspecifico;
+        baseInput.formato_alvo = formatoAlvo;
+        baseInput.contexto_compartilhamento = contextoCompartilhamento;
+      }
       const resp = await fetch("/api/agentes/tracao", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,7 +107,7 @@ export function TracaoView({
 
   return (
     <div className="mt-8 space-y-6">
-      <div className="grid gap-2 md:grid-cols-5">
+      <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
         {(Object.keys(LABELS) as Tipo[]).map((t) => (
           <button
             key={t}
