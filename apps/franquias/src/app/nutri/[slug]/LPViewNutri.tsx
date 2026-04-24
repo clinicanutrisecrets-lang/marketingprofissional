@@ -303,6 +303,96 @@ export function LPViewNutri({
         </div>
       </section>
 
+      {/* LINHA DO TEMPO 12 MESES */}
+      <section className="py-20 sm:py-[112px]" style={{ background: "rgba(237,228,214,0.45)" }}>
+        <div className="mx-auto max-w-[1180px] px-6">
+          <div className="mx-auto max-w-[640px] text-center">
+            <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
+              Sua transformação ao longo de 12 meses
+            </div>
+            <h2
+              style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.1, color: INK }}
+              className="text-[28px] font-normal sm:text-[36px]"
+            >
+              Resultado real não vem de uma consulta isolada — vem de um ano de acompanhamento próximo.
+            </h2>
+          </div>
+
+          <div className="mt-16 grid gap-6 md:grid-cols-5">
+            {[
+              {
+                marco: "Mês 1",
+                titulo: "Diagnóstico Inicial",
+                desc: "Primeira consulta + teste nutrigenético + plano alimentar personalizado pra você",
+              },
+              {
+                marco: "Mês 2-3",
+                titulo: "Adaptação",
+                desc: "WhatsApp ativo todo dia + 1 retorno + ajustes finos no plano conforme seu corpo responde",
+              },
+              {
+                marco: "Mês 4-6",
+                titulo: "Aprofundamento",
+                desc: "1 retorno presencial + leitura dos novos exames + refinamento do mapa metabólico",
+              },
+              {
+                marco: "Mês 7-9",
+                titulo: "Consolidação",
+                desc: "Hábitos viraram rotina. Plano evolui pra fase de manutenção. Você sente o corpo diferente",
+              },
+              {
+                marco: "Mês 10-12",
+                titulo: "Manutenção + Checkup",
+                desc: "Balanço anual completo + ajuste de longo prazo + planejamento do próximo ciclo",
+              },
+            ].map((m, i) => (
+              <div key={i} className="relative">
+                {/* Linha conectora desktop */}
+                {i < 4 && (
+                  <div
+                    className="absolute hidden md:block"
+                    style={{
+                      top: "20px",
+                      left: "calc(50% + 30px)",
+                      right: "calc(-50% + 30px)",
+                      height: "1px",
+                      background: "rgba(47,93,80,0.25)",
+                    }}
+                  />
+                )}
+                <div className="text-center">
+                  <div
+                    className="relative mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-bold"
+                    style={{ background: "#2F5D50" }}
+                  >
+                    {i + 1}
+                  </div>
+                  <div
+                    className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                    style={{ color: "#2F5D50" }}
+                  >
+                    {m.marco}
+                  </div>
+                  <h3
+                    style={{ fontFamily: SERIF, color: INK }}
+                    className="mb-2 text-[18px]"
+                  >
+                    {m.titulo}
+                  </h3>
+                  <p className="text-[13px] leading-[1.5]" style={{ color: GRAPHITE }}>
+                    {m.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-14 text-center text-[14px] italic" style={{ color: MUTED }}>
+            Todo mês a sua nutri ajusta o plano com base nos seus dados — não é receita pronta, é evolução constante.
+          </p>
+        </div>
+      </section>
+
       {/* JORNADA */}
       <section
         className="relative overflow-hidden py-24 sm:py-[140px]"
@@ -409,6 +499,124 @@ export function LPViewNutri({
               style={{ background: WA, boxShadow: "0 8px 24px rgba(37,211,102,0.25)" }}
             >
               <WhatsappIcon size={18} /> Começar a sua jornada
+            </WhatsAppLink>
+          </div>
+        </div>
+      </section>
+
+      {/* COMPARAÇÃO: CONSULTA AVULSA vs PLANO ANUAL */}
+      <section className="py-24 sm:py-[128px]">
+        <div className="mx-auto max-w-[1180px] px-6">
+          <div className="mx-auto mb-14 max-w-[640px] text-center">
+            <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
+              Como você quer começar
+            </div>
+            <h2
+              style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.1, color: INK }}
+              className="text-[28px] font-normal sm:text-[36px]"
+            >
+              Duas formas de cuidar da sua saúde com a {primeiroNome}.
+            </h2>
+            <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: GRAPHITE }}>
+              Os valores são personalizados pela sua jornada — conversamos no WhatsApp pra entender seu momento e sugerir o que faz mais sentido pra você.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Card 1 — Consulta Avulsa */}
+            <div className="rounded-2xl border bg-white p-8" style={{ borderColor: `${INK}14` }}>
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: MUTED }}>
+                Opção 1
+              </div>
+              <h3 style={{ fontFamily: SERIF, color: INK }} className="mb-3 text-[26px]">
+                Consulta Avulsa
+              </h3>
+              <p className="mb-6 text-[14px] leading-[1.55]" style={{ color: GRAPHITE }}>
+                Pra quem quer experimentar a abordagem antes de se comprometer com acompanhamento longo.
+              </p>
+              <ul className="space-y-3 text-[14px]" style={{ color: GRAPHITE }}>
+                {[
+                  "1 consulta de avaliação inicial (60 min)",
+                  "Plano alimentar personalizado",
+                  "1 retorno opcional em 30 dias (à parte)",
+                  "Sem teste laboratorial incluso",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span style={{ color: MUTED }}>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 text-[13px] italic" style={{ color: MUTED }}>
+                Investimento: pontual, sob consulta no WhatsApp
+              </div>
+            </div>
+
+            {/* Card 2 — Plano Anual (DESTAQUE) */}
+            <div
+              className="relative rounded-2xl p-8"
+              style={{
+                background: INK,
+                color: CREAM,
+                boxShadow: "0 30px 60px -20px rgba(31,29,26,0.35)",
+              }}
+            >
+              {/* Badge */}
+              <div
+                className="absolute -top-3 right-8 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-white"
+                style={{ background: "#2F5D50" }}
+              >
+                ★ Recomendado
+              </div>
+
+              <div
+                className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                style={{ color: "rgba(247,243,237,0.6)" }}
+              >
+                Opção 2
+              </div>
+              <h3 style={{ fontFamily: SERIF }} className="mb-3 text-[26px]">
+                Plano de Acompanhamento Anual
+              </h3>
+              <p className="mb-6 text-[14px] leading-[1.55]" style={{ color: "rgba(247,243,237,0.8)" }}>
+                Pra quem quer transformação real ao longo de 12 meses, com suporte contínuo e ajuste constante.
+              </p>
+              <ul className="space-y-3 text-[14px]" style={{ color: "rgba(247,243,237,0.92)" }}>
+                {[
+                  { texto: "Diagnóstico inicial completo", destaque: false },
+                  { texto: "Teste nutrigenético incluso", destaque: true },
+                  { texto: "4 consultas distribuídas no ano (a cada 3 meses)", destaque: true },
+                  { texto: "WhatsApp ativo todo dia (suporte da equipe)", destaque: true },
+                  { texto: "Mapa metabólico evolutivo (atualizado a cada consulta)", destaque: false },
+                  { texto: "Checkup anual completo no mês 12", destaque: false },
+                  { texto: "Acesso prioritário a novos exames lançados", destaque: false },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span style={{ color: "#25D366" }}>✓</span>
+                    <span style={item.destaque ? { fontWeight: 500, color: CREAM } : {}}>
+                      {item.texto}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div
+                className="mt-8 text-[13px] italic"
+                style={{ color: "rgba(247,243,237,0.7)" }}
+              >
+                Investimento: parcelável em até 12x — proporcional à sua jornada
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 text-center">
+            <WhatsAppLink
+              href={waLink}
+              franqueadaId={franqueadaId}
+              source="jornada"
+              className="inline-flex items-center gap-2.5 rounded-full px-7 py-4 text-[15px] font-medium text-white transition hover:opacity-90"
+              style={{ background: WA, boxShadow: "0 8px 24px rgba(37,211,102,0.25)" }}
+            >
+              <WhatsappIcon size={18} /> Conversar sobre qual faz mais sentido pra mim
             </WhatsAppLink>
           </div>
         </div>
