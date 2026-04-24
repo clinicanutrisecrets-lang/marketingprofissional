@@ -255,7 +255,7 @@ export async function executarTracao(params: InputTracao): Promise<ResultTracao>
       const resp = await anthropic.messages.create({
         model: MODEL,
         max_tokens: 6000,
-        system: [{ type: "text", text: systemText, cache_control: { type: "ephemeral" } }],
+        system: [{ type: "text", text: systemText, cache_control: { type: "ephemeral" } }] as never,
         messages: [{ role: "user", content: userMsgFinal }],
       });
       const block = resp.content[0];
@@ -265,7 +265,7 @@ export async function executarTracao(params: InputTracao): Promise<ResultTracao>
         input_tokens: usage.input_tokens + resp.usage.input_tokens,
         output_tokens: usage.output_tokens + resp.usage.output_tokens,
         cache_read_input_tokens:
-          usage.cache_read_input_tokens + (resp.usage.cache_read_input_tokens ?? 0),
+          usage.cache_read_input_tokens + ((resp.usage as { cache_read_input_tokens?: number }).cache_read_input_tokens ?? 0),
       };
     } catch (e) {
       return { ok: false, erro: `Claude: ${e instanceof Error ? e.message : String(e)}` };

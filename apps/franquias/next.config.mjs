@@ -9,6 +9,17 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ["sharp", "@scanner/ai-image"],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = Array.isArray(config.externals)
+        ? [...config.externals, "sharp"]
+        : [config.externals, "sharp"].filter(Boolean);
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },

@@ -100,7 +100,7 @@ Retorne APENAS JSON válido, sem markdown:
     model: CLAUDE_MODEL,
     max_tokens: 1024,
     system: [
-      { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+      { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } } as never,
     ],
     messages: [
       {

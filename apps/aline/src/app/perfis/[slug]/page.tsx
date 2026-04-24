@@ -130,10 +130,10 @@ export default async function PerfilPage({ params }: PageProps) {
                 </div>
               ))}
             </div>
-            {perfil.regras_especiais && (
+            {Boolean(perfil.regras_especiais) && (
               <div className="mt-4 rounded-lg bg-aline-muted p-3 text-xs text-aline-text/70">
                 <strong className="text-aline-text/80">Regra especial:</strong>{" "}
-                {perfil.regras_especiais as string}
+                {String(perfil.regras_especiais ?? "")}
               </div>
             )}
           </section>
@@ -162,7 +162,7 @@ export default async function PerfilPage({ params }: PageProps) {
                         <span className="text-aline-text/60">
                           {formatDate(post.data_hora_agendada as string)}
                         </span>
-                        {post.origem && (
+                        {Boolean(post.origem) && (
                           <>
                             <span className="text-aline-text/40">·</span>
                             <span className="text-aline-text/60">

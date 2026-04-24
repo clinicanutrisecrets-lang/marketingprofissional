@@ -80,7 +80,7 @@ export default async function TendenciasCard({ nicho }: Props) {
                   <div className="truncate text-sm font-medium text-aline-text">
                     {d.nome as string}
                   </div>
-                  {d.ideias_angulo && (
+                  {Boolean(d.ideias_angulo) && (
                     <div className="line-clamp-2 text-xs text-aline-text/60">
                       {d.ideias_angulo as string}
                     </div>
@@ -110,7 +110,7 @@ export default async function TendenciasCard({ nicho }: Props) {
                   <div className="line-clamp-1 text-sm font-medium text-aline-text">
                     {t.tema as string}
                   </div>
-                  {t.resumo && (
+                  {Boolean(t.resumo) && (
                     <div className="line-clamp-2 text-xs text-aline-text/60">
                       {t.resumo as string}
                     </div>

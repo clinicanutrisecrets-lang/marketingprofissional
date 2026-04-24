@@ -223,7 +223,8 @@ export async function executarDiagnosticoPerfil(
     const resp = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 4096,
-      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+      // cache_control enabled for prompt caching (runtime-supported, type not exported in SDK 0.30)
+      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }] as never,
       messages: [
         {
           role: "user",
@@ -239,7 +240,7 @@ export async function executarDiagnosticoPerfil(
     usage = {
       input_tokens: resp.usage.input_tokens,
       output_tokens: resp.usage.output_tokens,
-      cache_read_input_tokens: resp.usage.cache_read_input_tokens ?? 0,
+      cache_read_input_tokens: (resp.usage as { cache_read_input_tokens?: number }).cache_read_input_tokens ?? 0,
     };
   } catch (e) {
     return { ok: false, erro: `Claude: ${e instanceof Error ? e.message : String(e)}` };
