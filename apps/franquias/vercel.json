@@ -19,6 +19,18 @@
     {
       "path": "/api/cron/alertas-deadline",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/processar-email-queue",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/coletar-metricas-ads",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/verificar-budget-ads",
+      "schedule": "0 * * * *"
     }
   ]
 }
