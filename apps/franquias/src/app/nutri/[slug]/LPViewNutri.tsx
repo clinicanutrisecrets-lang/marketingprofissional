@@ -4,6 +4,8 @@ type Props = {
   franqueada: Record<string, unknown>;
   logoUrl: string | null;
   fotoUrl: string | null;
+  sofiaSlug?: string | null;
+  sofiaBaseUrl?: string;
 };
 
 const SERIF = `"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif`;
@@ -28,7 +30,13 @@ const WhatsappIcon = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
-export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
+export function LPViewNutri({
+  franqueada,
+  logoUrl,
+  fotoUrl,
+  sofiaSlug,
+  sofiaBaseUrl = "https://scannerdasaude.com/sofia",
+}: Props) {
   const franqueadaId = franqueada.id as string;
   const nomeComercial =
     (franqueada.nome_comercial as string) || (franqueada.nome_completo as string);
@@ -49,13 +57,21 @@ export function LPViewNutri({ franqueada, logoUrl, fotoUrl }: Props) {
   const email = (franqueada.email_publico as string) ?? (franqueada.email as string) ?? "";
   const endereco = (franqueada.endereco_consultorio as string) ?? cidadeUF;
 
+  // CTA primário: Sofia URL (se sofia_slug configurado), fallback WhatsApp direto
+  const sofiaLink = sofiaSlug
+    ? `${sofiaBaseUrl}/${sofiaSlug}?via=lp&ref=frq_${franqueadaId}`
+    : null;
+
   const waNumero = (franqueada.whatsapp_numero as string)?.replace(/\D/g, "") ?? "";
   const waMensagem = encodeURIComponent(
     `Oi! Vim pela página da ${primeiroNome} e quero agendar uma consulta. [ref:frq_${franqueadaId}]`,
   );
-  const waLink = waNumero
+  const waFallback = waNumero
     ? `https://wa.me/${waNumero.startsWith("55") ? waNumero : `55${waNumero}`}?text=${waMensagem}`
     : (franqueada.link_agendamento as string) ?? "#";
+
+  // waLink é a URL final do CTA — Sofia quando disponível, WhatsApp como fallback
+  const waLink = sofiaLink ?? waFallback;
 
   return (
     <main

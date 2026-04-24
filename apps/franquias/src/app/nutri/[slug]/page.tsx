@@ -40,14 +40,24 @@ export default async function NutriLPPage({ params }: PageProps) {
   const logoUrl = await buscarArquivoUrl(franqueadaId, "logo_principal");
   const fotoUrl = await buscarArquivoUrl(franqueadaId, "foto_profissional");
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
+  const sofiaSlug = (franqueada.sofia_slug as string | null) ?? null;
+  const sofiaBaseUrl = process.env.NEXT_PUBLIC_SOFIA_BASE_URL ?? "https://scannerdasaude.com/sofia";
 
   return (
     <>
-      {pixelId && <MetaPixel pixelId={pixelId} franqueadaId={franqueadaId} />}
+      {pixelId && (
+        <MetaPixel
+          pixelId={pixelId}
+          franqueadaId={franqueadaId}
+          funilVariante="lp_bridge"
+        />
+      )}
       <LPViewNutri
         franqueada={franqueada}
         logoUrl={logoUrl}
         fotoUrl={fotoUrl}
+        sofiaSlug={sofiaSlug}
+        sofiaBaseUrl={sofiaBaseUrl}
       />
     </>
   );

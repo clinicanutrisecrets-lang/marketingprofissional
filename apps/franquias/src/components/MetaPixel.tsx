@@ -13,9 +13,10 @@ declare global {
 type Props = {
   pixelId: string;
   franqueadaId: string;
+  funilVariante?: "lp_bridge" | "sofia_direto";
 };
 
-export function MetaPixel({ pixelId, franqueadaId }: Props) {
+export function MetaPixel({ pixelId, franqueadaId, funilVariante = "lp_bridge" }: Props) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -27,6 +28,13 @@ export function MetaPixel({ pixelId, franqueadaId }: Props) {
         const dias = 90;
         const expira = new Date(Date.now() + dias * 24 * 60 * 60 * 1000).toUTCString();
         document.cookie = `_fbclid=${encodeURIComponent(fbclid)}; expires=${expira}; path=/; SameSite=Lax`;
+      }
+      // Captura também funil_variante vindo do UTM (ad pode sobrescrever)
+      const utmVariant = params.get("utm_variant");
+      if (utmVariant) {
+        document.cookie = `_funil_variante=${encodeURIComponent(utmVariant)}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 30}`;
+      } else {
+        document.cookie = `_funil_variante=${encodeURIComponent(funilVariante)}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 30}`;
       }
     } catch {}
 
@@ -42,13 +50,14 @@ export function MetaPixel({ pixelId, franqueadaId }: Props) {
           content_name: "LP Nutri",
           content_category: "health_consultation",
           franqueada_id: franqueadaId,
+          funil_variante: funilVariante,
         });
         window.removeEventListener("scroll", onScroll);
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [franqueadaId]);
+  }, [franqueadaId, funilVariante]);
 
   if (!pixelId) return null;
 
