@@ -70,7 +70,7 @@ export function LPViewNutri({
     ? `https://wa.me/${waNumero.startsWith("55") ? waNumero : `55${waNumero}`}?text=${waMensagem}`
     : (franqueada.link_agendamento as string) ?? "#";
 
-  // waLink é a URL final do CTA — Sofia quando disponível, WhatsApp como fallback
+  // waLink é a URL final do CTA. Sofia quando disponível, WhatsApp como fallback.
   const waLink = sofiaLink ?? waFallback;
 
   return (
@@ -137,9 +137,12 @@ export function LPViewNutri({
               da sua saúde aparece.
             </h1>
             <p className="mt-7 max-w-[540px] text-[18px] leading-[1.55]" style={{ color: GRAPHITE }}>
-              Nutrição de precisão. Vamos dar tchau para os anos de tentativa e erro — e
-              boas-vindas ao começo de um plano que funciona em você, traçado pelo mapa
-              único do seu corpo.
+              Nutrição de precisão. Vamos dar tchau para os anos de tentativa e erro.
+              Boas-vindas ao começo de um plano que funciona em você, traçado pelo{" "}
+              <span style={{ color: "#2F5D50", fontWeight: 500 }}>
+                mapa único do seu corpo
+              </span>
+              .
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-5">
               <WhatsAppLink
@@ -202,8 +205,8 @@ export function LPViewNutri({
               style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.08, color: INK }}
               className="text-[30px] font-normal sm:text-[38px]"
             >
-              Você chegou até aqui porque sente que algo precisa mudar — mas não mais um
-              começo zerado.
+              Você chegou até aqui porque sente que algo precisa mudar. Não mais um{" "}
+              <span style={{ color: "#2F5D50", fontStyle: "italic" }}>começo zerado</span>.
             </h2>
           </div>
           <div className="mt-16 grid gap-y-10 gap-x-12 sm:grid-cols-2">
@@ -212,8 +215,9 @@ export function LPViewNutri({
                 n: "01",
                 t: (
                   <>
-                    Você já tentou <strong>várias dietas</strong> e nenhuma sustentou
-                    resultado. Tentativa e erro não é estratégia — é desgaste.
+                    Você já tentou <strong style={{ color: "#2F5D50" }}>várias dietas</strong> e nenhuma sustentou
+                    resultado. Tentativa e erro não é estratégia. É{" "}
+                    <span style={{ color: "#2F5D50", fontWeight: 500 }}>desgaste</span>.
                   </>
                 ),
               },
@@ -221,8 +225,8 @@ export function LPViewNutri({
                 n: "02",
                 t: (
                   <>
-                    Seu <strong>histórico familiar</strong> te preocupa — diabetes,
-                    colesterol, câncer — e você quer agir antes, não depois.
+                    Seu <strong style={{ color: "#2F5D50" }}>histórico familiar</strong> te preocupa (diabetes,
+                    colesterol, câncer) e você quer agir antes, não depois.
                   </>
                 ),
               },
@@ -239,8 +243,8 @@ export function LPViewNutri({
                 n: "04",
                 t: (
                   <>
-                    Você quer <strong>parar de adivinhar</strong> e começar a decidir com
-                    precisão — o mapa do seu metabolismo, não mais o palpite.
+                    Você quer <strong style={{ color: "#2F5D50" }}>parar de adivinhar</strong> e começar a decidir com
+                    precisão. O mapa do seu metabolismo, não mais o palpite.
                   </>
                 ),
               },
@@ -314,7 +318,9 @@ export function LPViewNutri({
               style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.1, color: INK }}
               className="text-[26px] font-normal sm:text-[34px]"
             >
-              Silenciar genes de doença, ativar genes de saúde — uma jornada anual de longevidade.
+              <span style={{ color: "#2F5D50" }}>Silenciar</span> genes de doença,{" "}
+              <span style={{ color: "#2F5D50" }}>ativar</span> genes de saúde. Uma jornada anual de{" "}
+              <em style={{ color: "#2F5D50", fontStyle: "italic" }}>longevidade</em>.
             </h2>
           </div>
 
@@ -406,7 +412,10 @@ export function LPViewNutri({
           </div>
 
           <p className="mt-12 text-center text-[14px] italic px-4" style={{ color: MUTED }}>
-            Todo mês seu plano evolui com base nos seus dados — não é receita pronta, é engenharia de longevidade aplicada a você.
+            Todo mês seu plano evolui com base nos seus dados. Não é receita pronta.{" "}
+            <span style={{ color: "#2F5D50", fontStyle: "normal", fontWeight: 500 }}>
+              É engenharia de longevidade aplicada a você.
+            </span>
           </p>
         </div>
       </section>
@@ -450,13 +459,13 @@ export function LPViewNutri({
               {
                 eyebrow: "Passo 02",
                 titulo: "Primeira consulta",
-                desc: "60 minutos de avaliação profunda — escuta, exames que você já tem, histórico. Aqui desenhamos sua rota.",
+                desc: "60 minutos de avaliação profunda: escuta, exames que você já tem, histórico. Aqui desenhamos sua rota.",
                 destaque: false,
               },
               {
                 eyebrow: "Passo 03",
                 titulo: "Plano que cabe em você",
-                desc: "Nutrição ajustada ao mapa do seu metabolismo. Quando faz sentido, o teste nutrigenético refina o mapa com precisão ainda maior — a análise do seu DNA que transforma tentativa em estratégia.",
+                desc: "Nutrição ajustada ao mapa do seu metabolismo. Quando faz sentido, o teste nutrigenético refina o mapa com precisão ainda maior. A análise do seu DNA que transforma tentativa em estratégia.",
                 destaque: false,
               },
             ].map((step, i) => (
@@ -536,12 +545,12 @@ export function LPViewNutri({
               Duas formas de cuidar da sua saúde com a {primeiroNome}.
             </h2>
             <p className="mt-4 text-[15px] leading-[1.6]" style={{ color: GRAPHITE }}>
-              Os valores são personalizados pela sua jornada — conversamos no WhatsApp pra entender seu momento e sugerir o que faz mais sentido pra você.
+              Os valores são personalizados pela sua jornada. Conversamos no WhatsApp pra entender seu momento e sugerir o que faz mais sentido pra você.
             </p>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Card 1 — Consulta Avulsa */}
+            {/* Card 1. Consulta Avulsa */}
             <div className="rounded-2xl border bg-white p-6 sm:p-8" style={{ borderColor: `${INK}14` }}>
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: MUTED }}>
                 Opção 1
@@ -570,7 +579,7 @@ export function LPViewNutri({
               </div>
             </div>
 
-            {/* Card 2 — Plano Anual (DESTAQUE) */}
+            {/* Card 2. Plano Anual (DESTAQUE) */}
             <div
               className="relative rounded-2xl p-6 sm:p-8 mt-4 lg:mt-0"
               style={{
@@ -622,7 +631,7 @@ export function LPViewNutri({
                 className="mt-8 text-[13px] italic"
                 style={{ color: "rgba(247,243,237,0.7)" }}
               >
-                Investimento: parcelável em até 12x — proporcional à sua jornada
+                Investimento: parcelável em até 12x, proporcional à sua jornada
               </div>
             </div>
           </div>
@@ -664,25 +673,25 @@ export function LPViewNutri({
                     vez entendi <strong>por que meu corpo reage</strong> do jeito que reage.
                   </>
                 ),
-                a: "— Marina, 42",
+                a: "Marina, 42",
               },
               {
                 t: (
                   <>
-                    Antes eu testava tudo. Hoje eu <strong>entendo meu metabolismo</strong>{" "}
-                    — e só faço o que faz sentido pra ele. Outro patamar.
+                    Antes eu testava tudo. Hoje eu <strong style={{ color: "#2F5D50" }}>entendo meu metabolismo</strong>.
+                    Só faço o que faz sentido pra ele. Outro patamar.
                   </>
                 ),
-                a: "— Patrícia, 51",
+                a: "Patrícia, 51",
               },
               {
                 t: (
                   <>
-                    O <strong>teste nutrigenético</strong> foi um divisor. Virou um antes
-                    e depois de autoconhecimento — não de dieta.
+                    O <strong style={{ color: "#2F5D50" }}>teste nutrigenético</strong> foi um divisor. Virou um antes
+                    e depois de autoconhecimento. Não de dieta.
                   </>
                 ),
-                a: "— Juliana, 38",
+                a: "Juliana, 38",
               },
             ].map((d, i) => (
               <blockquote
@@ -736,15 +745,15 @@ export function LPViewNutri({
               },
               {
                 q: "Como funciona o acompanhamento depois da primeira consulta?",
-                a: "Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo depende do seu caso — alguns precisam de revisão quinzenal, outros mensal.",
+                a: "Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo depende do seu caso: alguns precisam de revisão quinzenal, outros mensal.",
               },
               {
                 q: "O que é o teste nutrigenético?",
-                a: "É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos — usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.",
+                a: "É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos. Usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.",
               },
               {
                 q: "Atende plano de saúde?",
-                a: "O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista — emito recibo com código próprio pra você solicitar.",
+                a: "O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista. Emito recibo com código próprio pra você solicitar.",
               },
             ].map((f, i, arr) => (
               <details
@@ -790,7 +799,7 @@ export function LPViewNutri({
           </h2>
           <p className="mx-auto mb-11 max-w-[560px] leading-[1.65]" style={{ color: GRAPHITE }}>
             O primeiro passo pra trocar tentativa e erro pelo mapa do seu corpo. Mande uma
-            mensagem pra nossa equipe — sem formulário, sem pressa. A gente te ouve e te
+            mensagem pra nossa equipe. Sem formulário, sem pressa. A gente te ouve e te
             orienta pro próximo passo.
           </p>
           <WhatsAppLink
