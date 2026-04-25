@@ -74,15 +74,18 @@ export default async function PerfilPage({ params }: PageProps) {
               </div>
             </div>
             <div className="flex gap-2">
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  perfil.instagram_conta_id
-                    ? "bg-green-100 text-green-800"
-                    : "bg-amber-100 text-amber-800"
-                }`}
-              >
-                {perfil.instagram_conta_id ? "Instagram conectado" : "Conectar Instagram"}
-              </span>
+              {perfil.instagram_conta_id ? (
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
+                  Instagram conectado
+                </span>
+              ) : (
+                <a
+                  href={`/api/auth/instagram/connect?slug=${perfil.slug as string}`}
+                  className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-200"
+                >
+                  Conectar Instagram →
+                </a>
+              )}
             </div>
           </div>
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>

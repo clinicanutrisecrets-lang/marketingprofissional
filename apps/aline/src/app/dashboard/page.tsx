@@ -134,6 +134,13 @@ export default async function DashboardPage() {
           </h2>
           <div className="grid gap-3 md:grid-cols-3">
             <ActionCard
+              icone="✅"
+              titulo="Aprovacao semanal"
+              descricao="Revisar e aprovar pack de posts da semana"
+              href="/aprovacao"
+              disponivel={true}
+            />
+            <ActionCard
               icone="📊"
               titulo="Relatório unificado"
               descricao="Comparar performance dos 2 perfis"
