@@ -7,6 +7,7 @@ import {
   aprovarBlocoSemanal,
   cancelarPost,
   editarPostAprovacao,
+  regenerarArteAction,
 } from "@/lib/posts/aprovacao-actions";
 
 type Props = {
@@ -28,10 +29,12 @@ export function AprovacaoView({
   const [isPending, startTransition] = useTransition();
   const [posts, setPosts] = useState(postsIniciais);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [regenerandoId, setRegenerandoId] = useState<string | null>(null);
 
   const aguardando = posts.filter((p) => p.status === "aguardando_aprovacao").length;
   const aprovados = posts.filter((p) => p.status === "aprovado").length;
   const cancelados = posts.filter((p) => p.status === "cancelado").length;
+  const semMidia = posts.filter((p) => p.midia_pendente && p.status !== "cancelado").length;
 
   function handleAprovarTudo() {
     startTransition(async () => {
@@ -58,6 +61,7 @@ export function AprovacaoView({
         copy_legenda: post.copy_legenda as string,
         copy_cta: post.copy_cta as string,
         hashtags: post.hashtags as string[],
+        data_hora_agendada: post.data_hora_agendada as string,
       });
       setFeedback(r.ok ? "✓ salvo" : `✗ ${r.erro}`);
     });
@@ -76,6 +80,26 @@ export function AprovacaoView({
         setFeedback(`✗ ${r.erro}`);
       }
     });
+  }
+
+  function handleRegenerar(postId: string) {
+    if (!confirm("Regenerar arte deste post? A imagem atual sera substituida.")) return;
+    setRegenerandoId(postId);
+    setFeedback("Gerando nova arte… (10-30s)");
+    (async () => {
+      const r = await regenerarArteAction(postId);
+      setRegenerandoId(null);
+      if (r.ok) {
+        setPosts((cur) =>
+          cur.map((p) => (p.id === postId ? { ...p, midia_url: r.url, midia_pendente: false } : p)),
+        );
+        setFeedback(
+          `✓ arte regenerada${typeof r.custoUsd === "number" ? ` (custo: $${r.custoUsd.toFixed(4)})` : ""}`,
+        );
+      } else {
+        setFeedback(`✗ ${r.erro}`);
+      }
+    })();
   }
 
   return (
@@ -100,6 +124,9 @@ export function AprovacaoView({
           <div className="mt-4 flex flex-wrap gap-3 text-xs">
             <Pill label={`Aguardando: ${aguardando}`} cls="bg-amber-100 text-amber-800" />
             <Pill label={`Aprovados: ${aprovados}`} cls="bg-green-100 text-green-800" />
+            {semMidia > 0 && (
+              <Pill label={`Sem arte: ${semMidia}`} cls="bg-orange-100 text-orange-800" />
+            )}
             {cancelados > 0 && (
               <Pill label={`Cancelados: ${cancelados}`} cls="bg-gray-100 text-gray-600" />
             )}
@@ -137,28 +164,82 @@ export function AprovacaoView({
                   >
                     {post.tipo as string}
                   </span>
-                  <span className="text-aline-text/60">
-                    {formatDataHora(post.data_hora_agendada as string)}
-                  </span>
                   {Boolean(post.pilar) && (
                     <span className="text-aline-text/50">
-                      · {(post.pilar as string).replace(/_/g, " ")}
+                      {(post.pilar as string).replace(/_/g, " ")}
                     </span>
                   )}
                   {Boolean(post.midia_pendente) && (
-                    <Pill label="midia pendente" cls="bg-orange-100 text-orange-800" />
+                    <Pill label="sem arte" cls="bg-orange-100 text-orange-800" />
                   )}
                 </div>
                 <StatusBadge status={post.status as string} />
               </div>
 
-              {Boolean(post.angulo) && (
-                <p className="mb-2 text-xs italic text-aline-text/60">
-                  ângulo: {post.angulo as string}
-                </p>
-              )}
+              {/* Preview da arte + botao regenerar */}
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row">
+                <div className="relative h-48 w-48 flex-shrink-0 overflow-hidden rounded-xl bg-aline-bg/40">
+                  {post.midia_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={post.midia_url as string}
+                      alt={(post.angulo as string) ?? "post"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-aline-text/40">
+                      sem imagem
+                    </div>
+                  )}
+                  {regenerandoId === post.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 text-xs text-aline-text">
+                      gerando…
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col justify-between gap-3">
+                  {Boolean(post.angulo) && (
+                    <p className="text-xs italic text-aline-text/60">
+                      ângulo: {post.angulo as string}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleRegenerar(post.id as string)}
+                      disabled={isPending || regenerandoId !== null || post.status === "cancelado"}
+                      className="rounded-lg bg-aline-scanner/10 px-3 py-1.5 text-xs font-medium text-aline-scanner hover:bg-aline-scanner/20 disabled:opacity-50"
+                    >
+                      🔄 Regenerar arte
+                    </button>
+                    {Boolean(post.midia_url) && (
+                      <a
+                        href={post.midia_url as string}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-lg bg-aline-text/5 px-3 py-1.5 text-xs font-medium hover:bg-aline-text/10"
+                      >
+                        Ver tamanho real ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-aline-text/50">
+                Data e hora
+              </label>
+              <input
+                type="datetime-local"
+                value={toDatetimeLocal(post.data_hora_agendada as string)}
+                onChange={(e) =>
+                  handleEditar(post.id as string, "data_hora_agendada", fromDatetimeLocal(e.target.value))
+                }
+                className="rounded-lg border border-aline-text/10 bg-aline-bg/30 p-2 text-sm focus:border-aline-scanner focus:outline-none"
+                disabled={post.status === "cancelado"}
+              />
+
+              <label className="mb-2 mt-3 block text-xs font-semibold uppercase tracking-wide text-aline-text/50">
                 Legenda
               </label>
               <textarea
@@ -252,12 +333,16 @@ function formatSemana(s: string): string {
   });
 }
 
-function formatDataHora(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+/** ISO timestamp -> formato datetime-local (YYYY-MM-DDTHH:mm) em horario local */
+function toDatetimeLocal(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const off = d.getTimezoneOffset() * 60_000;
+  return new Date(d.getTime() - off).toISOString().slice(0, 16);
+}
+
+/** datetime-local input value -> ISO timestamp UTC */
+function fromDatetimeLocal(local: string): string {
+  if (!local) return "";
+  return new Date(local).toISOString();
 }

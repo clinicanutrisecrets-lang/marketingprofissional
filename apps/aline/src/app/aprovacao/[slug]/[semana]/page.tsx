@@ -35,13 +35,33 @@ export default async function AprovarSemanaPage({ params }: PageProps) {
 
   const posts = (postsData ?? []) as Array<Record<string, unknown>>;
 
+  // Carrega midia principal (ordem=0) de cada post
+  const postIds = posts.map((p) => p.id as string);
+  const { data: midiasData } = postIds.length
+    ? await aline
+        .from("post_midias")
+        .select("post_id, url, tipo, ordem")
+        .in("post_id", postIds)
+        .eq("ordem", 0)
+    : { data: [] };
+
+  const midiasPorPost = new Map<string, string>();
+  for (const m of (midiasData ?? []) as Array<{ post_id: string; url: string }>) {
+    midiasPorPost.set(m.post_id, m.url);
+  }
+
+  const postsComMidia = posts.map((p) => ({
+    ...p,
+    midia_url: midiasPorPost.get(p.id as string) ?? null,
+  }));
+
   return (
     <AprovacaoView
       perfilSlug={slug}
       perfilNome={perfil.nome as string}
       perfilCor={(perfil.cor_primaria as string) || "#0BB8A8"}
       semanaRef={semana}
-      posts={posts}
+      posts={postsComMidia}
     />
   );
 }

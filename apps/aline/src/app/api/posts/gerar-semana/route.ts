@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { gerarPackSemanal } from "@/lib/posts/gerador-semanal";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 /**
  * Trigger manual: POST /api/posts/gerar-semana

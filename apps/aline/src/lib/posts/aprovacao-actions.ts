@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
-import { gerarPackSemanal } from "./gerador-semanal";
+import { gerarPackSemanal, regenerarArtePost } from "./gerador-semanal";
 
 async function assertAdmin(): Promise<void> {
   const supabase = createClient();
@@ -96,6 +96,26 @@ export async function cancelarPost(postId: string): Promise<{ ok: boolean; erro?
     if (error) return { ok: false, erro: error.message };
     revalidatePath("/aprovacao");
     return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message };
+  }
+}
+
+/**
+ * Re-gera apenas a arte (imagem) de um post mantendo o texto.
+ * Usado quando a Aline nao gosta da imagem que a IA gerou na 1a vez.
+ */
+export async function regenerarArteAction(postId: string): Promise<{
+  ok: boolean;
+  url?: string;
+  custoUsd?: number;
+  erro?: string;
+}> {
+  try {
+    await assertAdmin();
+    const r = await regenerarArtePost(postId);
+    if (r.ok) revalidatePath("/aprovacao");
+    return r;
   } catch (e) {
     return { ok: false, erro: (e as Error).message };
   }
