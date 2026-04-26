@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
+import { gerarPackSemanal } from "./gerador-semanal";
 
 async function assertAdmin(): Promise<void> {
   const supabase = createClient();
@@ -95,6 +96,41 @@ export async function cancelarPost(postId: string): Promise<{ ok: boolean; erro?
     if (error) return { ok: false, erro: error.message };
     revalidatePath("/aprovacao");
     return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message };
+  }
+}
+
+/**
+ * Trigger manual: gera pack semanal pra um perfil.
+ * Pra usar quando nao quiser esperar a quinta-feira (lancamento, datas especiais etc.).
+ */
+export async function gerarPackAction(params: {
+  slug: string;
+  qtd?: number;
+  semanaRef?: string;
+}): Promise<{
+  ok: boolean;
+  qtd?: number;
+  semanaRef?: string;
+  custoUsd?: number;
+  erro?: string;
+}> {
+  try {
+    await assertAdmin();
+    const r = await gerarPackSemanal({
+      perfilSlug: params.slug,
+      qtd: params.qtd,
+      semanaRef: params.semanaRef,
+    });
+    if (r.ok) revalidatePath("/aprovacao");
+    return {
+      ok: r.ok,
+      qtd: r.postIds?.length,
+      semanaRef: r.semanaRef,
+      custoUsd: r.custoUsd,
+      erro: r.erro,
+    };
   } catch (e) {
     return { ok: false, erro: (e as Error).message };
   }

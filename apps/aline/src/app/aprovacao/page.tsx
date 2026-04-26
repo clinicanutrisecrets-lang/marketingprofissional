@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
+import { GerarPackForm } from "./GerarPackForm";
 
 export const dynamic = "force-dynamic";
 
@@ -74,16 +75,21 @@ export default async function AprovacaoIndexPage() {
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-aline-text">Aprovacao de pacotes semanais</h1>
           <p className="mt-2 text-sm text-aline-text/60">
-            Cada quinta o sistema gera o pack da semana seguinte. Aprova em bloco aqui antes
-            que o cron de publicacao comece a postar.
+            Toda quinta o sistema gera automaticamente o pack da semana seguinte.
+            Voce tambem pode gerar a qualquer hora pelo botao abaixo (lancamentos,
+            datas especiais).
           </p>
         </header>
+
+        <GerarPackForm
+          perfis={perfilList.map((p) => ({ slug: p.slug, nome: p.nome }))}
+        />
 
         {semanasPendentes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-aline-text/20 bg-white p-10 text-center">
             <p className="text-aline-text/60">Nenhum pacote aguardando aprovacao agora.</p>
             <p className="mt-2 text-xs text-aline-text/40">
-              O proximo sera gerado na quinta as 9h.
+              Use o botao acima pra gerar agora ou espere a proxima quinta as 9h.
             </p>
           </div>
         ) : (
