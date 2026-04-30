@@ -74,6 +74,12 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
           </div>
           <div className="flex items-center gap-2">
             <Link
+              href="/admin/custos-rede"
+              className="rounded-lg border border-brand-text/10 bg-white px-3 py-1.5 text-sm hover:border-brand-primary"
+            >
+              💸 Custos da rede
+            </Link>
+            <Link
               href="/admin/franqueadas/convidar"
               className="rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-primary/90"
             >
