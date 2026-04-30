@@ -178,3 +178,48 @@ export function emailErroPublicacao(nome: string, erro: string, linkDashboard: s
     texto: `Erro ao publicar: ${erro}. Veja em: ${linkDashboard}`,
   };
 }
+
+export function emailRevisaoAdsPronta(params: {
+  nome: string;
+  statusGeral: string;
+  resumoExecutivo: string;
+  qtdRecomendacoes: number;
+  qtdAlertas: number;
+  linkRevisao: string;
+}): { html: string; texto: string; assunto: string } {
+  const corStatus: Record<string, string> = {
+    excelente: "#10B981",
+    bom: "#0BB8A8",
+    mediano: "#F59E0B",
+    preocupante: "#F97316",
+    critico: "#EF4444",
+    sem_dados: "#9CA3AF",
+  };
+  const cor = corStatus[params.statusGeral] ?? "#0BB8A8";
+  const conteudo = `
+    <h1 style="${baseStyles.h1}">📊 Revisão semanal das suas campanhas</h1>
+    <p style="${baseStyles.p}">
+      Oi, ${params.nome}. Seu gestor de tráfego IA acabou de revisar suas campanhas dos últimos 7 dias.
+    </p>
+    <div style="background: ${cor}20; border-left: 4px solid ${cor}; padding: 16px; border-radius: 8px; margin: 20px 0;">
+      <div style="font-size: 12px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Status geral</div>
+      <div style="font-size: 22px; font-weight: 700; color: ${cor}; text-transform: capitalize; margin-top: 4px;">${params.statusGeral}</div>
+    </div>
+    <p style="${baseStyles.p}">${params.resumoExecutivo}</p>
+    <p style="${baseStyles.p}">
+      <strong>${params.qtdRecomendacoes}</strong> ${params.qtdRecomendacoes === 1 ? "recomendação" : "recomendações"}
+      ${params.qtdAlertas > 0 ? ` · <strong style="color: #F97316;">${params.qtdAlertas}</strong> ${params.qtdAlertas === 1 ? "alerta" : "alertas"}` : ""}
+    </p>
+    <p style="margin: 24px 0;">
+      <a href="${params.linkRevisao}" style="${baseStyles.button}">Ver revisão completa →</a>
+    </p>
+    <p style="font-size: 12px; color: #9CA3AF;">
+      Próxima revisão automática na próxima segunda/quinta. Você também pode rodar manualmente no dashboard.
+    </p>
+  `;
+  return {
+    assunto: `📊 Revisão semanal Ads — ${params.statusGeral}`,
+    html: wrap(conteudo),
+    texto: `${params.resumoExecutivo}\n\nVer completa: ${params.linkRevisao}`,
+  };
+}

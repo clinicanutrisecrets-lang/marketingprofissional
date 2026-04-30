@@ -141,6 +141,13 @@ export default async function DashboardPage() {
               disponivel={true}
             />
             <ActionCard
+              icone="💸"
+              titulo="Custos de IA"
+              descricao="Gasto com Claude + OpenAI por mes"
+              href="/dashboard/custos"
+              disponivel={true}
+            />
+            <ActionCard
               icone="📊"
               titulo="Relatório unificado"
               descricao="Comparar performance dos 2 perfis"
