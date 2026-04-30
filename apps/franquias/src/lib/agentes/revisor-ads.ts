@@ -6,6 +6,7 @@ import {
   FRAMEWORK_PEDRO_SOBRAL,
   FRAMEWORK_MOLLY_PITTMAN,
   FRAMEWORK_DEPESH_MANDALIA,
+  COMPLIANCE_CFN_2026_RESUMO,
 } from "./_frameworks";
 
 type Anuncio = {
@@ -58,6 +59,14 @@ ${FRAMEWORK_PEDRO_SOBRAL}
 ${FRAMEWORK_MOLLY_PITTMAN}
 
 ${FRAMEWORK_DEPESH_MANDALIA}
+
+${COMPLIANCE_CFN_2026_RESUMO}
+
+REGRAS DE RECOMENDACAO LIGADAS AO CODIGO DE ETICA:
+- NUNCA recomendar criar criativo com antes/depois, balanca, medida, exame
+- NUNCA recomendar criativo com IA simulando paciente ou resultado clinico
+- NUNCA recomendar associar a marca de alimento/bebida/suplemento/fitoterapico
+- Se identificar criativo ja ativo violando essas regras, ALERTAR como "alerta_compliance" prioridade ALTA — agir imediatamente
 
 VOCE RECEBE:
 - Periodo analisado (datas)

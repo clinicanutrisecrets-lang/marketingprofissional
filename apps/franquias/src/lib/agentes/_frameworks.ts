@@ -183,38 +183,99 @@ Use 1-2 por copy (nao mais — apela demais):
 // ============================================================
 
 export const FRAMEWORK_DONALD_MILLER_SB7 = `
-=== DONALD MILLER — StoryBrand SB7 ===
+=== DONALD MILLER — StoryBrand SB7 (USO MODERADO) ===
 PRINCIPIO CENTRAL:
-  CLIENTE eh o heroi, NUNCA a marca. Marca eh o GUIA (Yoda, nao Luke).
-  Empresas falham quando se posicionam como o heroi.
-  "If you confuse, you lose."
+  CLIENTE eh o heroi, marca eh o GUIA (Yoda, nao Luke).
 
-SB7 (7 partes):
-  1. CHARACTER — herói = cliente. Defina UMA desire clara.
-  2. PROBLEM:
-     - VILLAIN: causa-raiz (personificada, real, singular)
-     - EXTERNAL: dor tangivel (ex: "pacientes nao melhoram")
-     - INTERNAL: como SE SENTE (ex: "frustracao, sensacao de impostora")
-     - PHILOSOPHICAL: por que isso esta ERRADO ("nutri nao deveria ter que...")
-     INSIGHT: empresas vendem solucao pra dor externa, MAS clientes
-     compram solucao pra dor INTERNA.
-  3. GUIDE (voce):
-     - EMPATIA: "entendemos como eh frustrante quando..."
-     - AUTORIDADE: depoimentos, numeros, premios
-     - REGRA: lidere com empatia, sustente com autoridade. Nunca o contrario.
-  4. PLAN: 3 passos claros (remove confusao) + lista de compromissos (remove medo)
-  5. CTA:
-     - DIRETO: "Comprar", "Agendar", "Inscrever-se" (claro, repetido)
-     - TRANSICIONAL: "Baixar", "Assistir" (relacionamento)
-  6. FAILURE: o que acontece se NAO agir (consequencias)
-     "Salt the oats" — pouca falha, muito sucesso
-  7. SUCCESS: 3 finais possiveis:
-     - Ganhar poder/posicao (status)
-     - Uniao que torna o heroi completo (paz)
-     - Auto-realizacao (virar quem deveria ser)
+⚠️ ATENCAO: NAO aplicar SB7 em todo post — fica saturado e irreal.
+   Nem toda nutri viveu a jornada do paciente. Forcar empatia fake
+   ("eu sei como eh sofrer com isso porque ja passei") quando ela
+   nao passou destroi confianca e infringe etica.
 
-ONE-LINER (formula):
-  "Most [people] struggle with [problem]. We provide [solution]
-   so they can [result]."
-  Regras: max 25 palavras, memorizavel, passa no teste do coquetel.
+   Usar SB7 SOMENTE quando:
+   - For storytelling de caso (sem identificar paciente)
+   - For LP / pagina sobre / bio de captacao
+   - For carrossel narrativo (problema → solucao → resultado)
+   - Quando a nutri DE FATO viveu algo similar e quiser compartilhar
+
+   NAO usar em:
+   - Posts educativos / dado cientifico
+   - Bastidores / rotina
+   - Q&A / mitos vs verdades
+   - Curiosidades cientificas
+   - Posts tecnicos pra colega profissional
+
+SB7 (7 partes — quando usar):
+  1. CHARACTER: heroi = cliente. UMA desire clara.
+  2. PROBLEM (3 niveis):
+     - EXTERNAL: dor tangivel
+     - INTERNAL: como SE SENTE
+     - PHILOSOPHICAL: por que isso eh ERRADO
+     INSIGHT: vende-se solucao pra dor EXTERNA, mas compra-se pra INTERNA.
+  3. GUIDE (a nutri):
+     - EMPATIA: "entendemos como eh frustrante quando..." (sem fingir ter vivido)
+     - AUTORIDADE: experiencia profissional, formacao, casos (anonimizados)
+     - LIDERE com empatia, SUSTENTE com autoridade.
+  4. PLAN: 3 passos claros + lista de compromissos
+  5. CTA: direto (Agendar) ou transicional (Baixar/Assistir)
+  6. FAILURE: o que acontece se NAO agir — pouco, soft
+  7. SUCCESS: ganho concreto
+
+ONE-LINER:
+  "Pacientes que [problema]. A gente oferece [solucao] pra que eles [resultado]."
+  Max 25 palavras, memorizavel.
+`;
+
+// ============================================================
+// MATRIZ DE USO — quando usar cada framework
+// ============================================================
+
+export const FRAMEWORKS_MATRIZ_USO = `
+=== MATRIZ DE USO DOS FRAMEWORKS ===
+Nem todo post precisa de framework. Saturacao mata autoridade.
+Misture os tipos pra parecer humano e nao formula.
+
+POR TIPO DE POST:
+- Educativo / cientifico (dado, mecanismo): Schwartz (problem-aware) + Caples 4U.
+  NAO usar SB7. Sem "voce vai virar heroi". So educa direto.
+- Mito vs verdade / Q&A: Caples 4U + voz pessoal da nutri.
+  NAO usar SB7.
+- Caso clinico (anonimizado): SB7 leve (paciente como heroi, nutri como guia)
+  + Cialdini (prova social) + Schwartz (problem/solution-aware).
+- Bastidores / rotina: voz pessoal, sem framework explicito.
+  Cialdini (afinidade) ok.
+- Storytelling pessoal da nutri: SB7 com a nutri como personagem
+  (nem sempre heroina — as vezes ela eh quem vira guia depois de aprender algo).
+- Venda / oferta: Suby Godfather + Schwartz (most-aware) + Caples 4U.
+- LP / sobre: SB7 completo + Suby Godfather.
+- Trafego pago (anuncio): Pittman 3-part copy + Schwartz (definir awareness) + Caples + Cialdini (1 gatilho).
+
+REGRA GERAL:
+- Mistura: ~30% SB7-like, ~30% educativo direto, ~20% bastidor/voz pessoal,
+  ~20% prova/casos. NUNCA 100% SB7.
+- Cada post tem UM framework dominante. Nao stackeie 4 frameworks num post.
+- Se em duvida, escolha o mais simples (Caples 4U funciona em quase tudo).
+`;
+
+// ============================================================
+// COMPLIANCE CFN 2026 — APENAS REFERENCIA (texto completo no client.ts)
+// ============================================================
+
+export const COMPLIANCE_CFN_2026_RESUMO = `
+=== CFN 856/2026 — REGRAS NOVAS (vigencia 28/07/2026, ja adotadas) ===
+PROIBIDO:
+- Simular resultados clinicos via IA (deepfake, antes/depois fake)
+- Antes/depois de pacientes (mesmo com consentimento)
+- Composicao corporal / exames / medidas de pacientes em redes
+- Indicar/preferir/associar imagem a marca de alimento/bebida/suplemento/fitoterapico
+
+OBRIGATORIO:
+- Informar quando conteudo foi gerado por IA (aviso discreto)
+- IA nao substitui profissional na interacao direta com paciente
+
+ARTE IA — RESTRICOES:
+- Pessoas em contextos NEUTROS (consultorio, fala-camera, alimentacao saudavel)
+- Sem pose/numero/balanca/medida que sugira resultado de tratamento
+- Sem deepfake / pessoa real reconhecivel
+- Preferir cenas SEM pessoas (alimentos, graficos, ambientes)
 `;

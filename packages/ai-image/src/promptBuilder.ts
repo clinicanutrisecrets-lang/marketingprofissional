@@ -48,12 +48,17 @@ export function buildPrompt(input: PromptInput): string {
     : "";
 
   const restricoes = [
-    "STRICT RULES:",
+    "STRICT RULES (Brazilian Nutrition Council CFN 856/2026 compliance):",
     modoTextoOverlay ? "- DO NOT render any text, words, letters, logos, or watermarks in the image." : "",
-    "- DO NOT use before/after comparisons.",
-    "- DO NOT show weight scales, measuring tapes, or body part comparisons.",
-    "- DO NOT include medical symbols suggesting diagnosis (stethoscope, white coat, prescription pad).",
-    "- DO NOT show food plate photos that imply restrictive diet.",
+    "- DO NOT use before/after comparisons (banned by CFN 856/2026).",
+    "- DO NOT show weight scales, numbers, measuring tapes, calipers, or body-part progress comparisons.",
+    "- DO NOT depict bodies in poses that imply weight-loss success or treatment outcome.",
+    "- DO NOT include medical symbols suggesting diagnosis (stethoscope, white coat, prescription pad, exam reports).",
+    "- DO NOT show food plate photos that imply restrictive diet, calorie counting, or 'meal plan' aesthetics.",
+    "- DO NOT generate recognizable real people, celebrities, or anyone resembling a real patient (no deepfakes).",
+    "- DO NOT show specific commercial product brands or packaging of foods, supplements, or drinks.",
+    "- If a person appears, keep them in NEUTRAL contexts only (consultation room, talking-head, healthy lifestyle in general, contemplative). No transformation/result implication.",
+    "- Prefer scenes WITHOUT people: foods in natural light, nature, abstract science visuals, ingredients, environments, textures, conceptual illustrations.",
     "- AVOID generic stock-photo aesthetics.",
     "- Must feel editorial, refined, premium.",
   ].filter(Boolean).join("\n");

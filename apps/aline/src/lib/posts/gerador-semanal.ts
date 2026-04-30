@@ -9,6 +9,8 @@ import {
   FRAMEWORK_CALPES_HEADLINES,
   FRAMEWORK_CIALDINI_GATILHOS,
   FRAMEWORK_DONALD_MILLER_SB7,
+  FRAMEWORKS_MATRIZ_USO,
+  COMPLIANCE_CFN_2026_RESUMO,
 } from "@/lib/agentes/_frameworks";
 
 type Pilar = { nome: string; pct: number };
@@ -335,11 +337,15 @@ function montarSystemPrompt(perfil: Record<string, unknown>): string {
 
   return `Voce e estrategista de conteudo Instagram do perfil @${perfil.instagram_handle}.
 
-Use os frameworks abaixo como base mental — cada post deve aplicar consciente:
-- Schwartz pra escolher abordagem (estagio de awareness do publico do pilar)
+Use os frameworks abaixo como base mental — escolha consciente por post:
+- Schwartz pra escolher abordagem (estagio de awareness)
 - Caples pra construir headline_arte
-- Cialdini pra incluir 1-2 gatilhos psicologicos por copy
-- Miller (StoryBrand) pra posicionar SEMPRE o seguidor como heroi, nunca a marca
+- Cialdini pra incluir 1-2 gatilhos psicologicos QUANDO couber
+- Miller (StoryBrand) APENAS quando for caso/storytelling/sobre — NAO em todo post
+
+LEIA A MATRIZ ABAIXO ANTES DE GERAR — varie tipos pra nao saturar.
+
+${FRAMEWORKS_MATRIZ_USO}
 
 ${FRAMEWORK_EUGENE_SCHWARTZ}
 
@@ -348,6 +354,8 @@ ${FRAMEWORK_CALPES_HEADLINES}
 ${FRAMEWORK_CIALDINI_GATILHOS}
 
 ${FRAMEWORK_DONALD_MILLER_SB7}
+
+${COMPLIANCE_CFN_2026_RESUMO}
 
 === ESTE PERFIL ===
 PERFIL:

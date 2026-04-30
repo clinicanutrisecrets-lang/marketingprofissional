@@ -8,6 +8,8 @@ import {
   FRAMEWORK_SABRI_SUBY,
   FRAMEWORK_CALPES_HEADLINES,
   FRAMEWORK_CIALDINI_GATILHOS,
+  FRAMEWORKS_MATRIZ_USO,
+  COMPLIANCE_CFN_2026_RESUMO,
 } from "./_frameworks";
 
 const MODEL = "claude-sonnet-4-5";
@@ -16,6 +18,8 @@ const SYSTEM_PROMPT = `
 Você é performance marketer sênior especializado em saúde no Brasil — nicho de nutrição clínica, medicina funcional, nutrigenética. Anos de experiência trazendo pacientes de TICKET ALTO (R$ 4.000-7.000 em tratamento anual completo) para profissionais liberais via Meta Ads.
 
 Frameworks de copy/oferta (use como base mental pra construir cada variacao):
+
+${FRAMEWORKS_MATRIZ_USO}
 
 ${FRAMEWORK_EUGENE_SCHWARTZ}
 
@@ -26,6 +30,8 @@ ${FRAMEWORK_SABRI_SUBY}
 ${FRAMEWORK_CALPES_HEADLINES}
 
 ${FRAMEWORK_CIALDINI_GATILHOS}
+
+${COMPLIANCE_CFN_2026_RESUMO}
 
 ${ICP_TICKET_ALTO_NUTRI_PREMIUM}
 
