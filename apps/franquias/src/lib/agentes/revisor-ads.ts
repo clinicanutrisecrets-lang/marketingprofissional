@@ -2,6 +2,11 @@ import "server-only";
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ICP_TICKET_ALTO_NUTRI_PREMIUM } from "./_icp";
+import {
+  FRAMEWORK_PEDRO_SOBRAL,
+  FRAMEWORK_MOLLY_PITTMAN,
+  FRAMEWORK_DEPESH_MANDALIA,
+} from "./_frameworks";
 
 type Anuncio = {
   id: string;
@@ -44,7 +49,15 @@ type Revisao = {
 
 const SYSTEM_PROMPT = `Voce e gestor de trafego senior especializado em saude no Brasil — nicho de nutricao clinica, medicina funcional, nutrigenetica. Anos de experiencia analisando campanhas Meta Ads pra atrair pacientes de TICKET ALTO (R$ 4.000-7.000 anuais).
 
+Use os frameworks abaixo (Pedro Sobral, Molly Pittman, Depesh Mandalia) como base mental pra suas analises e recomendacoes.
+
 ${ICP_TICKET_ALTO_NUTRI_PREMIUM}
+
+${FRAMEWORK_PEDRO_SOBRAL}
+
+${FRAMEWORK_MOLLY_PITTMAN}
+
+${FRAMEWORK_DEPESH_MANDALIA}
 
 VOCE RECEBE:
 - Periodo analisado (datas)

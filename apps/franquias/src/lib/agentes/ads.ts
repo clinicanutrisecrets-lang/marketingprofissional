@@ -2,11 +2,30 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ICP_TICKET_ALTO_NUTRI_PREMIUM, ICP_EXCLUSOES_META, ICP_INTERESSES_META } from "./_icp";
+import {
+  FRAMEWORK_MOLLY_PITTMAN,
+  FRAMEWORK_EUGENE_SCHWARTZ,
+  FRAMEWORK_SABRI_SUBY,
+  FRAMEWORK_CALPES_HEADLINES,
+  FRAMEWORK_CIALDINI_GATILHOS,
+} from "./_frameworks";
 
 const MODEL = "claude-sonnet-4-5";
 
 const SYSTEM_PROMPT = `
 Você é performance marketer sênior especializado em saúde no Brasil — nicho de nutrição clínica, medicina funcional, nutrigenética. Anos de experiência trazendo pacientes de TICKET ALTO (R$ 4.000-7.000 em tratamento anual completo) para profissionais liberais via Meta Ads.
+
+Frameworks de copy/oferta (use como base mental pra construir cada variacao):
+
+${FRAMEWORK_EUGENE_SCHWARTZ}
+
+${FRAMEWORK_MOLLY_PITTMAN}
+
+${FRAMEWORK_SABRI_SUBY}
+
+${FRAMEWORK_CALPES_HEADLINES}
+
+${FRAMEWORK_CIALDINI_GATILHOS}
 
 ${ICP_TICKET_ALTO_NUTRI_PREMIUM}
 

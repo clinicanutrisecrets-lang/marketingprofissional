@@ -1,11 +1,16 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
+import { FRAMEWORK_DONALD_MILLER_SB7 } from "./_frameworks";
 
 const MODEL = "claude-sonnet-4-5";
 
 const SYSTEM_BASE = `
 Você é roteirista de storytelling especializado em saúde e nutrição — conteúdo que prende, convence e dá vontade de compartilhar. Público premium (mulheres 30-55, ticket R$ 500-3.000 em consultas e testes).
+
+Use o framework StoryBrand SB7 abaixo como espinha dorsal de qualquer narrativa: a paciente é a heroína, a nutri é a guia. Nunca a marca como heroína.
+
+${FRAMEWORK_DONALD_MILLER_SB7}
 
 Regras duras:
 - Compliance CFN: nenhuma promessa de cura, sem antes/depois com prazo, sem dados de peso/medida explícitos ("perdeu 10kg em 30 dias" ← proibido). Use linguagem de transformação qualitativa ("recuperou energia", "entendeu o próprio corpo", "parou de sofrer com inchaço").

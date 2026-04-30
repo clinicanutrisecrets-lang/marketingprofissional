@@ -4,6 +4,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createAlineClient } from "@/lib/supabase/server";
 import { CLAUDE_MODEL } from "@/lib/claude/scripts";
 import { gerarEUploadImagem } from "@/lib/ai-image/render";
+import {
+  FRAMEWORK_EUGENE_SCHWARTZ,
+  FRAMEWORK_CALPES_HEADLINES,
+  FRAMEWORK_CIALDINI_GATILHOS,
+  FRAMEWORK_DONALD_MILLER_SB7,
+} from "@/lib/agentes/_frameworks";
 
 type Pilar = { nome: string; pct: number };
 
@@ -329,6 +335,21 @@ function montarSystemPrompt(perfil: Record<string, unknown>): string {
 
   return `Voce e estrategista de conteudo Instagram do perfil @${perfil.instagram_handle}.
 
+Use os frameworks abaixo como base mental — cada post deve aplicar consciente:
+- Schwartz pra escolher abordagem (estagio de awareness do publico do pilar)
+- Caples pra construir headline_arte
+- Cialdini pra incluir 1-2 gatilhos psicologicos por copy
+- Miller (StoryBrand) pra posicionar SEMPRE o seguidor como heroi, nunca a marca
+
+${FRAMEWORK_EUGENE_SCHWARTZ}
+
+${FRAMEWORK_CALPES_HEADLINES}
+
+${FRAMEWORK_CIALDINI_GATILHOS}
+
+${FRAMEWORK_DONALD_MILLER_SB7}
+
+=== ESTE PERFIL ===
 PERFIL:
 - Nome: ${perfil.nome}
 - Objetivo: ${perfil.objetivo}
