@@ -23,7 +23,7 @@ export default async function AprovacaoIndexPage() {
   const aline = createAlineClient();
 
   // Lista todos os perfis ativos
-  const { data: perfis } = await aline
+  const { data: perfis, error: perfilErro } = await aline
     .from("perfis")
     .select("id, slug, nome")
     .eq("ativo", true);
@@ -80,6 +80,30 @@ export default async function AprovacaoIndexPage() {
             datas especiais).
           </p>
         </header>
+
+        {(perfilList.length === 0 || perfilErro) && (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+            <p className="font-semibold">⚠️ Nenhum perfil carregado</p>
+            <p className="mt-1">
+              A query <code>aline.perfis WHERE ativo=true</code> retornou{" "}
+              <strong>{perfilList.length} linhas</strong>.
+              {perfilErro && (
+                <>
+                  {" "}
+                  Erro: <code>{perfilErro.message}</code>{" "}
+                  (code: <code>{perfilErro.code ?? "—"}</code>)
+                </>
+              )}
+            </p>
+            <p className="mt-2 text-xs">
+              Causa provavel:{" "}
+              <strong>schema &quot;aline&quot; nao esta exposto</strong> na API
+              do Supabase. Verifica em: Dashboard Supabase → Project Settings →
+              Data API → Exposed schemas → adicionar <code>aline</code> →
+              salvar.
+            </p>
+          </div>
+        )}
 
         <GerarPackForm
           perfis={perfilList.map((p) => ({ slug: p.slug, nome: p.nome }))}
