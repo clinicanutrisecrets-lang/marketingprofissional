@@ -39,14 +39,22 @@ function LoginInner() {
     if (!supabase) return;
     setLoading(true);
     setErro(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setErro(error.message);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setErro(error.message);
+        setLoading(false);
+        return;
+      }
+      // signin OK — navega
+      router.push("/dashboard");
+      router.refresh();
+      // safety: se o redirect nao acontecer em 5s, libera o botao pra evitar travar
+      setTimeout(() => setLoading(false), 5000);
+    } catch (e) {
+      setErro((e as Error).message ?? "Erro inesperado no login");
       setLoading(false);
-      return;
     }
-    router.push("/dashboard");
-    router.refresh();
   }
 
   if (initError) {
