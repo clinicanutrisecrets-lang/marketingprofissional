@@ -10,13 +10,28 @@ async function assertAdmin(): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Nao autenticado");
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("admins")
-    .select("papel")
+    .select("papel, email")
     .eq("auth_user_id", user.id)
     .maybeSingle();
-  const a = data as { papel?: string } | null;
-  if (!a || a.papel !== "super_admin") throw new Error("Apenas super_admin");
+  if (error) {
+    throw new Error(
+      `Erro lendo admins: ${error.message} (user_id=${user.id} email=${user.email})`,
+    );
+  }
+  const a = data as { papel?: string; email?: string } | null;
+  if (!a) {
+    throw new Error(
+      `Sem registro em admins pra user_id=${user.id} email=${user.email}. ` +
+        `Crie em admins via SQL: INSERT INTO admins (auth_user_id, email, nome, papel) VALUES ('${user.id}', '${user.email}', 'Nome', 'super_admin');`,
+    );
+  }
+  if (a.papel !== "super_admin") {
+    throw new Error(
+      `Apenas super_admin (seu papel: '${a.papel ?? "null"}', email: ${a.email ?? user.email}, user_id: ${user.id})`,
+    );
+  }
 }
 
 /**
