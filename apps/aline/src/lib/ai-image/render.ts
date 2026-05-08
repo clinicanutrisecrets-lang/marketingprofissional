@@ -14,12 +14,12 @@ import { createPublicAdminClient } from "@/lib/supabase/server";
 const BUCKET = "aline-assets";
 
 /**
- * Studio Aline usa OpenAI (GPT-Image-1) por padrão — qualidade premium
- * para os 2 perfis pessoais (scannerdasaude + nutrisecrets). Volume baixo
- * justifica o custo maior.
+ * Studio Aline default = Gemini (custo ~$0.04/img, mesmo provider das franquias).
+ * Pode trocar pra "openai" via env AI_IMAGE_PROVIDER_ALINE=openai (gpt-image-1
+ * tem qualidade premium pra texto na imagem mas custa ~4x mais).
  */
 function providerDefault(): Provider {
-  return (process.env.AI_IMAGE_PROVIDER_ALINE as Provider) ?? "openai";
+  return (process.env.AI_IMAGE_PROVIDER_ALINE as Provider) ?? "gemini";
 }
 
 function resolverApiKey(provider: Provider): string {
