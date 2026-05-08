@@ -81,9 +81,9 @@ export async function GET(request: Request) {
     const userToken = longJson.access_token;
     const expiry = new Date(Date.now() + (longJson.expires_in ?? 60 * 24 * 3600) * 1000);
 
-    // 3. Listar Paginas que o user gerencia + pegar a primeira que tem IG vinculada
+    // 3. Listar Paginas que o user gerencia, com username do IG vinculado
     const pagesRes = await fetch(
-      `https://graph.facebook.com/v21.0/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${userToken}`,
+      `https://graph.facebook.com/v21.0/me/accounts?fields=id,name,access_token,instagram_business_account{id,username}&access_token=${userToken}`,
     );
     if (!pagesRes.ok) throw new Error(`pages: ${await pagesRes.text()}`);
     const pagesJson = (await pagesRes.json()) as {
@@ -91,22 +91,54 @@ export async function GET(request: Request) {
         id: string;
         name: string;
         access_token: string;
-        instagram_business_account?: { id: string };
+        instagram_business_account?: { id: string; username?: string };
       }>;
     };
 
-    const pageComIg = pagesJson.data.find((p) => p.instagram_business_account?.id);
-    if (!pageComIg) {
+    const pagesComIg = pagesJson.data.filter((p) => p.instagram_business_account?.id);
+    if (pagesComIg.length === 0) {
       throw new Error(
         "Nenhuma Pagina FB conectada com Instagram Business. Conecte a IG na Pagina do FB primeiro.",
       );
     }
 
+    // 4. Buscar handle do perfil no DB pra fazer match com IG correto
+    const adminPublic = createPublicAdminClient();
+    const { data: perfilRow } = await adminPublic
+      .schema("aline")
+      .from("perfis")
+      .select("instagram_handle, slug, nome")
+      .eq("slug", state)
+      .maybeSingle();
+
+    const handleEsperado = ((perfilRow as { instagram_handle?: string } | null)
+      ?.instagram_handle ?? state)
+      .toLowerCase()
+      .replace(/^@/, "");
+
+    // Tenta match exato pelo username do IG; se nao achar, pega o primeiro
+    // (com aviso na URL pra Aline confirmar visualmente que conectou o IG certo)
+    const pageMatch = pagesComIg.find(
+      (p) =>
+        p.instagram_business_account?.username?.toLowerCase().replace(/^@/, "") ===
+        handleEsperado,
+    );
+
+    if (!pageMatch) {
+      const candidatos = pagesComIg
+        .map((p) => p.instagram_business_account?.username ?? p.name)
+        .join(", ");
+      throw new Error(
+        `Nenhum IG vinculado bate com '@${handleEsperado}'. IGs encontrados: ${candidatos}. ` +
+          `Verifique se autorizou a Page+IG correta — ou atualize aline.perfis.instagram_handle pra um destes.`,
+      );
+    }
+
+    const pageComIg = pageMatch;
     const igUserId = pageComIg.instagram_business_account!.id;
     const pageToken = pageComIg.access_token; // page token (nao expira se user token long-lived)
 
-    // 4. Salva via RPC (token criptografado por pgsodium)
-    const adminPublic = createPublicAdminClient();
+    // 5. Salva via RPC (token criptografado por pgsodium)
     const { error: rpcErr } = await adminPublic.rpc("set_perfil_instagram_credenciais", {
       p_slug: state,
       p_conta_id: igUserId,

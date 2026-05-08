@@ -30,10 +30,16 @@ export async function GET(request: Request) {
   dialog.searchParams.set("client_id", APP_ID);
   dialog.searchParams.set("redirect_uri", REDIRECT);
   dialog.searchParams.set("state", slug);
+  // Permissoes:
+  // - instagram_business_basic: substitui instagram_basic (deprecated 04/12/2024)
+  // - instagram_content_publish: pra publicar posts
+  // - pages_show_list: pra listar Pages do FB
+  // - pages_read_engagement: pra ler insights pos-publicacao
+  // - business_management: pra gerenciar Business assets
   dialog.searchParams.set(
     "scope",
     [
-      "instagram_basic",
+      "instagram_business_basic",
       "instagram_content_publish",
       "pages_show_list",
       "pages_read_engagement",
