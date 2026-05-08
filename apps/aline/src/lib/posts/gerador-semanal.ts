@@ -49,6 +49,9 @@ export async function gerarPackSemanal(params: {
   semanaRef?: string;
   erro?: string;
   custoUsd?: number;
+  artesGeradas?: number;
+  artesFalharam?: number;
+  errosArte?: string[];
 }> {
   try {
     const aline = createAlineClient();
@@ -170,18 +173,53 @@ export async function gerarPackSemanal(params: {
       ),
     );
 
+    // Loga falhas individuais pra aparecerem nos Vercel Runtime Logs
+    let sucessos = 0;
+    let falhas = 0;
+    resultados.forEach((r, i) => {
+      const postId = insertedRows[i]?.id;
+      if (r.status === "rejected") {
+        falhas++;
+        const reason = r.reason as Error | string;
+        const msg = reason instanceof Error ? reason.message : String(reason);
+        const stack = reason instanceof Error ? reason.stack : undefined;
+        console.error(
+          `[gerarPackSemanal] arte falhou postId=${postId} slug=${params.perfilSlug} err=${msg}`,
+          stack ?? reason,
+        );
+      } else {
+        sucessos++;
+      }
+    });
+    console.log(
+      `[gerarPackSemanal] arte resumo slug=${params.perfilSlug} total=${insertedRows.length} sucessos=${sucessos} falhas=${falhas}`,
+    );
+
     const custoArte = resultados.reduce(
       (acc, r) => acc + (r.status === "fulfilled" ? r.value.custoUsd : 0),
       0,
     );
+
+    // Coleta os erros pra retornar pra UI (max 3 pra nao poluir)
+    const errosArte = resultados
+      .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+      .slice(0, 3)
+      .map((r) => {
+        const reason = r.reason as Error | string;
+        return reason instanceof Error ? reason.message : String(reason);
+      });
 
     return {
       ok: true,
       postIds: insertedRows.map((r) => r.id),
       semanaRef,
       custoUsd: custoCopy + custoArte,
+      artesGeradas: sucessos,
+      artesFalharam: falhas,
+      errosArte: errosArte.length > 0 ? errosArte : undefined,
     };
   } catch (e) {
+    console.error("[gerarPackSemanal] erro fatal", e);
     return { ok: false, erro: (e as Error).message };
   }
 }
@@ -236,7 +274,12 @@ export async function regenerarArtePost(
 
     return { ok: true, url: r.url, custoUsd: r.custoUsd };
   } catch (e) {
-    return { ok: false, erro: (e as Error).message };
+    const err = e as Error;
+    console.error(
+      `[regenerarArtePost] postId=${postId} err=${err.message}`,
+      err.stack ?? err,
+    );
+    return { ok: false, erro: err.message };
   }
 }
 
@@ -263,13 +306,31 @@ async function gerarArteParaPost(params: {
 }): Promise<{ url: string; custoUsd: number }> {
   const aline = createAlineClient();
 
-  const r = await gerarEUploadImagem({
-    perfilId: params.perfilId,
-    perfilSlug: params.perfilSlug,
-    tipo: "feed_imagem",
-    brand: params.brand,
-    conteudo: params.conteudo,
-  });
+  console.log(
+    `[gerarArteParaPost] iniciando postId=${params.postId} headline="${params.conteudo.headline.slice(0, 50)}..."`,
+  );
+
+  let r: Awaited<ReturnType<typeof gerarEUploadImagem>>;
+  try {
+    r = await gerarEUploadImagem({
+      perfilId: params.perfilId,
+      perfilSlug: params.perfilSlug,
+      tipo: "feed_imagem",
+      brand: params.brand,
+      conteudo: params.conteudo,
+    });
+  } catch (e) {
+    const err = e as Error;
+    console.error(
+      `[gerarArteParaPost] gerarEUploadImagem falhou postId=${params.postId} err=${err.message}`,
+      err.stack ?? err,
+    );
+    throw err;
+  }
+
+  console.log(
+    `[gerarArteParaPost] arte gerada postId=${params.postId} url=${r.url.slice(0, 60)} custoUsd=${r.meta.custoEstimadoUsd}`,
+  );
 
   if (params.sobrescrever) {
     await aline.from("post_midias").delete().eq("post_id", params.postId);

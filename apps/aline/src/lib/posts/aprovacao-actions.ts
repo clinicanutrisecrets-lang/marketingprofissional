@@ -135,6 +135,9 @@ export async function gerarPackAction(params: {
   semanaRef?: string;
   custoUsd?: number;
   erro?: string;
+  artesGeradas?: number;
+  artesFalharam?: number;
+  errosArte?: string[];
 }> {
   try {
     await assertAdmin();
@@ -150,6 +153,9 @@ export async function gerarPackAction(params: {
       semanaRef: r.semanaRef,
       custoUsd: r.custoUsd,
       erro: r.erro,
+      artesGeradas: r.artesGeradas,
+      artesFalharam: r.artesFalharam,
+      errosArte: r.errosArte,
     };
   } catch (e) {
     return { ok: false, erro: (e as Error).message };

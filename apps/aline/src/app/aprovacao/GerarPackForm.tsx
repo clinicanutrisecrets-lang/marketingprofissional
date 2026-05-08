@@ -7,7 +7,16 @@ import { gerarPackAction } from "@/lib/posts/aprovacao-actions";
 type Perfil = { slug: string; nome: string };
 
 type Resultado =
-  | { tipo: "ok"; slug: string; qtd: number; semanaRef: string; custoUsd?: number }
+  | {
+      tipo: "ok";
+      slug: string;
+      qtd: number;
+      semanaRef: string;
+      custoUsd?: number;
+      artesGeradas?: number;
+      artesFalharam?: number;
+      errosArte?: string[];
+    }
   | { tipo: "erro"; slug: string; mensagem: string };
 
 export function GerarPackForm({ perfis }: { perfis: Perfil[] }) {
@@ -33,6 +42,9 @@ export function GerarPackForm({ perfis }: { perfis: Perfil[] }) {
             qtd: r.qtd ?? 0,
             semanaRef: r.semanaRef ?? semanaRef,
             custoUsd: r.custoUsd,
+            artesGeradas: r.artesGeradas,
+            artesFalharam: r.artesFalharam,
+            errosArte: r.errosArte,
           }
         : { tipo: "erro", slug, mensagem: r.erro ?? "erro desconhecido" };
       setResultados((cur) => [novoResultado, ...cur]);
@@ -118,11 +130,41 @@ export function GerarPackForm({ perfis }: { perfis: Perfil[] }) {
             >
               {r.tipo === "ok" ? (
                 <>
-                  ✓ @{r.slug}: {r.qtd} posts gerados pra semana {r.semanaRef}
-                  {typeof r.custoUsd === "number" && (
-                    <span className="ml-2 text-xs opacity-70">
-                      (custo IA: ${r.custoUsd.toFixed(4)})
-                    </span>
+                  <div>
+                    ✓ @{r.slug}: {r.qtd} posts gerados pra semana {r.semanaRef}
+                    {typeof r.custoUsd === "number" && (
+                      <span className="ml-2 text-xs opacity-70">
+                        (custo IA: ${r.custoUsd.toFixed(4)})
+                      </span>
+                    )}
+                  </div>
+                  {typeof r.artesGeradas === "number" && (
+                    <div className="mt-1 text-xs">
+                      Artes:{" "}
+                      <strong>
+                        {r.artesGeradas}/{(r.artesGeradas ?? 0) + (r.artesFalharam ?? 0)}
+                      </strong>
+                      {(r.artesFalharam ?? 0) > 0 && (
+                        <span className="ml-2 text-orange-700">
+                          {r.artesFalharam} falharam — use &quot;Regenerar arte&quot; em
+                          cada post
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {r.errosArte && r.errosArte.length > 0 && (
+                    <details className="mt-1 text-xs">
+                      <summary className="cursor-pointer text-red-700">
+                        Ver erros das artes
+                      </summary>
+                      <ul className="mt-1 list-disc pl-4 text-red-700">
+                        {r.errosArte.map((erro, idx) => (
+                          <li key={idx} className="font-mono text-[10px]">
+                            {erro}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
                   )}
                 </>
               ) : (
