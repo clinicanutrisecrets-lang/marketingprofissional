@@ -25,6 +25,12 @@ function providerDefault(): Provider {
 function resolverApiKey(provider: Provider): string {
   const key =
     provider === "openai" ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY;
+  const envKeysOpenai = Object.keys(process.env).filter((k) =>
+    k.toUpperCase().includes("OPENAI"),
+  );
+  console.log(
+    `[resolverApiKey] provider=${provider} keyDefined=${key !== undefined} keyLen=${key?.length ?? 0} keyPrefix=${key?.slice(0, 7) ?? "none"} envKeysWithOpenai=${JSON.stringify(envKeysOpenai)} VERCEL_ENV=${process.env.VERCEL_ENV} NODE_ENV=${process.env.NODE_ENV}`,
+  );
   if (!key) throw new Error(`API key ausente para provider ${provider}`);
   return key;
 }
