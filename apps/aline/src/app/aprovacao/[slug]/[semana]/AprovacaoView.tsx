@@ -36,6 +36,11 @@ export function AprovacaoView({
   const cancelados = posts.filter((p) => p.status === "cancelado").length;
   const semMidia = posts.filter((p) => p.midia_pendente && p.status !== "cancelado").length;
 
+  // Feedback por post (regenerar arte) — { postId: { tipo, msg } }
+  const [feedbackPost, setFeedbackPost] = useState<
+    Record<string, { tipo: "ok" | "erro" | "loading"; msg: string }>
+  >({});
+
   function handleAprovarTudo() {
     startTransition(async () => {
       const r = await aprovarBlocoSemanal({ perfilSlug, semanaRef });
@@ -86,18 +91,45 @@ export function AprovacaoView({
     if (!confirm("Regenerar arte deste post? A imagem atual sera substituida.")) return;
     setRegenerandoId(postId);
     setFeedback("Gerando nova arte… (10-30s)");
+    setFeedbackPost((cur) => ({
+      ...cur,
+      [postId]: { tipo: "loading", msg: "Gerando nova arte… (10-30s)" },
+    }));
     (async () => {
-      const r = await regenerarArteAction(postId);
-      setRegenerandoId(null);
-      if (r.ok) {
-        setPosts((cur) =>
-          cur.map((p) => (p.id === postId ? { ...p, midia_url: r.url, midia_pendente: false } : p)),
-        );
-        setFeedback(
-          `✓ arte regenerada${typeof r.custoUsd === "number" ? ` (custo: $${r.custoUsd.toFixed(4)})` : ""}`,
-        );
-      } else {
-        setFeedback(`✗ ${r.erro}`);
+      try {
+        const r = await regenerarArteAction(postId);
+        setRegenerandoId(null);
+        if (r.ok) {
+          setPosts((cur) =>
+            cur.map((p) =>
+              p.id === postId ? { ...p, midia_url: r.url, midia_pendente: false } : p,
+            ),
+          );
+          const sucessoMsg = `✓ arte regenerada${
+            typeof r.custoUsd === "number" ? ` (custo: $${r.custoUsd.toFixed(4)})` : ""
+          }`;
+          setFeedback(sucessoMsg);
+          setFeedbackPost((cur) => ({
+            ...cur,
+            [postId]: { tipo: "ok", msg: sucessoMsg },
+          }));
+        } else {
+          const erroMsg = `✗ ${r.erro ?? "erro desconhecido"}`;
+          setFeedback(erroMsg);
+          setFeedbackPost((cur) => ({
+            ...cur,
+            [postId]: { tipo: "erro", msg: erroMsg },
+          }));
+        }
+      } catch (e) {
+        // Catch generico (network, timeout, server action falhou)
+        setRegenerandoId(null);
+        const erroMsg = `✗ Erro: ${(e as Error).message ?? "exception sem mensagem"}`;
+        setFeedback(erroMsg);
+        setFeedbackPost((cur) => ({
+          ...cur,
+          [postId]: { tipo: "erro", msg: erroMsg },
+        }));
       }
     })();
   }
@@ -223,6 +255,19 @@ export function AprovacaoView({
                       </a>
                     )}
                   </div>
+                  {feedbackPost[post.id as string] && (
+                    <div
+                      className={`mt-2 break-words rounded-lg px-3 py-2 text-xs ${
+                        feedbackPost[post.id as string].tipo === "ok"
+                          ? "bg-green-50 text-green-800"
+                          : feedbackPost[post.id as string].tipo === "erro"
+                            ? "bg-red-50 text-red-800"
+                            : "bg-aline-bg/50 text-aline-text/70"
+                      }`}
+                    >
+                      {feedbackPost[post.id as string].msg}
+                    </div>
+                  )}
                 </div>
               </div>
 
