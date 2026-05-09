@@ -50,18 +50,50 @@ Canva Brand Templates resolve os três:
 └──────────────────────────────────────────┘
 ```
 
-## Master Brand Templates
+## Pool de Brand Templates
 
 Vivem na conta Canva da Aline (Pro) e são compartilhados por todas as franquias.
 
-| Perfil          | Tipo     | Design ID      | Brand Template ID  | Status                                    |
-| --------------- | -------- | -------------- | ------------------ | ----------------------------------------- |
-| Scanner         | Capa     | `DAHJILDNdi4`  | _aguardando_       | direção visual aprovada (teal + sans)     |
-| Nutri Secrets   | Capa     | `DAHJIGrFmoQ`  | _aguardando_       | direção aprovada (cream + magenta accent) |
+**Modelo: pool, não master único.** A Aline já tem dezenas de posts publicados na
+pasta "Scanner 2.0" — cada um é um layout diferente (foto de cápsula + headline,
+flat-lay de comida + question card, foto moody de microscopia + título serif,
+fundo sólido cream + texto puro, etc). Em vez de gerar templates do zero, ela
+marca essa biblioteca existente como Brand Templates. O sistema escolhe o
+template certo por contexto (tipo de post, tema, presença de foto hero).
 
-**Próximas:** problema, conceito, dado, encerramento — pra cada perfil. Polish via API
-de edição (`perform-editing-operations`) duplicando+editando das capas, não via
-`generate-design` (loteria de qualidade).
+```
+search-designs("Scanner 2.0") já retornou 10+ designs:
+  DAHIVng4K2Q  Post Scanner 2.0           (9 pgs)
+  DAHIzg43yl4  Scanner 2.0                (10 pgs)
+  DAHIztQhOKs  Scanner 2.0                (9 pgs)
+  DAHIK0W1LD4  Post Scanner 2.0           (10 pgs)
+  ...etc
+```
+
+Aline marca via **Arquivo → Salvar como modelo de marca** na UI Canva (1 clique
+por design — ação não exposta na API). Manda os Brand Template IDs (formato
+`EAGxxx...`).
+
+**Schema implication:** migration 007 atual tem 1 ID por tipo de peça
+(`canva_template_carrossel_id TEXT`). Próxima migration (008) vira pool — favoreço
+tabela separada `aline.canva_templates` com (perfil_id, brand_template_id, tipo,
+tags, descricao, ativo) por permitir metadata.
+
+**Tags por template** (definidas na criação) ajudam o seletor a escolher o certo:
+
+- Template-tag examples: `gene-especifico`, `dieta-strategy`, `dado-stat`,
+  `principio`, `caso-clinico`, `tem-foto-hero`, `solido-only`
+- Post.tags do Claude: `tema:resistencia-insulina, formato:explicativo`
+- Match: pega templates compatíveis, escolhe um randomicamente (ou por uso recente
+  pra rotação)
+
+**Descartado:** `DAHJILDNdi4` (teal Scanner cover gerado por AI) — direção errada,
+me confundi com o print "Monte o seu painel" que ela mandou inicialmente. A marca
+real do Scanner 2.0 é warm cream + serif italic, não teal clinical.
+
+**Bug a corrigir:** `DAHJIGrFmoQ` (Nutri cover gerado AI) tem espaçamento broken
+no headline (color spans cortando palavras). Manter pra referência da paleta
+mas não como template ativo.
 
 ## Schema (migration 007)
 
