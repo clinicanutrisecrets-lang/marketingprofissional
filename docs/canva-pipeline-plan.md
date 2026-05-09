@@ -32,8 +32,14 @@ Canva Brand Templates resolve os três:
            │
            ▼
 ┌──────────────────────────┐
-│  Claude (copy)           │  ← gera headline/corpo/cta
-│  Gemini (foto opcional)  │  ← se template tem placeholder de foto
+│  Claude (copy + visual_  │  ← gera headline/corpo/cta + hint de foto
+│   hint p/ Pexels)        │     ("vitamin D capsule sunlight")
+└──────────┬───────────────┘
+           │
+           ▼
+┌──────────────────────────┐
+│  Pexels API (foto hero)  │  ← top 20 → pega 1ª não-usada
+│  Fallback: Gemini gen    │     (cache em aline.fotos_usadas)
 └──────────┬───────────────┘
            │
            ▼
@@ -128,27 +134,91 @@ exigir Canva Pro de cada nutri.
 
 → pipeline cai automaticamente no Sharp composite legado. Não bloqueia geração de pack.
 
+## Pexels: foto hero dinâmica
+
+**Problema:** se cada Brand Template tem 1 foto fixa embedada, posts repetem foto.
+Não rola.
+
+**Solução:** placeholder de imagem no template; foto vem dinamicamente do Pexels
+(stock free, alta qualidade, mesma estética dos posts atuais da Aline — Scanner 2.0
+posts mostram fotos cara-de-Pexels: cápsula vit D, almonds, eggs, woman tank top).
+
+**Fluxo:**
+
+1. Claude gera post + também `visual_hint TEXT` (3–5 palavras descrevendo o
+   subject ideal pra foto): `"vitamin D capsule sunlight"`,
+   `"almonds avocado oil flat-lay"`, `"pills hand minimal"`, etc.
+2. `pexelsClient.search(hint, perPage=20)` → lista de URLs
+3. Filtra contra cache `aline.fotos_usadas` (perfil_id, pexels_photo_id, usado_em)
+   — ignora fotos usadas nas últimas N semanas (default 4) pra esse perfil
+4. Pega 1ª foto disponível, baixa
+5. Upload pra Canva como asset (Connect API → assets endpoint)
+6. Autofill do template com `image_field_id → asset_id` + textos
+
+**Fallback:** se Pexels não retornar nada relevante (raro), gera via Gemini com
+prompt restrito (mesmo `visual_hint` + estilo "warm cream natural light").
+
+**Tabela `aline.fotos_usadas` (migration 008 ou 009):**
+
+```sql
+CREATE TABLE aline.fotos_usadas (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  perfil_id       UUID NOT NULL REFERENCES aline.perfis(id) ON DELETE CASCADE,
+  pexels_photo_id TEXT NOT NULL,
+  visual_hint     TEXT,
+  post_id         UUID REFERENCES aline.posts(id) ON DELETE SET NULL,
+  usado_em        TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX ON aline.fotos_usadas (perfil_id, usado_em DESC);
+```
+
 ## Próximos passos (próxima sessão)
 
-1. **OAuth Canva no studio**
+1. **Migration 008 — pool de templates**
+   - Tabela `aline.canva_templates` (perfil_id, brand_template_id, tipo, tags[],
+     descricao, ativo, criado_em)
+   - Drop colunas legacy `canva_template_*_id` em `aline.perfis`
+   - Tabela `aline.fotos_usadas` (cache de rotação Pexels)
+
+2. **OAuth Canva no studio**
    - Rota `/admin/canva/conectar` (inicia OAuth)
    - Rota `/admin/canva/callback` (recebe code, troca por token, chama
      `aline.set_canva_credentials`)
    - UI: card de status em `/configuracoes` mostrando conectado/não-conectado
 
-2. **Service `canvaAutofill` em `packages/ai-image/src/providers/canva.ts`**
+3. **Pexels client em `packages/ai-image/src/providers/pexels.ts`**
+   - `pexelsSearch(query, count)` → array de fotos
+   - `pexelsDownload(photoId)` → buffer
+   - PEXELS_API_KEY no env
+
+4. **Service `canvaAutofill` em `packages/ai-image/src/providers/canva.ts`**
    - Cliente da Connect API (`@canva/connect-api-ts` se publicado, ou fetch puro)
    - Refresh token automático se token expirado
-   - Função `autofillBrandTemplate(templateId, data)` → polling do export → buffer PNG
+   - `uploadAsset(buffer)` → asset_id
+   - `autofillBrandTemplate(templateId, data)` → polling do export → buffer PNG
 
-3. **Wiring em `apps/aline/src/lib/ai-image/render.ts`**
+5. **Service `selecionarTemplate(perfilId, post)`**
+   - Filtra `aline.canva_templates` por tipo + tags compatíveis com post
+   - Retorna 1 template (random ou round-robin de uso recente)
+
+6. **Service `selecionarFoto(perfilId, visualHint)`**
+   - Pexels search com hint
+   - Filtra fotos já usadas (cache `aline.fotos_usadas`)
+   - Retorna buffer + registra uso
+
+7. **Wiring em `apps/aline/src/lib/ai-image/render.ts`**
    - Branch por `perfil.render_engine`
-   - Sharp = chama `renderImagemIA` atual
-   - Canva = chama `gerarImagemViaCanva`
+   - Sharp = chama `renderImagemIA` atual (fallback)
+   - Canva = `selecionarTemplate` → `selecionarFoto` → `canvaAutofill` → upload bucket
 
-4. **UI de configuração de templates**
-   - Admin pode colar Brand Template IDs em cada perfil pelo studio
+8. **UI de configuração**
+   - Admin lista templates registrados por perfil + edita tags
    - Campo de teste: "Renderizar peça de exemplo" pra validar antes de soltar pack
+
+9. **Refinar prompt do Claude (gerador-semanal.ts)**
+   - Output adicional: `visual_hint` por post
+   - Pilar `sinergias_nutricionais`: lista de pares banidos (Vit C+ferro,
+     curcumina+pimenta) + diretriz pra pares não-óbvios com mecanismo molecular
 
 ## Decisão registrada
 
