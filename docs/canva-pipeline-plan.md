@@ -56,42 +56,36 @@ Canva Brand Templates resolve os três:
 └──────────────────────────────────────────┘
 ```
 
-## Pool de Brand Templates
+## Decisão: duplicate-and-edit (NÃO autofill via Brand Template)
 
-Vivem na conta Canva da Aline (Pro) e são compartilhados por todas as franquias.
+**Path escolhido pela Aline:** pular Brand Templates totalmente. Razão: requer
+ação manual na UI Canva (Arquivo → Salvar como modelo de marca), e o MCP/Connect
+API não expõe essa ação.
 
-**Modelo: pool, não master único.** A Aline já tem dezenas de posts publicados na
-pasta "Scanner 2.0" — cada um é um layout diferente (foto de cápsula + headline,
-flat-lay de comida + question card, foto moody de microscopia + título serif,
-fundo sólido cream + texto puro, etc). Em vez de gerar templates do zero, ela
-marca essa biblioteca existente como Brand Templates. O sistema escolhe o
-template certo por contexto (tipo de post, tema, presença de foto hero).
+**Implicação no pipeline:** em vez de 1 chamada `/v1/autofills`, são 3-4 chamadas
+por post:
+
+1. `POST /v1/designs/{designId}/copy` — duplica design original do pool
+2. `POST /v1/designs/{copyId}/edits` (ou perform-editing-operations equivalente
+   via Connect) — substitui texto headline, texto corpo, image asset hero
+3. `POST /v1/exports` — gera PNG
+4. Poll até `/v1/exports/{id}` ficar `success` → download
+
+Custo: ~2x mais chamadas que autofill, mas funcional sem nenhuma ação UI da Aline.
+
+## Design IDs do pool Scanner 2.0 (já fornecidos)
 
 ```
-search-designs("Scanner 2.0") já retornou 10+ designs:
-  DAHIVng4K2Q  Post Scanner 2.0           (9 pgs)
-  DAHIzg43yl4  Scanner 2.0                (10 pgs)
-  DAHIztQhOKs  Scanner 2.0                (9 pgs)
-  DAHIK0W1LD4  Post Scanner 2.0           (10 pgs)
-  ...etc
+DAHIK0W1LD4
+DAHGMl54D-8
+DAHIztQhOKs
+DAHIK_YXsDc
+DAG7zkzfCAQ
+DAG7IDNTt68
 ```
 
-Aline marca via **Arquivo → Salvar como modelo de marca** na UI Canva (1 clique
-por design — ação não exposta na API). Manda os Brand Template IDs (formato
-`EAGxxx...`).
-
-**Schema implication:** migration 007 atual tem 1 ID por tipo de peça
-(`canva_template_carrossel_id TEXT`). Próxima migration (008) vira pool — favoreço
-tabela separada `aline.canva_templates` com (perfil_id, brand_template_id, tipo,
-tags, descricao, ativo) por permitir metadata.
-
-**Tags por template** (definidas na criação) ajudam o seletor a escolher o certo:
-
-- Template-tag examples: `gene-especifico`, `dieta-strategy`, `dado-stat`,
-  `principio`, `caso-clinico`, `tem-foto-hero`, `solido-only`
-- Post.tags do Claude: `tema:resistencia-insulina, formato:explicativo`
-- Match: pega templates compatíveis, escolhe um randomicamente (ou por uso recente
-  pra rotação)
+Vivem na conta Canva da Aline. Pipeline duplica do original; original nunca é
+alterado.
 
 **Descartado:** `DAHJILDNdi4` (teal Scanner cover gerado por AI) — direção errada,
 me confundi com o print "Monte o seu painel" que ela mandou inicialmente. A marca
