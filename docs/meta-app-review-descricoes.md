@@ -68,21 +68,29 @@ Cole essas descrições no campo **"How you're using this permission"** de cada 
 
 ---
 
-## `business_management` (somente se for usar)
+## `business_management`
 
-> We use `business_management` to list ad accounts and business assets 
-> accessible to the nutritionist, so she can select which ad account should 
-> be used for her campaigns. This avoids her having to manually copy ad 
-> account IDs. Read-only access at setup time.
+> We use `business_management` to identify the Instagram Business Account 
+> linked to the Facebook Page the user selected during connection. 
+> Instagram Business accounts are managed through Meta Business Manager, 
+> and this permission is required to resolve the correct 
+> `instagram_business_account_id` from the user's chosen Page. We store 
+> only the resolved ID; we do not modify any Business Manager settings. 
+> Access is used at setup time only, in read mode.
 
 ---
 
-## `instagram_basic`
+## `instagram_business_basic`
 
-> We use `instagram_basic` to read the basic profile information (username, 
-> profile picture, account type) of the Instagram Business account the 
-> nutritionist connects. This is displayed in the platform dashboard so she 
-> can confirm the correct account is linked before any publishing action.
+> We use `instagram_business_basic` to read basic profile information 
+> (username, profile picture, account type) of the Instagram Business 
+> account the nutritionist connects. This is displayed in the platform 
+> dashboard so she can confirm the correct Business account is linked 
+> before any publishing action. Access is read-only and limited to 
+> accounts the user has explicitly connected through our consent flow.
+>
+> NOTE: This is the new name (Meta renamed `instagram_basic` to 
+> `instagram_business_basic` for Business accounts).
 
 ---
 
