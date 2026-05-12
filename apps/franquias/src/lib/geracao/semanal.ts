@@ -2,7 +2,11 @@
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { gerarPost, planejarSemana } from "@/lib/claude/generate";
-import type { ContextoFranqueada } from "@/lib/claude/prompts";
+import type {
+  ContextoFranqueada,
+  TipoPost,
+  AnguloPost,
+} from "@/lib/claude/prompts";
 import {
   generateImage,
   buildModifications,
@@ -21,7 +25,19 @@ import {
   filtrarPorNicho,
 } from "@/lib/tendencias/datas-comemorativas";
 import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
+import {
+  buscarBriefingsPendentes,
+  marcarBriefingUsado,
+  type Briefing,
+} from "@/lib/briefings/actions";
+import {
+  logarCusto,
+  CUSTO_BANNERBEAR_RENDER_USD,
+  CUSTO_CREATOMATE_RENDER_USD,
+} from "@/lib/custos/log";
 import { revalidatePath } from "next/cache";
+
+const MODELO_CLAUDE_DEFAULT = "claude-sonnet-4-5";
 
 /**
  * Gera a semana de posts de uma franqueada.
@@ -119,19 +135,45 @@ export async function gerarPostsDaSemana(
     tendencias,
   );
 
+  // Briefings antecipados — temas que a nutri pediu durante a semana.
+  // Consumidos primeiro, antes do plano automático.
+  const briefingsPendentes = await buscarBriefingsPendentes(franqueadaId, 7);
+  const planoCasado = casarBriefingsComPlano(plano, briefingsPendentes);
+
   // 5. Gera cada post (sequencial pra respeitar rate limits)
   let gerados = 0;
   const erros: string[] = [];
 
-  for (const item of plano) {
+  for (const item of planoCasado) {
     try {
+      const contextoComBriefing = item.briefing
+        ? montarContextoComBriefing(blocoContextoExtra, item.briefing)
+        : blocoContextoExtra;
+
+      const tInicio = Date.now();
       const post = await gerarPost(
         contexto,
         item.tipo,
         item.angulo,
         semanaRef,
-        blocoContextoExtra,
+        contextoComBriefing,
       );
+      const latenciaMs = Date.now() - tInicio;
+
+      // Registra custo Claude (silent fail se falhar)
+      if (post._usage) {
+        await logarCusto({
+          franqueadaId,
+          servico: "claude",
+          operacao: "gerar_post",
+          modelo: MODELO_CLAUDE_DEFAULT,
+          uso: post._usage,
+          briefingId: item.briefing?.id ?? null,
+          aprovacaoId: aprovacaoId,
+          latenciaMs,
+          metadata: { tipo: item.tipo, angulo: item.angulo },
+        });
+      }
 
       // Calcula data/hora do post
       const dataHora = calcularDataHora(
@@ -175,7 +217,24 @@ export async function gerarPostsDaSemana(
             },
           });
           urlImagem = r.url;
+          await logarCusto({
+            franqueadaId,
+            servico: "gemini",
+            operacao: "render_imagem",
+            briefingId: item.briefing?.id ?? null,
+            aprovacaoId,
+            metadata: { tipo: item.tipo },
+          });
         } catch (aiErr) {
+          await logarCusto({
+            franqueadaId,
+            servico: "gemini",
+            operacao: "render_imagem",
+            sucesso: false,
+            erro: (aiErr as Error).message,
+            briefingId: item.briefing?.id ?? null,
+            aprovacaoId,
+          });
           console.warn("AI-Image falhou, tentando Creatomate:", aiErr);
         }
       }
@@ -221,8 +280,26 @@ export async function gerarPostsDaSemana(
               urlImagem = ready.url;
             }
             designId = renders[0].id;
+            await logarCusto({
+              franqueadaId,
+              servico: "creatomate",
+              operacao: "render",
+              custoUsd: CUSTO_CREATOMATE_RENDER_USD,
+              briefingId: item.briefing?.id ?? null,
+              aprovacaoId,
+              metadata: { tipo: item.tipo, design_id: renders[0].id },
+            });
           }
         } catch (e) {
+          await logarCusto({
+            franqueadaId,
+            servico: "creatomate",
+            operacao: "render",
+            sucesso: false,
+            erro: (e as Error).message,
+            briefingId: item.briefing?.id ?? null,
+            aprovacaoId,
+          });
           console.warn("Creatomate falhou, tentando Bannerbear:", e);
         }
       }
@@ -245,41 +322,72 @@ export async function gerarPostsDaSemana(
           });
           urlImagem = img.image_url;
           designId = img.uid;
+          await logarCusto({
+            franqueadaId,
+            servico: "bannerbear",
+            operacao: "render",
+            custoUsd: CUSTO_BANNERBEAR_RENDER_USD,
+            briefingId: item.briefing?.id ?? null,
+            aprovacaoId,
+            metadata: { tipo: item.tipo, design_id: img.uid },
+          });
         } catch (bbErr) {
+          await logarCusto({
+            franqueadaId,
+            servico: "bannerbear",
+            operacao: "render",
+            sucesso: false,
+            erro: (bbErr as Error).message,
+            briefingId: item.briefing?.id ?? null,
+            aprovacaoId,
+          });
           console.warn("Bannerbear falhou, seguindo sem criativo:", bbErr);
         }
       }
 
       // Salva post
-      const { error: postErr } = await admin.from("posts_agendados").insert({
-        franqueada_id: franqueadaId,
-        aprovacao_semanal_id: aprovacaoId,
-        semana_ref: semanaRef,
-        tipo_post: item.tipo,
-        status: "aguardando_aprovacao",
-        origem: "ia_automatico",
-        copy_legenda: post.copy_legenda,
-        copy_cta: post.copy_cta,
-        hashtags: post.hashtags,
-        angulo_copy: post.angulo_copy,
-        copy_legenda_ia_original: post.copy_legenda,
-        copy_cta_ia_original: post.copy_cta,
-        hashtags_ia_original: post.hashtags,
-        ia_model_usado: "claude-sonnet-4-5",
-        ia_tokens_input: post._usage?.input_tokens,
-        ia_tokens_output: post._usage?.output_tokens,
-        ia_tokens_cached: post._usage?.cache_read_input_tokens,
-        bannerbear_design_id: designId,
-        url_imagem_final: urlImagem,
-        url_video_final: urlVideo,
-        data_hora_agendada: dataHora,
-        legenda_gerada_ia: true,
-      });
+      const { data: postInserted, error: postErr } = await admin
+        .from("posts_agendados")
+        .insert({
+          franqueada_id: franqueadaId,
+          aprovacao_semanal_id: aprovacaoId,
+          semana_ref: semanaRef,
+          tipo_post: item.tipo,
+          status: "aguardando_aprovacao",
+          origem: item.briefing ? "briefing_antecipado" : "ia_automatico",
+          briefing_id: item.briefing?.id ?? null,
+          briefing_nutri: item.briefing?.tema ?? null,
+          copy_legenda: post.copy_legenda,
+          copy_cta: post.copy_cta,
+          hashtags: post.hashtags,
+          angulo_copy: post.angulo_copy,
+          copy_legenda_ia_original: post.copy_legenda,
+          copy_cta_ia_original: post.copy_cta,
+          hashtags_ia_original: post.hashtags,
+          ia_model_usado: MODELO_CLAUDE_DEFAULT,
+          ia_tokens_input: post._usage?.input_tokens,
+          ia_tokens_output: post._usage?.output_tokens,
+          ia_tokens_cached: post._usage?.cache_read_input_tokens,
+          bannerbear_design_id: designId,
+          url_imagem_final: urlImagem,
+          url_video_final: urlVideo,
+          data_hora_agendada: dataHora,
+          legenda_gerada_ia: true,
+        })
+        .select("id")
+        .single();
 
-      if (postErr) {
-        erros.push(`${item.angulo}: ${postErr.message}`);
+      if (postErr || !postInserted) {
+        erros.push(`${item.angulo}: ${postErr?.message ?? "insert falhou"}`);
       } else {
         gerados += 1;
+        if (item.briefing) {
+          await marcarBriefingUsado(
+            item.briefing.id,
+            (postInserted as { id: string }).id,
+            semanaRef,
+          );
+        }
       }
     } catch (e) {
       erros.push(`${item.angulo}: ${(e as Error).message}`);
@@ -458,4 +566,87 @@ function montarBlocoContextoExtra(
   );
 
   return partes.join("\n");
+}
+
+/**
+ * Casa briefings antecipados com slots do plano. Os primeiros N slots
+ * do plano (até o número de briefings) viram posts a partir dos
+ * pedidos da nutri. Se a nutri pediu formato específico, prioriza
+ * matching de tipo. Os demais slots seguem com o tema automático.
+ */
+function casarBriefingsComPlano(
+  plano: Array<{ dia: number; tipo: TipoPost; angulo: AnguloPost }>,
+  briefings: Briefing[],
+): Array<{
+  dia: number;
+  tipo: TipoPost;
+  angulo: AnguloPost;
+  briefing?: Briefing;
+}> {
+  if (briefings.length === 0) {
+    return plano.map((p) => ({ ...p }));
+  }
+
+  const restantes = [...briefings];
+  const resultado: Array<{
+    dia: number;
+    tipo: TipoPost;
+    angulo: AnguloPost;
+    briefing?: Briefing;
+  }> = plano.map((p) => ({ ...p }));
+
+  // 1. Casa briefings com formato preferido específico
+  for (const b of [...restantes]) {
+    if (
+      b.formato_preferido &&
+      b.formato_preferido !== "sem_preferencia"
+    ) {
+      const idx = resultado.findIndex(
+        (r) => !r.briefing && r.tipo === b.formato_preferido,
+      );
+      if (idx >= 0) {
+        resultado[idx].briefing = b;
+        // Mantemos o ângulo automático — o tema do briefing já entra
+        // como contexto direto no prompt. angulo_sugerido textual da
+        // nutri vai dentro do bloco de contexto, sem virar enum.
+        restantes.splice(restantes.indexOf(b), 1);
+      }
+    }
+  }
+
+  // 2. Os demais ocupam slots na ordem (do começo da semana pro fim)
+  for (const slot of resultado) {
+    if (slot.briefing || restantes.length === 0) continue;
+    if (slot.tipo === "stories") continue; // stories ficam pro tema automático
+    const b = restantes.shift()!;
+    slot.briefing = b;
+  }
+
+  return resultado;
+}
+
+function montarContextoComBriefing(
+  contextoBase: string | undefined,
+  briefing: Briefing,
+): string {
+  const linhas: string[] = [];
+  linhas.push("PEDIDO DIRETO DA NUTRI PRA ESSE POST (priorize esse tema):");
+  linhas.push(`Tema: ${briefing.tema}`);
+  if (briefing.angulo_sugerido) {
+    linhas.push(`Ângulo que ela pediu: ${briefing.angulo_sugerido}`);
+  }
+  if (briefing.observacoes) {
+    linhas.push(`Observações dela: ${briefing.observacoes}`);
+  }
+  linhas.push(
+    "Use exatamente o tema acima como assunto principal do post. O ângulo automático fica em segundo plano.",
+  );
+
+  if (contextoBase) {
+    linhas.push("");
+    linhas.push("---");
+    linhas.push(contextoBase);
+  }
+
+  return linhas.join("\n");
 }
