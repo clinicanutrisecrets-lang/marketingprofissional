@@ -68,7 +68,7 @@ Cole essas descrições no campo **"How you're using this permission"** de cada 
 
 ---
 
-## `business_management` (somente se for usar)
+## `business_management`
 
 > We use `business_management` to list ad accounts and business assets 
 > accessible to the nutritionist, so she can select which ad account should 
