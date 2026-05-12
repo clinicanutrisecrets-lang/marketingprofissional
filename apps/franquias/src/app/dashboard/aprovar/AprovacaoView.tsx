@@ -247,6 +247,15 @@ function PostCard({
           </span>
         </div>
 
+        {post.origem === "briefing_antecipado" && post.briefing_nutri && (
+          <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <div className="font-semibold">📝 Você pediu este tema</div>
+            <div className="mt-0.5 line-clamp-2 text-amber-800/80">
+              {post.briefing_nutri as string}
+            </div>
+          </div>
+        )}
+
         {editando ? (
           <div className="space-y-2">
             <textarea

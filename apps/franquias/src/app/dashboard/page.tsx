@@ -137,6 +137,13 @@ export default async function DashboardPage() {
               disponivel={true}
             />
             <ActionCard
+              icone="📝"
+              titulo="Pedir conteúdo"
+              descricao="Diga os temas que quer ver no domingo"
+              href="/dashboard/briefings"
+              disponivel={true}
+            />
+            <ActionCard
               icone="✨"
               titulo="Criar post manual"
               descricao="Sobe seu vídeo + IA faz a legenda"
