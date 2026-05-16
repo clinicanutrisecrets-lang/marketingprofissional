@@ -28,6 +28,18 @@ export async function GET(request: Request) {
     path: "/",
   });
 
+  // Optional return_to param: only allow safe internal paths
+  const returnTo = new URL(request.url).searchParams.get("return_to");
+  if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+    cookieStore.set("meta_oauth_return_to", returnTo, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 10,
+      path: "/",
+    });
+  }
+
   const redirectUri =
     process.env.META_REDIRECT_URI ??
     new URL("/api/auth/meta/callback", request.url).toString();

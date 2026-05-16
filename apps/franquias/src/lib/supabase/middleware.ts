@@ -32,11 +32,20 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Rotas protegidas da franqueada
+  // Rotas protegidas da franqueada (PT)
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Rotas protegidas da franqueada (EN, demo p/ Meta App Review)
+  if (pathname.startsWith("/en/dashboard")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/en/login";
       return NextResponse.redirect(url);
     }
   }

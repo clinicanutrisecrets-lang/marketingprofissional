@@ -23,11 +23,23 @@ export async function GET(request: Request) {
   const state = url.searchParams.get("state");
   const error = url.searchParams.get("error");
 
-  const redirectOk = new URL("/onboarding?step=6&conectado=1", request.url);
-  const redirectErr = (msg: string) =>
-    NextResponse.redirect(
-      new URL(`/onboarding?step=6&erro=${encodeURIComponent(msg)}`, request.url),
-    );
+  const cookieStoreEarly = cookies();
+  const returnTo = cookieStoreEarly.get("meta_oauth_return_to")?.value ?? null;
+  const okPath = returnTo ?? "/onboarding?step=6&conectado=1";
+  const errPath = (msg: string) =>
+    returnTo
+      ? `${returnTo}${returnTo.includes("?") ? "&" : "?"}meta_error=${encodeURIComponent(msg)}`
+      : `/onboarding?step=6&erro=${encodeURIComponent(msg)}`;
+
+  const clearReturnTo = () => {
+    if (returnTo) cookieStoreEarly.delete("meta_oauth_return_to");
+  };
+
+  const redirectOk = new URL(okPath, request.url);
+  const redirectErr = (msg: string) => {
+    clearReturnTo();
+    return NextResponse.redirect(new URL(errPath(msg), request.url));
+  };
 
   if (error) return redirectErr(error);
   if (!code) return redirectErr("Código ausente");
@@ -92,6 +104,7 @@ export async function GET(request: Request) {
 
     if (updateError) return redirectErr(`DB: ${updateError.message}`);
 
+    clearReturnTo();
     return NextResponse.redirect(redirectOk);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro desconhecido";
