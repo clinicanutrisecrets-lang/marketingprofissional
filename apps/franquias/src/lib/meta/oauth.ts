@@ -13,6 +13,26 @@ export const INSTAGRAM_SCOPES = [
   "business_management",
 ];
 
+export const ADS_SCOPES = [
+  "ads_management",
+  "ads_read",
+  "business_management",
+  "pages_show_list",
+];
+
+export function buildAdsAuthUrl(state: string, redirectUri: string): string {
+  const appId = process.env.META_APP_ID;
+  if (!appId) throw new Error("META_APP_ID não configurada");
+
+  const url = new URL(`https://www.facebook.com/${GRAPH_VERSION}/dialog/oauth`);
+  url.searchParams.set("client_id", appId);
+  url.searchParams.set("redirect_uri", redirectUri);
+  url.searchParams.set("state", state);
+  url.searchParams.set("scope", ADS_SCOPES.join(","));
+  url.searchParams.set("response_type", "code");
+  return url.toString();
+}
+
 export function buildAuthUrl(state: string, redirectUri: string): string {
   const appId = process.env.META_APP_ID;
   if (!appId) throw new Error("META_APP_ID não configurada");

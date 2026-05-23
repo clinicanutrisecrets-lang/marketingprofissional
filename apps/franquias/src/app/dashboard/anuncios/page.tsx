@@ -31,7 +31,7 @@ export default async function AnunciosPage() {
 
   const { data: f } = await supabase
     .from("franqueadas")
-    .select("id, faz_anuncio_pago, budget_anuncio_mensal, nicho_principal")
+    .select("id, faz_anuncio_pago, budget_anuncio_mensal, nicho_principal, meta_ads_access_token, meta_ads_token_expiry")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   if (!f) redirect("/onboarding");
@@ -41,7 +41,17 @@ export default async function AnunciosPage() {
     faz_anuncio_pago: boolean | null;
     budget_anuncio_mensal: number | null;
     nicho_principal: string | null;
+    meta_ads_access_token: string | null;
+    meta_ads_token_expiry: string | null;
   };
+
+  const metaAdsConectado = !!franqueada.meta_ads_access_token;
+  const adsTokenDias = franqueada.meta_ads_token_expiry
+    ? Math.round(
+        (new Date(franqueada.meta_ads_token_expiry).getTime() - Date.now()) /
+          (24 * 60 * 60 * 1000),
+      )
+    : null;
 
   const { data: anuncios } = await supabase
     .from("anuncios")
@@ -79,6 +89,30 @@ export default async function AnunciosPage() {
             + Criar anúncio
           </Link>
         </header>
+
+        {/* Card de conexão Meta Ads */}
+        <div className={`mb-6 rounded-2xl p-5 ${metaAdsConectado ? "border border-green-200 bg-green-50" : "border-2 border-blue-200 bg-blue-50"}`}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="mb-1 text-sm font-semibold text-brand-text">
+                {metaAdsConectado ? "✅ Meta Ads conectado" : "🔗 Conectar Meta Ads"}
+              </div>
+              <p className="text-xs text-brand-text/60">
+                {metaAdsConectado
+                  ? `Agente de tráfego autorizado a criar e gerenciar campanhas.${adsTokenDias !== null ? ` Token válido por ${adsTokenDias} dias.` : ""}`
+                  : "Clique para autorizar o agente a criar campanhas no seu Meta Business."}
+              </p>
+            </div>
+            {!metaAdsConectado && (
+              <Link
+                href="/api/auth/meta/ads/start"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Conectar Meta Ads →
+              </Link>
+            )}
+          </div>
+        </div>
 
         {!franqueada.faz_anuncio_pago && (
           <div className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
