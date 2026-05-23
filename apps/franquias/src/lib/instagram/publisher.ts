@@ -35,23 +35,67 @@ export async function publicarPost(
 
   const { data: fData } = await admin
     .from("franqueadas")
-    .select("id, instagram_conta_id, instagram_access_token, instagram_token_expiry, email, nome_comercial, nome_completo, instagram_handle")
+    .select("id, instagram_conta_id, instagram_access_token, instagram_token_expiry, email, nome_comercial, nome_completo, instagram_handle, publer_profile_id")
     .eq("id", post.franqueada_id)
     .maybeSingle();
 
   if (!fData) return { ok: false, erro: "Franqueada não encontrada" };
   const f = fData as Record<string, unknown>;
 
-  if (!f.instagram_conta_id || !f.instagram_access_token) {
-    return { ok: false, erro: "Instagram não conectado" };
-  }
+  // ── Fallback: se não tem token direto do Instagram, tenta via Publer ──
+  const temTokenDireto = !!f.instagram_conta_id && !!f.instagram_access_token;
+  const tokenExpirado = f.instagram_token_expiry
+    ? new Date(f.instagram_token_expiry as string).getTime() < Date.now()
+    : false;
 
-  // Verifica expiração
-  const expiry = f.instagram_token_expiry
-    ? new Date(f.instagram_token_expiry as string).getTime()
-    : null;
-  if (expiry && expiry < Date.now()) {
-    return { ok: false, erro: "Token Instagram expirado — precisa reconectar" };
+  if (!temTokenDireto || tokenExpirado) {
+    const publerProfileId = f.publer_profile_id as string | null;
+    if (publerProfileId) {
+      // Delega ao Publer — o cron chama esta rota interna
+      try {
+        const { agendarPost } = await import("@/lib/publer/client");
+        const caption = montarCaption(post);
+        const tipo = post.tipo_post as string;
+        let publerTipo: "photo" | "video" | "reel" | "carousel" | "story" = "photo";
+        const mediaUrls: string[] = [];
+
+        if (tipo === "feed_imagem" || tipo === "stories") {
+          publerTipo = tipo === "stories" ? "story" : "photo";
+          const url = (post.url_imagem_final ?? post.imagem_upload_url) as string | null;
+          if (url) mediaUrls.push(url);
+        } else if (tipo === "reels") {
+          publerTipo = "reel";
+          const url = (post.url_video_final ?? post.video_upload_url) as string | null;
+          if (url) mediaUrls.push(url);
+        } else if (tipo === "feed_carrossel") {
+          publerTipo = "carousel";
+          const { data: midias } = await admin.from("post_midias").select("url").eq("post_id", postId).order("ordem", { ascending: true });
+          for (const m of midias ?? []) mediaUrls.push((m as { url: string }).url);
+        }
+
+        if (!mediaUrls.length) return { ok: false, erro: "Post sem mídia para Publer" };
+
+        const resultado = await agendarPost({
+          publerAccountId: publerProfileId,
+          caption,
+          dataHora: post.data_hora_agendada as string,
+          tipo: publerTipo,
+          mediaUrls,
+        });
+
+        await admin.from("posts_agendados").update({
+          status: "postado",
+          instagram_post_id: resultado.postId,
+          data_hora_postado: new Date().toISOString(),
+        }).eq("id", postId);
+
+        return { ok: true, instagramPostId: resultado.postId };
+      } catch (e) {
+        return { ok: false, erro: `Publer: ${(e as Error).message}` };
+      }
+    }
+    if (!temTokenDireto) return { ok: false, erro: "Instagram não conectado — complete o passo de conexão no onboarding." };
+    if (tokenExpirado) return { ok: false, erro: "Token Instagram expirado — reconecte no painel." };
   }
 
   let pageToken: string;
