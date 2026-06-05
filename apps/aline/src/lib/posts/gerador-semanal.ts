@@ -168,6 +168,7 @@ export async function gerarPackSemanal(params: {
             subtitle: posts[i].arte_subtitle,
             eyebrow: posts[i].arte_eyebrow,
             cta: posts[i].copy_cta,
+            corpo: posts[i].copy_legenda,
           },
         }),
       ),

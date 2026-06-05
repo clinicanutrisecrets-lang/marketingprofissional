@@ -8,11 +8,11 @@ type Props = {
 export default async function TendenciasCard({ nicho }: Props) {
   const admin = createPublicAdminClient();
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const nichoFiltro = nicho ?? "saude_integrativa";
   const { data: tendenciasRaw } = await admin
     .from("tendencias_diarias")
     .select("*")
-    .eq("nicho", "saude_integrativa")
+    .eq("nicho", nichoFiltro)
     .order("data_ref", { ascending: false })
     .order("relevancia_icp", { ascending: false })
     .limit(5);
@@ -44,9 +44,6 @@ export default async function TendenciasCard({ nicho }: Props) {
   if (tendencias.length === 0 && datas.length === 0) {
     return null;
   }
-
-  void hoje;
-  void nicho;
 
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm">

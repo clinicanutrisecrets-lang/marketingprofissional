@@ -125,7 +125,7 @@ export default async function DashboardPage() {
         </section>
 
         <section className="mb-8">
-          <TendenciasCard />
+          <TendenciasCard nicho={(lista[0]?.nicho_principal as string) ?? "saude_integrativa"} />
         </section>
 
         <section>

@@ -31,13 +31,14 @@ export function buildPrompt(input: PromptInput): string {
   const headline = conteudo.headline;
   const tema = conteudo.subtitle ?? conteudo.eyebrow ?? "";
   const corPrimaria = brand.corPrimariaHex;
+  const corpoPost = conteudo.corpo ? conteudo.corpo.slice(0, 300) : "";
 
   const direcao = [
     `Fine art editorial still-life photography, ${aspecto}.`,
     `Choose ONE subject category, picked to reflect the editorial theme below — do NOT illustrate the theme literally, evoke it through a tangible photographic object:`,
     CATEGORIAS_VISUAIS.map((c, i) => `  (${i + 1}) ${c}`).join("\n"),
     ``,
-    `Editorial theme guiding the choice: "${headline}"${tema ? ` — context: "${tema}"` : ""}.`,
+    `Editorial theme guiding the choice: "${headline}"${tema ? ` — context: "${tema}"` : ""}${corpoPost ? `\nPost body for deeper context (do NOT illustrate literally — use it to choose a more specific, resonant subject): "${corpoPost}"` : ""}.`,
   ].join("\n");
 
   const estilo = [
