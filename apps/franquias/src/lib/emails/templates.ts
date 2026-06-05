@@ -223,3 +223,34 @@ export function emailRevisaoAdsPronta(params: {
     texto: `${params.resumoExecutivo}\n\nVer completa: ${params.linkRevisao}`,
   };
 }
+
+export function emailCriativoProntoParaAprovacao(params: {
+  nome: string;
+  qtdVariacoes: number;
+  anguloCampanha: string;
+  linkAprovar: string;
+}): { html: string; texto: string; assunto: string } {
+  const conteudo = `
+    <h1 style="${baseStyles.h1}">🎨 ${params.qtdVariacoes} criativos prontos pra aprovar</h1>
+    <p style="${baseStyles.p}">
+      Oi, ${params.nome}! Seu gestor de tráfego IA criou ${params.qtdVariacoes} variações de anúncio
+      angularmente diferentes, todas dentro do compliance CFN.
+    </p>
+    <div style="background: #0BB8A820; border-left: 4px solid #0BB8A8; padding: 16px; border-radius: 8px; margin: 20px 0;">
+      <div style="font-size: 12px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Ângulo da campanha</div>
+      <div style="font-size: 15px; color: #182024; margin-top: 6px; line-height: 1.5;">${params.anguloCampanha}</div>
+    </div>
+    <p style="${baseStyles.p}">
+      É só escolher a variação que mais combina com você e aprovar. Assim que você aprovar,
+      o sistema lança a campanha automaticamente — público, segmentação e ativação, tudo no piloto automático.
+    </p>
+    <p style="margin: 24px 0;">
+      <a href="${params.linkAprovar}" style="${baseStyles.button}">Revisar e aprovar criativo →</a>
+    </p>
+  `;
+  return {
+    assunto: `🎨 ${params.qtdVariacoes} criativos prontos pra aprovar`,
+    html: wrap(conteudo),
+    texto: `${params.qtdVariacoes} criativos prontos pra aprovar. ${params.anguloCampanha}\n\nAprovar: ${params.linkAprovar}`,
+  };
+}
