@@ -81,42 +81,60 @@ export const ICP_EXCLUSOES_META = {
   // Públicos a EXCLUIR no Meta Ads pra não atrair perfil errado
   comportamentos_excluir: [
     "Compradores frequentes de programas de emagrecimento rápido",
-    "Frequentadores de academias de baixo padrão",
+    "Frequentadores de academias de baixo custo (Smart Fit, redes populares)",
     "Compradores de produtos de detox / chá emagrecedor",
+    // CRÍTICO: excluir quem JÁ comprou teste genético (Genera, DNA Vida, etc.)
+    // — chegam já sabendo o resultado e pedem desconto na consulta
+    "Compradores de testes genéticos diretos ao consumidor (Genera, DNA Vida, Geneone)",
+    "Interesse em ancestralidade genética (23andMe, MyHeritage — perfil curiosidade, não saúde clínica)",
   ],
   interesses_excluir: [
     "Dieta da Lua / Dieta Cetogênica popular / Dieta Detox",
     "Influenciadores fitness sensacionalistas",
     "Bariátrica / cirurgia rápida de emagrecimento",
     "Status luxo extremo (yacht, helicóptero, supercarros)",
+    "Programas de emagrecimento em grupo (Weight Watchers, Vigilantes do Peso)",
+    "Suplementos MLM / venda direta (Herbalife, Amway saúde)",
   ],
   paginas_excluir: [
     "Páginas de coach motivacional fitness",
     "Páginas de marketing multinível de saúde (MLM)",
     "Páginas de produto emagrecedor sem evidência",
+    "Páginas de cirurgia plástica / bariátrica",
   ],
 };
 
 export const ICP_INTERESSES_META = {
   // Interesses a INCLUIR no Meta Ads pra atrair ICP
+  // ATENÇÃO: usar referências BRASILEIRAS — o público-alvo é Brasil
+  // Não usar nomes de influenciadores estrangeiros que o público não reconhece
   interesses_principais: [
-    "Medicina funcional",
+    // Referências brasileiras de saúde funcional / integrativa
+    "Luciano Bruno",              // farmacêutico/educador de saúde funcional, grande no Brasil
+    "Pura Vida",                  // marca de suplementos premium — indica renda e consciência
+    "Bodytech",                   // academia premium (não Smart Fit) — indica classe A/B
+    "Bio Ritmo",                  // academia premium classe A/B
+    "Farmácia de manipulação",    // quem já faz fórmulas magistrais = consciente de personalização
+    "Medicina integrativa",
+    "Nutrição funcional",
     "Nutrigenética",
     "Microbioma intestinal",
     "Epigenética",
     "Saúde da mulher 40+",
-    "Longevidade saudável",
-    "Andrew Huberman",
-    "Tim Ferriss",
-    "Michael Pollan",
-    "Mark Hyman",
+    "Longevidade",
+    "Check-up executivo",
+    "Plano de saúde Amil One / Bradesco Saúde Top",  // indicador de renda
     "Suplementação personalizada",
+    "Vitaminas e minerais (interesse, não produto MLM)",
   ],
   comportamentos_principais: [
-    "Compradores de testes genéticos diretos ao consumidor (23andMe, MyHeritage)",
-    "Compradores de suplementos premium online (Vitamin Shoppe, Apothecary)",
-    "Leitoras de revistas/sites de saúde funcional (Goop, MindBodyGreen-equivalente)",
-    "Pacientes de medicina integrativa",
+    // ATENÇÃO: NÃO incluir 'compradores de teste genético' — chegam já com resultado e pedem desconto
+    // Queremos quem está INTERESSADO em personalização mas ainda não comprou o teste
+    "Compradores de suplementos premium (Pura Vida, Essential Nutrition, manipulação)",
+    "Usuários de apps de saúde premium (Whoop, Oura Ring, Garmin saúde)",
+    "Consumidores de conteúdo de medicina integrativa / funcional no Brasil",
+    "Pacientes que buscam segunda opinião médica / clínicas de check-up executivo",
+    "Engajamento com conteúdo de longevidade, epigenética, microbioma (sem compra de kit)",
   ],
   demograficos: {
     idade_min: 35,
@@ -125,7 +143,17 @@ export const ICP_INTERESSES_META = {
     escolaridade: ["Ensino superior completo", "Pós-graduação"],
     rendimento_familiar_estimado: "renda média-alta (top 20-40%)",
   },
+  nota_teste_genetico: `
+REGRA CRÍTICA — TESTE GENÉTICO:
+- INCLUIR: pessoas interessadas em personalização de saúde, nutrição de precisão,
+  que AINDA NÃO compraram teste genético (são o lead ideal — vêm sem âncora de preço)
+- EXCLUIR: pessoas que já compraram kits da Genera, DNA Vida, Geneone, 23andMe
+  (chegam com resultado em mãos, pedem desconto na consulta, desvalorizam o serviço)
+- ESTRATÉGIA: não usar "teste genético" como interesse de inclusão —
+  usar "nutrição personalizada", "medicina de precisão", "saúde integrativa"
+  que capturam a curiosidade sem atrair quem já tem o kit
+  `.trim(),
 };
 
 export const ICP_RESUMO_CURTO =
-  "Mulher 35-52, classe A-B, frustrada com nutris anteriores, lê Pollan/Lustig/Ferriss, pesquisa antes de comprar, valoriza profundidade científica, decide por valor não preço, se organiza financeiramente pra investir em tratamento real (não busca quick fix nem status).";
+  "Mulher 35-52, classe A-B, frustrada com nutris anteriores que só deram cardápio genérico, busca entender o próprio corpo com profundidade científica (microbioma, nutrigenética, epigenética), investe em suplementação premium, frequenta academia de alto padrão, decide por valor e não por preço, se organiza financeiramente pra tratamento real.";

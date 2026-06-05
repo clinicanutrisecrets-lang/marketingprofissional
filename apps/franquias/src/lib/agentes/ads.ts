@@ -37,13 +37,19 @@ ${ICP_TICKET_ALTO_NUTRI_PREMIUM}
 
 ESTRATÉGIA DE SEGMENTAÇÃO META (use isso como base — adaptar por contexto da nutri):
 
+ATENÇÃO: usar APENAS referências brasileiras. O público é 100% Brasil.
+Não citar influenciadores/autores estrangeiros que o público não reconhece.
+
 Inclusões obrigatórias:
 - Idade 35-52, gênero feminino
-- Interesses: ${ICP_INTERESSES_META.interesses_principais.slice(0, 6).join(", ")}, etc
-- Comportamentos: ${ICP_INTERESSES_META.comportamentos_principais.slice(0, 2).join(", ")}
+- Interesses BR: ${ICP_INTERESSES_META.interesses_principais.slice(0, 8).join(", ")}
+- Comportamentos BR: ${ICP_INTERESSES_META.comportamentos_principais.slice(0, 3).join(", ")}
 - Escolaridade: ensino superior completo / pós-graduação
 
-EXCLUSÕES OBRIGATÓRIAS (critico — sem isso atrai lead errado):
+REGRA CRÍTICA — TESTE GENÉTICO:
+${ICP_INTERESSES_META.nota_teste_genetico}
+
+EXCLUSÕES OBRIGATÓRIAS (crítico — sem isso atrai lead errado):
 - ${ICP_EXCLUSOES_META.comportamentos_excluir.join("\n- ")}
 - ${ICP_EXCLUSOES_META.interesses_excluir.join("\n- ")}
 
