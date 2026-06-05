@@ -12,10 +12,11 @@ import { sugerirTagsParaVideo } from "@/lib/videos/sugerir-tags";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 
 type Video = Record<string, unknown>;
+type Aba = "upload" | "pexels" | "reel-ia";
 
 export function BibliotecaView({ videos: initial }: { videos: Video[] }) {
   const [videos, setVideos] = useState(initial);
-  const [aba, setAba] = useState<"upload" | "pexels">("upload");
+  const [aba, setAba] = useState<Aba>("upload");
 
   return (
     <>
@@ -38,13 +39,20 @@ export function BibliotecaView({ videos: initial }: { videos: Video[] }) {
         >
           🔎 Buscar no Pexels
         </button>
+        <button
+          type="button"
+          onClick={() => setAba("reel-ia")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
+            aba === "reel-ia" ? "bg-brand-primary text-white" : "text-brand-text/60"
+          }`}
+        >
+          🎬 Reel com IA
+        </button>
       </div>
 
-      {aba === "upload" ? (
-        <UploadForm onAdded={(v) => setVideos((prev) => [v, ...prev])} />
-      ) : (
-        <PexelsSearch onAdded={(v) => setVideos((prev) => [v, ...prev])} />
-      )}
+      {aba === "upload" && <UploadForm onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
+      {aba === "pexels" && <PexelsSearch onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
+      {aba === "reel-ia" && <ReelIA videos={videos} onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
@@ -381,6 +389,241 @@ function PexelsSearch({ onAdded }: { onAdded: (v: Video) => void }) {
             ➕ Adicionar à biblioteca
           </button>
         </div>
+      )}
+    </div>
+  );
+}
+
+type ReelIAProps = {
+  videos: Video[];
+  onAdded: (v: Video) => void;
+};
+
+function ReelIA({ videos, onAdded }: ReelIAProps) {
+  const [videoSelecionadoUrl, setVideoSelecionadoUrl] = useState("");
+  const [videoSelecionadoTitulo, setVideoSelecionadoTitulo] = useState("");
+  const [templates, setTemplates] = useState<Array<{ id: string; name: string }>>([]);
+  const [templateId, setTemplateId] = useState("");
+  const [carregandoTemplates, setCarregandoTemplates] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [processando, setProcessando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  const videosUpload = videos.filter((v) => v.fonte === "upload" && v.url);
+
+  async function carregarTemplates() {
+    setCarregandoTemplates(true);
+    setErro(null);
+    try {
+      const res = await fetch("/api/captions/templates");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro ?? "Erro ao carregar templates");
+      setTemplates(data.templates ?? []);
+      if (data.templates?.length > 0) setTemplateId(data.templates[0].id);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro");
+    } finally {
+      setCarregandoTemplates(false);
+    }
+  }
+
+  async function iniciarProcessamento() {
+    if (!videoSelecionadoUrl || !templateId) {
+      setErro("Selecione um vídeo e um estilo de legenda");
+      return;
+    }
+    setProcessando(true);
+    setErro(null);
+    setDownloadUrl(null);
+    setProgress(0);
+
+    const res = await fetch("/api/captions/criar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videoUrl: videoSelecionadoUrl, captionTemplateId: templateId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setErro(data.erro ?? "Erro ao iniciar");
+      setProcessando(false);
+      return;
+    }
+
+    setJobId(data.jobId);
+    poll(data.jobId);
+  }
+
+  function poll(id: string) {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/captions/status/${id}`);
+        const data = await res.json();
+        setProgress(data.progress ?? 0);
+
+        if (data.status === "COMPLETE") {
+          clearInterval(interval);
+          setProcessando(false);
+          setDownloadUrl(data.downloadUrl);
+          setMsg("Reel pronto! Baixe e adicione à sua biblioteca.");
+        } else if (data.status === "FAILED" || data.status === "CANCELLED") {
+          clearInterval(interval);
+          setProcessando(false);
+          setErro(data.error ?? "Processamento falhou");
+        }
+      } catch {
+        clearInterval(interval);
+        setProcessando(false);
+        setErro("Erro ao verificar status");
+      }
+    }, 4000);
+  }
+
+  async function salvarNaBiblioteca() {
+    if (!downloadUrl) return;
+    startTransition(async () => {
+      const r = await adicionarVideoBiblioteca({
+        titulo: `${videoSelecionadoTitulo} — com legendas`,
+        url: downloadUrl,
+        tags: ["reel", "legendas", "captions-ia"],
+        fonte: "upload",
+      });
+      if (r.ok) {
+        onAdded({
+          id: r.id!,
+          titulo: `${videoSelecionadoTitulo} — com legendas`,
+          url: downloadUrl,
+          tags: ["reel", "legendas", "captions-ia"],
+          fonte: "upload",
+        });
+        setMsg("Salvo na biblioteca!");
+        setDownloadUrl(null);
+        setJobId(null);
+        setProgress(0);
+        setTimeout(() => setMsg(null), 2500);
+      }
+    });
+  }
+
+  return (
+    <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+      <div>
+        <h3 className="mb-1 font-semibold text-brand-text">Adicionar legendas ao seu Reel</h3>
+        <p className="text-xs text-brand-text/60">
+          Selecione um vídeo da sua biblioteca, escolha o estilo de legenda e a IA processa automaticamente.{" "}
+          <span className="text-brand-text/40">Powered by Captions</span>
+        </p>
+      </div>
+
+      {videosUpload.length === 0 ? (
+        <div className="rounded-lg bg-brand-muted p-4 text-center text-sm text-brand-text/60">
+          Nenhum vídeo de upload encontrado. Suba um vídeo na aba "Upload meu vídeo" primeiro.
+        </div>
+      ) : (
+        <div>
+          <label className="mb-1 block text-sm font-medium">Vídeo base</label>
+          <select
+            value={videoSelecionadoUrl}
+            onChange={(e) => {
+              setVideoSelecionadoUrl(e.target.value);
+              const v = videosUpload.find((x) => x.url === e.target.value);
+              setVideoSelecionadoTitulo((v?.titulo as string) ?? "");
+            }}
+            className="w-full rounded-lg border border-brand-text/10 px-3 py-2 text-sm"
+          >
+            <option value="">— selecione —</option>
+            {videosUpload.map((v) => (
+              <option key={v.id as string} value={v.url as string}>
+                {v.titulo as string}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div>
+        <div className="mb-1 flex items-center justify-between">
+          <label className="text-sm font-medium">Estilo de legenda</label>
+          {templates.length === 0 && (
+            <button
+              type="button"
+              onClick={carregarTemplates}
+              disabled={carregandoTemplates}
+              className="text-xs text-brand-primary hover:underline disabled:opacity-60"
+            >
+              {carregandoTemplates ? "Carregando..." : "Carregar estilos"}
+            </button>
+          )}
+        </div>
+        {templates.length > 0 ? (
+          <select
+            value={templateId}
+            onChange={(e) => setTemplateId(e.target.value)}
+            className="w-full rounded-lg border border-brand-text/10 px-3 py-2 text-sm"
+          >
+            {templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-xs text-brand-text/50">Clique em "Carregar estilos" acima para ver as opções disponíveis.</p>
+        )}
+      </div>
+
+      {processando && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-brand-text/60">
+            <span>Processando com IA...</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-brand-muted">
+            <div
+              className="h-full rounded-full bg-brand-primary transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {erro && <div className="rounded-lg bg-red-50 p-2 text-xs text-red-700">{erro}</div>}
+      {msg && <div className="rounded-lg bg-green-50 p-2 text-xs text-green-700">{msg}</div>}
+
+      {downloadUrl ? (
+        <div className="flex gap-2">
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 rounded-lg border border-brand-primary px-4 py-2.5 text-center text-sm font-semibold text-brand-primary hover:bg-brand-primary/5"
+          >
+            ⬇️ Baixar vídeo
+          </a>
+          <button
+            type="button"
+            onClick={salvarNaBiblioteca}
+            className="flex-1 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary/90"
+          >
+            💾 Salvar na biblioteca
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={iniciarProcessamento}
+          disabled={processando || !videoSelecionadoUrl || !templateId}
+          className="w-full rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary/90 disabled:opacity-60"
+        >
+          {processando ? `Processando... ${progress}%` : "✨ Adicionar legendas com IA"}
+        </button>
+      )}
+
+      {jobId && !processando && !downloadUrl && (
+        <p className="text-center text-xs text-brand-text/40">Job ID: {jobId}</p>
       )}
     </div>
   );
