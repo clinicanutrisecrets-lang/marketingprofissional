@@ -120,23 +120,8 @@ export type InstagramProfile = {
   followers_count?: number;
   follows_count?: number;
   media_count?: number;
+  website?: string;
 };
-
-export async function getInstagramProfileFull(
-  igAccountId: string,
-  pageToken: string,
-): Promise<InstagramProfile> {
-  const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${igAccountId}`);
-  url.searchParams.set(
-    "fields",
-    "id,username,name,biography,profile_picture_url,followers_count,follows_count,media_count",
-  );
-  url.searchParams.set("access_token", pageToken);
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`getIGProfile: ${res.status} ${await res.text()}`);
-  return res.json();
-}
 
 export type InstagramMedia = {
   id: string;
@@ -150,6 +135,29 @@ export type InstagramMedia = {
   comments_count?: number;
 };
 
+/**
+ * Perfil completo da conta Instagram Business — usado na tela /dashboard/perfil-instagram
+ * para o review da Meta (instagram_business_basic).
+ */
+export async function getInstagramProfileFull(
+  igAccountId: string,
+  pageToken: string,
+): Promise<InstagramProfile> {
+  const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${igAccountId}`);
+  url.searchParams.set(
+    "fields",
+    "id,username,name,biography,profile_picture_url,followers_count,follows_count,media_count,website",
+  );
+  url.searchParams.set("access_token", pageToken);
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`getIGProfileFull: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+/**
+ * Lista as mídias (posts/reels) da conta Instagram Business.
+ */
 export async function getInstagramMedia(
   igAccountId: string,
   pageToken: string,

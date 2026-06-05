@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { decrypt } from "@/lib/security/encrypt";
 import {
   getInstagramProfileFull,
@@ -17,37 +17,36 @@ export default async function PerfilInstagramPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/login");
 
-  const { data: franqueada } = await supabase
+  const admin = createAdminClient();
+  const { data: fData } = await admin
     .from("franqueadas")
-    .select("*")
+    .select(
+      "id, instagram_conta_id, instagram_access_token, instagram_handle, instagram_token_expiry",
+    )
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
-  if (!franqueada) redirect("/onboarding");
+  const f = fData as unknown as Record<string, unknown> | null;
 
-  const f = franqueada as Record<string, unknown>;
-  const igAccountId = f.instagram_conta_id as string | null;
-  const encryptedToken = f.instagram_access_token as string | null;
+  if (!f || !f.instagram_conta_id || !f.instagram_access_token) {
+    return <NaoConectado />;
+  }
 
   let profile: InstagramProfile | null = null;
   let media: InstagramMedia[] = [];
-  let apiError: string | null = null;
+  let erroApi: string | null = null;
 
-  if (igAccountId && encryptedToken) {
-    try {
-      const pageToken = decrypt(encryptedToken);
-      const [p, m] = await Promise.all([
-        getInstagramProfileFull(igAccountId, pageToken),
-        getInstagramMedia(igAccountId, pageToken, 9),
-      ]);
-      profile = p;
-      media = m;
-    } catch (e) {
-      apiError = e instanceof Error ? e.message : "Erro ao carregar dados do Instagram";
-    }
+  try {
+    const pageToken = decrypt(f.instagram_access_token as string);
+    const igId = f.instagram_conta_id as string;
+    [profile, media] = await Promise.all([
+      getInstagramProfileFull(igId, pageToken),
+      getInstagramMedia(igId, pageToken, 9),
+    ]);
+  } catch (e) {
+    erroApi = e instanceof Error ? e.message : "Erro ao consultar Meta Graph API";
   }
 
   return (
@@ -57,99 +56,109 @@ export default async function PerfilInstagramPage() {
           <div>
             <Link
               href="/dashboard"
-              className="text-sm text-brand-text/60 hover:text-brand-primary"
+              className="text-xs font-medium text-brand-text/60 hover:text-brand-primary"
             >
-              ← Voltar para o painel
+              ← Voltar ao dashboard
             </Link>
             <h1 className="mt-2 text-2xl font-bold text-brand-text lg:text-3xl">
-              Perfil da Nutricionista
+              Perfil Instagram
             </h1>
             <p className="text-sm text-brand-text/60">
-              Dados da sua conta Instagram Business conectada à plataforma.
+              Dados da sua conta Instagram Business conectada via Meta Graph API.
             </p>
           </div>
         </header>
 
-        {!igAccountId && (
-          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-            <p className="mb-4 text-brand-text">
-              Você ainda não conectou sua conta do Instagram.
-            </p>
-            <Link
-              href="/onboarding?step=6"
-              className="inline-block rounded-lg bg-brand-primary px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
-            >
-              Conectar Instagram
-            </Link>
-          </div>
-        )}
-
-        {igAccountId && apiError && (
-          <div className="rounded-2xl bg-red-50 p-6 text-sm text-red-700 shadow-sm">
-            <strong>Erro ao carregar dados do Instagram:</strong> {apiError}
-            <div className="mt-3">
-              <Link
-                href="/onboarding?step=6"
-                className="text-red-700 underline hover:text-red-900"
-              >
-                Reconectar Instagram
+        {erroApi && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <strong>Não conseguimos buscar os dados agora.</strong>
+            <div className="mt-1 text-xs opacity-80">{erroApi}</div>
+            <div className="mt-2 text-xs">
+              Se o token expirou, reconecte em{" "}
+              <Link href="/onboarding?step=6" className="underline">
+                Integrações
               </Link>
+              .
             </div>
           </div>
         )}
 
         {profile && (
           <>
-            <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm lg:p-8">
-              <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center">
+            <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+              <div className="flex flex-wrap items-start gap-6">
                 {profile.profile_picture_url ? (
                   <Image
                     src={profile.profile_picture_url}
-                    alt={profile.username}
-                    width={128}
-                    height={128}
-                    className="h-32 w-32 rounded-full border-4 border-brand-muted object-cover"
+                    alt={`Foto de perfil de @${profile.username}`}
+                    width={120}
+                    height={120}
+                    className="rounded-full border border-brand-text/10"
                     unoptimized
                   />
                 ) : (
-                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-brand-primary text-4xl font-bold text-white">
-                    {profile.username.charAt(0).toUpperCase()}
+                  <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-brand-muted text-3xl text-brand-text/40">
+                    ?
                   </div>
                 )}
-
-                <div className="flex-1">
-                  <div className="mb-1 text-lg font-semibold text-brand-text">
-                    {profile.name ?? profile.username}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-xl font-semibold text-brand-text">
+                      @{profile.username}
+                    </h2>
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                      ● Conectado
+                    </span>
                   </div>
-                  <div className="mb-3 text-sm text-brand-text/60">
-                    @{profile.username}
-                  </div>
-
+                  {profile.name && (
+                    <div className="mt-1 text-sm font-medium text-brand-text">
+                      {profile.name}
+                    </div>
+                  )}
                   {profile.biography && (
-                    <p className="mb-4 whitespace-pre-line text-sm text-brand-text/80">
+                    <p className="mt-2 whitespace-pre-line text-sm text-brand-text/80">
                       {profile.biography}
                     </p>
                   )}
-
-                  <div className="flex flex-wrap gap-6 text-sm">
-                    <Stat label="Seguidores" value={profile.followers_count} />
-                    <Stat label="Seguindo" value={profile.follows_count} />
-                    <Stat label="Publicações" value={profile.media_count} />
-                  </div>
+                  {profile.website && (
+                    <a
+                      href={profile.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-block text-sm text-brand-primary hover:underline"
+                    >
+                      {profile.website}
+                    </a>
+                  )}
                 </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-3 gap-4 border-t border-brand-text/10 pt-4">
+                <StatBlock
+                  label="Publicações"
+                  valor={profile.media_count ?? 0}
+                />
+                <StatBlock
+                  label="Seguidores"
+                  valor={profile.followers_count ?? 0}
+                />
+                <StatBlock
+                  label="Seguindo"
+                  valor={profile.follows_count ?? 0}
+                />
               </div>
             </section>
 
             <section>
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
-                Últimos posts
-              </h2>
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
+                Publicações recentes
+              </h3>
               {media.length === 0 ? (
-                <div className="rounded-2xl bg-white p-6 text-sm text-brand-text/60 shadow-sm">
-                  Nenhum post encontrado nesta conta.
+                <div className="rounded-xl bg-white p-6 text-center text-sm text-brand-text/60 shadow-sm">
+                  Essa conta ainda não tem publicações.
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {media.map((m) => (
                     <MediaCard key={m.id} media={m} />
                   ))}
@@ -163,16 +172,12 @@ export default async function PerfilInstagramPage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value?: number }) {
-  const formatted =
-    value == null
-      ? "—"
-      : value >= 1000
-        ? `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`
-        : String(value);
+function StatBlock({ label, valor }: { label: string; valor: number }) {
   return (
-    <div>
-      <div className="text-xl font-bold text-brand-text">{formatted}</div>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-brand-text">
+        {formatNumber(valor)}
+      </div>
       <div className="text-xs uppercase tracking-wider text-brand-text/60">
         {label}
       </div>
@@ -181,7 +186,7 @@ function Stat({ label, value }: { label: string; value?: number }) {
 }
 
 function MediaCard({ media }: { media: InstagramMedia }) {
-  const thumb =
+  const src =
     media.media_type === "VIDEO"
       ? media.thumbnail_url ?? media.media_url
       : media.media_url;
@@ -191,31 +196,81 @@ function MediaCard({ media }: { media: InstagramMedia }) {
       href={media.permalink}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative block aspect-square overflow-hidden rounded-xl bg-brand-muted shadow-sm"
+      className="group relative block aspect-square overflow-hidden rounded-xl bg-brand-muted"
     >
-      {thumb ? (
+      {src ? (
         <Image
-          src={thumb}
-          alt={media.caption?.slice(0, 60) ?? "Post"}
+          src={src}
+          alt={media.caption?.slice(0, 80) ?? "Publicação do Instagram"}
           fill
           className="object-cover transition group-hover:scale-105"
           unoptimized
-          sizes="(max-width: 640px) 50vw, 33vw"
+          sizes="(max-width: 640px) 33vw, 200px"
         />
       ) : (
-        <div className="flex h-full items-center justify-center text-brand-text/40">
-          Post
+        <div className="flex h-full items-center justify-center text-xs text-brand-text/40">
+          sem preview
         </div>
       )}
       {media.media_type === "VIDEO" && (
-        <div className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
-          ▶ Vídeo
-        </div>
+        <span className="absolute right-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          VIDEO
+        </span>
       )}
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent p-2 text-xs text-white opacity-0 transition group-hover:opacity-100">
-        <span>♥ {media.like_count ?? 0}</span>
-        <span>💬 {media.comments_count ?? 0}</span>
+      {media.media_type === "CAROUSEL_ALBUM" && (
+        <span className="absolute right-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          ALBUM
+        </span>
+      )}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+        <div className="flex gap-3 text-xs font-medium text-white">
+          {typeof media.like_count === "number" && (
+            <span>♥ {formatNumber(media.like_count)}</span>
+          )}
+          {typeof media.comments_count === "number" && (
+            <span>💬 {formatNumber(media.comments_count)}</span>
+          )}
+        </div>
       </div>
     </a>
   );
+}
+
+function NaoConectado() {
+  return (
+    <main className="min-h-screen bg-brand-muted">
+      <div className="mx-auto max-w-3xl p-6 lg:p-8">
+        <Link
+          href="/dashboard"
+          className="text-xs font-medium text-brand-text/60 hover:text-brand-primary"
+        >
+          ← Voltar ao dashboard
+        </Link>
+        <h1 className="mt-2 text-2xl font-bold text-brand-text lg:text-3xl">
+          Perfil Instagram
+        </h1>
+        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-brand-text">
+            Instagram ainda não conectado
+          </h2>
+          <p className="mt-1 text-sm text-brand-text/60">
+            Conecte sua conta Instagram Business para visualizar foto, bio,
+            seguidores e publicações aqui.
+          </p>
+          <Link
+            href="/onboarding?step=6"
+            className="mt-4 inline-block rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Conectar Instagram
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString("pt-BR");
 }
