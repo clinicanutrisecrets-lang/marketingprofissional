@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getInsightsCampanha } from "@/lib/meta/ads";
+import { decrypt } from "@/lib/security/encrypt";
+
+function tokenDecrypt(raw: string): string {
+  try {
+    return decrypt(raw);
+  } catch {
+    return raw;
+  }
+}
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -57,10 +66,24 @@ export async function GET(req: Request) {
     if (!t) continue;
 
     try {
+      const accessToken = tokenDecrypt(t.token);
+      // Métricas gerais (últimos 7 dias) + gasto de hoje (date_preset today)
       const insights = await getInsightsCampanha({
-        accessToken: t.token,
+        accessToken,
         campaignId: a.meta_campaign_id,
+        days: 7,
       });
+      let gastoHoje = 0;
+      try {
+        const hoje = await getInsightsCampanha({
+          accessToken,
+          campaignId: a.meta_campaign_id,
+          days: 1,
+        });
+        gastoHoje = hoje.spend ?? 0;
+      } catch {
+        // gasto_hoje é best-effort; falha não trava a coleta geral
+      }
 
       // Avaliar vs benchmark
       const metricaMap: Record<string, string> = {
@@ -93,6 +116,7 @@ export async function GET(req: Request) {
         .from("anuncios")
         .update({
           gasto_total: insights.spend ?? 0,
+          gasto_hoje: gastoHoje,
           impressoes: insights.impressions ?? 0,
           cliques: insights.clicks ?? 0,
           leads: insights.leads ?? 0,

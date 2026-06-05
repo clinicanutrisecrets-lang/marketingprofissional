@@ -1,7 +1,17 @@
 import "server-only";
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
+import { decrypt } from "@/lib/security/encrypt";
+import { pausarCampanha, atualizarBudgetCampanha } from "@/lib/meta/ads";
 import { ICP_TICKET_ALTO_NUTRI_PREMIUM } from "./_icp";
+
+function tokenDecrypt(raw: string): string {
+  try {
+    return decrypt(raw);
+  } catch {
+    return raw;
+  }
+}
 import {
   FRAMEWORK_PEDRO_SOBRAL,
   FRAMEWORK_MOLLY_PITTMAN,
@@ -249,6 +259,14 @@ export async function revisarAdsFranqueada(params: {
       .single();
 
     if (error) return { ok: false, erro: `Insert: ${error.message}` };
+
+    // ===== AUTO-EXECUÇÃO DE RECOMENDAÇÕES DE PRIORIDADE ALTA =====
+    await autoExecutarRecomendacoes({
+      franqueadaId: params.franqueadaId,
+      recomendacoes: revisao.recomendacoes,
+      anuncios,
+    });
+
     return { ok: true, revisaoId: (inserted as { id: string }).id, custoUsd };
   } catch (e) {
     return { ok: false, erro: (e as Error).message };
@@ -259,6 +277,136 @@ export async function revisarAdsFranqueada(params: {
 
 function sum(xs: number[]): number {
   return xs.reduce((a, b) => a + (b ?? 0), 0);
+}
+
+/**
+ * Pausa automática + ajuste de budget sem confirmação humana, conforme as
+ * recomendações de prioridade ALTA do revisor. Pausa quando a ação menciona
+ * "pausar"; aumenta budget (respeitando budget_diario_maximo) quando menciona
+ * "aumentar budget". Tudo logado em ads_audit_log com ator='agente_revisor_ia'.
+ */
+async function autoExecutarRecomendacoes(params: {
+  franqueadaId: string;
+  recomendacoes: Recomendacao[];
+  anuncios: Anuncio[];
+}): Promise<void> {
+  const altas = params.recomendacoes.filter((r) => r.prioridade === "alta");
+  if (altas.length === 0) return;
+
+  const admin = createAdminClient();
+
+  const { data: franqData } = await admin
+    .from("franqueadas")
+    .select("meta_ads_access_token, budget_diario_maximo")
+    .eq("id", params.franqueadaId)
+    .maybeSingle();
+  const franq = franqData as {
+    meta_ads_access_token: string | null;
+    budget_diario_maximo: number | null;
+  } | null;
+  if (!franq?.meta_ads_access_token) return;
+  const accessToken = tokenDecrypt(franq.meta_ads_access_token);
+
+  // mapeia nome da campanha -> anuncio (com meta_campaign_id)
+  const porNome = new Map<string, Anuncio>();
+  for (const a of params.anuncios) {
+    porNome.set(a.nome.trim().toLowerCase(), a);
+  }
+
+  function acharAnuncio(nomeCampanha: string): Anuncio | undefined {
+    const alvo = (nomeCampanha ?? "").trim().toLowerCase();
+    if (porNome.has(alvo)) return porNome.get(alvo);
+    // fallback: match parcial
+    for (const [nome, a] of porNome) {
+      if (alvo && (nome.includes(alvo) || alvo.includes(nome))) return a;
+    }
+    return undefined;
+  }
+
+  for (const rec of altas) {
+    const acao = (rec.acao ?? "").toLowerCase();
+    const anuncio = acharAnuncio(rec.campanha);
+    if (!anuncio?.meta_campaign_id) continue;
+
+    try {
+      if (acao.includes("pausar")) {
+        await pausarCampanha({ campaignId: anuncio.meta_campaign_id, accessToken });
+        await admin
+          .from("anuncios")
+          .update({
+            status: "pausado_por_performance_ruim",
+            pausado_automaticamente: true,
+            motivo_pausa: rec.justificativa,
+            pausado_em: new Date().toISOString(),
+          })
+          .eq("id", anuncio.id);
+
+        await admin.from("ads_audit_log").insert({
+          franqueada_id: params.franqueadaId,
+          anuncio_id: anuncio.id,
+          ator: "agente_revisor_ia",
+          acao: "pausa_auto_performance",
+          meta_campaign_id: anuncio.meta_campaign_id,
+          estado_antes: { status: anuncio.status },
+          estado_depois: { status: "pausado_por_performance_ruim" },
+          motivo: rec.justificativa,
+          detalhes: { recomendacao: rec },
+        });
+      } else if (acao.includes("aumentar budget") || acao.includes("aumentar o budget")) {
+        // extrai % de aumento da ação (default 25%)
+        const m = acao.match(/(\d+)\s*%/);
+        const pct = m ? Number(m[1]) : 25;
+        const atual = anuncio.budget_diario ?? 0;
+        const novo = atual * (1 + pct / 100);
+        const capDiario = franq.budget_diario_maximo ?? Infinity;
+
+        if (atual > 0 && novo <= capDiario) {
+          await atualizarBudgetCampanha({
+            campaignId: anuncio.meta_campaign_id,
+            accessToken,
+            novoBudgetDiarioCentavos: Math.round(novo * 100),
+          });
+          await admin
+            .from("anuncios")
+            .update({ budget_diario: novo })
+            .eq("id", anuncio.id);
+
+          await admin.from("ads_audit_log").insert({
+            franqueada_id: params.franqueadaId,
+            anuncio_id: anuncio.id,
+            ator: "agente_revisor_ia",
+            acao: "ajustar_budget_auto",
+            meta_campaign_id: anuncio.meta_campaign_id,
+            estado_antes: { budget_diario: atual },
+            estado_depois: { budget_diario: novo },
+            motivo: rec.justificativa,
+            detalhes: { pct, recomendacao: rec },
+          });
+        } else {
+          // ultrapassaria o cap — não executa, só registra
+          await admin.from("ads_audit_log").insert({
+            franqueada_id: params.franqueadaId,
+            anuncio_id: anuncio.id,
+            ator: "agente_revisor_ia",
+            acao: "ajustar_budget_bloqueado_cap",
+            meta_campaign_id: anuncio.meta_campaign_id,
+            motivo: `Aumento sugerido (R$${novo.toFixed(2)}) ultrapassaria budget_diario_maximo (R$${capDiario === Infinity ? "∞" : capDiario.toFixed(2)})`,
+            detalhes: { pct, atual, novo, capDiario: franq.budget_diario_maximo },
+          });
+        }
+      }
+    } catch (e) {
+      await admin.from("ads_audit_log").insert({
+        franqueada_id: params.franqueadaId,
+        anuncio_id: anuncio.id,
+        ator: "agente_revisor_ia",
+        acao: "auto_execucao_falhou",
+        meta_campaign_id: anuncio.meta_campaign_id,
+        motivo: e instanceof Error ? e.message : String(e),
+        detalhes: { recomendacao: rec },
+      });
+    }
+  }
 }
 
 function montarUserPrompt(params: {

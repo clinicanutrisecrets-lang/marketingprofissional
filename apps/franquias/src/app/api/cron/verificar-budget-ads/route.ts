@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { pausarCampanha } from "@/lib/meta/ads";
+import { decrypt } from "@/lib/security/encrypt";
+
+function tokenDecrypt(raw: string): string {
+  try {
+    return decrypt(raw);
+  } catch {
+    return raw;
+  }
+}
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -36,9 +45,10 @@ export async function GET(req: Request) {
     const fid = franq.id as string;
     const budgetMensal = Number(franq.budget_anuncio_mensal ?? 0);
     const alertaPct = Number(franq.budget_alerta_percentual ?? 80);
-    const token = franq.meta_ads_access_token as string | null;
+    const tokenRaw = franq.meta_ads_access_token as string | null;
 
-    if (!budgetMensal || !token) continue;
+    if (!budgetMensal || !tokenRaw) continue;
+    const token = tokenDecrypt(tokenRaw);
 
     const { data: anunciosAtivos } = await admin
       .from("anuncios")
