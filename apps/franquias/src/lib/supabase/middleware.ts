@@ -41,6 +41,15 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // English mirror — protected dashboard routes
+  if (pathname.startsWith("/en/dashboard")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/en/login";
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Rotas protegidas do admin
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     if (!user) {
