@@ -15,15 +15,6 @@ const DESCRITOR_ASPECTO: Record<Dimensoes, string> = {
   "1080x1920": "9:16 vertical full-screen framing",
 };
 
-const CATEGORIAS_VISUAIS = [
-  "macro still-life of a single raw ingredient (single fruit half, herb sprig, grain, seed, leaf, root, single flower) on a textured natural surface (linen, raw wood, stone, ceramic)",
-  "human hands at deliberate work — tearing a herb leaf, pouring oil from a bottle, slicing a fig, kneading dough, dusting flour, stirring a pot — only hands and forearms visible, no face",
-  "tools and utensils arranged on a textured surface — wooden spoon, ceramic bowl, mortar, copper pan, linen cloth — flat-lay or three-quarter view",
-  "prepared dish detail — close crop of a single bowl or plate, focused on texture and ingredient (NOT the full plate, NOT 'meal plan' aesthetic)",
-  "organic texture and material study — grains spilling, leaves overlapping, oil pooling, water droplets on greens, steam rising — abstract but tactile",
-  "kitchen environment moment — north-window light hitting a counter, herbs in a glass, fruit in a bowl by a window — empty of people, contemplative",
-];
-
 export function buildPrompt(input: PromptInput): string {
   const { tipo, dimensoes, brand, conteudo, slide } = input;
   const aspecto = DESCRITOR_ASPECTO[dimensoes];
@@ -35,10 +26,17 @@ export function buildPrompt(input: PromptInput): string {
 
   const direcao = [
     `Fine art editorial still-life photography, ${aspecto}.`,
-    `Choose ONE subject category, picked to reflect the editorial theme below — do NOT illustrate the theme literally, evoke it through a tangible photographic object:`,
-    CATEGORIAS_VISUAIS.map((c, i) => `  (${i + 1}) ${c}`).join("\n"),
     ``,
-    `Editorial theme guiding the choice: "${headline}"${tema ? ` — context: "${tema}"` : ""}${corpoPost ? `\nPost body for deeper context (do NOT illustrate literally — use it to choose a more specific, resonant subject): "${corpoPost}"` : ""}.`,
+    `POST THEME — use this to choose a DIRECTLY CONNECTED subject:`,
+    `  Headline: "${headline}"${tema ? `\n  Context: "${tema}"` : ""}${corpoPost ? `\n  Post body: "${corpoPost.slice(0, 200)}"` : ""}`,
+    ``,
+    `VISUAL SUBJECT SELECTION RULES:`,
+    `  • The image subject must be THEMATICALLY CONNECTED to the post topic above — not generic food`,
+    `  • If the theme is about a specific nutrient, herb, or ingredient → show that exact ingredient in editorial still-life style`,
+    `  • If the theme is about a feeling or concept (energy, sleep, inflammation, gut health) → choose a natural object that SYMBOLIZES it (e.g. energy → citrus half with warm light; sleep → lavender sprig, dark linen; inflammation → turmeric root; gut health → kefir jar, fermented foods)`,
+    `  • If the theme is about a process or habit → show hands at work or relevant tools (mortar, bowl, glass)`,
+    `  • ALWAYS: single focused subject on a textured neutral surface (linen, stone, wood, ceramic) — one clear, deliberate composition`,
+    `  • NEVER: generic stock-food-photography aesthetic; never use an unrelated ingredient just because it looks pretty`,
   ].join("\n");
 
   const estilo = [
