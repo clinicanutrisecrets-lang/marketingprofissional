@@ -64,6 +64,7 @@ export default async function AnunciosPage() {
   const ativos = lista.filter((a) => a.status === "ativo");
   const gastoTotal = ativos.reduce((s, a) => s + ((a.gasto_total as number) ?? 0), 0);
   const leadsTotal = ativos.reduce((s, a) => s + ((a.leads as number) ?? 0), 0);
+  const pendingApproval = lista.filter((a) => a.status === "aguardando_aprovacao");
 
   return (
     <main className="min-h-screen bg-brand-muted">
@@ -89,6 +90,39 @@ export default async function AnunciosPage() {
             + Criar anúncio
           </Link>
         </header>
+
+        {/* Banner de aprovação pendente */}
+        {pendingApproval.length > 0 && (
+          <div className="mb-6 rounded-2xl border-2 border-amber-400 bg-amber-50 p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-2xl">⏳</span>
+              <div>
+                <h2 className="font-semibold text-amber-900">
+                  {pendingApproval.length} criativo{pendingApproval.length > 1 ? "s" : ""} aguardando aprovação
+                </h2>
+                <p className="text-xs text-amber-700">
+                  A IA gerou variações de copy. Escolha a melhor pra lançar no Meta Ads.
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {pendingApproval.map((a) => (
+                <Link
+                  key={a.id as string}
+                  href={`/dashboard/anuncios/${a.id as string}/aprovar`}
+                  className="flex items-center justify-between rounded-xl bg-white px-4 py-3 shadow-sm hover:shadow-md"
+                >
+                  <span className="text-sm font-medium text-brand-text">
+                    {(a.nome as string) || "Campanha sem nome"}
+                  </span>
+                  <span className="text-sm font-semibold text-amber-700">
+                    Ver variações →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Card de conexão Meta Ads */}
         <div className={`mb-6 rounded-2xl p-5 ${metaAdsConectado ? "border border-green-200 bg-green-50" : "border-2 border-blue-200 bg-blue-50"}`}>

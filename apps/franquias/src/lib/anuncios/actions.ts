@@ -48,6 +48,7 @@ export async function criarAnuncioDraft(params: {
   copy_headline?: string;
   copy_texto?: string;
   copy_cta_botao?: string;
+  video_url?: string;
 }): Promise<{ ok: boolean; anuncioId?: string; erro?: string }> {
   const franqueadaId = await getFranqueadaDoUser();
   if (!franqueadaId) return { ok: false, erro: "Não autenticado" };
@@ -75,6 +76,7 @@ export async function criarAnuncioDraft(params: {
       copy_headline: params.copy_headline,
       copy_texto: params.copy_texto,
       copy_cta_botao: params.copy_cta_botao,
+      video_url: params.video_url,
     })
     .select("id")
     .single();

@@ -73,7 +73,7 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
   const { data: franqData } = await admin
     .from("franqueadas")
     .select(
-      "id, email, nome_completo, meta_ads_account_id, meta_ads_access_token, facebook_pagina_id, instagram_conta_id, cidade, valor_consulta_inicial, budget_diario_maximo",
+      "id, email, nome_completo, meta_ads_account_id, meta_ads_access_token, facebook_pagina_id, instagram_conta_id, cidade, modalidade_atendimento, valor_consulta_inicial, budget_diario_maximo",
     )
     .eq("id", anuncio.franqueada_id)
     .maybeSingle();
@@ -85,6 +85,7 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
     facebook_pagina_id: string | null;
     instagram_conta_id: string | null;
     cidade: string | null;
+    modalidade_atendimento: string | null;
     valor_consulta_inicial: number | null;
     budget_diario_maximo: number | null;
   };
@@ -100,8 +101,9 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
     return await abortar(anuncioId, "Objetivo de negócio ausente");
   }
 
+  const modalidade = franq.modalidade_atendimento ?? "presencial";
   const cidade = franq.cidade ?? "";
-  if (!cidade) {
+  if (!cidade && modalidade !== "online") {
     return await abortar(anuncioId, "Cidade da franqueada ausente — geo targeting impossível");
   }
 
@@ -145,10 +147,10 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
       const ca = await criarCustomAudience({
         adAccountId,
         accessToken,
-        nome: `Scanner Pixel · ${cidade} · ${anuncio.nome}`.slice(0, 100),
+        nome: `Scanner Pixel · ${modalidade === "online" ? "BR" : cidade} · ${anuncio.nome}`.slice(0, 100),
         pixelId,
-        cidade,
-        raioKm,
+        cidade: modalidade === "online" ? undefined : cidade,
+        raioKm: modalidade === "online" ? undefined : raioKm,
       });
       audienceId = ca.id;
 
@@ -190,8 +192,8 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
       lookalikeId,
       idadeMin,
       idadeMax,
-      cidade,
-      raioKm,
+      cidade: modalidade === "online" ? undefined : cidade,
+      raioKm: modalidade === "online" ? undefined : raioKm,
       dataInicio: anuncio.data_inicio ?? undefined,
       dataFim: anuncio.data_fim ?? undefined,
       // Fallback de interesses ICP só quando não há lookalike (sem pixel central)
