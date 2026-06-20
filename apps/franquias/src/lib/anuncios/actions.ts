@@ -241,13 +241,51 @@ export async function gerarCriativos(briefing: {
     compliance_ok: v.compliance_ok,
   }));
 
+  // Fetch franqueada brand info for image generation
+  const { data: franqBrand } = await admin
+    .from("franqueadas")
+    .select("nome_completo, nome_comercial, cor_primaria_hex, instagram_handle")
+    .eq("id", franqueadaId)
+    .maybeSingle();
+  const fb = franqBrand as {
+    nome_completo: string;
+    nome_comercial: string | null;
+    cor_primaria_hex: string | null;
+    instagram_handle: string | null;
+  } | null;
+
+  // Generate image for each variation (best-effort, non-blocking errors)
+  const variacoesComImagens = await Promise.all(
+    variacoes.map(async (v) => {
+      try {
+        const { gerarEUploadImagem } = await import("@/lib/ai-image/render");
+        const img = await gerarEUploadImagem({
+          franqueadaId,
+          tipo: "feed_imagem" as const,
+          brand: {
+            nomeMarca: fb?.nome_comercial ?? fb?.nome_completo ?? "Nutri",
+            corPrimariaHex: fb?.cor_primaria_hex ?? "#0BB8A8",
+          },
+          conteudo: {
+            headline: v.headline,
+            subtitle: v.description,
+            corpo: v.primary_text,
+          },
+        });
+        return { ...v, imagem_url: img.url };
+      } catch {
+        return v; // If image generation fails, continue without image
+      }
+    }),
+  );
+
   let anuncioId = briefing.anuncioId;
 
   if (anuncioId) {
     const { error } = await admin
       .from("anuncios")
       .update({
-        variacoes,
+        variacoes: variacoesComImagens,
         publico_meta_json: result.output.publico_sugerido,
         status: "aguardando_aprovacao",
       })
@@ -265,7 +303,7 @@ export async function gerarCriativos(briefing: {
         meta_optimization: MAPEAMENTO_META[briefing.objetivo_negocio].optimization_goal,
         meta_destination: MAPEAMENTO_META[briefing.objetivo_negocio].destination_type,
         budget_diario: briefing.budget_diario,
-        variacoes,
+        variacoes: variacoesComImagens,
         publico_meta_json: result.output.publico_sugerido,
         status: "aguardando_aprovacao",
       })
