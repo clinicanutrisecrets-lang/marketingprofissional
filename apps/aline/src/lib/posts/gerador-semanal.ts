@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createAlineClient } from "@/lib/supabase/server";
 import { CLAUDE_MODEL } from "@/lib/claude/scripts";
-import { gerarEUploadImagem } from "@/lib/ai-image/render";
+import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import {
   FRAMEWORK_EUGENE_SCHWARTZ,
   FRAMEWORK_CALPES_HEADLINES,
@@ -15,9 +15,12 @@ import {
 
 type Pilar = { nome: string; pct: number };
 
+type TipoPost = "feed_imagem" | "stories" | "feed_carrossel";
+
 type PostGerado = {
   pilar: string;
   angulo: string;
+  tipo?: TipoPost;
   copy_legenda: string;
   copy_cta: string;
   hashtags: string[];
@@ -25,13 +28,13 @@ type PostGerado = {
   arte_headline: string; // frase forte, 3-8 palavras, max 60 chars
   arte_subtitle?: string; // apoio, max 80 chars
   arte_eyebrow?: string; // pequena tag em cima, max 30 chars
+  // Para carrossel: slides adicionais
+  slides?: Array<{ headline: string; subtitle?: string }>;
 };
 
 /**
  * Gera N posts (texto + arte) pra um perfil seguindo distribuicao dos pilares.
- *
- * Por enquanto so gera tipo `feed_imagem`. Carrossel/reels ficam pra proxima
- * iteracao (carrossel precisa decompor em slides; reels precisa Heygen ou upload manual).
+ * Suporta feed_imagem, stories (9:16) e feed_carrossel (multi-slide).
  *
  * Cria registros em aline.posts com:
  *   status = 'aguardando_aprovacao'
@@ -118,7 +121,7 @@ export async function gerarPackSemanal(params: {
     const inserts = posts.map((p, i) => ({
       perfil_id: perfil.id as string,
       semana_ref: semanaRef,
-      tipo: "feed_imagem" as const,
+      tipo: (p.tipo ?? "feed_imagem") as TipoPost,
       status: "aguardando_aprovacao",
       origem: "ia",
       aprovacao_tipo: "bloco_semanal",
@@ -163,12 +166,14 @@ export async function gerarPackSemanal(params: {
           perfilId: perfil.id as string,
           perfilSlug: params.perfilSlug,
           brand,
+          tipo: posts[i]!.tipo ?? "feed_imagem",
+          slides: posts[i]!.slides,
           conteudo: {
-            headline: posts[i].arte_headline,
-            subtitle: posts[i].arte_subtitle,
-            eyebrow: posts[i].arte_eyebrow,
-            cta: posts[i].copy_cta,
-            corpo: posts[i].copy_legenda,
+            headline: posts[i]!.arte_headline,
+            subtitle: posts[i]!.arte_subtitle,
+            eyebrow: posts[i]!.arte_eyebrow,
+            cta: posts[i]!.copy_cta,
+            corpo: posts[i]!.copy_legenda,
           },
         }),
       ),
@@ -286,6 +291,12 @@ export async function regenerarArtePost(
 
 // ============== HELPERS ==============
 
+const DIMENSOES_POR_TIPO: Record<TipoPost, { largura_px: number; altura_px: number }> = {
+  feed_imagem: { largura_px: 1080, altura_px: 1080 },
+  feed_carrossel: { largura_px: 1080, altura_px: 1350 },
+  stories: { largura_px: 1080, altura_px: 1920 },
+};
+
 async function gerarArteParaPost(params: {
   postId: string;
   perfilId: string;
@@ -302,21 +313,68 @@ async function gerarArteParaPost(params: {
     subtitle?: string;
     eyebrow?: string;
     cta?: string;
+    corpo?: string;
   };
+  tipo?: TipoPost;
+  slides?: Array<{ headline: string; subtitle?: string }>;
   sobrescrever?: boolean;
 }): Promise<{ url: string; custoUsd: number }> {
   const aline = createAlineClient();
+  const tipo: TipoPost = params.tipo ?? "feed_imagem";
+  const dim = DIMENSOES_POR_TIPO[tipo];
 
   console.log(
-    `[gerarArteParaPost] iniciando postId=${params.postId} headline="${params.conteudo.headline.slice(0, 50)}..."`,
+    `[gerarArteParaPost] iniciando postId=${params.postId} tipo=${tipo} headline="${params.conteudo.headline.slice(0, 50)}..."`,
   );
 
+  if (params.sobrescrever) {
+    await aline.from("post_midias").delete().eq("post_id", params.postId);
+  }
+
+  // Carrossel: generate multiple slides
+  if (tipo === "feed_carrossel") {
+    const slideConteudos = params.slides && params.slides.length > 1
+      ? params.slides.map((s) => ({ headline: s.headline, subtitle: s.subtitle, corpo: params.conteudo.corpo }))
+      : [params.conteudo, { headline: params.conteudo.headline, subtitle: params.conteudo.subtitle }];
+
+    try {
+      const resultado = await gerarCarrosselEUpload({
+        perfilSlug: params.perfilSlug,
+        brand: params.brand,
+        slides: slideConteudos,
+      });
+
+      await aline.from("post_midias").insert(
+        resultado.urls.map((url, i) => ({
+          post_id: params.postId,
+          ordem: i,
+          tipo: "imagem",
+          url,
+          largura_px: dim.largura_px,
+          altura_px: dim.altura_px,
+        })),
+      );
+
+      await aline.from("posts").update({ midia_pendente: false }).eq("id", params.postId);
+
+      console.log(
+        `[gerarArteParaPost] carrossel gerado postId=${params.postId} slides=${resultado.urls.length}`,
+      );
+      return { url: resultado.urls[0]!, custoUsd: resultado.meta.custoTotalUsd };
+    } catch (e) {
+      const err = e as Error;
+      console.error(`[gerarArteParaPost] carrossel falhou postId=${params.postId} err=${err.message}`, err.stack ?? err);
+      throw err;
+    }
+  }
+
+  // Single image (feed_imagem or stories)
   let r: Awaited<ReturnType<typeof gerarEUploadImagem>>;
   try {
     r = await gerarEUploadImagem({
       perfilId: params.perfilId,
       perfilSlug: params.perfilSlug,
-      tipo: "feed_imagem",
+      tipo,
       brand: params.brand,
       conteudo: params.conteudo,
     });
@@ -333,17 +391,13 @@ async function gerarArteParaPost(params: {
     `[gerarArteParaPost] arte gerada postId=${params.postId} url=${r.url.slice(0, 60)} custoUsd=${r.meta.custoEstimadoUsd}`,
   );
 
-  if (params.sobrescrever) {
-    await aline.from("post_midias").delete().eq("post_id", params.postId);
-  }
-
   await aline.from("post_midias").insert({
     post_id: params.postId,
     ordem: 0,
     tipo: "imagem",
     url: r.url,
-    largura_px: 1080,
-    altura_px: 1080,
+    largura_px: dim.largura_px,
+    altura_px: dim.altura_px,
   });
 
   await aline
@@ -453,15 +507,28 @@ function montarUserPrompt(
   semanaRef: string,
 ): string {
   const lista = distribuicao.map((p, i) => `  ${i + 1}. ${p}`).join("\n");
-  return `Gere ${distribuicao.length} posts pro Instagram @${perfil.instagram_handle} pra semana iniciando em ${semanaRef}.
+  const qtd = distribuicao.length;
+  const nCarrossel = qtd >= 5 ? 1 : 0;
+  const nStories = qtd >= 4 ? 1 : 0;
 
-TODOS sao tipo feed_imagem (post unico com 1 imagem).
+  return `Gere ${qtd} posts pro Instagram @${perfil.instagram_handle} pra semana iniciando em ${semanaRef}.
+
+TIPOS DE POST:
+- feed_imagem: post unico com 1 imagem (maioria dos posts)
+- stories: vertical 9:16, impacto visual forte, conteudo rapido/direto
+- feed_carrossel: carrossel com 3-5 slides — use pra listas, passo-a-passo, mitos vs verdade, comparacoes
+
+DISTRIBUICAO DESTA SEMANA:
+- ${nCarrossel} post(s) do tipo "feed_carrossel" — escolha o pilar mais adequado a formato de lista/slides
+- ${nStories} post(s) do tipo "stories" — escolha conteudo impactante e direto
+- Restante: "feed_imagem"
 
 PILARES DA SEMANA (na ordem):
 ${lista}
 
 Pra cada post, defina:
 - pilar: o pilar atribuido acima
+- tipo: "feed_imagem" | "stories" | "feed_carrossel"
 - angulo: gancho/ideia central em 1 frase (uso interno)
 - copy_legenda: texto da legenda (80-180 palavras)
 - copy_cta: linha de CTA isolada
@@ -469,14 +536,25 @@ Pra cada post, defina:
 - arte_headline: frase forte que vai estampar a imagem (3-8 palavras, max 60 chars)
 - arte_subtitle: apoio opcional (max 80 chars)
 - arte_eyebrow: tag opcional em cima (max 30 chars)
+- slides: APENAS pra tipo "feed_carrossel" — array de 3-5 objetos com { headline, subtitle } pra cada slide
 
 Devolva APENAS um JSON valido no formato:
 {
   "posts": [
     {
-      "pilar": "...", "angulo": "...",
+      "pilar": "...", "tipo": "feed_imagem", "angulo": "...",
       "copy_legenda": "...", "copy_cta": "...", "hashtags": ["..."],
       "arte_headline": "...", "arte_subtitle": "...", "arte_eyebrow": "..."
+    },
+    {
+      "pilar": "...", "tipo": "feed_carrossel", "angulo": "...",
+      "copy_legenda": "...", "copy_cta": "...", "hashtags": ["..."],
+      "arte_headline": "...", "arte_subtitle": "...", "arte_eyebrow": "...",
+      "slides": [
+        { "headline": "Slide 1 titulo", "subtitle": "descricao slide 1" },
+        { "headline": "Slide 2 titulo", "subtitle": "descricao slide 2" },
+        { "headline": "Slide 3 titulo", "subtitle": "descricao slide 3" }
+      ]
     }
   ]
 }`;

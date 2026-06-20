@@ -20,6 +20,9 @@ export default async function EnApprovePage() {
 
   const franqueadaId = (fData as Record<string, unknown> | null)?.id as string | undefined;
 
+  // FIX 5: Guard — redirect if franqueadaId is missing
+  if (!franqueadaId) redirect("/en/login");
+
   const { data: postsRaw } = await admin
     .from("posts_agendados")
     .select("id, tipo_post, legenda, imagem_url, status, agendado_para, criado_em")
@@ -88,7 +91,7 @@ export default async function EnApprovePage() {
                     </p>
                     <div className="mt-4 flex gap-2">
                       <Link
-                        href={`/dashboard/aprovar?id=${p.id as string}`}
+                        href={`/dashboard/aprovar`}
                         className="flex-1 rounded-lg bg-brand-primary py-2 text-center text-sm font-semibold text-white hover:opacity-90"
                       >
                         Review &amp; approve

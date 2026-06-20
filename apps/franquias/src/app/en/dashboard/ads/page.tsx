@@ -19,12 +19,16 @@ export default async function EnAdsPage() {
     .maybeSingle();
 
   const f = fData as Record<string, unknown> | null;
+
+  // FIX 9: Guard — redirect if franqueadaId is missing
+  if (!f?.id) redirect("/en/login");
+
   const metaAdsConnected = !!(f?.meta_ads_access_token);
 
   const { data: anunciosRaw } = await admin
     .from("anuncios")
     .select("id, status, titulo_campanha, budget_diario, meta_campaign_id, criado_em")
-    .eq("franqueada_id", f?.id as string)
+    .eq("franqueada_id", f.id as string)
     .order("criado_em", { ascending: false })
     .limit(10);
 

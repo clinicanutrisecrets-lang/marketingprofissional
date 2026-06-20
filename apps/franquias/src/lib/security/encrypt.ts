@@ -11,12 +11,17 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypt
 const ALGORITHM = "aes-256-gcm";
 const SALT = "scanner_saude_franquia_v1"; // fixo — não sensível
 
+// FIX 7: Cache derived key so scryptSync runs only once per process
+let _cachedKey: Buffer | null = null;
+
 function getKey(): Buffer {
+  if (_cachedKey) return _cachedKey;
   const master = process.env.ENCRYPTION_KEY;
   if (!master) {
     throw new Error("ENCRYPTION_KEY env var não definida");
   }
-  return scryptSync(master, SALT, 32);
+  _cachedKey = scryptSync(master, SALT, 32) as Buffer;
+  return _cachedKey;
 }
 
 /**

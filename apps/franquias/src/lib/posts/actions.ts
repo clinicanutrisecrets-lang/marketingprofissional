@@ -49,9 +49,25 @@ export async function aprovarSemanaToda(
       aprovado_individual: true,
     })
     .eq("aprovacao_semanal_id", aprovacaoId)
-    .eq("franqueada_id", ctx.franqueadaId);
+    .eq("franqueada_id", ctx.franqueadaId)
+    // FIX 8: Only update posts still awaiting approval (idempotency guard)
+    .eq("status", "aguardando_aprovacao");
 
   if (errPosts) return { ok: false, erro: errPosts.message };
+
+  // FIX 8: Check current status before updating weekly record
+  const { data: aprovacaoAtual } = await supabase
+    .from("aprovacoes_semanais")
+    .select("status")
+    .eq("id", aprovacaoId)
+    .eq("franqueada_id", ctx.franqueadaId)
+    .maybeSingle();
+
+  if ((aprovacaoAtual as Record<string, unknown> | null)?.status === "aprovada_integral") {
+    revalidatePath("/dashboard/aprovar");
+    revalidatePath("/dashboard");
+    return { ok: true };
+  }
 
   const { error: errAprov } = await supabase
     .from("aprovacoes_semanais")

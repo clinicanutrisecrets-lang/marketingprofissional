@@ -40,6 +40,18 @@ ESTRATÉGIA DE SEGMENTAÇÃO META (use isso como base — adaptar por contexto d
 ATENÇÃO: usar APENAS referências brasileiras. O público é 100% Brasil.
 Não citar influenciadores/autores estrangeiros que o público não reconhece.
 
+INFERÊNCIA DE PÚBLICO POR NICHO (aplique sempre):
+- Se nicho_principal inclui "infantil" ou "pediatria" → público são MÃES com filhos (28-45 anos, interesses: maternidade, pediatria, filhos, escola)
+- Se nicho_principal inclui "esportiva" ou "fitness" ou "performance" → público são atletas/praticantes (25-45, interesses: academia, CrossFit, corrida, suplementação)
+- Se nicho_principal inclui "oncologia" ou "cancer" → público inclui pacientes e cuidadores (35-60, interesses: oncologia, saúde integrativa, cuidadores)
+- Se nicho_principal inclui "gestante" ou "maternidade" → público são gestantes e puérperas (22-38, interesses: gravidez, maternidade, bebê)
+- Se nicho_principal inclui "idoso" ou "envelhecimento" ou "longevidade" → público são 50+ e filhos adultos cuidadores (45-65)
+- Se nicho_principal inclui "emagrecimento" ou "perda de peso" → público geral saúde e bem-estar (30-50, maioria feminino)
+- Padrão (clínica geral / funcional) → mulheres 35-52, interesse em saúde preventiva
+
+Use publico_alvo_descricao da nutri como refinamento adicional sobre a inferência por nicho.
+Use o campo modalidade_atendimento: se "online" → comente que a segmentação pode ser nacional; se "presencial" ou "hibrido" → use cidade + raio.
+
 Inclusões obrigatórias:
 - Idade 35-52, gênero feminino
 - Interesses BR: ${ICP_INTERESSES_META.interesses_principais.slice(0, 8).join(", ")}
@@ -93,7 +105,8 @@ Schema:
     "comportamentos_meta": ["lista"],
     "exclusoes": ["lista de exclusões obrigatórias do ICP"],
     "tamanho_estimado": "nicho | broad | lookalike",
-    "publico_lookalike_sugerido": "fonte ideal de seed (ex: 'pacientes que compraram pacote anual')"
+    "publico_lookalike_sugerido": "fonte ideal de seed (ex: 'pacientes que compraram pacote anual')",
+    "modalidade": "presencial | online | hibrido"
   },
   "recomendacao_objetivo_meta": "OUTCOME_LEADS | OUTCOME_SALES",
   "recomendacao_destino": "ctwa_whatsapp | sofia_url | lp_nutri | kiwify",
@@ -161,7 +174,7 @@ export async function gerarCopyAnuncio(
 
   const { data: f } = await admin
     .from("franqueadas")
-    .select("nome_comercial, nicho_principal, publico_alvo_descricao, diferenciais, tom_comunicacao, cidade, estado, valor_consulta_inicial, palavras_chave_usar, palavras_evitar")
+    .select("nome_comercial, nicho_principal, nicho_secundario, publico_alvo_descricao, modalidade_atendimento, historia_pessoal, diferenciais, tom_comunicacao, cidade, estado, valor_consulta_inicial, palavras_chave_usar, palavras_evitar")
     .eq("id", input.franqueadaId)
     .maybeSingle();
   if (!f) return { ok: false, erro: "Franqueada não encontrada" };

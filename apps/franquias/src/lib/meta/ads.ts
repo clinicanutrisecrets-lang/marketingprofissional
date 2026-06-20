@@ -75,7 +75,7 @@ export async function criarCampanha(params: {
   url.searchParams.set("objective", mapping.campaign_objective);
   url.searchParams.set("status", params.status ?? "PAUSED"); // cria pausado por segurança
   url.searchParams.set("special_ad_categories", "[]");
-  url.searchParams.set("daily_budget", params.budget_diario_centavos.toString());
+  // FIX 2: Do NOT set daily_budget on campaign level — budget is set only on adset level
   url.searchParams.set("access_token", params.accessToken);
 
   const res = await fetch(url, { method: "POST" });
@@ -240,6 +240,33 @@ export async function criarLookalikeAudience(params: {
 // ============================================================================
 
 /**
+ * Resolve o nome de uma cidade para a chave numérica exigida pela Meta Ads API
+ * via Targeting Search API. Retorna a key (string numérica) ou null se não
+ * encontrada — nesse caso o caller deve usar country-level targeting.
+ */
+export async function buscarCidadeMeta(
+  nomeCidade: string,
+  accessToken: string,
+): Promise<string | null> {
+  try {
+    const url = new URL(`${GRAPH}/search`);
+    url.searchParams.set("type", "adgeolocation");
+    url.searchParams.set("q", nomeCidade);
+    url.searchParams.set("location_types", '["city"]');
+    url.searchParams.set("access_token", accessToken);
+
+    const res = await fetch(url);
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as { data?: Array<{ key: string; type: string; name: string }> };
+    const match = data.data?.find((item) => item.type === "city");
+    return match?.key ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Cria um AdSet com targeting ICP completo: geo (cidade + raio), idade, gênero
  * feminino, custom audience e/ou lookalike e interesses-fallback do ICP.
  */
@@ -263,24 +290,19 @@ export async function criarAdSet(params: {
   const mapping = MAPEAMENTO_META[params.objetivo];
   const raio = params.raioKm ?? 30;
 
+  // Resolve o nome da cidade para chave numérica exigida pela Meta Ads API.
+  // Se falhar, cai para targeting em nível de país (BR) — melhor que rejeição da API.
+  const cidadeKey = await buscarCidadeMeta(params.cidade, params.accessToken);
+
+  const geoLocations = cidadeKey
+    ? { cities: [{ key: cidadeKey, radius: raio, distance_unit: "kilometer" }] }
+    : { countries: ["BR"] };
+
   const targeting: Record<string, unknown> = {
-    geo_locations: {
-      custom_locations: [
-        {
-          // Sem coordenadas resolvidas usamos a string de cidade via "name".
-          // O Meta exige lat/lng pra custom_locations; quando não temos,
-          // caímos pro targeting por cidade nominal.
-        },
-      ],
-    },
+    geo_locations: geoLocations,
     age_min: params.idadeMin ?? 35,
     age_max: params.idadeMax ?? 52,
     genders: [2], // 2 = mulheres
-  };
-
-  // geo: preferimos cidade nominal (mais robusto sem geocoding)
-  targeting.geo_locations = {
-    cities: [{ key: params.cidade, radius: raio, distance_unit: "kilometer" }],
   };
 
   const customAudiences: Array<{ id: string }> = [];

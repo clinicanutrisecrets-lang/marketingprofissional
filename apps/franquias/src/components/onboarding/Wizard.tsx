@@ -35,6 +35,7 @@ export function Wizard({ initialData, initialStep = 1 }: WizardProps) {
   const [ultimoSalvoEm, setUltimoSalvoEm] = useState<Date | null>(null);
   const [isPending, startTransition] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
+  const [finalizing, setFinalizing] = useState(false);
 
   const percentualAtual = useMemo(() => calcularPercentual(dados), [dados]);
 
@@ -76,12 +77,15 @@ export function Wizard({ initialData, initialStep = 1 }: WizardProps) {
   };
 
   async function handleFinalizar() {
+    if (finalizing) return;
+    setFinalizing(true);
     const r = await finalizarOnboarding();
     if (r.ok) {
       router.push("/dashboard");
       router.refresh();
     } else {
       setErro(r.erro ?? "Não foi possível finalizar");
+      setFinalizing(false);
     }
   }
 

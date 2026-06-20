@@ -28,11 +28,25 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, publicados: 0 });
   }
 
+  // FIX 1: Bulk-update to "publicando" BEFORE processing to prevent duplicate cron runs
+  const postIds = posts.map((p) => (p as { id: string }).id);
+  await admin
+    .from("posts_agendados")
+    .update({ status: "publicando" })
+    .in("id", postIds);
+
   const resultados: Array<{ postId: string; ok: boolean; erro?: string; instagramPostId?: string }> = [];
 
   for (const p of posts) {
     const post = p as { id: string };
     const r = await publicarPost(post.id);
+    // FIX 3: Always update to "erro" on failure (not just thrown exceptions)
+    if (!r.ok) {
+      await admin
+        .from("posts_agendados")
+        .update({ status: "erro", erro_mensagem: r.erro ?? "Falha desconhecida" })
+        .eq("id", post.id);
+    }
     resultados.push({
       postId: post.id,
       ok: r.ok,
