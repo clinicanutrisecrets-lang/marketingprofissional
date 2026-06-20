@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { formatCurrency } from "@/lib/utils";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { AprovarVariacaoButton } from "./AprovarVariacaoButton";
+
+export const dynamic = "force-dynamic";
 
 type Variacao = {
   letra: string;
@@ -14,8 +16,6 @@ type Variacao = {
   imagem_url?: string;
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function AprovarAnuncioPage({
   params,
 }: {
@@ -27,170 +27,200 @@ export default async function AprovarAnuncioPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: f } = await supabase
-    .from("franqueadas")
-    .select("id, nome_completo, nome_comercial")
-    .eq("auth_user_id", user.id)
-    .maybeSingle();
-  if (!f) redirect("/onboarding");
-
-  const franqueada = f as { id: string; nome_completo: string; nome_comercial: string | null };
-
-  const { data: a } = await supabase
+  const admin = createAdminClient();
+  const { data: anuncioData } = await admin
     .from("anuncios")
-    .select("*")
+    .select("*, franqueadas(id, auth_user_id, nome_comercial, cidade)")
     .eq("id", params.id)
-    .eq("franqueada_id", franqueada.id)
     .maybeSingle();
 
-  if (!a || (a as Record<string, unknown>).status !== "aguardando_aprovacao") {
+  if (!anuncioData) redirect("/dashboard/anuncios");
+
+  const anuncio = anuncioData as {
+    id: string;
+    nome: string;
+    objetivo_negocio: string | null;
+    budget_diario: number | null;
+    status: string;
+    variacoes: unknown;
+    alertas_compliance: string[] | null;
+    franqueadas: {
+      id: string;
+      auth_user_id: string;
+      nome_comercial: string | null;
+      cidade: string | null;
+    };
+  };
+
+  if (anuncio.franqueadas.auth_user_id !== user.id) {
     redirect("/dashboard/anuncios");
   }
 
-  const anuncio = a as Record<string, unknown>;
-  const variacoes = (anuncio.variacoes as Variacao[] | null) ?? [];
-  const alertas =
-    (anuncio.alertas_compliance as string[] | null) ??
-    ((anuncio.publico_meta_json as Record<string, unknown> | null)
-      ?.alertas_compliance as string[] | null) ??
-    [];
+  if (anuncio.status !== "aguardando_aprovacao") {
+    redirect("/dashboard/anuncios");
+  }
+
+  let variacoes: Variacao[] = [];
+  try {
+    const raw = anuncio.variacoes;
+    if (Array.isArray(raw)) {
+      variacoes = raw as Variacao[];
+    } else if (typeof raw === "string") {
+      variacoes = JSON.parse(raw);
+    }
+  } catch {
+    variacoes = [];
+  }
+
+  const OBJETIVO_LABEL: Record<string, string> = {
+    ganhar_seguidores: "Ganhar seguidores",
+    receber_mensagens: "Receber mensagens",
+    agendar_consultas: "Agendar consultas",
+    vender_teste_genetico: "Vender teste genético",
+    alcance: "Alcance",
+    trafego_site: "Tráfego pro site",
+  };
 
   return (
     <main className="min-h-screen bg-brand-muted">
       <div className="mx-auto max-w-6xl p-6 lg:p-8">
-        <a
+        <Link
           href="/dashboard/anuncios"
           className="mb-4 inline-block text-sm text-brand-text/60 hover:text-brand-primary"
         >
-          ← Voltar
-        </a>
+          ← Voltar para Anúncios
+        </Link>
 
         <header className="mb-6">
-          <h1 className="text-3xl font-bold text-brand-text">Aprovar criativo</h1>
-          <p className="text-sm text-brand-text/60">
-            Escolha a melhor variação de copy para lançar no Meta Ads
-          </p>
+          <h1 className="text-2xl font-bold text-brand-text">
+            Aprovar criativo: {anuncio.nome || "Campanha"}
+          </h1>
+          <div className="mt-1 flex flex-wrap gap-3 text-sm text-brand-text/60">
+            <span>
+              Objetivo:{" "}
+              <strong className="text-brand-text">
+                {OBJETIVO_LABEL[anuncio.objetivo_negocio ?? ""] ??
+                  anuncio.objetivo_negocio}
+              </strong>
+            </span>
+            {anuncio.budget_diario != null && (
+              <span>
+                Budget/dia:{" "}
+                <strong className="text-brand-text">
+                  R$ {anuncio.budget_diario.toFixed(2)}
+                </strong>
+              </span>
+            )}
+            {anuncio.franqueadas.cidade && (
+              <span>
+                Cidade:{" "}
+                <strong className="text-brand-text">
+                  {anuncio.franqueadas.cidade}
+                </strong>
+              </span>
+            )}
+          </div>
         </header>
 
-        {/* Informações da campanha */}
-        <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
-            Campanha
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <InfoCell label="Nome" value={(anuncio.nome as string) || "—"} />
-            <InfoCell
-              label="Objetivo"
-              value={(anuncio.objetivo_negocio as string)?.replace(/_/g, " ") || "—"}
-            />
-            <InfoCell
-              label="Budget diário"
-              value={
-                anuncio.budget_diario ? formatCurrency(anuncio.budget_diario as number) : "—"
-              }
-            />
-            <InfoCell
-              label="Público"
-              value={(anuncio.publico_descricao as string) || "—"}
-            />
-          </div>
-        </div>
-
-        {/* Alertas de compliance */}
-        {alertas.length > 0 && (
-          <div className="mb-6 rounded-2xl border-2 border-yellow-300 bg-yellow-50 p-5">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="text-xl">⚠️</span>
-              <h2 className="font-semibold text-yellow-900">Alertas de compliance CFN</h2>
+        {anuncio.alertas_compliance && anuncio.alertas_compliance.length > 0 && (
+          <div className="mb-6 rounded-2xl border border-yellow-400 bg-yellow-50 p-4">
+            <div className="mb-2 flex items-center gap-2 font-semibold text-yellow-900">
+              <span>⚠️</span>
+              <span>Alertas de compliance detectados</span>
             </div>
-            <ul className="space-y-1">
-              {alertas.map((alerta, i) => (
-                <li key={i} className="text-sm text-yellow-800">
-                  • {alerta}
-                </li>
+            <ul className="space-y-1 text-sm text-yellow-800">
+              {anuncio.alertas_compliance.map((alerta, i) => (
+                <li key={i}>• {alerta}</li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Variações */}
-        <div className="grid gap-5 lg:grid-cols-3">
+        <p className="mb-6 text-sm text-brand-text/60">
+          A IA gerou {variacoes.length} variações de copy com ângulos psicológicos diferentes.
+          Escolha a que mais combina com o momento da campanha.
+        </p>
+
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
           {variacoes.map((v, idx) => (
             <div
               key={v.letra}
               className="flex flex-col rounded-2xl bg-white p-5 shadow-sm"
             >
+              {/* Header */}
               <div className="mb-3 flex items-center justify-between">
-                <span className="rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold text-brand-primary">
+                <span className="rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">
                   Variação {v.letra}
                 </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    v.compliance_ok
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {v.compliance_ok ? "✅ Compliance OK" : "❌ Compliance falhou"}
-                </span>
+                {v.compliance_ok ? (
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                    ✓ Compliance OK
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+                    ⚠ Revisar
+                  </span>
+                )}
               </div>
 
+              {/* Angulo */}
+              <p className="mb-2 text-xs text-brand-text/50">{v.angulo}</p>
+
+              {/* Headline */}
+              <h3 className="mb-2 text-lg font-bold text-brand-text">{v.headline}</h3>
+
+              {/* Primary text */}
+              <p className="mb-2 text-sm text-brand-text/80">{v.primary_text}</p>
+
+              {/* Description */}
+              <p className="mb-3 text-xs text-brand-text/50">{v.description}</p>
+
+              {/* Justificativa */}
+              <details className="mb-4">
+                <summary className="cursor-pointer text-xs font-medium text-brand-primary hover:underline">
+                  Por que essa variação?
+                </summary>
+                <p className="mt-1 text-xs italic text-brand-text/60">{v.justificativa}</p>
+              </details>
+
+              {/* Imagem preview */}
               {v.imagem_url && (
-                <div className="mb-3 overflow-hidden rounded-xl">
+                <div className="mb-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={v.imagem_url}
                     alt={`Preview variação ${v.letra}`}
-                    className="h-48 w-full object-cover"
+                    className="w-full rounded-xl object-cover"
+                    style={{ maxHeight: 200 }}
                   />
                 </div>
               )}
 
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Ângulo
-              </div>
-              <p className="mb-3 text-sm text-brand-text">{v.angulo}</p>
+              {/* Spacer to push button to bottom */}
+              <div className="flex-1" />
 
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Headline
-              </div>
-              <p className="mb-3 text-base font-bold text-brand-text">{v.headline}</p>
-
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Texto principal
-              </div>
-              <p className="mb-3 text-sm text-brand-text">{v.primary_text}</p>
-
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Descrição
-              </div>
-              <p className="mb-3 text-sm text-brand-text/80">{v.description}</p>
-
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Justificativa
-              </div>
-              <p className="mb-4 text-xs text-brand-text/60 italic">{v.justificativa}</p>
-
-              <div className="mt-auto">
-                <AprovarVariacaoButton
-                  anuncioId={params.id}
-                  variacaoIdx={idx}
-                  disabled={!v.compliance_ok}
-                />
-              </div>
+              {/* Approve button */}
+              <AprovarVariacaoButton
+                anuncioId={anuncio.id}
+                variacaoIdx={idx}
+                disabled={!v.compliance_ok}
+              />
+              {!v.compliance_ok && (
+                <p className="mt-1 text-center text-xs text-red-500">
+                  Variação bloqueada por compliance
+                </p>
+              )}
             </div>
           ))}
         </div>
+
+        {variacoes.length === 0 && (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <div className="mb-3 text-4xl">🤔</div>
+            <p className="text-brand-text/60">Nenhuma variação encontrada neste anúncio.</p>
+          </div>
+        )}
       </div>
     </main>
-  );
-}
-
-function InfoCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="text-xs uppercase tracking-wider text-brand-text/60">{label}</div>
-      <div className="mt-0.5 text-sm font-medium text-brand-text">{value}</div>
-    </div>
   );
 }

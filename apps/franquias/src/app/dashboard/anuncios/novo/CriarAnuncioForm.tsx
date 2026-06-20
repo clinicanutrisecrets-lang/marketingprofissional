@@ -4,9 +4,10 @@ import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CardPicker, Field, TextArea, Select } from "@/components/ui/Field";
 import { criarAnuncioDraft, buscarBenchmark } from "@/lib/anuncios/actions";
-import type { ObjetivoNegocio } from "@/lib/meta/ads";
-import { gerarRoteiroAnuncio } from "./actions";
+import { gerarRoteiroVideo } from "@/lib/agentes/roteiro-video";
 import type { RoteiroVideo } from "@/lib/agentes/roteiro-video";
+import { createClient } from "@/lib/supabase/client";
+import type { ObjetivoNegocio } from "@/lib/meta/ads";
 
 const OBJETIVOS: Array<{
   value: ObjetivoNegocio;
@@ -44,9 +45,11 @@ export function CriarAnuncioForm({
   const [copyTexto, setCopyTexto] = useState("");
   const [copyCta, setCopyCta] = useState("Saiba mais");
 
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [videoErro, setVideoErro] = useState<string | null>(null);
   const [roteiro, setRoteiro] = useState<RoteiroVideo | null>(null);
-  const [gerandoRoteiro, setGerandoRoteiro] = useState(false);
+  const [roteiroLoading, setRoteiroLoading] = useState(false);
   const [roteiroErro, setRoteiroErro] = useState<string | null>(null);
 
   const [benchmark, setBenchmark] = useState<Awaited<ReturnType<typeof buscarBenchmark>>>(null);
@@ -54,28 +57,66 @@ export function CriarAnuncioForm({
   const [msg, setMsg] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function handleGerarRoteiro() {
-    if (!tema) {
-      setRoteiroErro("Preencha o tema primeiro");
-      return;
-    }
-    setGerandoRoteiro(true);
-    setRoteiroErro(null);
-    const r = await gerarRoteiroAnuncio({
-      tema_criativo: tema,
-      objetivo_negocio: objetivo,
-      copy_headline: copyHead || undefined,
-      copy_texto: copyTexto || undefined,
-    });
-    setGerandoRoteiro(false);
-    if (r.ok && r.roteiro) setRoteiro(r.roteiro);
-    else setRoteiroErro(r.erro ?? "Erro ao gerar roteiro");
-  }
-
   useEffect(() => {
     if (!nicho) return;
     buscarBenchmark(nicho, objetivo).then(setBenchmark);
   }, [objetivo, nicho]);
+
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500 * 1024 * 1024) {
+      setVideoErro("Arquivo muito grande. Máximo 500MB.");
+      return;
+    }
+    setVideoUploading(true);
+    setVideoErro(null);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop() ?? "mp4";
+      const path = `anuncios-videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("midia").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      if (error) throw new Error(error.message);
+      const { data: urlData } = supabase.storage.from("midia").getPublicUrl(path);
+      setVideoUrl(urlData.publicUrl);
+    } catch (err) {
+      setVideoErro(err instanceof Error ? err.message : "Erro ao fazer upload");
+    } finally {
+      setVideoUploading(false);
+    }
+  }
+
+  async function handleGerarRoteiro() {
+    if (!tema) {
+      setRoteiroErro("Preencha o tema do criativo antes de gerar o roteiro.");
+      return;
+    }
+    setRoteiroLoading(true);
+    setRoteiroErro(null);
+    setRoteiro(null);
+    try {
+      const r = await gerarRoteiroVideo({
+        nomeMarca: nome || "Minha Clínica",
+        nicho: nicho ?? "nutrição clínica",
+        publicoAlvo: publico || "mulheres 30-50 interessadas em saúde",
+        temaCriativo: tema,
+        objetivo: objetivo,
+        headline: copyHead || undefined,
+      });
+      if (r.ok && r.roteiro) {
+        setRoteiro(r.roteiro);
+      } else {
+        setRoteiroErro(r.erro ?? "Erro ao gerar roteiro");
+      }
+    } catch (err) {
+      setRoteiroErro(err instanceof Error ? err.message : "Erro inesperado");
+    } finally {
+      setRoteiroLoading(false);
+    }
+  }
 
   async function handleSubmit() {
     setErro(null);
@@ -101,7 +142,7 @@ export function CriarAnuncioForm({
         copy_headline: copyHead,
         copy_texto: copyTexto,
         copy_cta_botao: copyCta,
-        video_url: videoUrl || undefined,
+        video_url: videoUrl ?? undefined,
       });
       if (r.ok) {
         setMsg("Anúncio criado como rascunho! Nossa equipe revisa e ativa no Meta Ads.");
@@ -251,92 +292,106 @@ export function CriarAnuncioForm({
         hint="Até 125 caracteres pra não cortar no feed"
       />
 
-      {/* Video URL */}
-      <div className="rounded-xl border border-dashed border-brand-text/20 p-4">
-        <div className="mb-2 text-sm font-semibold text-brand-text">
-          🎬 Criativo de vídeo (opcional)
-        </div>
-        <p className="mb-3 text-xs text-brand-text/60">
-          Cole a URL de um vídeo (ex: do Google Drive, Supabase Storage ou CDN) para usar como
-          criativo no lugar da imagem gerada pela IA.
-        </p>
-        <Field
-          label="URL do vídeo"
-          name="video_url"
-          value={videoUrl}
-          onChange={setVideoUrl}
-          placeholder="https://..."
-          hint="MP4, MOV ou AVI — até 500MB"
+      {/* Video upload */}
+      <div>
+        <label className="block text-sm font-medium text-brand-text mb-1">
+          Vídeo do anúncio (opcional)
+        </label>
+        <input
+          type="file"
+          accept="video/mp4,video/quicktime,video/avi"
+          onChange={handleVideoUpload}
+          disabled={videoUploading}
+          className="w-full text-sm text-brand-text/60"
         />
+        <p className="mt-1 text-xs text-brand-text/40">
+          MP4, MOV ou AVI · Máx. 500MB · Recomendado: vídeo vertical 9:16
+        </p>
+        {videoUploading && (
+          <p className="mt-1 text-xs text-brand-primary">Fazendo upload...</p>
+        )}
+        {videoUrl && !videoUploading && (
+          <p className="mt-1 text-xs text-green-600">✓ Vídeo enviado com sucesso</p>
+        )}
+        {videoErro && (
+          <p className="mt-1 text-xs text-red-600">{videoErro}</p>
+        )}
       </div>
 
-      {/* Roteiro de vídeo com IA */}
-      <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
-        <div className="mb-2 text-sm font-semibold text-purple-900">🎬 Roteiro de vídeo (IA)</div>
-        <p className="mb-3 text-xs text-purple-700">
-          Gere um roteiro profissional para gravar um vídeo criativo baseado no tema acima.
-        </p>
+      {/* Roteiro de vídeo */}
+      <div>
         <button
           type="button"
           onClick={handleGerarRoteiro}
-          disabled={gerandoRoteiro || !tema}
-          className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
+          disabled={roteiroLoading || !tema}
+          className="rounded-lg border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/5 disabled:opacity-50"
         >
-          {gerandoRoteiro ? "Gerando roteiro..." : "✨ Gerar roteiro com IA"}
+          {roteiroLoading ? "Gerando roteiro..." : "✨ Gerar roteiro de vídeo"}
         </button>
-        {roteiroErro && <p className="mt-2 text-xs text-red-600">{roteiroErro}</p>}
+        {roteiroErro && (
+          <p className="mt-2 text-xs text-red-600">{roteiroErro}</p>
+        )}
         {roteiro && (
-          <div className="mt-4 space-y-3 rounded-xl bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-brand-text">
-                Roteiro {roteiro.formato.replace(/_/g, " ")} ({roteiro.duracao_segundos}s)
+          <div className="mt-3 rounded-xl border border-brand-primary/20 bg-brand-muted p-4 text-sm">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-semibold text-brand-text">
+                Roteiro gerado —{" "}
+                {roteiro.formato === "reels_15s"
+                  ? "Reels 15s"
+                  : roteiro.formato === "reels_30s"
+                  ? "Reels 30s"
+                  : "Vídeo 60s"}
               </span>
+              <span className="text-xs text-brand-text/50">{roteiro.duracao_segundos}s</span>
             </div>
-            <div>
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-purple-700">
-                Hook (0-3s)
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-text/50">
+                  Hook (abertura)
+                </p>
+                <p className="mt-0.5 font-medium text-brand-text">{roteiro.hook}</p>
               </div>
-              <p className="rounded-lg bg-purple-50 p-2 text-sm">{roteiro.hook}</p>
-            </div>
-            <div>
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Desenvolvimento
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-text/50">
+                  Desenvolvimento
+                </p>
+                <ol className="mt-0.5 list-decimal list-inside space-y-0.5">
+                  {roteiro.desenvolvimento.map((frase, i) => (
+                    <li key={i} className="text-brand-text/80">
+                      {frase}
+                    </li>
+                  ))}
+                </ol>
               </div>
-              <ul className="space-y-1">
-                {roteiro.desenvolvimento.map((d, i) => (
-                  <li key={i} className="flex gap-2 text-sm">
-                    <span className="text-purple-500">•</span> {d}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-green-700">
-                CTA Final
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-text/50">
+                  CTA Final
+                </p>
+                <p className="mt-0.5 font-medium text-brand-text">{roteiro.cta_final}</p>
               </div>
-              <p className="rounded-lg bg-green-50 p-2 text-sm font-medium text-green-800">
-                {roteiro.cta_final}
-              </p>
-            </div>
-            <div>
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Dicas de gravação
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-text/50">
+                  Dicas de gravação
+                </p>
+                <ul className="mt-0.5 list-disc list-inside space-y-0.5">
+                  {roteiro.dicas_gravacao.map((dica, i) => (
+                    <li key={i} className="text-brand-text/70 text-xs">
+                      {dica}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-1">
-                {roteiro.dicas_gravacao.map((d, i) => (
-                  <li key={i} className="flex gap-2 text-xs text-brand-text/70">
-                    <span>💡</span> {d}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-text/60">
-                Legenda sugerida
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-text/50">
+                  Legenda sugerida
+                </p>
+                <p className="mt-0.5 text-xs text-brand-text/70">{roteiro.legenda_sugerida}</p>
               </div>
-              <p className="rounded-lg bg-gray-50 p-2 text-xs text-brand-text/70">
-                {roteiro.legenda_sugerida}
-              </p>
             </div>
           </div>
         )}
