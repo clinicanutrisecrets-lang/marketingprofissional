@@ -76,10 +76,11 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   ];
 
   // Title — use Sharp's native text rendering (Pango/fontconfig, no □□□ issue)
-  composites.push({
+  const headlineText = (conteudo.headline ?? "").trim();
+  if (headlineText) composites.push({
     input: {
       text: {
-        text: `<span foreground="#FFFFFF" font_desc="serif ${fontSizeTitulo}">${escapePango(conteudo.headline)}</span>`,
+        text: `<span foreground="#FFFFFF" font_desc="serif ${fontSizeTitulo}">${escapePango(headlineText)}</span>`,
         rgba: true,
         width: textWidth,
         wrap: "word",
@@ -91,10 +92,11 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   });
 
   // Handle (@username)
-  composites.push({
+  const handleText = handle.toUpperCase().trim();
+  if (handleText && handleText !== "@") composites.push({
     input: {
       text: {
-        text: `<span foreground="#FFFFFFCC" font_desc="sans-serif ${fontSizeHandle}">${escapePango(handle.toUpperCase())}</span>`,
+        text: `<span foreground="#FFFFFFCC" font_desc="sans-serif ${fontSizeHandle}">${escapePango(handleText)}</span>`,
         rgba: true,
         width: textWidth,
         dpi: 72,

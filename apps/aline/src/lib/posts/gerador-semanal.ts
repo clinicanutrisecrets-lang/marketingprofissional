@@ -159,9 +159,12 @@ export async function gerarPackSemanal(params: {
       nicho: (perfil.objetivo as string) ?? undefined,
     };
 
-    const resultados = await Promise.allSettled(
-      insertedRows.map((row, i) =>
-        gerarArteParaPost({
+    // Sequential to avoid Sharp/libvips OOM on Vercel (each image ~1GB RAM)
+    const resultados: PromiseSettledResult<{ url: string; custoUsd: number }>[] = [];
+    for (let i = 0; i < insertedRows.length; i++) {
+      const row = insertedRows[i]!;
+      try {
+        const r = await gerarArteParaPost({
           postId: row.id,
           perfilId: perfil.id as string,
           perfilSlug: params.perfilSlug,
@@ -175,10 +178,12 @@ export async function gerarPackSemanal(params: {
             cta: posts[i]!.copy_cta,
             corpo: posts[i]!.copy_legenda,
           },
-        }),
-      ),
-    );
-
+        });
+        resultados.push({ status: "fulfilled", value: r });
+      } catch (e) {
+        resultados.push({ status: "rejected", reason: e });
+      }
+    }
     // Loga falhas individuais pra aparecerem nos Vercel Runtime Logs
     let sucessos = 0;
     let falhas = 0;
