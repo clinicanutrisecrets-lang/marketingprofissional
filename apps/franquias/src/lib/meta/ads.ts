@@ -75,7 +75,7 @@ export async function criarCampanha(params: {
   url.searchParams.set("objective", mapping.campaign_objective);
   url.searchParams.set("status", params.status ?? "PAUSED"); // cria pausado por segurança
   url.searchParams.set("special_ad_categories", "[]");
-  url.searchParams.set("daily_budget", params.budget_diario_centavos.toString());
+  // FIX 2: Do NOT set daily_budget on campaign level — budget is set only on adset level
   url.searchParams.set("access_token", params.accessToken);
 
   const res = await fetch(url, { method: "POST" });

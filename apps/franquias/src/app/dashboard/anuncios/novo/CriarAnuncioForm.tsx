@@ -58,6 +58,11 @@ export function CriarAnuncioForm({
       setErro("Preencha nome e tema");
       return;
     }
+    // FIX 6: Minimum budget validation
+    if (budgetDiario < 6) {
+      setErro("Budget mínimo é R$6/dia");
+      return;
+    }
     startTransition(async () => {
       const r = await criarAnuncioDraft({
         nome,

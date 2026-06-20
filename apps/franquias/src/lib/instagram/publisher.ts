@@ -29,7 +29,7 @@ export async function publicarPost(
   if (!postData) return { ok: false, erro: "Post não encontrado" };
   const post = postData as Record<string, unknown>;
 
-  if (post.status !== "aprovado") {
+  if (post.status !== "aprovado" && post.status !== "publicando") {
     return { ok: false, erro: `Status inválido: ${post.status}` };
   }
 

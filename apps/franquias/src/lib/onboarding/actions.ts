@@ -93,11 +93,16 @@ export async function finalizarOnboarding(): Promise<{ ok: boolean; erro?: strin
 
   const { data: franq } = await admin
     .from("franqueadas")
-    .select("id, nome_completo, nome_comercial, email, instagram_handle, scanner_saas_user_id")
+    .select("id, nome_completo, nome_comercial, email, instagram_handle, scanner_saas_user_id, onboarding_completo")
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
   if (!franq) return { ok: false, erro: "Franqueada não encontrada" };
+
+  // FIX 4: Idempotency guard — prevent duplicate emails on double-click
+  if ((franq as Record<string, unknown>).onboarding_completo === true) {
+    return { ok: true };
+  }
 
   const f = franq as {
     id: string;
