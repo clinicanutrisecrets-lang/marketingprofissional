@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { existsSync, writeFileSync } from "fs";
 import type { ConteudoPeca, Dimensoes, BrandGuidelines, TipoPeca } from "./types";
 
 type OverlayInput = {
@@ -8,6 +9,30 @@ type OverlayInput = {
   brand: BrandGuidelines;
   conteudo: ConteudoPeca;
 };
+
+// Download Roboto-Regular to /tmp once per Lambda instance so Pango can find it.
+// Without a bundled font, Vercel's Lambda environment has no fontconfig fonts
+// and renders every glyph as a □ box.
+const FONT_URL =
+  "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf";
+const FONT_PATH = "/tmp/_overlay_font_roboto.ttf";
+let _fontPath: string | null = null; // "" means download failed
+
+async function getFont(): Promise<string | undefined> {
+  if (_fontPath !== null) return _fontPath || undefined;
+  try {
+    if (!existsSync(FONT_PATH)) {
+      const res = await fetch(FONT_URL, { signal: AbortSignal.timeout(10_000) });
+      if (!res.ok) throw new Error(`font download ${res.status}`);
+      writeFileSync(FONT_PATH, Buffer.from(await res.arrayBuffer()));
+    }
+    _fontPath = FONT_PATH;
+    return FONT_PATH;
+  } catch {
+    _fontPath = "";
+    return undefined;
+  }
+}
 
 export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> {
   const { imagemIA, dimensoesFinal, tipo, brand, conteudo } = input;
@@ -36,7 +61,7 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
     .resize(largura, altura, { fit: "cover", position: "attention" })
     .toBuffer();
 
-  // Gradient overlay (geometric SVG — no text, always renders correctly)
+  // Gradient overlay
   const inicioGradiente = Math.round(altura * (1 - alturaGradienteRel));
   const alturaPx = altura - inicioGradiente;
   const gradienteSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${largura}" height="${altura}">
@@ -55,8 +80,7 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   <rect x="0" y="${inicioGradiente}" width="${largura}" height="${alturaPx}" fill="url(#bf)"/>
 </svg>`;
 
-  // Approximate title block height to position accent line and handle below it
-  // Sharp text wraps at textWidth — estimate ~2 lines for most headlines
+  // Estimate title block height for accent and handle positioning
   const lineHeightPx = Math.round(fontSizeTitulo * 1.3);
   const estimatedTitleLines = Math.min(3, Math.ceil((conteudo.headline.length * fontSizeTitulo * 0.5) / textWidth));
   const titleBlockHeight = lineHeightPx * Math.max(1, estimatedTitleLines);
@@ -64,70 +88,72 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   const yAccent = yTitulo + titleBlockHeight + Math.round(fontSizeTitulo * 0.4);
   const yHandle = yAccent + Math.round(fontSizeHandle * 2.2);
 
-  // Accent line SVG (just a colored rect — no text)
   const accentSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${largura}" height="${altura}">
   <rect x="${padding}" y="${yAccent}" width="${larguraAcento}" height="2" fill="${corPrimaria}"/>
 </svg>`;
 
-  // Build composite layers
+  // Download font once — without it, Pango renders every character as □
+  const fontFile = await getFont();
+
+  const makeText = (
+    text: string,
+    color: string,
+    size: number,
+    width: number,
+    wrap?: "word" | "char" | "word-char" | "none",
+  ) => ({
+    input: {
+      text: {
+        text: `<span foreground="${color}">${escapePango(text)}</span>`,
+        ...(fontFile ? { fontfile: fontFile, font: "Roboto" } : { font: "Sans" }),
+        rgba: true,
+        width,
+        dpi: Math.round(72 * (size / 14)), // scale dpi so Roboto renders at target px size
+        ...(wrap ? { wrap } : {}),
+      },
+    } as Parameters<typeof sharp>[0],
+  });
+
   const composites: sharp.OverlayOptions[] = [
     { input: Buffer.from(gradienteSvg), top: 0, left: 0 },
     { input: Buffer.from(accentSvg), top: 0, left: 0 },
   ];
 
-  // Title — use Sharp's native text rendering (Pango/fontconfig, no □□□ issue)
+  // Headline
   const headlineText = (conteudo.headline ?? "").trim();
-  if (headlineText) composites.push({
-    input: {
-      text: {
-        text: `<span foreground="#FFFFFF" font_desc="serif ${fontSizeTitulo}">${escapePango(headlineText)}</span>`,
-        rgba: true,
-        width: textWidth,
-        wrap: "word",
-        dpi: 72,
-      },
-    } as Parameters<typeof sharp>[0],
-    top: yTitulo,
-    left: padding,
-  });
+  if (headlineText) {
+    composites.push({
+      ...makeText(headlineText, "#FFFFFF", fontSizeTitulo, textWidth, "word"),
+      top: yTitulo,
+      left: padding,
+    });
+  }
 
   // Handle (@username)
   const handleText = handle.toUpperCase().trim();
-  if (handleText && handleText !== "@") composites.push({
-    input: {
-      text: {
-        text: `<span foreground="#FFFFFFCC" font_desc="sans-serif ${fontSizeHandle}">${escapePango(handleText)}</span>`,
-        rgba: true,
-        width: textWidth,
-        dpi: 72,
-      },
-    } as Parameters<typeof sharp>[0],
-    top: yHandle,
-    left: padding,
-  });
+  if (handleText && handleText !== "@") {
+    composites.push({
+      ...makeText(handleText, "#FFFFFFCC", fontSizeHandle, textWidth),
+      top: yHandle,
+      left: padding,
+    });
+  }
 
-  // Subtitle eyebrow (optional) — positioned above headline
+  // Eyebrow / subtitle above headline
   if (conteudo.subtitle || conteudo.eyebrow) {
-    const sub = conteudo.eyebrow ?? conteudo.subtitle ?? "";
+    const sub = (conteudo.eyebrow ?? conteudo.subtitle ?? "").toUpperCase();
     const fontSizeSub = Math.round(fontSizeTitulo * 0.32);
     const ySub = yTitulo - Math.round(fontSizeSub * 3.5);
     if (ySub > altura * 0.5) {
       composites.push({
-        input: {
-          text: {
-            text: `<span foreground="#FFFFFFCC" font_desc="sans-serif ${fontSizeSub}">${escapePango(sub.toUpperCase())}</span>`,
-            rgba: true,
-            width: textWidth,
-            dpi: 72,
-          },
-        } as Parameters<typeof sharp>[0],
+        ...makeText(sub, "#FFFFFFCC", fontSizeSub, textWidth),
         top: Math.max(padding, ySub),
         left: padding,
       });
     }
   }
 
-  // Logo (optional, top-left corner)
+  // Logo (optional, top-left)
   if (brand.logoUrl) {
     try {
       const logoBuf = await baixarImagem(brand.logoUrl);
