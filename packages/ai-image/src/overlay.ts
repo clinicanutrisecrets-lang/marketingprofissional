@@ -1,6 +1,6 @@
 import sharp from "sharp";
-import { existsSync, writeFileSync } from "fs";
 import type { ConteudoPeca, Dimensoes, BrandGuidelines, TipoPeca } from "./types";
+import { renderTextoVetorial } from "./textVector";
 
 type OverlayInput = {
   imagemIA: Buffer;
@@ -9,30 +9,6 @@ type OverlayInput = {
   brand: BrandGuidelines;
   conteudo: ConteudoPeca;
 };
-
-// Download Roboto-Regular to /tmp once per Lambda instance so Pango can find it.
-// Without a bundled font, Vercel's Lambda environment has no fontconfig fonts
-// and renders every glyph as a □ box.
-const FONT_URL =
-  "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf";
-const FONT_PATH = "/tmp/_overlay_font_roboto.ttf";
-let _fontPath: string | null = null; // "" means download failed
-
-async function getFont(): Promise<string | undefined> {
-  if (_fontPath !== null) return _fontPath || undefined;
-  try {
-    if (!existsSync(FONT_PATH)) {
-      const res = await fetch(FONT_URL, { signal: AbortSignal.timeout(10_000) });
-      if (!res.ok) throw new Error(`font download ${res.status}`);
-      writeFileSync(FONT_PATH, Buffer.from(await res.arrayBuffer()));
-    }
-    _fontPath = FONT_PATH;
-    return FONT_PATH;
-  } catch {
-    _fontPath = "";
-    return undefined;
-  }
-}
 
 export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> {
   const { imagemIA, dimensoesFinal, tipo, brand, conteudo } = input;
@@ -45,15 +21,14 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   const padding = Math.round(largura * paddingRel);
   const textWidth = largura - padding * 2;
 
-  const yTituloRel = tipo === "stories" ? 0.78 : tipo === "feed_carrossel" ? 0.76 : 0.74;
-  const fontSizeTituloRel = tipo === "stories" ? 0.058 : 0.062;
-  const fontSizeHandleRel = tipo === "stories" ? 0.02 : 0.022;
+  const fontSizeTituloRel = tipo === "stories" ? 0.06 : 0.064;
+  const fontSizeHandleRel = tipo === "stories" ? 0.022 : 0.024;
+  const fontSizeEyebrowRel = tipo === "stories" ? 0.02 : 0.022;
   const larguraAcentoRel = tipo === "stories" ? 0.16 : 0.18;
-  const alturaGradienteRel = tipo === "stories" ? 0.28 : tipo === "feed_carrossel" ? 0.3 : 0.32;
 
-  const yTitulo = Math.round(altura * yTituloRel);
   const fontSizeTitulo = Math.round(largura * fontSizeTituloRel);
   const fontSizeHandle = Math.round(largura * fontSizeHandleRel);
+  const fontSizeEyebrow = Math.round(largura * fontSizeEyebrowRel);
   const larguraAcento = Math.round(largura * larguraAcentoRel);
   const logoLargura = Math.round(largura * 0.085);
 
@@ -61,15 +36,107 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
     .resize(largura, altura, { fit: "cover", position: "attention" })
     .toBuffer();
 
-  // Gradient overlay
-  const inicioGradiente = Math.round(altura * (1 - alturaGradienteRel));
+  const composites: sharp.OverlayOptions[] = [];
+
+  // Render dos textos como vetores (geometria pura — nunca vira □□□)
+  const headlineText = (conteudo.headline ?? "").trim();
+  const eyebrowText = (conteudo.eyebrow ?? conteudo.subtitle ?? "").trim();
+  const handleText = handle.toUpperCase().trim();
+
+  // Bloco do título (serif, branco)
+  const tituloVet = headlineText
+    ? renderTextoVetorial({
+        texto: headlineText,
+        familia: "serif",
+        fontSize: fontSizeTitulo,
+        maxWidth: textWidth,
+        cor: "#FFFFFF",
+        lineHeight: 1.18,
+      })
+    : null;
+
+  // Eyebrow / subtítulo (sans caixa alta, com espaçamento)
+  const eyebrowVet = eyebrowText
+    ? renderTextoVetorial({
+        texto: eyebrowText.toUpperCase(),
+        familia: "sans",
+        fontSize: fontSizeEyebrow,
+        maxWidth: textWidth,
+        cor: "#FFFFFF",
+        opacidade: 0.85,
+        letterSpacing: Math.round(fontSizeEyebrow * 0.12),
+      })
+    : null;
+
+  // Handle (@usuario) (sans caixa alta)
+  const handleVet =
+    handleText && handleText !== "@"
+      ? renderTextoVetorial({
+          texto: handleText,
+          familia: "sans",
+          fontSize: fontSizeHandle,
+          maxWidth: textWidth,
+          cor: "#FFFFFF",
+          opacidade: 0.8,
+          letterSpacing: Math.round(fontSizeHandle * 0.08),
+        })
+      : null;
+
+  // Posicionamento ANCORADO NA BASE: calcula a altura total do bloco
+  // (eyebrow + título + acento + handle) e empilha de baixo pra cima, garantindo
+  // que nada seja cortado por mais longo que seja o título.
+  const gapEyebrow = Math.round(fontSizeTitulo * 0.4);
+  const gapAcento = Math.round(fontSizeTitulo * 0.4);
+  const gapHandle = Math.round(fontSizeHandle * 0.8);
+  const acentoAltura = Math.max(2, Math.round(largura * 0.004));
+  const bottomPadding = Math.round(altura * (tipo === "stories" ? 0.1 : 0.07));
+
+  // Handle fica na base; sobe: acento, título, eyebrow
+  let y = altura - bottomPadding;
+
+  const acentoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larguraAcento}" height="${acentoAltura}"><rect width="${larguraAcento}" height="${acentoAltura}" fill="${corPrimaria}"/></svg>`;
+
+  const handleComposite = handleVet
+    ? { input: Buffer.from(handleVet.svg), left: padding, top: 0 }
+    : null;
+  if (handleVet && handleComposite) {
+    y -= handleVet.altura;
+    handleComposite.top = y;
+    y -= gapHandle;
+  }
+
+  y -= acentoAltura;
+  const acentoComposite = { input: Buffer.from(acentoSvg), left: padding, top: y };
+  y -= gapAcento;
+
+  let tituloComposite: sharp.OverlayOptions | null = null;
+  if (tituloVet) {
+    y -= tituloVet.altura;
+    tituloComposite = { input: Buffer.from(tituloVet.svg), left: padding, top: y };
+    y -= gapEyebrow;
+  }
+
+  let eyebrowComposite: sharp.OverlayOptions | null = null;
+  if (eyebrowVet) {
+    y -= eyebrowVet.altura;
+    y = Math.max(padding, y);
+    eyebrowComposite = { input: Buffer.from(eyebrowVet.svg), left: padding, top: y };
+  }
+
+  // Gradiente adaptativo: começa um pouco acima do topo real do bloco de texto
+  // para garantir legibilidade independente de quantas linhas o título tem.
+  const topoBloco = y;
+  const inicioGradiente = Math.max(
+    Math.round(altura * 0.45),
+    topoBloco - Math.round(altura * 0.08),
+  );
   const alturaPx = altura - inicioGradiente;
   const gradienteSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${largura}" height="${altura}">
   <defs>
     <linearGradient id="bf" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="55%" stop-color="#000" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#000" stop-opacity="0.78"/>
+      <stop offset="45%" stop-color="#000" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.85"/>
     </linearGradient>
     <linearGradient id="tf" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#000" stop-opacity="0.35"/>
@@ -79,81 +146,15 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   <rect x="0" y="0" width="${largura}" height="${Math.round(altura * 0.14)}" fill="url(#tf)"/>
   <rect x="0" y="${inicioGradiente}" width="${largura}" height="${alturaPx}" fill="url(#bf)"/>
 </svg>`;
+  composites.push({ input: Buffer.from(gradienteSvg), top: 0, left: 0 });
 
-  // Estimate title block height for accent and handle positioning
-  const lineHeightPx = Math.round(fontSizeTitulo * 1.3);
-  const estimatedTitleLines = Math.min(3, Math.ceil((conteudo.headline.length * fontSizeTitulo * 0.5) / textWidth));
-  const titleBlockHeight = lineHeightPx * Math.max(1, estimatedTitleLines);
+  // Empurra na ordem visual (cima -> baixo)
+  if (eyebrowComposite) composites.push(eyebrowComposite);
+  if (tituloComposite) composites.push(tituloComposite);
+  composites.push(acentoComposite);
+  if (handleComposite) composites.push(handleComposite);
 
-  const yAccent = yTitulo + titleBlockHeight + Math.round(fontSizeTitulo * 0.4);
-  const yHandle = yAccent + Math.round(fontSizeHandle * 2.2);
-
-  const accentSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${largura}" height="${altura}">
-  <rect x="${padding}" y="${yAccent}" width="${larguraAcento}" height="2" fill="${corPrimaria}"/>
-</svg>`;
-
-  // Download font once — without it, Pango renders every character as □
-  const fontFile = await getFont();
-
-  const makeText = (
-    text: string,
-    color: string,
-    size: number,
-    width: number,
-    wrap?: "word" | "char" | "word-char" | "none",
-  ) => ({
-    input: {
-      text: {
-        text: `<span foreground="${color}">${escapePango(text)}</span>`,
-        ...(fontFile ? { fontfile: fontFile, font: "Roboto" } : { font: "Sans" }),
-        rgba: true,
-        width,
-        dpi: Math.round(72 * (size / 14)), // scale dpi so Roboto renders at target px size
-        ...(wrap ? { wrap } : {}),
-      },
-    } as Parameters<typeof sharp>[0],
-  });
-
-  const composites: sharp.OverlayOptions[] = [
-    { input: Buffer.from(gradienteSvg), top: 0, left: 0 },
-    { input: Buffer.from(accentSvg), top: 0, left: 0 },
-  ];
-
-  // Headline
-  const headlineText = (conteudo.headline ?? "").trim();
-  if (headlineText) {
-    composites.push({
-      ...makeText(headlineText, "#FFFFFF", fontSizeTitulo, textWidth, "word"),
-      top: yTitulo,
-      left: padding,
-    });
-  }
-
-  // Handle (@username)
-  const handleText = handle.toUpperCase().trim();
-  if (handleText && handleText !== "@") {
-    composites.push({
-      ...makeText(handleText, "#FFFFFFCC", fontSizeHandle, textWidth),
-      top: yHandle,
-      left: padding,
-    });
-  }
-
-  // Eyebrow / subtitle above headline
-  if (conteudo.subtitle || conteudo.eyebrow) {
-    const sub = (conteudo.eyebrow ?? conteudo.subtitle ?? "").toUpperCase();
-    const fontSizeSub = Math.round(fontSizeTitulo * 0.32);
-    const ySub = yTitulo - Math.round(fontSizeSub * 3.5);
-    if (ySub > altura * 0.5) {
-      composites.push({
-        ...makeText(sub, "#FFFFFFCC", fontSizeSub, textWidth),
-        top: Math.max(padding, ySub),
-        left: padding,
-      });
-    }
-  }
-
-  // Logo (optional, top-left)
+  // Logo (opcional, canto superior esquerdo)
   if (brand.logoUrl) {
     try {
       const logoBuf = await baixarImagem(brand.logoUrl);
@@ -163,7 +164,7 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
         .toBuffer();
       composites.push({ input: logoResized, top: padding, left: padding });
     } catch {
-      // logo failed — continue without it
+      // logo falhou — segue sem ele
     }
   }
 
@@ -182,13 +183,4 @@ async function baixarImagem(url: string): Promise<Buffer> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`baixar logo: ${res.status}`);
   return Buffer.from(await res.arrayBuffer());
-}
-
-function escapePango(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
 }
