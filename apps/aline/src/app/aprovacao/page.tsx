@@ -60,7 +60,15 @@ export default async function AprovacaoIndexPage() {
     }
   }
 
-  semanasPendentes.sort((a, b) => a.semanaRef.localeCompare(b.semanaRef));
+  // Mais recentes primeiro; "(sem semana)" (null) vai para o final
+  semanasPendentes.sort((a, b) => {
+    const aData = a.semanaRef === "(sem semana)";
+    const bData = b.semanaRef === "(sem semana)";
+    if (aData && bData) return 0;
+    if (aData) return 1;
+    if (bData) return -1;
+    return b.semanaRef.localeCompare(a.semanaRef);
+  });
 
   return (
     <main className="min-h-screen bg-aline-bg">
@@ -135,12 +143,18 @@ export default async function AprovacaoIndexPage() {
                       {s.qtd} {s.qtd === 1 ? "post" : "posts"} aguardando
                     </p>
                   </div>
-                  <Link
-                    href={`/aprovacao/${s.perfilSlug}/${s.semanaRef}`}
-                    className="rounded-lg bg-aline-scanner px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-                  >
-                    Revisar e aprovar
-                  </Link>
+                  {s.semanaRef === "(sem semana)" ? (
+                    <span className="rounded-lg bg-aline-text/20 px-4 py-2 text-sm font-semibold text-aline-text/40 cursor-not-allowed">
+                      Sem data — ignorar
+                    </span>
+                  ) : (
+                    <Link
+                      href={`/aprovacao/${s.perfilSlug}/${s.semanaRef}`}
+                      className="rounded-lg bg-aline-scanner px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                    >
+                      Revisar e aprovar
+                    </Link>
+                  )}
                 </div>
               </li>
             ))}
