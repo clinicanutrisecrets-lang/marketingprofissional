@@ -235,6 +235,56 @@ export async function criarLookalikeAudience(params: {
   return res.json();
 }
 
+/**
+ * Cria um Custom Audience do tipo "lista de clientes" (customer_file_source),
+ * vazio. Usado pra semear lookalike com as COMPRADORAS DA PRÓPRIA NUTRI
+ * (estratégia premium) em vez do pixel central — ver docs/DECISOES-ARQUITETURA.
+ */
+export async function criarCustomerListAudience(params: {
+  adAccountId: string;
+  accessToken: string;
+  nome: string;
+}): Promise<{ id: string }> {
+  const url = new URL(`${GRAPH}/act_${params.adAccountId}/customaudiences`);
+  url.searchParams.set("name", params.nome.slice(0, 100));
+  url.searchParams.set("subtype", "CUSTOM");
+  url.searchParams.set("customer_file_source", "USER_PROVIDED_ONLY");
+  url.searchParams.set("access_token", params.accessToken);
+
+  const res = await fetch(url, { method: "POST" });
+  if (!res.ok) throw new Error(`criarCustomerListAudience: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+/**
+ * Adiciona usuários (email/telefone já em SHA256) a um customer-list audience.
+ * Schema fixo [EMAIL_SHA256, PHONE_SHA256]; valores vazios viram "".
+ * Retorna num_received reportado pela Meta.
+ */
+export async function adicionarUsuariosCustomerList(params: {
+  adAccountId: string;
+  accessToken: string;
+  audienceId: string;
+  usuariosHash: Array<{ emailSha256?: string; phoneSha256?: string }>;
+}): Promise<{ num_received?: number; audience_id?: string }> {
+  if (params.usuariosHash.length === 0) return { num_received: 0 };
+  const url = new URL(`${GRAPH}/${params.audienceId}/users`);
+  url.searchParams.set("access_token", params.accessToken);
+
+  const payload = {
+    schema: ["EMAIL_SHA256", "PHONE_SHA256"],
+    data: params.usuariosHash.map((u) => [u.emailSha256 ?? "", u.phoneSha256 ?? ""]),
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payload }),
+  });
+  if (!res.ok) throw new Error(`adicionarUsuariosCustomerList: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
 // ============================================================================
 // ADSET
 // ============================================================================

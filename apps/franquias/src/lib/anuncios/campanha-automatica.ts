@@ -11,6 +11,7 @@ import {
   deletarEntidadeMeta,
   type ObjetivoNegocio,
 } from "@/lib/meta/ads";
+import { montarSeedProprioDaNutri } from "@/lib/anuncios/publico-proprio";
 
 /**
  * Orquestrador do lançamento automático de uma campanha Meta Ads.
@@ -142,8 +143,29 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
   let adId: string | undefined;
 
   try {
-    // 1+2. Custom audience + lookalike (só se houver pixel central)
-    if (pixelId) {
+    // 1+2. Semente do lookalike.
+    // PREFERÊNCIA: público próprio da nutri (compradoras/agendamentos dela) —
+    // estratégia premium. FALLBACK: pixel central Scanner (cold start).
+    let seedAudienceId: string | undefined;
+    let seedOrigem: "proprio_nutri" | "pixel_central" | "nenhum" = "nenhum";
+
+    try {
+      const seedProprio = await montarSeedProprioDaNutri(admin, franqueadaId, {
+        adAccountId,
+        accessToken,
+        nomeAnuncio: anuncio.nome,
+      });
+      if (seedProprio) {
+        seedAudienceId = seedProprio.audienceId;
+        audienceId = seedProprio.audienceId;
+        seedOrigem = "proprio_nutri";
+      }
+    } catch {
+      seedAudienceId = undefined;
+    }
+
+    // Fallback: custom audience do pixel central (quando a nutri ainda não tem base)
+    if (!seedAudienceId && pixelId) {
       const ca = await criarCustomAudience({
         adAccountId,
         accessToken,
@@ -153,12 +175,16 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
         raioKm: modalidade === "online" ? undefined : raioKm,
       });
       audienceId = ca.id;
+      seedAudienceId = ca.id;
+      seedOrigem = "pixel_central";
+    }
 
+    if (seedAudienceId) {
       try {
         const la = await criarLookalikeAudience({
           adAccountId,
           accessToken,
-          seedAudienceId: audienceId,
+          seedAudienceId,
           country: "BR",
           ratio: 0.03,
         });
@@ -247,7 +273,7 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
       estado_antes: { status: "criativo_aprovado" },
       estado_depois: { status: "ativo", campaignId, adSetId, adId },
       motivo: "Lançamento automático após aprovação do criativo",
-      detalhes: { audienceId, lookalikeId, usouPixelCentral: Boolean(pixelId) },
+      detalhes: { audienceId, lookalikeId, seedOrigem },
     });
 
     return { ok: true, campaignId, adSetId, adId, audienceId, lookalikeId };
