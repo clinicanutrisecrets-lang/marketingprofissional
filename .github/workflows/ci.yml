@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Test · Build (bloqueante) + Typecheck (informativo)
+    runs-on: ubuntu-latest
+    env:
+      # Valores dummy só pra build/typecheck não quebrarem por env ausente.
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy
+      SUPABASE_SERVICE_ROLE_KEY: dummy
+      ANTHROPIC_API_KEY: dummy
+      ENCRYPTION_KEY: dummy0000000000000000000000000000
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # --- Gates bloqueantes ---
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      # --- Informativo (não bloqueia merge enquanto zeramos a dívida de tipos) ---
+      # TODO: tornar bloqueante quando os tipos do Supabase forem regenerados
+      # e o typecheck do app franquias chegar a zero erro.
+      - name: Typecheck (informativo)
+        run: pnpm typecheck
+        continue-on-error: true
