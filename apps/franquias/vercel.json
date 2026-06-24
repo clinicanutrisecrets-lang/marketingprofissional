@@ -29,6 +29,10 @@
       "schedule": "0 6 * * *"
     },
     {
+      "path": "/api/cron/otimizar-ads",
+      "schedule": "30 6 * * *"
+    },
+    {
       "path": "/api/cron/verificar-budget-ads",
       "schedule": "0 * * * *"
     },
