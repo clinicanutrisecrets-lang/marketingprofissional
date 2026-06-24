@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { enviarEventoCAPI } from "@/lib/ads/capi";
+import { enviarEventoCAPIComRetry } from "@/lib/ads/capi";
+import { identificarServico, extrairAnuncioId } from "@/lib/conversions/servico-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -26,11 +27,17 @@ export const maxDuration = 30;
  *   userAgent?: string,
  * }
  *
- * Auth: header x-sofia-token = SOFIA_INTERNAL_TOKEN
+ * Auth: header x-ia-token = WHATSAPP_IA_TOKEN (IA central no WhatsApp).
+ *       x-sofia-token = SOFIA_INTERNAL_TOKEN ainda aceito (legado/transição).
  */
 export async function POST(req: Request) {
-  const sofiaToken = req.headers.get("x-sofia-token");
-  const isSofia = sofiaToken && sofiaToken === process.env.SOFIA_INTERNAL_TOKEN;
+  const servico = identificarServico(
+    req.headers.get("x-ia-token"),
+    req.headers.get("x-sofia-token"),
+    process.env.WHATSAPP_IA_TOKEN,
+    process.env.SOFIA_INTERNAL_TOKEN,
+  );
+  const isServico = !!servico;
 
   const body = (await req.json().catch(() => ({}))) as {
     franqueadaId?: string;
@@ -45,7 +52,7 @@ export async function POST(req: Request) {
 
   let franqueadaId = body.franqueadaId;
 
-  if (!isSofia) {
+  if (!isServico) {
     const supabase = createClient();
     const {
       data: { user },
@@ -77,11 +84,7 @@ export async function POST(req: Request) {
   const admin = createAdminClient();
 
   // Resolve anúncio a partir do leadRef/fbclid pra atribuição correta
-  let anuncioId = body.anuncioId ?? null;
-  if (!anuncioId && body.leadRef) {
-    const match = body.leadRef.match(/ad_([a-f0-9-]+)/i);
-    if (match) anuncioId = match[1]!;
-  }
+  const anuncioId = body.anuncioId ?? extrairAnuncioId(body.leadRef);
 
   const eventId = `lead_${randomUUID()}`;
 
@@ -95,13 +98,13 @@ export async function POST(req: Request) {
       event_time: new Date().toISOString(),
       fbclid: body.fbclid ?? null,
       fbp: body.fbp ?? null,
-      origem: isSofia ? "sofia" : "admin_manual",
+      origem: servico?.origem ?? "admin_manual",
       payload_origem: body as unknown as Record<string, unknown>,
     })
     .select("id")
     .single();
 
-  const capi = await enviarEventoCAPI({
+  const capi = await enviarEventoCAPIComRetry({
     event_name: "Lead",
     event_id: eventId,
     action_source: "chat",
@@ -115,7 +118,7 @@ export async function POST(req: Request) {
       client_user_agent: body.userAgent,
     },
     custom_data: {
-      content_name: "Lead qualificado via Sofia",
+      content_name: "Lead qualificado via WhatsApp IA",
       content_category: "health_consultation",
       franqueada_id: franqueadaId,
       anuncio_id: anuncioId,
@@ -130,7 +133,7 @@ export async function POST(req: Request) {
         capi_enviado: capi.ok,
         capi_resposta: capi.ok ? { events_received: capi.events_received } : null,
         capi_erro: capi.ok ? null : capi.erro,
-        capi_tentativas: 1,
+        capi_tentativas: capi.tentativas,
       })
       .eq("id", (registrada as { id: string }).id);
   }

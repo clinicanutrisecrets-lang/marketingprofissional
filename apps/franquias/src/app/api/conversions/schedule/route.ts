@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { enviarEventoCAPI } from "@/lib/ads/capi";
+import { enviarEventoCAPIComRetry } from "@/lib/ads/capi";
+import { identificarServico, extrairAnuncioId } from "@/lib/conversions/servico-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -29,7 +30,8 @@ export const maxDuration = 30;
  * }
  *
  * Auth: pode ser chamado por:
- *   a) Sofia via service token (header x-sofia-token = SOFIA_INTERNAL_TOKEN)
+ *   a) IA do WhatsApp via service token (header x-ia-token = WHATSAPP_IA_TOKEN);
+ *      x-sofia-token ainda aceito (legado)
  *   b) Admin logado
  *   c) Franqueada logada (pra marcar próprios agendamentos)
  */
@@ -44,13 +46,18 @@ export async function POST(req: Request) {
     dataConsulta?: string;
   };
 
-  // Autenticação — 3 formas
-  const sofiaToken = req.headers.get("x-sofia-token");
-  const isSofia = sofiaToken && sofiaToken === process.env.SOFIA_INTERNAL_TOKEN;
+  // Autenticação — serviço (IA WhatsApp/Sofia legado), admin ou franqueada
+  const servico = identificarServico(
+    req.headers.get("x-ia-token"),
+    req.headers.get("x-sofia-token"),
+    process.env.WHATSAPP_IA_TOKEN,
+    process.env.SOFIA_INTERNAL_TOKEN,
+  );
+  const isServico = !!servico;
 
   let franqueadaId = body.franqueadaId;
 
-  if (!isSofia) {
+  if (!isServico) {
     const supabase = createClient();
     const {
       data: { user },
@@ -92,11 +99,7 @@ export async function POST(req: Request) {
     ((f as { valor_consulta_inicial?: number } | null)?.valor_consulta_inicial ?? 650);
 
   // Resolve anúncio a partir do leadRef (formato: frq_<id>_ad_<anuncioId>)
-  let anuncioId = body.anuncioId ?? null;
-  if (!anuncioId && body.leadRef) {
-    const match = body.leadRef.match(/ad_([a-f0-9-]+)/i);
-    if (match) anuncioId = match[1]!;
-  }
+  let anuncioId = body.anuncioId ?? extrairAnuncioId(body.leadRef);
   if (!anuncioId && body.fbclid) {
     const { data: anterior } = await admin
       .from("conversoes_registradas")
@@ -122,18 +125,18 @@ export async function POST(req: Request) {
       value: valor,
       currency: "BRL",
       fbclid: body.fbclid ?? null,
-      origem: isSofia ? "sofia" : "admin_manual",
+      origem: servico?.origem ?? "admin_manual",
       payload_origem: body as unknown as Record<string, unknown>,
     })
     .select("id")
     .single();
 
-  const capi = await enviarEventoCAPI({
+  const capi = await enviarEventoCAPIComRetry({
     event_name: "Schedule",
     event_id: eventId,
     value: valor,
     currency: "BRL",
-    action_source: isSofia ? "chat" : "system_generated",
+    action_source: isServico ? "chat" : "system_generated",
     user_data: {
       email: body.paciente?.email,
       phone: body.paciente?.phone,
@@ -157,7 +160,7 @@ export async function POST(req: Request) {
         capi_enviado: capi.ok,
         capi_resposta: capi.ok ? { events_received: capi.events_received } : null,
         capi_erro: capi.ok ? null : capi.erro,
-        capi_tentativas: 1,
+        capi_tentativas: capi.tentativas,
       })
       .eq("id", (registrada as { id: string }).id);
   }

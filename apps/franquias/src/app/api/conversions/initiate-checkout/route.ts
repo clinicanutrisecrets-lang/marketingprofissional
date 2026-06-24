@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { enviarEventoCAPI } from "@/lib/ads/capi";
+import { enviarEventoCAPIComRetry } from "@/lib/ads/capi";
+import { identificarServico, extrairAnuncioId } from "@/lib/conversions/servico-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -9,22 +10,26 @@ export const maxDuration = 30;
 /**
  * POST /api/conversions/initiate-checkout
  *
- * Chamado pela Sofia (SaaS) quando envia link Kiwify do teste genetico
- * pro lead. Sinal forte de intencao de compra — dispara CAPI
- * InitiateCheckout pro Meta otimizar pra perfis com intencao real.
+ * Chamado pela IA do WhatsApp quando envia o link de checkout (Asaas) do
+ * teste genético pro lead. Sinal forte de intenção de compra — dispara CAPI
+ * InitiateCheckout pro Meta otimizar pra perfis com intenção real.
  *
- * Purchase vem depois pelo webhook Kiwify quando compra for aprovada.
- * Dedup entre os 2 eventos é via event_id diferente (Purchase tem seu
- * proprio event_id baseado em orderId do Kiwify).
+ * Purchase vem depois pelo webhook /api/webhooks/venda (plataforma própria)
+ * quando a compra for aprovada. Dedup entre os 2 eventos é via event_id
+ * diferente (Purchase usa event_id baseado no pedido).
  *
- * Body: igual ao /api/conversions/lead + valor (default: valor_teste
- * da franqueada, fallback 1800).
+ * Body: igual ao /api/conversions/lead + valor (default 1800).
  *
- * Auth: header x-sofia-token = SOFIA_INTERNAL_TOKEN
+ * Auth: x-ia-token = WHATSAPP_IA_TOKEN (x-sofia-token aceito como legado).
  */
 export async function POST(req: Request) {
-  const sofiaToken = req.headers.get("x-sofia-token");
-  const isSofia = sofiaToken && sofiaToken === process.env.SOFIA_INTERNAL_TOKEN;
+  const servico = identificarServico(
+    req.headers.get("x-ia-token"),
+    req.headers.get("x-sofia-token"),
+    process.env.WHATSAPP_IA_TOKEN,
+    process.env.SOFIA_INTERNAL_TOKEN,
+  );
+  const isServico = !!servico;
 
   const body = (await req.json().catch(() => ({}))) as {
     franqueadaId?: string;
@@ -40,7 +45,7 @@ export async function POST(req: Request) {
 
   let franqueadaId = body.franqueadaId;
 
-  if (!isSofia) {
+  if (!isServico) {
     const supabase = createClient();
     const {
       data: { user },
@@ -79,11 +84,7 @@ export async function POST(req: Request) {
   // valor default = R$1800 (teste nutrigenético)
   const valor = body.valor ?? 1800;
 
-  let anuncioId = body.anuncioId ?? null;
-  if (!anuncioId && body.leadRef) {
-    const match = body.leadRef.match(/ad_([a-f0-9-]+)/i);
-    if (match) anuncioId = match[1]!;
-  }
+  const anuncioId = body.anuncioId ?? extrairAnuncioId(body.leadRef);
 
   const eventId = `initcheckout_${randomUUID()}`;
 
@@ -99,13 +100,13 @@ export async function POST(req: Request) {
       currency: "BRL",
       fbclid: body.fbclid ?? null,
       fbp: body.fbp ?? null,
-      origem: isSofia ? "sofia" : "admin_manual",
+      origem: servico?.origem ?? "admin_manual",
       payload_origem: body as unknown as Record<string, unknown>,
     })
     .select("id")
     .single();
 
-  const capi = await enviarEventoCAPI({
+  const capi = await enviarEventoCAPIComRetry({
     event_name: "InitiateCheckout",
     event_id: eventId,
     value: valor,
@@ -121,7 +122,7 @@ export async function POST(req: Request) {
       client_user_agent: body.userAgent,
     },
     custom_data: {
-      content_name: "Link Kiwify enviado pela Sofia",
+      content_name: "Link de checkout enviado pela IA do WhatsApp",
       content_category: "health_test",
       franqueada_id: franqueadaId,
       anuncio_id: anuncioId,
@@ -136,7 +137,7 @@ export async function POST(req: Request) {
         capi_enviado: capi.ok,
         capi_resposta: capi.ok ? { events_received: capi.events_received } : null,
         capi_erro: capi.ok ? null : capi.erro,
-        capi_tentativas: 1,
+        capi_tentativas: capi.tentativas,
       })
       .eq("id", (registrada as { id: string }).id);
   }
