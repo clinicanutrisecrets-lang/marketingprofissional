@@ -25,12 +25,13 @@ type Contato = { emailSha256?: string; phoneSha256?: string };
 export async function coletarContatosProprios(
   admin: Admin,
   franqueadaId: string,
+  tipos: string[] = ["Purchase", "Schedule"],
 ): Promise<Contato[]> {
   const { data } = await admin
     .from("conversoes_registradas")
     .select("payload_origem, tipo")
     .eq("franqueada_id", franqueadaId)
-    .in("tipo", ["Purchase", "Schedule"])
+    .in("tipo", tipos)
     .limit(5000);
 
   const porChave = new Map<string, Contato>();
@@ -79,4 +80,33 @@ export async function montarSeedProprioDaNutri(
     usuariosHash: contatos,
   });
   return { audienceId: ca.id, contatos: contatos.length };
+}
+
+/** Mínimo de compradoras pra criar lista de exclusão (abaixo disso não compensa). */
+export const MIN_EXCLUSAO = 10;
+
+/**
+ * Monta a lista de EXCLUSÃO de compradoras (quem já comprou o teste) pra não
+ * gastar budget frio com quem já converteu. Retorna audienceId ou null.
+ */
+export async function montarExclusaoCompradores(
+  admin: Admin,
+  franqueadaId: string,
+  meta: { adAccountId: string; accessToken: string; nomeAnuncio: string },
+): Promise<string | null> {
+  const contatos = await coletarContatosProprios(admin, franqueadaId, ["Purchase"]);
+  if (contatos.length < MIN_EXCLUSAO) return null;
+
+  const ca = await criarCustomerListAudience({
+    adAccountId: meta.adAccountId,
+    accessToken: meta.accessToken,
+    nome: `Compradoras (excluir do frio) · ${meta.nomeAnuncio}`,
+  });
+  await adicionarUsuariosCustomerList({
+    adAccountId: meta.adAccountId,
+    accessToken: meta.accessToken,
+    audienceId: ca.id,
+    usuariosHash: contatos,
+  });
+  return ca.id;
 }

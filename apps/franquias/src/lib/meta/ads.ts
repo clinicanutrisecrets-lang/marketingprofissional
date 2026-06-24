@@ -336,6 +336,8 @@ export async function criarAdSet(params: {
   dataInicio?: string;
   dataFim?: string;
   interessesIds?: string[];
+  /** públicos a EXCLUIR (ex.: compradoras — não queimar budget frio com quem já comprou) */
+  excludedAudienceIds?: string[];
 }): Promise<{ id: string }> {
   const mapping = MAPEAMENTO_META[params.objetivo];
   const raio = params.raioKm ?? 30;
@@ -360,6 +362,10 @@ export async function criarAdSet(params: {
   if (params.lookalikeId) customAudiences.push({ id: params.lookalikeId });
   if (customAudiences.length > 0) {
     targeting.custom_audiences = customAudiences;
+  }
+
+  if (params.excludedAudienceIds && params.excludedAudienceIds.length > 0) {
+    targeting.excluded_custom_audiences = params.excludedAudienceIds.map((id) => ({ id }));
   }
 
   if (params.interessesIds && params.interessesIds.length > 0) {

@@ -11,7 +11,7 @@ import {
   deletarEntidadeMeta,
   type ObjetivoNegocio,
 } from "@/lib/meta/ads";
-import { montarSeedProprioDaNutri } from "@/lib/anuncios/publico-proprio";
+import { montarSeedProprioDaNutri, montarExclusaoCompradores } from "@/lib/anuncios/publico-proprio";
 
 /**
  * Orquestrador do lançamento automático de uma campanha Meta Ads.
@@ -195,6 +195,19 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
       }
     }
 
+    // 2b. Exclusão de compradoras — não queimar budget frio com quem já comprou.
+    let excludedAudienceIds: string[] | undefined;
+    try {
+      const exclusaoId = await montarExclusaoCompradores(admin, franqueadaId, {
+        adAccountId,
+        accessToken,
+        nomeAnuncio: anuncio.nome,
+      });
+      if (exclusaoId) excludedAudienceIds = [exclusaoId];
+    } catch {
+      excludedAudienceIds = undefined;
+    }
+
     // 3. Campanha (PAUSED)
     const camp = await criarCampanha({
       adAccountId,
@@ -222,6 +235,7 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
       raioKm: modalidade === "online" ? undefined : raioKm,
       dataInicio: anuncio.data_inicio ?? undefined,
       dataFim: anuncio.data_fim ?? undefined,
+      excludedAudienceIds,
       // Fallback de interesses ICP só quando não há lookalike (sem pixel central)
       interessesIds: !lookalikeId && !audienceId ? interessesIds : undefined,
     });
