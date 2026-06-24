@@ -1,3 +1,6 @@
+> ⚠️ **HISTÓRICO.** Kiwify e Sofia foram substituídos por plataforma própria (Asaas) + IA no
+> WhatsApp. Ver `docs/DECISOES-ARQUITETURA-2026-06.md` e `docs/HANDOFF-PLATAFORMA-PROPRIA.md`.
+
 # Hand-off pro time do Scanner SaaS
 
 Configurações e adaptações que o repo `clinicanutrisecrets-lang/scanner-saude` precisa implementar pra integração com o Marketing estar 100% funcional.

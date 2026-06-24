@@ -1,3 +1,7 @@
+> ⚠️ **HISTÓRICO.** Os fluxos de Kiwify e Sofia descritos aqui foram substituídos.
+> Ver `docs/DECISOES-ARQUITETURA-2026-06.md` (pivôs Asaas + WhatsApp IA) e
+> `docs/HANDOFF-PLATAFORMA-PROPRIA.md` (contrato de integração atual).
+
 # Handoff & Pendências
 
 Documento vivo de o que falta fazer, em qual ordem, quem faz, e o que está aguardando input.
