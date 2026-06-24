@@ -25,6 +25,7 @@ import {
   filtrarPorNicho,
 } from "@/lib/tendencias/datas-comemorativas";
 import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
+import { construirContextoAprendizado } from "@/lib/organico/contexto";
 import {
   buscarBriefingsPendentes,
   marcarBriefingUsado,
@@ -130,10 +131,10 @@ export async function gerarPostsDaSemana(
   const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
 
   // Monta bloco de contexto extra textual que vai entrar no prompt do Claude
-  const blocoContextoExtra = montarBlocoContextoExtra(
-    datasComemorativas,
-    tendencias,
-  );
+  const blocoBase = montarBlocoContextoExtra(datasComemorativas, tendencias);
+  // Loop de aprendizado: o que funciona/é editado no histórico desta nutri
+  const blocoAprendizado = await construirContextoAprendizado(admin, franqueadaId);
+  const blocoContextoExtra = blocoBase + blocoAprendizado;
 
   // Briefings antecipados — temas que a nutri pediu durante a semana.
   // Consumidos primeiro, antes do plano automático.
