@@ -254,3 +254,45 @@ export function emailCriativoProntoParaAprovacao(params: {
     texto: `${params.qtdVariacoes} criativos prontos pra aprovar. ${params.anguloCampanha}\n\nAprovar: ${params.linkAprovar}`,
   };
 }
+
+export function emailAlertaBudget(params: {
+  nome: string;
+  pctUsado: number;
+  urgente: boolean;
+  budgetMensal: number;
+  gastoMes: number;
+  linkAnuncios: string;
+}): { html: string; texto: string; assunto: string } {
+  const cor = params.urgente ? "#EF4444" : "#F59E0B";
+  const emoji = params.urgente ? "🚨" : "⚠️";
+  const restante = Math.max(0, params.budgetMensal - params.gastoMes);
+  const conteudo = `
+    <h1 style="${baseStyles.h1}">${emoji} Seu orçamento de anúncios atingiu ${params.pctUsado}%</h1>
+    <p style="${baseStyles.p}">
+      Oi, ${params.nome}. Suas campanhas já usaram <strong>${params.pctUsado}%</strong> do
+      orçamento mensal de anúncios.
+    </p>
+    <div style="background: ${cor}20; border-left: 4px solid ${cor}; padding: 16px; border-radius: 8px; margin: 20px 0;">
+      <div style="font-size: 12px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Orçamento do mês</div>
+      <div style="font-size: 15px; color: #182024; margin-top: 6px; line-height: 1.6;">
+        Gasto: <strong>R$ ${params.gastoMes.toFixed(2)}</strong> de R$ ${params.budgetMensal.toFixed(2)}<br>
+        Restante: <strong>R$ ${restante.toFixed(2)}</strong>
+      </div>
+    </div>
+    <p style="${baseStyles.p}">
+      ${
+        params.urgente
+          ? "Quando chegar a 98%, o sistema pausa automaticamente todas as campanhas pra você não estourar o orçamento."
+          : "Nada foi pausado ainda — é só um aviso pra você acompanhar. Você pode ajustar o orçamento ou os criativos a qualquer momento."
+      }
+    </p>
+    <p style="margin: 24px 0;">
+      <a href="${params.linkAnuncios}" style="${baseStyles.button}">Ver minhas campanhas →</a>
+    </p>
+  `;
+  return {
+    assunto: `${emoji} Orçamento de anúncios em ${params.pctUsado}%`,
+    html: wrap(conteudo),
+    texto: `Seu orçamento de anúncios atingiu ${params.pctUsado}% (R$ ${params.gastoMes.toFixed(2)} de R$ ${params.budgetMensal.toFixed(2)}). Ver: ${params.linkAnuncios}`,
+  };
+}

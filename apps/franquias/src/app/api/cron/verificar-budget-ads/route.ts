@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { pausarCampanha } from "@/lib/meta/ads";
 import { decrypt } from "@/lib/security/encrypt";
+import { agendarEmail } from "@/lib/emails/queue";
+import { emailAlertaBudget } from "@/lib/emails/templates";
 
 function tokenDecrypt(raw: string): string {
   try {
@@ -146,13 +148,52 @@ export async function GET(req: Request) {
 
     // 3. Alertas (sem pausa)
     if (pctUsado >= alertaPct) {
+      const urgente = pctUsado >= 95;
+      const tipoEmail = urgente ? "budget_alerta_95" : "budget_alerta_80";
+      const emailNutri = franq.email as string | null;
+
+      // Dedup: no máximo 1 email de cada nível por dia (cron roda de hora em hora)
+      const inicioDia = new Date(
+        agora.getFullYear(),
+        agora.getMonth(),
+        agora.getDate(),
+      ).toISOString();
+      const { data: jaEnviado } = await admin
+        .from("email_queue")
+        .select("id")
+        .eq("franqueada_id", fid)
+        .eq("tipo", tipoEmail)
+        .gte("scheduled_for", inicioDia)
+        .limit(1)
+        .maybeSingle();
+
+      let emailAgendado = false;
+      if (emailNutri && !jaEnviado) {
+        const tpl = emailAlertaBudget({
+          nome: (franq.nome_completo as string) ?? "nutri",
+          pctUsado: Math.round(pctUsado),
+          urgente,
+          budgetMensal,
+          gastoMes,
+          linkAnuncios: "https://app.scannerdasaude.com/dashboard/anuncios",
+        });
+        const r = await agendarEmail({
+          franqueadaId: fid,
+          tipo: tipoEmail,
+          toEmail: emailNutri,
+          subject: tpl.assunto,
+          html: tpl.html,
+        });
+        emailAgendado = r.ok;
+      }
+
       resultados.push({
         franqueadaId: fid,
         acao: "alerta",
         pct: pctUsado,
-        nivel: pctUsado >= 95 ? "urgente_95pct" : `alerta_${alertaPct}pct`,
+        nivel: urgente ? "urgente_95pct" : `alerta_${alertaPct}pct`,
+        email_agendado: emailAgendado,
       });
-      // TODO: disparar email via Resend quando tabela de emails estiver pronta
     }
   }
 
