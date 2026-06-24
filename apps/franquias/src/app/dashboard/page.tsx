@@ -172,6 +172,13 @@ export default async function DashboardPage() {
               disponivel={true}
             />
             <ActionCard
+              icone="🧲"
+              titulo="Meus leads"
+              descricao="Pacientes que chegaram pelos anúncios"
+              href="/dashboard/leads"
+              disponivel={true}
+            />
+            <ActionCard
               icone="📸"
               titulo="Perfil Instagram"
               descricao="Foto, bio, seguidores e últimos posts"
