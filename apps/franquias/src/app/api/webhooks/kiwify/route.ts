@@ -7,6 +7,10 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 /**
+ * [DEPRECADO] Webhook Kiwify — substituído por /api/webhooks/venda (plataforma
+ * própria + checkout Asaas). Mantido funcional apenas durante a transição.
+ * Ver docs/DECISOES-ARQUITETURA-2026-06.md.
+ *
  * Webhook Kiwify — recebe notificação de venda e dispara CAPI Purchase.
  *
  * Configuração no painel Kiwify:

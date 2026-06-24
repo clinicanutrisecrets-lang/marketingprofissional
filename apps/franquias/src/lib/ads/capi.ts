@@ -1,5 +1,5 @@
 import "server-only";
-import { createHash } from "node:crypto";
+import { normalizarUserData, type CAPIUserData } from "./capi-hash";
 
 /**
  * Meta Conversions API (CAPI) — envia eventos server-side.
@@ -12,20 +12,12 @@ import { createHash } from "node:crypto";
 
 const CAPI_VERSION = "v21.0";
 
-export type CAPIUserData = {
-  fbclid?: string;
-  fbp?: string;
-  email?: string;
-  phone?: string;
-  external_id?: string;
-  client_ip?: string;
-  client_user_agent?: string;
-};
+export type { CAPIUserData };
 
 export type CAPIEvent = {
   event_name: "Lead" | "Schedule" | "InitiateCheckout" | "Purchase";
   event_time?: number; // unix seconds
-  event_id: string;   // pra dedup com pixel
+  event_id: string; // pra dedup com pixel
   event_source_url?: string;
   action_source?: "website" | "chat" | "phone_call" | "system_generated";
   value?: number;
@@ -39,39 +31,28 @@ export type CAPIResult = {
   events_received?: number;
   fbtrace_id?: string;
   erro?: string;
+  /** true quando o erro é transitório (rede/5xx/429) e vale a pena re-tentar */
+  retryable?: boolean;
 };
-
-function sha256(v: string): string {
-  return createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
-}
-
-function normalizarUserData(u: CAPIUserData): Record<string, string> {
-  const out: Record<string, string> = {};
-  if (u.email) out.em = sha256(u.email);
-  if (u.phone) out.ph = sha256(u.phone.replace(/\D/g, ""));
-  if (u.external_id) out.external_id = sha256(u.external_id);
-  if (u.fbclid) out.fbc = `fb.1.${Date.now()}.${u.fbclid}`;
-  if (u.fbp) out.fbp = u.fbp;
-  if (u.client_ip) out.client_ip_address = u.client_ip;
-  if (u.client_user_agent) out.client_user_agent = u.client_user_agent;
-  return out;
-}
 
 export async function enviarEventoCAPI(event: CAPIEvent): Promise<CAPIResult> {
   const pixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const token = process.env.META_CAPI_ACCESS_TOKEN;
-  if (!pixelId) return { ok: false, erro: "META_PIXEL_ID ausente" };
-  if (!token) return { ok: false, erro: "META_CAPI_ACCESS_TOKEN ausente" };
+  if (!pixelId) return { ok: false, erro: "META_PIXEL_ID ausente", retryable: false };
+  if (!token) return { ok: false, erro: "META_CAPI_ACCESS_TOKEN ausente", retryable: false };
+
+  const eventTimeSec = event.event_time ?? Math.floor(Date.now() / 1000);
 
   const payload = {
     data: [
       {
         event_name: event.event_name,
-        event_time: event.event_time ?? Math.floor(Date.now() / 1000),
+        event_time: eventTimeSec,
         event_id: event.event_id,
         event_source_url: event.event_source_url,
         action_source: event.action_source ?? "website",
-        user_data: normalizarUserData(event.user_data),
+        // usa o event_time (em ms) pra montar o fbc — mais correto que "agora"
+        user_data: normalizarUserData(event.user_data, eventTimeSec * 1000),
         custom_data: {
           ...event.custom_data,
           ...(event.value !== undefined ? { value: event.value } : {}),
@@ -97,10 +78,32 @@ export async function enviarEventoCAPI(event: CAPIEvent): Promise<CAPIResult> {
       error?: { message: string };
     };
     if (!resp.ok || j.error) {
-      return { ok: false, erro: j.error?.message ?? `HTTP ${resp.status}` };
+      // 5xx e 429 são transitórios; 4xx (exceto 429) são definitivos.
+      const retryable = resp.status >= 500 || resp.status === 429;
+      return { ok: false, erro: j.error?.message ?? `HTTP ${resp.status}`, retryable };
     }
     return { ok: true, events_received: j.events_received, fbtrace_id: j.fbtrace_id };
   } catch (e) {
-    return { ok: false, erro: e instanceof Error ? e.message : String(e) };
+    // timeout / erro de rede → transitório
+    return { ok: false, erro: e instanceof Error ? e.message : String(e), retryable: true };
   }
+}
+
+/**
+ * Envia com retry em erros transitórios (rede/5xx/429), backoff exponencial.
+ * Erros definitivos (token ausente, 4xx) não re-tentam.
+ */
+export async function enviarEventoCAPIComRetry(
+  event: CAPIEvent,
+  opts: { tentativas?: number; baseDelayMs?: number } = {},
+): Promise<CAPIResult & { tentativas: number }> {
+  const max = opts.tentativas ?? 3;
+  const base = opts.baseDelayMs ?? 500;
+  let ultimo: CAPIResult = { ok: false, erro: "não executado" };
+  for (let i = 1; i <= max; i++) {
+    ultimo = await enviarEventoCAPI(event);
+    if (ultimo.ok || !ultimo.retryable) return { ...ultimo, tentativas: i };
+    if (i < max) await new Promise((r) => setTimeout(r, base * 2 ** (i - 1)));
+  }
+  return { ...ultimo, tentativas: max };
 }
