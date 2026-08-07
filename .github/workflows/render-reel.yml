@@ -1,0 +1,60 @@
+name: Render Reel Animado
+
+# Worker de vídeo: renderiza um reel MP4 (Python/PIL + ffmpeg) e sobe pro
+# Supabase Storage. Disparado pela plataforma via API do GitHub
+# (workflow_dispatch) — sem precisar de servidor dedicado.
+#
+# Secrets necessários no repositório:
+#   SUPABASE_URL           ex.: https://xxxx.supabase.co
+#   SUPABASE_SERVICE_ROLE  service role key (Storage write)
+
+on:
+  workflow_dispatch:
+    inputs:
+      spec_b64:
+        description: "SPEC do reel em JSON, codificado em base64"
+        required: true
+      destino_path:
+        description: "Caminho no bucket franqueadas-assets (ex.: <id>/reels/rec.mp4)"
+        required: true
+      handle:
+        description: "Handle exibido na assinatura (ex.: @fulana)"
+        required: false
+        default: "@nutri_secrets"
+      anuncio:
+        description: "true para versão anúncio (carimbo no rodapé)"
+        required: false
+        default: "false"
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install pillow numpy
+
+      - name: Renderizar
+        run: |
+          echo "${{ inputs.spec_b64 }}" | base64 -d > /tmp/spec.json
+          EXTRA=""
+          if [ "${{ inputs.anuncio }}" = "true" ]; then EXTRA="--anuncio"; fi
+          python3 packages/reel-engine/engine/render_cli.py /tmp/spec.json /tmp/reel.mp4 \
+            --handle "${{ inputs.handle }}" $EXTRA
+
+      - name: Upload pro Supabase Storage
+        run: |
+          curl -sf -X POST \
+            "${{ secrets.SUPABASE_URL }}/storage/v1/object/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
+            -H "Content-Type: video/mp4" \
+            --data-binary @/tmp/reel.mp4
+          echo "enviado: ${{ inputs.destino_path }}"
