@@ -14,7 +14,7 @@ import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
  * Zero chamadas de IA → zero custo, zero surpresa, zero revisão.
  */
 
-export type CardLayout = "hero" | "foto" | "conteudo";
+export type CardLayout = "hero" | "foto" | "conteudo" | "citacao" | "lista";
 
 export type CardInput = {
   layout: CardLayout;
@@ -23,6 +23,8 @@ export type CardInput = {
   conteudo: ConteudoPeca;
   /** Foto opcional (tirinha decorativa no layout "foto") */
   fotoBuffer?: Buffer;
+  /** Enquadramento vertical da foto na tirinha (default "centro") */
+  fotoPosicao?: "topo" | "centro" | "base";
   /** Força um esquema de cor (0..2); default = hash do headline */
   schemeIndex?: number;
   /** Cor de fundo personalizada (hex) — as cores de texto se adaptam
@@ -257,8 +259,15 @@ function blocoTitulo(
 }
 
 /** Foto com cantos arredondados (tirinha decorativa). */
-async function fotoArredondada(foto: Buffer, w: number, h: number, raio: number): Promise<Buffer> {
-  const base = await sharp(foto).resize(w, h, { fit: "cover", position: "attention" }).png().toBuffer();
+async function fotoArredondada(
+  foto: Buffer,
+  w: number,
+  h: number,
+  raio: number,
+  posicao: "topo" | "centro" | "base" = "centro",
+): Promise<Buffer> {
+  const pos = posicao === "topo" ? "top" : posicao === "base" ? "bottom" : "attention";
+  const base = await sharp(foto).resize(w, h, { fit: "cover", position: pos }).png().toBuffer();
   const mask = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${raio}" ry="${raio}" fill="#fff"/></svg>`,
   );
@@ -293,6 +302,12 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   if (layout === "conteudo") {
     return renderConteudo({ W, H, scheme, conteudo, handle });
   }
+  if (layout === "citacao") {
+    return renderCitacao({ W, H, scheme, conteudo, handle });
+  }
+  if (layout === "lista") {
+    return renderLista({ W, H, scheme, conteudo, handle });
+  }
 
   const headline = (conteudo.headline ?? "").trim();
   const eyebrow = (conteudo.eyebrow ?? "").trim();
@@ -314,7 +329,7 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
     const fotoW = contentW;
     const fotoH = Math.round(H * (stories ? 0.2 : 0.22));
     try {
-      const foto = await fotoArredondada(fotoBuffer, fotoW, fotoH, Math.round(W * 0.024));
+      const foto = await fotoArredondada(fotoBuffer, fotoW, fotoH, Math.round(W * 0.024), input.fotoPosicao);
       fotoStrip = { buf: foto, w: fotoW, h: fotoH };
     } catch {
       // foto falhou — card segue tipográfico puro
@@ -497,6 +512,163 @@ async function renderConteudo(params: {
         Math.round((W - hBloco.largura) / 2),
         H - Math.round(H * 0.05) - hBloco.altura,
       ),
+    );
+  }
+
+  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
+  return sharp({
+    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
+  })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
+
+// ————— Layout citação —————
+
+async function renderCitacao(params: {
+  W: number;
+  H: number;
+  scheme: Scheme;
+  conteudo: ConteudoPeca;
+  handle: string;
+}): Promise<Buffer> {
+  const { W, H, scheme, conteudo, handle } = params;
+  const contentW = Math.round(W * 0.78);
+  const composites: sharp.OverlayOptions[] = [];
+
+  const frase = (conteudo.headline ?? "").trim();
+  const autor = (conteudo.subtitle ?? "").trim();
+
+  // Aspas decorativas gigantes (serif) no topo do bloco
+  const aspas = blocoDeTexto("“", "serif", scheme.kicker, Math.round(W * 0.2), Math.round(W * 0.3), {
+    lineHeight: 0.8,
+  });
+
+  const citacao = blocoTitulo(frase, scheme.titulo, contentW, H * 0.44, Math.round(W * 0.078));
+
+  const autorBloco = autor
+    ? blocoDeTexto(autor.toUpperCase(), "sans", scheme.sub, Math.round(W * 0.024), contentW, {
+        letterSpacing: Math.round(W * 0.024 * 0.22),
+        peso: 0.6,
+      })
+    : null;
+
+  const gap1 = Math.round(H * 0.005);
+  const gap2 = Math.round(H * 0.045);
+  const linhaAltura = Math.max(2, Math.round(W * 0.004));
+  const linhaW = Math.round(W * 0.1);
+
+  const alturaGrupo =
+    aspas.altura + gap1 + citacao.altura + gap2 + linhaAltura +
+    (autorBloco ? gap2 + autorBloco.altura : 0);
+  let y = Math.max(Math.round(H * 0.08), Math.round((H - alturaGrupo) * 0.44));
+
+  composites.push(...posicionar(aspas, Math.round((W - aspas.largura) / 2), y));
+  y += aspas.altura + gap1;
+  composites.push(...posicionar(citacao, Math.round((W - citacao.largura) / 2), y));
+  y += citacao.altura + gap2;
+  const linha = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${linhaW}" height="${linhaAltura}"><rect width="${linhaW}" height="${linhaAltura}" rx="${linhaAltura / 2}" fill="${scheme.kicker}"/></svg>`,
+  );
+  composites.push({ input: linha, top: y, left: Math.round((W - linhaW) / 2) });
+  y += linhaAltura + gap2;
+  if (autorBloco) {
+    composites.push(...posicionar(autorBloco, Math.round((W - autorBloco.largura) / 2), y));
+  }
+
+  if (handle) {
+    const fsH = Math.round(W * 0.02);
+    const hBloco = blocoDeTexto(handle, "sans", scheme.handle, fsH, contentW, {
+      letterSpacing: Math.round(fsH * 0.18),
+      peso: 0.5,
+    });
+    composites.push(
+      ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.055) - hBloco.altura),
+    );
+  }
+
+  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
+  return sharp({
+    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
+  })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
+
+// ————— Layout lista —————
+
+async function renderLista(params: {
+  W: number;
+  H: number;
+  scheme: Scheme;
+  conteudo: ConteudoPeca;
+  handle: string;
+}): Promise<Buffer> {
+  const { W, H, scheme, conteudo, handle } = params;
+  const contentW = Math.round(W * 0.8);
+  const composites: sharp.OverlayOptions[] = [];
+
+  const titulo = (conteudo.headline ?? "").trim();
+  const eyebrow = (conteudo.eyebrow ?? "").trim();
+  // Itens vêm do corpo, um por linha
+  const itens = (conteudo.corpo ?? "")
+    .split(/\n+/)
+    .map((l) => l.replace(/^[-•*\d.)\s]+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 7);
+
+  let y = Math.round(H * 0.09);
+
+  if (eyebrow) {
+    const pill = blocoPill(eyebrow, scheme.pill, W);
+    if (pill) {
+      composites.push(...posicionar(pill, Math.round((W - pill.largura) / 2), y));
+      y += pill.altura + Math.round(H * 0.035);
+    }
+  }
+
+  if (titulo) {
+    const t = blocoTitulo(titulo, scheme.titulo, contentW, H * 0.22, Math.round(W * 0.07));
+    composites.push(...posicionar(t, Math.round((W - t.largura) / 2), y));
+    y += t.altura + Math.round(H * 0.05);
+  }
+
+  const fsItem = Math.round(W * 0.036);
+  const bolinha = Math.round(W * 0.012);
+  const gapItem = Math.round(fsItem * 1.15);
+  const xTexto = Math.round((W - contentW) / 2) + bolinha * 3;
+  const larguraTexto = contentW - bolinha * 3;
+  const maxY = H - Math.round(H * 0.13);
+
+  for (const item of itens) {
+    const b = blocoDeTexto(item, "sans", scheme.sub, fsItem, larguraTexto, {
+      lineHeight: 1.4,
+      align: "left",
+      peso: 0.5,
+    });
+    if (y + b.altura > maxY) break;
+    const dot = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${bolinha * 2}" height="${bolinha * 2}"><circle cx="${bolinha}" cy="${bolinha}" r="${bolinha}" fill="${scheme.kicker}"/></svg>`,
+    );
+    composites.push({
+      input: dot,
+      top: y + Math.round(fsItem * 0.45),
+      left: Math.round((W - contentW) / 2),
+    });
+    composites.push(...posicionar(b, xTexto, y));
+    y += b.altura + gapItem;
+  }
+
+  if (handle) {
+    const fsH = Math.round(W * 0.02);
+    const hBloco = blocoDeTexto(handle, "sans", scheme.handle, fsH, contentW, {
+      letterSpacing: Math.round(fsH * 0.18),
+      peso: 0.5,
+    });
+    composites.push(
+      ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.05) - hBloco.altura),
     );
   }
 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import TendenciasCard from "@/components/TendenciasCard";
+import { TutorialTour } from "@/components/TutorialTour";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-brand-muted">
+      <TutorialTour />
       <div className="mx-auto max-w-6xl p-6 lg:p-8">
         {/* Header com a marca da nutri */}
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">

@@ -38,6 +38,29 @@ export async function gerarSugestoesAction(): Promise<{ ok: boolean; msg: string
   return { ok: true, msg: `${r.criadas} sugestões criadas para a semana de ${semanaRef}` };
 }
 
+export async function excluirArteGaleria(id: string): Promise<{ ok: boolean }> {
+  const franqueadaId = await franqueadaDoUsuario();
+  if (!franqueadaId) return { ok: false };
+  const supabase = createClient();
+  const { data: row } = await supabase
+    .from("artes_geradas")
+    .select("path")
+    .eq("id", id)
+    .eq("franqueada_id", franqueadaId)
+    .maybeSingle();
+  const path = (row as { path?: string } | null)?.path;
+  const { error } = await supabase
+    .from("artes_geradas")
+    .delete()
+    .eq("id", id)
+    .eq("franqueada_id", franqueadaId);
+  if (!error && path) {
+    await supabase.storage.from("franqueadas-assets").remove([path]);
+  }
+  revalidatePath("/dashboard/conteudo/galeria");
+  return { ok: !error };
+}
+
 export async function marcarStatusSugestao(
   id: string,
   status: "baixado" | "gravado" | "descartado",

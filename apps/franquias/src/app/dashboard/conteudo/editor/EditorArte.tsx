@@ -14,6 +14,12 @@ const FORMATOS = [
   { valor: "stories", nome: "Stories 9:16" },
 ];
 
+const LAYOUTS = [
+  { valor: "auto", nome: "Clássico", desc: "título grande (+ foto se subir)" },
+  { valor: "citacao", nome: "Citação", desc: "frase de impacto com aspas" },
+  { valor: "lista", nome: "Lista", desc: "título + itens com marcadores" },
+];
+
 export function EditorArte(props: {
   headlineInicial?: string;
   eyebrowInicial?: string;
@@ -31,12 +37,34 @@ export function EditorArte(props: {
   const [logoNome, setLogoNome] = useState<string>("");
   const [usarCorCustom, setUsarCorCustom] = useState(false);
   const [corFundo, setCorFundo] = useState("#2F5D50");
+  const [layout, setLayout] = useState("auto");
+  const [fotoPos, setFotoPos] = useState("centro");
+  const [itens, setItens] = useState("");
+  const [salvando, setSalvando] = useState(false);
+  const [salvoMsg, setSalvoMsg] = useState<string | null>(null);
   const logoRef = useRef<HTMLInputElement>(null);
 
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  function montarForm(): FormData {
+    const fd = new FormData();
+    fd.set("headline", headline);
+    fd.set("eyebrow", eyebrow);
+    fd.set("subtitle", subtitle);
+    fd.set("cta", cta);
+    fd.set("esquema", String(esquema));
+    fd.set("formato", formato);
+    fd.set("layout", layout);
+    fd.set("fotoPos", fotoPos);
+    fd.set("itens", itens);
+    if (usarCorCustom) fd.set("corFundo", corFundo);
+    if (foto) fd.set("foto", foto);
+    if (logo) fd.set("logo", logo);
+    return fd;
+  }
 
   async function gerar() {
     if (!headline.trim()) {
@@ -45,19 +73,9 @@ export function EditorArte(props: {
     }
     setGerando(true);
     setErro(null);
+    setSalvoMsg(null);
     try {
-      const fd = new FormData();
-      fd.set("headline", headline);
-      fd.set("eyebrow", eyebrow);
-      fd.set("subtitle", subtitle);
-      fd.set("cta", cta);
-      fd.set("esquema", String(esquema));
-      fd.set("formato", formato);
-      if (usarCorCustom) fd.set("corFundo", corFundo);
-      if (foto) fd.set("foto", foto);
-      if (logo) fd.set("logo", logo);
-
-      const res = await fetch("/api/conteudo/render-card", { method: "POST", body: fd });
+      const res = await fetch("/api/conteudo/render-card", { method: "POST", body: montarForm() });
       if (!res.ok) {
         const j = (await res.json().catch(() => null)) as { erro?: string } | null;
         throw new Error(j?.erro ?? `erro ${res.status}`);
@@ -72,10 +90,47 @@ export function EditorArte(props: {
     }
   }
 
+  async function salvarNaGaleria() {
+    setSalvando(true);
+    setSalvoMsg(null);
+    try {
+      const fd = montarForm();
+      fd.set("salvar", "1");
+      const res = await fetch("/api/conteudo/render-card", { method: "POST", body: fd });
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; erro?: string } | null;
+      if (!res.ok || !j?.ok) throw new Error(j?.erro ?? `erro ${res.status}`);
+      setSalvoMsg("✓ Salva na galeria!");
+    } catch (e) {
+      setSalvoMsg(e instanceof Error ? e.message : "falha ao salvar");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Formulário */}
       <div className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+        <Campo label="Tipo de arte">
+          <div className="flex flex-wrap gap-2">
+            {LAYOUTS.map((l) => (
+              <button
+                key={l.valor}
+                type="button"
+                onClick={() => setLayout(l.valor)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold ring-1 ${
+                  layout === l.valor
+                    ? "bg-brand-primary text-white ring-brand-primary"
+                    : "text-brand-text/70 ring-brand-text/15 hover:ring-brand-primary/40"
+                }`}
+                title={l.desc}
+              >
+                {l.nome}
+              </button>
+            ))}
+          </div>
+        </Campo>
+
         <Campo label="Categoria (pill do topo)">
           <input
             value={eyebrow}
@@ -107,6 +162,19 @@ export function EditorArte(props: {
             placeholder="1-2 frases complementando o título"
           />
         </Campo>
+
+        {layout === "lista" && (
+          <Campo label="Itens da lista (um por linha)">
+            <textarea
+              value={itens}
+              onChange={(e) => setItens(e.target.value)}
+              rows={5}
+              maxLength={600}
+              className="w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
+              placeholder={"Sono de qualidade\nIntestino regulado\nAlimentação anti-inflamatória\nGestão do estresse"}
+            />
+          </Campo>
+        )}
 
         <Campo label="Frase manuscrita (opcional)">
           <input
@@ -195,9 +263,23 @@ export function EditorArte(props: {
             />
           </div>
           <p className="mt-1 text-[11px] text-brand-text/40">
-            Dica: PNG com fundo transparente fica melhor.
+            Dica: PNG com fundo transparente fica melhor. Sem upload, usamos a
+            logo do seu onboarding automaticamente.
           </p>
         </Campo>
+
+        {foto && layout === "auto" && (
+          <Campo label="Enquadramento da foto">
+            <div className="flex gap-3">
+              {(["topo", "centro", "base"] as const).map((p) => (
+                <label key={p} className="flex cursor-pointer items-center gap-1.5 text-xs capitalize">
+                  <input type="radio" checked={fotoPos === p} onChange={() => setFotoPos(p)} />
+                  {p}
+                </label>
+              ))}
+            </div>
+          </Campo>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <Campo label="Estilo de cor">
@@ -278,13 +360,23 @@ export function EditorArte(props: {
               alt="Preview da arte"
               className="max-h-[560px] w-auto rounded-xl ring-1 ring-black/10"
             />
-            <a
-              href={previewUrl}
-              download={`arte-${Date.now()}.png`}
-              className="mt-4 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:opacity-90"
-            >
-              ⬇️ Baixar PNG
-            </a>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <a
+                href={previewUrl}
+                download={`arte-${Date.now()}.png`}
+                className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:opacity-90"
+              >
+                ⬇️ Baixar PNG
+              </a>
+              <button
+                onClick={salvarNaGaleria}
+                disabled={salvando}
+                className="rounded-xl bg-brand-primary/10 px-5 py-2.5 text-sm font-semibold text-brand-primary hover:bg-brand-primary/20 disabled:opacity-50"
+              >
+                {salvando ? "Salvando..." : "💾 Salvar na galeria"}
+              </button>
+            </div>
+            {salvoMsg && <p className="mt-2 text-xs text-brand-text/60">{salvoMsg}</p>}
           </>
         ) : (
           <p className="text-sm text-brand-text/40">

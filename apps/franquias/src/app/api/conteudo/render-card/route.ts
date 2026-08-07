@@ -75,7 +75,18 @@ export async function POST(request: Request) {
   const corFundoRaw = String(form.get("corFundo") ?? "").trim();
   const corFundoHex = /^#[0-9a-fA-F]{6}$/.test(corFundoRaw) ? corFundoRaw : undefined;
 
-  const layout: CardLayout = fotoBuffer ? "foto" : "hero";
+  const fotoPosRaw = String(form.get("fotoPos") ?? "centro");
+  const fotoPosicao =
+    fotoPosRaw === "topo" || fotoPosRaw === "base" ? fotoPosRaw : ("centro" as const);
+
+  const itens = String(form.get("itens") ?? "").trim();
+  const layoutRaw = String(form.get("layout") ?? "auto");
+  let layout: CardLayout;
+  if (layoutRaw === "citacao") layout = "citacao";
+  else if (layoutRaw === "lista") layout = "lista";
+  else layout = fotoBuffer ? "foto" : "hero";
+
+  const salvar = String(form.get("salvar") ?? "") === "1";
 
   try {
     const buffer = await renderCard({
@@ -86,12 +97,34 @@ export async function POST(request: Request) {
         corPrimariaHex: f.cor_primaria_hex || "#2F5D50",
         logoUrl: logoBuffer ? undefined : logoUrlOnboarding,
       },
-      conteudo: { headline, eyebrow, subtitle, cta },
+      conteudo: { headline, eyebrow, subtitle, cta, corpo: itens || undefined },
       fotoBuffer,
+      fotoPosicao,
       schemeIndex: esquema >= 0 && esquema <= 2 ? esquema : undefined,
       corFundoHex,
       logoBuffer,
     });
+
+    if (salvar) {
+      const path = `${f.id}/editor/${Date.now()}.png`;
+      const { error: upErr } = await supabase.storage
+        .from("franqueadas-assets")
+        .upload(path, buffer, { contentType: "image/png", upsert: false });
+      if (upErr) {
+        return NextResponse.json({ erro: `salvar falhou: ${upErr.message}` }, { status: 500 });
+      }
+      const { data: signed } = await supabase.storage
+        .from("franqueadas-assets")
+        .createSignedUrl(path, 365 * 24 * 60 * 60);
+      const url = signed?.signedUrl ?? path;
+      await supabase.from("artes_geradas").insert({
+        franqueada_id: f.id,
+        url,
+        path,
+        params: { layout, formato, esquema, corFundoHex, headline },
+      } as never);
+      return NextResponse.json({ ok: true, url });
+    }
 
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
