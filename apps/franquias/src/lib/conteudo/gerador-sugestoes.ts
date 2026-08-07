@@ -76,6 +76,10 @@ CARDS (arte tipográfica premium — sem foto):
 - CARROSSEL: 4 a 6 slides; slide 1 = capa (headline forte); slides internos = headline curta + corpo de 2-3 parágrafos curtos; último slide = CTA
 - Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
+PEDIDOS DA NUTRI (quando o input trouxer "pedidos_da_nutri"):
+- São temas que a própria profissional pediu — TÊM PRIORIDADE MÁXIMA sobre as manchetes.
+- Use cada pedido como base de uma sugestão (respeitando o formato preferido quando indicado).
+
 RECEITAS TERAPÊUTICAS (quando o input trouxer "receitas_disponiveis"):
 - Escolha UMA receita que converse com o nicho e as pautas da semana e crie uma sugestão EXTRA de tipo feed_imagem com:
   - "receita_slug": o slug exato da receita escolhida
@@ -91,8 +95,18 @@ com exatamente: 2 feed_imagem, 1 feed_carrossel, 2 reel — e +1 feed_imagem de 
 export async function gerarSugestoesSemana(params: {
   franqueadaId: string;
   semanaRef: string; // segunda-feira YYYY-MM-DD
+  /** true = apaga as sugestões existentes da semana e gera de novo */
+  regerar?: boolean;
 }): Promise<{ criadas: number; erro?: string }> {
   const admin = createAdminClient();
+
+  if (params.regerar) {
+    await admin
+      .from("sugestoes_conteudo")
+      .delete()
+      .eq("franqueada_id", params.franqueadaId)
+      .eq("semana_ref", params.semanaRef);
+  }
 
   const { data: fData, error: fErr } = await admin
     .from("franqueadas")
@@ -131,6 +145,19 @@ export async function gerarSugestoesSemana(params: {
     nichoSecundario: f.nicho_secundario,
   });
 
+  // Pedidos da nutri ("Pedir conteúdo") entram como prioridade da semana
+  const { data: pedidosData } = await admin
+    .from("briefings_franqueada")
+    .select("id, tema, angulo_sugerido, formato_preferido, observacoes")
+    .eq("franqueada_id", params.franqueadaId)
+    .eq("status", "pendente")
+    .order("criado_em", { ascending: true })
+    .limit(5);
+  const pedidos = (pedidosData ?? []) as Array<{
+    id: string; tema: string; angulo_sugerido: string | null;
+    formato_preferido: string | null; observacoes: string | null;
+  }>;
+
   // Receitas da biblioteca central (fotos reais no git da marca)
   const { data: receitasData } = await admin
     .from("biblioteca_receitas")
@@ -155,6 +182,9 @@ export async function gerarSugestoesSemana(params: {
     },
     manchetes_recentes: manchetes.map((m) => `${m.titulo} (${m.fonte})`),
     receitas_disponiveis: receitas.map((r) => ({ slug: r.slug, titulo: r.titulo })),
+    pedidos_da_nutri: pedidos.map((p) => ({
+      tema: p.tema, angulo: p.angulo_sugerido, formato: p.formato_preferido, obs: p.observacoes,
+    })),
     semana_ref: params.semanaRef,
   };
 
@@ -311,6 +341,13 @@ export async function gerarSugestoesSemana(params: {
       artes,
     } as never); // tabela nova — fora dos types gerados do Supabase
     if (!insErr) criadas++;
+  }
+
+  if (criadas > 0 && pedidos.length) {
+    await admin
+      .from("briefings_franqueada")
+      .update({ status: "usado", usado_em: new Date().toISOString() } as never)
+      .in("id", pedidos.map((p) => p.id));
   }
 
   return { criadas };

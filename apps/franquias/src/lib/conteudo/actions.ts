@@ -27,12 +27,12 @@ function proximaSegunda(): string {
   return seg.toISOString().slice(0, 10);
 }
 
-export async function gerarSugestoesAction(): Promise<{ ok: boolean; msg: string }> {
+export async function gerarSugestoesAction(regerar = false): Promise<{ ok: boolean; msg: string }> {
   const franqueadaId = await franqueadaDoUsuario();
   if (!franqueadaId) return { ok: false, msg: "sessão inválida" };
 
   const semanaRef = proximaSegunda();
-  const r = await gerarSugestoesSemana({ franqueadaId, semanaRef });
+  const r = await gerarSugestoesSemana({ franqueadaId, semanaRef, regerar });
   revalidatePath("/dashboard/conteudo");
   if (r.erro) return { ok: r.criadas > 0, msg: r.erro };
   return { ok: true, msg: `${r.criadas} sugestões criadas para a semana de ${semanaRef}` };

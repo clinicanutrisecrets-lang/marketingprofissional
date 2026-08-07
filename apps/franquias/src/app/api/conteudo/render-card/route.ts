@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { renderCard, ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type CardLayout, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
+import { renderCard, ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type CardLayout, type ConteudoPeca, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -98,15 +98,85 @@ export async function POST(request: Request) {
 
   const salvar = String(form.get("salvar") ?? "") === "1";
 
+  const brandCard = {
+    nomeMarca: f.instagram_handle || f.nome_comercial || f.nome_completo || "",
+    corPrimariaHex: f.cor_primaria_hex || "#2F5D50",
+    logoUrl: logoBuffer ? undefined : logoUrlOnboarding,
+  };
+
+  // ——— CARROSSEL: capa + slides de conteúdo + CTA final ———
+  if (layoutRaw === "carrossel") {
+    const blocos = String(form.get("slides") ?? "")
+      .split(/\n\s*---\s*\n/)
+      .map((b) => b.trim())
+      .filter(Boolean)
+      .slice(0, 8);
+    const conteudos: ConteudoPeca[] = [
+      { headline, eyebrow, subtitle, cta },
+      ...blocos.map((b) => {
+        const [primeira, ...resto] = b.split("\n");
+        return { headline: (primeira ?? "").trim(), corpo: resto.join("\n").trim(), eyebrow };
+      }),
+    ];
+    if (cta) conteudos.push({ headline: cta, eyebrow, subtitle: "" });
+
+    try {
+      const buffers: Buffer[] = [];
+      for (let i = 0; i < conteudos.length; i++) {
+        const ehCapa = i === 0;
+        const ehUltimo = i === conteudos.length - 1 && conteudos.length > 1 && !!cta;
+        const buf = await renderCard({
+          layout: ehCapa || ehUltimo ? "hero" : "conteudo",
+          dimensoes: "1080x1350",
+          brand: brandCard,
+          conteudo: conteudos[i]!,
+          schemeIndex: ehCapa || ehUltimo ? 0 : 1,
+          corFundoHex,
+          logoBuffer: ehCapa ? logoBuffer : undefined,
+        });
+        buffers.push(buf);
+      }
+
+      if (salvar) {
+        const urls: string[] = [];
+        for (let i = 0; i < buffers.length; i++) {
+          const path = `${f.id}/editor/${Date.now()}_slide${i + 1}.png`;
+          const { error: upErr } = await supabase.storage
+            .from("franqueadas-assets")
+            .upload(path, buffers[i]!, { contentType: "image/png", upsert: false });
+          if (upErr) continue;
+          const { data: signed } = await supabase.storage
+            .from("franqueadas-assets")
+            .createSignedUrl(path, 365 * 24 * 60 * 60);
+          const url = signed?.signedUrl ?? path;
+          urls.push(url);
+          await supabase.from("artes_geradas").insert({
+            franqueada_id: f.id,
+            url,
+            path,
+            params: { layout: "carrossel", formato: "retrato", headline: `${headline} (slide ${i + 1}/${buffers.length})` },
+          } as never);
+        }
+        return NextResponse.json({ ok: true, urls });
+      }
+
+      return NextResponse.json({
+        ok: true,
+        slides: buffers.map((b) => `data:image/png;base64,${b.toString("base64")}`),
+      });
+    } catch (e) {
+      return NextResponse.json(
+        { erro: e instanceof Error ? e.message : "falha ao renderizar carrossel" },
+        { status: 500 },
+      );
+    }
+  }
+
   try {
     const buffer = await renderCard({
       layout,
       dimensoes,
-      brand: {
-        nomeMarca: f.instagram_handle || f.nome_comercial || f.nome_completo || "",
-        corPrimariaHex: f.cor_primaria_hex || "#2F5D50",
-        logoUrl: logoBuffer ? undefined : logoUrlOnboarding,
-      },
+      brand: brandCard,
       conteudo: { headline, eyebrow, subtitle, cta, corpo: itens || undefined },
       fotoBuffer,
       fotoPosicao,

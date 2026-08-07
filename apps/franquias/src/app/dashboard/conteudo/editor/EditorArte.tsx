@@ -15,10 +15,11 @@ const FORMATOS = [
 ];
 
 const LAYOUTS = [
-  { valor: "auto", nome: "Clássico", desc: "título grande (+ foto se subir)" },
-  { valor: "editorial", nome: "Editorial", desc: "dois tons + ilustração em traço" },
-  { valor: "citacao", nome: "Citação", desc: "frase de impacto com aspas" },
-  { valor: "lista", nome: "Lista", desc: "título + itens com marcadores" },
+  { valor: "auto", nome: "Clássico", desc: "Título grande (+ sua foto se subir)", thumb: "/editor-thumbs/classico.png" },
+  { valor: "editorial", nome: "Editorial", desc: "Dois tons + ilustração em traço", thumb: "/editor-thumbs/editorial.png" },
+  { valor: "citacao", nome: "Citação", desc: "Frase de impacto com aspas", thumb: "/editor-thumbs/citacao.png" },
+  { valor: "lista", nome: "Lista", desc: "Título + itens com marcadores", thumb: "/editor-thumbs/lista.png" },
+  { valor: "carrossel", nome: "Carrossel", desc: "Vários slides pra deslizar", thumb: "/editor-thumbs/carrossel.png" },
 ];
 
 const ILUSTRACOES = [
@@ -80,6 +81,8 @@ export function EditorArte(props: {
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewSlides, setPreviewSlides] = useState<string[]>([]);
+  const [slidesTexto, setSlidesTexto] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   function montarForm(): FormData {
@@ -94,6 +97,7 @@ export function EditorArte(props: {
     fd.set("fotoPos", fotoPos);
     fd.set("itens", itens);
     fd.set("ilustracao", ilustracao);
+    fd.set("slides", slidesTexto);
     if (usarCorCustom) fd.set("corFundo", corFundo);
     if (foto) fd.set("foto", foto);
     if (logo) fd.set("logo", logo);
@@ -114,9 +118,16 @@ export function EditorArte(props: {
         const j = (await res.json().catch(() => null)) as { erro?: string } | null;
         throw new Error(j?.erro ?? `erro ${res.status}`);
       }
-      const blob = await res.blob();
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(URL.createObjectURL(blob));
+      if (layout === "carrossel") {
+        const j = (await res.json()) as { slides?: string[] };
+        setPreviewSlides(j.slides ?? []);
+        setPreviewUrl(null);
+      } else {
+        const blob = await res.blob();
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(URL.createObjectURL(blob));
+        setPreviewSlides([]);
+      }
     } catch (e) {
       setErro(e instanceof Error ? e.message : "falha ao gerar");
     } finally {
@@ -146,23 +157,34 @@ export function EditorArte(props: {
       {/* Formulário */}
       <div className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
         <Campo label="Tipo de arte">
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {LAYOUTS.map((l) => (
               <button
                 key={l.valor}
                 type="button"
                 onClick={() => setLayout(l.valor)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold ring-1 ${
-                  layout === l.valor
-                    ? "bg-brand-primary text-white ring-brand-primary"
-                    : "text-brand-text/70 ring-brand-text/15 hover:ring-brand-primary/40"
-                }`}
                 title={l.desc}
+                className={`flex flex-col items-center gap-1.5 rounded-xl p-1.5 ring-2 transition ${
+                  layout === l.valor
+                    ? "ring-brand-primary"
+                    : "ring-transparent hover:ring-brand-primary/30"
+                }`}
               >
-                {l.nome}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={l.thumb}
+                  alt={l.nome}
+                  className="w-full rounded-lg ring-1 ring-black/5"
+                />
+                <span
+                  className={`text-[11px] font-semibold ${layout === l.valor ? "text-brand-primary" : "text-brand-text/60"}`}
+                >
+                  {l.nome}
+                </span>
               </button>
             ))}
           </div>
+          <p className="mt-1 text-[11px] text-brand-text/40">{LAYOUTS.find((l) => l.valor === layout)?.desc}</p>
         </Campo>
 
         <Campo label="Categoria (pill do topo)">
@@ -208,6 +230,23 @@ export function EditorArte(props: {
                 <option key={i.id} value={i.id}>{i.nome}</option>
               ))}
             </select>
+          </Campo>
+        )}
+
+        {layout === "carrossel" && (
+          <Campo label="Slides internos (separe cada slide com uma linha contendo só ---)">
+            <textarea
+              value={slidesTexto}
+              onChange={(e) => setSlidesTexto(e.target.value)}
+              rows={8}
+              maxLength={2400}
+              className="w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
+              placeholder={"Título do slide 2\nTexto do slide 2 em 1-3 parágrafos.\n---\nTítulo do slide 3\nTexto do slide 3."}
+            />
+            <p className="mt-1 text-[11px] text-brand-text/40">
+              O título lá de cima vira a CAPA. A primeira linha de cada bloco é o título
+              do slide; o resto é o texto. A frase manuscrita vira o slide final de CTA.
+            </p>
           </Campo>
         )}
 
@@ -400,7 +439,36 @@ export function EditorArte(props: {
 
       {/* Preview */}
       <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-sm">
-        {previewUrl ? (
+        {previewSlides.length > 0 ? (
+          <>
+            <div className="grid max-h-[560px] grid-cols-2 gap-3 overflow-y-auto">
+              {previewSlides.map((s2, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={s2} alt={`Slide ${i + 1}`} className="w-full rounded-lg ring-1 ring-black/10" />
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              {previewSlides.map((s2, i) => (
+                <a
+                  key={i}
+                  href={s2}
+                  download={`slide-${i + 1}.png`}
+                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
+                >
+                  ⬇️ Slide {i + 1}
+                </a>
+              ))}
+              <button
+                onClick={salvarNaGaleria}
+                disabled={salvando}
+                className="rounded-lg bg-brand-primary/10 px-3 py-1.5 text-xs font-semibold text-brand-primary hover:bg-brand-primary/20 disabled:opacity-50"
+              >
+                {salvando ? "Salvando..." : "💾 Salvar tudo na galeria"}
+              </button>
+            </div>
+            {salvoMsg && <p className="mt-2 text-xs text-brand-text/60">{salvoMsg}</p>}
+          </>
+        ) : previewUrl ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
