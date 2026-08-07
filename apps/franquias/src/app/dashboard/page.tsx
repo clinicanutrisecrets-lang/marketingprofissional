@@ -62,7 +62,7 @@ export default async function DashboardPage() {
                 {f.nicho_principal
                   ? `Nutrição ${(f.nicho_principal as string).replace("_", " ")}`
                   : "Seu painel Scanner da Saúde"}
-                {f.instagram_handle ? ` · @${f.instagram_handle as string}` : ""}
+                {f.instagram_handle ? ` · @${(f.instagram_handle as string).replace(/^@+/, "")}` : ""}
               </p>
             </div>
           </div>

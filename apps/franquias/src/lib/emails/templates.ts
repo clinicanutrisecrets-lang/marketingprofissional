@@ -45,7 +45,7 @@ function wrap(conteudo: string, titulo = "Scanner da Saúde"): string {
 
 export function emailBoasVindas(nome: string, linkOnboarding: string): { html: string; texto: string; assunto: string } {
   const conteudo = `
-    <h1 style="${baseStyles.h1}">Bem-vinda ao Scanner da Saúde, ${nome}!</h1>
+    <h1 style="${baseStyles.h1}">Boas-vindas ao Scanner da Saúde, ${nome}!</h1>
     <p style="${baseStyles.p}">
       Sua conta foi criada. Agora falta um passo: completar o onboarding para o sistema
       entender sua nutri e começar a gerar conteúdo pra você.
@@ -67,9 +67,9 @@ export function emailBoasVindas(nome: string, linkOnboarding: string): { html: s
     </p>
   `;
   return {
-    assunto: `Bem-vinda, ${nome}! Falta só o onboarding 👋`,
+    assunto: `Boas-vindas, ${nome}! Falta só o onboarding 👋`,
     html: wrap(conteudo),
-    texto: `Bem-vinda ao Scanner da Saúde, ${nome}! Complete o onboarding: ${linkOnboarding}`,
+    texto: `Boas-vindas ao Scanner da Saúde, ${nome}! Complete o onboarding: ${linkOnboarding}`,
   };
 }
 

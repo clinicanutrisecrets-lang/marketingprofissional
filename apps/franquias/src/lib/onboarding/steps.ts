@@ -92,7 +92,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 7,
     slug: "voz",
     label: "Voz e comunicação",
-    descricao: "Seu jeito de falar com as pacientes",
+    descricao: "Seu jeito de falar com quem você atende",
     camposObrigatorios: ["tom_comunicacao"],
     camposOpcionais: [
       "palavras_evitar",

@@ -36,7 +36,7 @@ export default async function ConvitePage({ params }: Props) {
             Scanner da Saúde · Franquia Digital
           </div>
           <h1 className="text-3xl font-bold text-brand-text">
-            Bem-vinda, {resultado.convite!.nome_completo.split(" ")[0]}!
+            Boas-vindas, {resultado.convite!.nome_completo.split(" ")[0]}!
           </h1>
           <p className="mt-2 text-sm text-brand-text/60">
             Defina uma senha pra entrar no seu painel e começar o onboarding.

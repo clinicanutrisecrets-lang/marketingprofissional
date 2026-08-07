@@ -46,7 +46,7 @@ export function OnboardingTokenLogin({ email, nome, token }: Props) {
     <main className="min-h-screen bg-brand-muted flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl p-8 shadow-sm">
         <div className="text-xs uppercase tracking-[0.2em] text-brand-primary mb-3">
-          Bem-vinda
+          Boas-vindas
         </div>
         <h1 className="text-2xl font-bold text-brand-text">Olá, {nome.split(" ")[0]}!</h1>
         <p className="mt-3 text-sm text-brand-text/70 leading-relaxed">

@@ -22,7 +22,7 @@ type Passo = {
 const PASSOS: Passo[] = [
   {
     emoji: "👋",
-    titulo: "Bem-vinda à sua agência de marketing!",
+    titulo: "Boas-vindas à sua agência de marketing!",
     texto:
       "Aqui você tem conteúdo profissional pro seu Instagram sem precisar de designer nem redator. Vou te mostrar em 2 minutos como tudo funciona.",
     dica: "Você pode reabrir este tutorial quando quiser no botão ❓ Tutorial.",
@@ -46,7 +46,7 @@ const PASSOS: Passo[] = [
     emoji: "🖼️",
     titulo: "Editor de arte",
     texto:
-      "Quer criar um post do zero? No editor você escreve o texto, escolhe cor (ou usa as da sua marca), sube sua foto e sua logo — e baixa a arte pronta em segundos. Tem layout clássico, citação e lista.",
+      "Quer criar um post do zero? No editor você escreve o texto, escolhe cor (ou usa as da sua marca), suba sua foto e sua logo — e baixa a arte pronta em segundos. Tem layout clássico, citação e lista.",
     href: "/dashboard/conteudo/editor",
     hrefLabel: "Abrir o Editor",
   },
@@ -59,14 +59,15 @@ const PASSOS: Passo[] = [
     hrefLabel: "Ver a biblioteca",
   },
   {
-    emoji: "✅",
-    titulo: "Aprovação semanal",
+    emoji: "📲",
+    titulo: "Como postar no Instagram",
     texto:
-      "Quando a publicação automática estiver ativa na sua conta, os posts da semana chegam pra você revisar e aprovar em bloco — nada é publicado sem o seu OK.",
+      "É simples: baixe a arte (vai pra galeria do seu celular), toque em 'Copiar legenda', abra o Instagram, crie o post com a arte e cole a legenda. Menos de 1 minuto por post.",
+    dica: "Salve as artes da semana de uma vez e agende no próprio Instagram se quiser.",
   },
   {
     emoji: "🚀",
-    titulo: "Pronta pra começar!",
+    titulo: "Tudo pronto pra começar!",
     texto:
       "Sugestão de primeiro passo: abra o Estúdio de conteúdo e clique em '✨ Gerar sugestões da semana'. Em 1 minuto você terá seus primeiros posts prontos.",
     href: "/dashboard/conteudo",
