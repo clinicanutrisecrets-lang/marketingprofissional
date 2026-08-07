@@ -111,12 +111,14 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: 9,
-    slug: "automacao",
-    label: "Seus posts",
-    descricao: "Como revisar e quando publicar",
+    slug: "ritmo",
+    label: "Ritmo de conteúdo",
+    // Não pergunta mais horário de publicação: publicar automático depende da
+    // aprovação do app na Meta / do Publer configurado. Aqui só entra o que a
+    // geração usa de verdade (volume e formato) — ver Step9Automacao.tsx.
+    descricao: "Quanto conteúdo por semana e como você quer revisar",
     camposObrigatorios: ["aprovacao_modo"],
     camposOpcionais: [
-      "horario_preferido_post",
       "dias_post_semana",
       "frequencia_stories",
       "frequencia_reels",

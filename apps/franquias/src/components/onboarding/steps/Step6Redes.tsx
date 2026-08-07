@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import { Field, FormWrapper } from "@/components/ui/Field";
+import { metaAdsAtivo, publerAtivo, publerContasUrl } from "@/lib/features";
 import type { StepFormProps } from "../Wizard";
 
 export function Step6Redes({ dados, atualizar }: StepFormProps) {
+  // Blocos de Página do Facebook / anúncios só aparecem quando a aprovação
+  // do Meta sair (NEXT_PUBLIC_META_ADS_ATIVO). Publer só quando a workspace
+  // estiver configurada — senão o link de conexão sairia quebrado.
+  const mostrarMetaAds = metaAdsAtivo();
+  const mostrarPubler = publerAtivo();
   const temPagina = !!(dados.facebook_pagina_id || dados.facebook_pagina_url);
   const temPubler = !!dados.publer_profile_id;
   const [paginaUrl, setPaginaUrl] = useState((dados.facebook_pagina_url as string) ?? "");
@@ -81,7 +87,11 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
   return (
     <FormWrapper
       title="Redes sociais"
-      descricao="Configure suas redes e conecte o Instagram para publicação automática."
+      descricao={
+        mostrarPubler
+          ? "Onde seu conteúdo vive — e, se quiser, conecte o Instagram pra publicação automática."
+          : "Onde seu conteúdo vive. Usamos essas informações no seu conteúdo e na sua página."
+      }
     >
       {/* Campos de redes */}
       <Field
@@ -121,7 +131,10 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
         onChange={(v) => atualizar({ linktree_ou_similar: v })}
       />
 
-      {/* ── Guia: como criar Página no Facebook ── */}
+      {/* ── Página do Facebook + conta de anúncios (só com aprovação Meta) ── */}
+      {mostrarMetaAds && (
+      <>
+      {/* Guia: como criar Página no Facebook */}
       <div className="rounded-xl border border-brand-text/10 bg-white overflow-hidden">
         <button
           type="button"
@@ -166,7 +179,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
         )}
       </div>
 
-      {/* ── Vincular Página do Facebook ── */}
+      {/* Vincular Página do Facebook */}
       <div className={`rounded-xl border-2 p-5 ${temPagina ? "border-green-200 bg-green-50" : "border-dashed border-brand-primary/30 bg-brand-primary/5"}`}>
         <div className="mb-2 text-sm font-semibold text-brand-text">
           {temPagina ? "✅ Página do Facebook vinculada" : "🔗 Vincular Página do Facebook"}
@@ -219,7 +232,11 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
         )}
       </div>
 
+      </>
+      )}
+
       {/* ── Conectar Instagram para publicação (Publer) ── */}
+      {mostrarPubler && (
       <div className={`rounded-xl border-2 p-5 ${temPubler ? "border-green-200 bg-green-50" : "border-dashed border-purple-200 bg-purple-50/50"}`}>
         <div className="mb-1 text-sm font-semibold text-brand-text">
           {temPubler ? "✅ Instagram conectado para publicação" : "📲 Conectar Instagram para publicação automática"}
@@ -235,7 +252,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
               Depois volte aqui e clique em "Verificar conexão".
             </p>
             <a
-              href={`https://app.publer.com/workspace/${process.env.NEXT_PUBLIC_PUBLER_WORKSPACE_ID ?? ""}/settings/accounts`}
+              href={publerContasUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
@@ -260,6 +277,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
           </div>
         )}
       </div>
+      )}
     </FormWrapper>
   );
 }

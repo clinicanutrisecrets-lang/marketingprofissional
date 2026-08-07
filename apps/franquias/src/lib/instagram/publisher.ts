@@ -94,7 +94,12 @@ export async function publicarPost(
         return { ok: false, erro: `Publer: ${(e as Error).message}` };
       }
     }
-    if (!temTokenDireto) return { ok: false, erro: "Instagram não conectado — complete o passo de conexão no onboarding." };
+    // Sem token direto (depende da aprovação do app na Meta) e sem Publer,
+    // esta conta não tem canal de publicação automática: o conteúdo fica
+    // pronto pra nutri baixar e postar. Mensagem precisa dizer isso — antes
+    // apontava pra um "passo de conexão no onboarding" que não existe
+    // enquanto o Publer está desligado.
+    if (!temTokenDireto) return { ok: false, erro: "Publicação automática não está ativa nesta conta — baixe a arte e a legenda e publique direto no seu Instagram." };
     if (tokenExpirado) return { ok: false, erro: "Token Instagram expirado — reconecte no painel." };
   }
 
