@@ -322,12 +322,22 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
 
   // Logo no topo-centro (estilo @patibianco). Empurra o conteúdo pra baixo.
+  // Usa o buffer enviado ou baixa da logoUrl da marca (onboarding).
+  let logoBruta: Buffer | undefined = input.logoBuffer;
+  if (!logoBruta && brand.logoUrl) {
+    try {
+      const res = await fetch(brand.logoUrl, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) logoBruta = Buffer.from(await res.arrayBuffer());
+    } catch {
+      // logo remota indisponível — segue sem
+    }
+  }
   let logoComposite: { buf: Buffer; w: number; h: number } | null = null;
-  if (input.logoBuffer) {
+  if (logoBruta) {
     try {
       const maxLogoH = Math.round(H * 0.055);
       const maxLogoW = Math.round(W * 0.34);
-      const logoPng = await sharp(input.logoBuffer)
+      const logoPng = await sharp(logoBruta)
         .resize(maxLogoW, maxLogoH, { fit: "inside", withoutEnlargement: true })
         .png()
         .toBuffer();

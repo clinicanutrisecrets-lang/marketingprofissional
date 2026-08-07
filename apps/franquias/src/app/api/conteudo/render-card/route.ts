@@ -24,11 +24,23 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!franqueada) return NextResponse.json({ erro: "sem franqueada" }, { status: 403 });
   const f = franqueada as {
+    id: string;
     nome_comercial: string | null;
     nome_completo: string | null;
     instagram_handle: string | null;
     cor_primaria_hex: string | null;
   };
+
+  // Logo do onboarding entra automaticamente quando a nutri não sobe outra
+  const { data: logoRow } = await supabase
+    .from("arquivos_franqueada")
+    .select("url_storage")
+    .eq("franqueada_id", f.id)
+    .eq("tipo", "logo_principal")
+    .order("criado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const logoUrlOnboarding = (logoRow as { url_storage?: string } | null)?.url_storage;
 
   const form = await request.formData();
   const headline = String(form.get("headline") ?? "").trim();
@@ -72,6 +84,7 @@ export async function POST(request: Request) {
       brand: {
         nomeMarca: f.instagram_handle || f.nome_comercial || f.nome_completo || "",
         corPrimariaHex: f.cor_primaria_hex || "#2F5D50",
+        logoUrl: logoBuffer ? undefined : logoUrlOnboarding,
       },
       conteudo: { headline, eyebrow, subtitle, cta },
       fotoBuffer,

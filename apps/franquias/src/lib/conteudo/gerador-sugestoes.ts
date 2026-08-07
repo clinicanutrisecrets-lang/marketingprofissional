@@ -159,9 +159,20 @@ export async function gerarSugestoesSemana(params: {
   }
   if (!sugestoes.length) return { criadas: 0, erro: "agente não gerou sugestões" };
 
+  // Logo do onboarding (se existir) entra automaticamente no topo dos cards
+  const { data: logoRow } = await admin
+    .from("arquivos_franqueada")
+    .select("url_storage")
+    .eq("franqueada_id", params.franqueadaId)
+    .eq("tipo", "logo_principal")
+    .order("criado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const brand: BrandGuidelines = {
     nomeMarca: f.instagram_handle || f.nome_comercial || f.nome_completo || "",
     corPrimariaHex: f.cor_primaria_hex || "#2F5D50",
+    logoUrl: (logoRow as { url_storage?: string } | null)?.url_storage ?? undefined,
   };
 
   // 3. Renderiza artes + salva
