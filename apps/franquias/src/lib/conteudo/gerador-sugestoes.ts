@@ -72,7 +72,7 @@ CARDS (arte tipográfica premium — sem foto):
 - subtitle: complemento de 1-2 frases (opcional)
 - cta_card: frase manuscrita curta tipo "salva esse post" (opcional)
 - CARROSSEL: 4 a 6 slides; slide 1 = capa (headline forte); slides internos = headline curta + corpo de 2-3 parágrafos curtos; último slide = CTA
-- Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: "mulher" | "folhas" | "ramo" | "laranja" | "cha" | "coracao" | "intestino" | "dna" — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
+- Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
 Saída: APENAS JSON válido:
 {"sugestoes": [SugestaoIA, ...]}
@@ -192,7 +192,7 @@ export async function gerarSugestoesSemana(params: {
           subtitle: s.subtitle,
           cta: s.cta_card,
         };
-        const ILUSTRACOES_VALIDAS = ["mulher","folhas","ramo","laranja","cha","coracao","intestino","dna"];
+        const ILUSTRACOES_VALIDAS = ["mulher","folhas","ramo","laranja","cha","cafe","suco","coracao","intestino","dna","celulas","microbiota","exame","estetoscopio","lupa","balanca","prato","salada","maca","abacate","uvas","morango","cereais","leguminosas","peixe","ovo"];
         if (s.ilustracao && ILUSTRACOES_VALIDAS.includes(s.ilustracao)) {
           // Layout editorial com ilustração em traço (zero custo de IA)
           const buffer = await renderCard({

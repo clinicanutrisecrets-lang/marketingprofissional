@@ -312,7 +312,11 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
     return renderLista({ W, H, scheme, conteudo, handle });
   }
   if (layout === "editorial") {
-    return renderEditorial({ W, H, scheme, conteudo, handle, ilustracao: input.ilustracao });
+    return renderEditorial({
+      W, H, scheme, conteudo, handle,
+      ilustracao: input.ilustracao,
+      corMarca: brand.corPrimariaHex || "#2F5D50",
+    });
   }
 
   const headline = (conteudo.headline ?? "").trim();
@@ -698,12 +702,15 @@ async function renderEditorial(params: {
   conteudo: ConteudoPeca;
   handle: string;
   ilustracao?: IlustracaoId;
+  corMarca: string;
 }): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle, ilustracao } = params;
+  const { W, H, scheme, conteudo, handle, ilustracao, corMarca } = params;
   // Editorial vive melhor no fundo claro: força creme se o esquema for escuro
   const bgClaro = luminancia(scheme.bg) >= 0.55 ? scheme.bg : CREME;
-  const verde = luminancia(bgClaro) >= 0.55 ? scheme.bg !== bgClaro ? shade("#2F5D50", 0.1) : (luminancia(scheme.titulo) < 0.5 ? scheme.titulo : shade("#2F5D50", 0.1)) : CREME;
-  const dourado = shade(DOURADO, 0);
+  // Título e ilustrações SEMPRE na cor da marca da nutri (escurecida p/ contraste)
+  const prim = /^#[0-9a-fA-F]{6}$/.test(corMarca) ? corMarca : "#2F5D50";
+  const verde = luminancia(prim) < 0.5 ? prim : shade(prim, 0.45);
+  const dourado = DOURADO;
 
   const composites: sharp.OverlayOptions[] = [];
 
