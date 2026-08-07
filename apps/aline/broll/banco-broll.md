@@ -22,24 +22,40 @@ overlay queimado na montagem).
 - Resultado esperado: um mês de assinatura → banco que abastece meses de
   reels.
 
+## Dois destinos, um banco
+
+O banco abastece duas frentes — cada clipe recebe tag de uso no índice:
+
+- **[ORG] Orgânico @nutri_secrets** — foco em paciente: genes, microbiota,
+  exames, casos clínicos como exemplo didático (conhecimento, nunca dados
+  de paciente real), persona Detetive da Saúde. Ex.: reel do TDAH.
+- **[ADS] Anúncios da formação em saúde integrativa** — foco em
+  profissionais: Aline professora/palestrante/autoridade clínica. Cenas
+  precisam funcionar com narração (voiceover) por cima.
+- **[AMBOS]** — a maioria: B-roll neutro serve pras duas frentes.
+
 ## Cenários do banco (aprovados pela Aline)
 
 Por cenário: 3-4 frames-base diferentes (enquadramento/luz/figurino) e, de
 cada frame aprovado, 2-3 animações com movimentos de câmera distintos.
 Cada clipe em 10s (duração padrão do ilimitado) — na edição eu corto o
-trecho bom de 4-6s. Meta: **40-60 clipes aproveitáveis**.
+trecho bom de 4-6s. Meta: **50-70 clipes aproveitáveis**.
 
-| Cenário | Variações de ação | Usos típicos |
+| Cenário | Variações de ação | Uso |
 |---|---|---|
-| 1. Cozinha | mexendo tigela; montando prato colorido; lavando folhas; café da manhã na bancada | sinergia alimentar, receitas, rotina |
-| 2. Cafeteria | xícara perto do rosto olhando janela; lendo caderno fechado/genérico; olhar pra rua | ganchos de estilo de vida, cortisol, sono |
-| 3. Laboratório | observando placa de Petri; analisando folha de resultado; ao microscópio (mãos paradas) | nutrigenética, exames, microbiota |
-| 4. Consultório | explicando exame ao paciente (de costas, desfocado); à mesa revisando pasta; acolhendo na porta | exames, consulta, autoridade clínica |
-| 5. Palestra | em pé com microfone de mão abaixado, público desfocado; gesto estático apontando slide desfocado; caminhando devagar no palco | autoridade, eventos, institucional |
-| Extras (se sobrar janela) | home office/abas abertas; lousinha; caminhada ao ar livre; escrivaninha escrevendo parada | ganchos de TDAH/foco, didáticos |
+| 1. Cozinha — refeições | café da manhã na bancada; montando almoço colorido; preparando jantar leve; finalizando uma sobremesa saudável | AMBOS |
+| 2. Cozinha — pausa | sentada na cozinha tomando chá; tomando café devagar; mexendo tigela; lavando folhas | AMBOS |
+| 3. Cafeteria | xícara perto do rosto olhando janela; lendo caderno fechado/genérico; olhar pra rua | ORG |
+| 4. Laboratório | observando placa de Petri; analisando folha de resultado; ao microscópio (mãos paradas) | AMBOS |
+| 5. Consultório / prática clínica | explicando exame ao paciente (de costas, desfocado); à mesa revisando pasta; acolhendo na porta; em pé ao lado da mesa, postura de escuta | AMBOS |
+| 6. Palestra | em pé com microfone de mão abaixado, público desfocado; gesto estático apontando slide desfocado; caminhando devagar no palco | ADS |
+| 7. Professora / aula | à frente de sala pequena com alunos de costas desfocados; ao lado de lousa com traços genéricos; mesa de estudo com livros fechados | ADS |
+| Extras (se sobrar janela) | home office/abas abertas; lousinha; caminhada ao ar livre; escrivaninha escrevendo parada | ORG |
 
 Todos seguem as regras fixas do `README.md`: um movimento de câmera,
 boca fechada, sem manipulação fina, nenhum texto legível, pele natural.
+Nas cenas [ADS], figurino um degrau mais formal (blazer, jaleco limpo) e
+enquadramentos que deixem respiro pra headline do anúncio.
 
 ## Cronograma da janela de 33 dias
 
@@ -74,5 +90,23 @@ repetir o mesmo clipe em reels consecutivos.
 
 Eu monto (ffmpeg): seleção dos clipes do banco + ordem narrativa + cortes +
 texto queimado na paleta da marca quando a Aline quiser. Entrega: MP4 único
-pronto pra postar (áudio/música ela escolhe no app do Instagram) + clipes
-soltos caso queira editar no CapCut.
+pronto pra postar + clipes soltos caso queira editar no CapCut.
+
+## Áudio / narração
+
+Três caminhos, por ordem de automação:
+
+1. **ElevenLabs via API (preferido pra ADS e reels narrados)** — a Aline
+   tem conta ElevenLabs. Com a API key configurada (`ELEVENLABS_API_KEY`
+   em env/secret da sessão — **nunca commitar**), eu: escrevo o roteiro de
+   narração → gero a voz dela (voice clonada ou escolhida) via API → ajusto
+   o corte das cenas ao ritmo da fala → entrego o MP4 com áudio embutido.
+   Anúncio sai 100% pronto pra subir no Gerenciador.
+2. **Aline manda o áudio pronto** (gravado ou exportado do ElevenLabs) —
+   eu sincronizo na montagem e entrego o MP4 final.
+3. **CapCut/Instagram** — só pro caso de música em alta do app (trending
+   audio precisa ser adicionado dentro do app por licenciamento) ou se ela
+   quiser legendas animadas estilo CapCut.
+
+Orgânico com música em alta → caminho 3 (vídeo entregue mudo, texto
+queimado). Orgânico narrado e anúncios → caminho 1 ou 2.
