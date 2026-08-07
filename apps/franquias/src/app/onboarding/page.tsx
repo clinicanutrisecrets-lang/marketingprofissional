@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
 import { Wizard } from "@/components/onboarding/Wizard";
 import { OnboardingTokenLogin } from "./OnboardingTokenLogin";
 
@@ -57,7 +58,7 @@ export default async function OnboardingPage({ searchParams }: PageProps) {
     const admin = createAdminClient();
     const { data: registro } = await admin
       .from("franquia_onboardings")
-      .select("id, email, scanner_user_id, status")
+      .select("id, email, scanner_user_id, status, origem_payload")
       .eq("onboarding_token", token)
       .maybeSingle();
 
@@ -67,6 +68,7 @@ export default async function OnboardingPage({ searchParams }: PageProps) {
         email: string;
         scanner_user_id: string;
         status: string;
+        origem_payload: Record<string, unknown> | null;
       };
 
       // Marca onboarding como iniciado se ainda estava em token_gerado/email_enviado
@@ -87,18 +89,42 @@ export default async function OnboardingPage({ searchParams }: PageProps) {
         .eq("auth_user_id", user.id)
         .maybeSingle();
 
+      let franqueadaId: string | null = null;
       if (!franqExistente) {
-        await admin.from("franqueadas").insert({
-          auth_user_id: user.id,
-          email: reg.email,
-          nome_completo: user.user_metadata?.nome ?? reg.email,
-          scanner_saas_user_id: reg.scanner_user_id,
-        });
-      } else if (reg.scanner_user_id) {
-        await admin
+        const { data: nova } = await admin
           .from("franqueadas")
-          .update({ scanner_saas_user_id: reg.scanner_user_id })
-          .eq("id", (franqExistente as { id: string }).id);
+          .insert({
+            auth_user_id: user.id,
+            email: reg.email,
+            nome_completo: user.user_metadata?.nome ?? reg.email,
+            scanner_saas_user_id: reg.scanner_user_id,
+          })
+          .select("id")
+          .single();
+        franqueadaId = (nova as { id: string } | null)?.id ?? null;
+      } else {
+        franqueadaId = (franqExistente as { id: string }).id;
+        if (reg.scanner_user_id) {
+          await admin
+            .from("franqueadas")
+            .update({ scanner_saas_user_id: reg.scanner_user_id })
+            .eq("id", franqueadaId);
+        }
+      }
+
+      // Pré-preenche o wizard com o perfil que veio do Scanner SaaS
+      // (origem_payload.perfil). Só campos vazios; falha não trava o wizard.
+      const perfilScanner = reg.origem_payload?.perfil;
+      if (franqueadaId && perfilScanner && typeof perfilScanner === "object") {
+        try {
+          await aplicarPrefillScanner(
+            admin,
+            franqueadaId,
+            perfilScanner as Record<string, unknown>,
+          );
+        } catch (e) {
+          console.error("[onboarding] prefill do Scanner falhou:", e);
+        }
       }
     }
   }

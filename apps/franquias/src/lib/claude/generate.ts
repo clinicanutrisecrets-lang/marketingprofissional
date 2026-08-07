@@ -2,10 +2,12 @@ import { createClaude, CLAUDE_MODEL } from "./client";
 import {
   buildSystemPrompt,
   buildPromptPost,
+  buildPromptPostVenda,
   buildPromptLP,
   type ContextoFranqueada,
   type AnguloPost,
   type TipoPost,
+  type ProdutoContexto,
 } from "./prompts";
 
 export type PostGerado = {
@@ -66,6 +68,53 @@ export async function gerarPost(
   }
 
   const parsed = parseJSON(textBlock.text);
+  return {
+    ...parsed,
+    _usage: {
+      input_tokens: response.usage.input_tokens,
+      output_tokens: response.usage.output_tokens,
+      cache_creation_input_tokens: response.usage.cache_creation_input_tokens ?? undefined,
+      cache_read_input_tokens: response.usage.cache_read_input_tokens ?? undefined,
+    },
+  };
+}
+
+export type PostVendaGerado = PostGerado & { slides?: string[] };
+
+/**
+ * Gera 1 post de VENDA de um produto real do Scanner Tratamentos.
+ * Mesmo pipeline do gerarPost (system cached com contexto + compliance),
+ * prompt específico de venda (buildPromptPostVenda).
+ */
+export async function gerarPostVenda(
+  contexto: ContextoFranqueada,
+  produto: ProdutoContexto & { descricao?: string },
+  tipo: TipoPost,
+  incluirPreco: boolean,
+): Promise<PostVendaGerado> {
+  const claude = createClaude();
+  const systemText = buildSystemPrompt(contexto);
+  const userPrompt = buildPromptPostVenda({ produto, tipo, incluir_preco: incluirPreco });
+
+  const response = await claude.messages.create({
+    model: CLAUDE_MODEL,
+    max_tokens: 1024,
+    system: [
+      {
+        type: "text",
+        text: systemText,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    messages: [{ role: "user", content: userPrompt }],
+  });
+
+  const textBlock = response.content.find((b) => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("Claude não retornou texto");
+  }
+
+  const parsed = parseJSON<PostVendaGerado>(textBlock.text);
   return {
     ...parsed,
     _usage: {

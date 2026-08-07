@@ -35,6 +35,7 @@ import {
   CUSTO_BANNERBEAR_RENDER_USD,
   CUSTO_CREATOMATE_RENDER_USD,
 } from "@/lib/custos/log";
+import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { revalidatePath } from "next/cache";
 
 const MODELO_CLAUDE_DEFAULT = "claude-sonnet-4-5";
@@ -116,6 +117,9 @@ export async function gerarPostsDaSemana(
   });
 
   const contexto = toContexto(franqueada);
+  // Produtos reais do Scanner Tratamentos entram no system prompt — copy
+  // pode citar produto/preço/link verdadeiros (nunca inventados)
+  contexto.produtos = await carregarProdutosContexto(admin, franqueadaId);
 
   // Busca arquivos pra usar nos criativos (logo + foto)
   const logoUrl = await buscarArquivoUrl(admin, franqueadaId, "logo_principal");

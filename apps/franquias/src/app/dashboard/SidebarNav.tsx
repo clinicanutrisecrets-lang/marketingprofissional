@@ -9,6 +9,7 @@ const ITENS = [
   { href: "/dashboard/conteudo/editor", icone: "🖼️", label: "Editor de arte" },
   { href: "/dashboard/conteudo/galeria", icone: "🗂️", label: "Minha galeria" },
   { href: "/dashboard/biblioteca-posts", icone: "📚", label: "Posts prontos" },
+  { href: "/dashboard/posts-venda", icone: "🛍️", label: "Posts de venda" },
   { href: "/dashboard/aprovar", icone: "✅", label: "Aprovar semana" },
   { href: "/dashboard/briefings", icone: "📝", label: "Pedir conteúdo" },
   { href: "/dashboard/posts/novo", icone: "✨", label: "Post manual" },

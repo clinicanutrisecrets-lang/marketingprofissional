@@ -3,6 +3,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { buildSystemPrompt } from "@/lib/claude/prompts";
+import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { revalidatePath } from "next/cache";
 
 type ContextoFranqueada = Parameters<typeof buildSystemPrompt>[0];
@@ -40,6 +41,9 @@ export async function gerarLegendaManual(
     hashtags_favoritas: fr.hashtags_favoritas as string[],
     link_agendamento: fr.link_agendamento as string,
   };
+  // Produtos reais do Scanner Tratamentos — legenda pode citar
+  // produto/preço/link verdadeiros se o briefing pedir
+  contexto.produtos = await carregarProdutosContexto(supabase, fr.id as string);
 
   try {
     const claude = createClaude();
@@ -103,6 +107,13 @@ export async function criarPostManual(params: {
   url_imagem?: string;
   url_video?: string;
   legenda_gerada_ia?: boolean;
+  /**
+   * Default 'aprovado' (comportamento original). 'aguardando_aprovacao'
+   * é usado quando o post ainda não tem mídia — o cron de publicação só
+   * pega 'aprovado', então o post não vai pro Instagram sem arte (evita
+   * cair em status 'erro' com "Post sem mídia" no horário agendado).
+   */
+  status?: "aprovado" | "aguardando_aprovacao";
 }): Promise<{ ok: boolean; postId?: string; erro?: string; redistribuidos?: number }> {
   const supabase = createClient();
   const {
@@ -156,7 +167,7 @@ export async function criarPostManual(params: {
     .insert({
       franqueada_id: franqueadaId,
       tipo_post: params.tipo,
-      status: "aprovado", // manual já é aprovado
+      status: params.status ?? "aprovado", // manual já é aprovado
       origem: "manual_nutri",
       prioridade: 100,
       bloqueado_horario: true,

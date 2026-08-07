@@ -5,6 +5,18 @@
 
 import { COMPLIANCE_CFN_BR } from "./client";
 
+/**
+ * Produto real da nutri no Scanner Tratamentos (cache produtos_scanner,
+ * sincronizado do Hub). Vai no system prompt pra TODA copy poder citar
+ * produto/preço/link verdadeiros — e é a base dos Posts de venda.
+ */
+export type ProdutoContexto = {
+  nome: string;
+  tipo?: string;
+  preco_texto?: string; // "R$ 1.997,00" — já formatado
+  checkout_url: string;
+};
+
 export type ContextoFranqueada = {
   nome_comercial?: string;
   nome_completo?: string;
@@ -23,6 +35,7 @@ export type ContextoFranqueada = {
   estado?: string;
   valor_consulta_inicial?: number;
   link_agendamento?: string;
+  produtos?: ProdutoContexto[];
 };
 
 /**
@@ -117,6 +130,7 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     ctx.concorrentes_nao_citar
       ? `NUNCA citar: ${ctx.concorrentes_nao_citar}`
       : "",
+    ...(ctx.produtos?.length ? blocoProdutos(ctx.produtos) : []),
     "",
     COMPLIANCE_CFN_BR,
     "",
@@ -126,6 +140,30 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
   ].filter(Boolean);
 
   return linhas.join("\n");
+}
+
+/**
+ * Bloco do system prompt com os produtos REAIS da nutri.
+ * Fica no system (cached) porque muda pouco e vale pra toda geração.
+ */
+function blocoProdutos(produtos: ProdutoContexto[]): string[] {
+  return [
+    "",
+    "=== PRODUTOS REAIS DA NUTRI (Scanner Tratamentos) ===",
+    "Estes são os ÚNICOS produtos próprios que ela vende. Regras ABSOLUTAS:",
+    "- NUNCA inventar produto, preço, desconto, condição de pagamento ou link. Só o que está listado abaixo, exatamente como está.",
+    "- Se o preço não estiver listado, NÃO citar preço.",
+    "- O NOME do produto é marca própria registrada da nutri: quando citar, cite VERBATIM — nome próprio de produto não conta como vocabulário comercial proibido (ex.: um produto chamado 'Protocolo X' pode ser citado pelo nome, mas a palavra 'protocolo' segue proibida fora do nome do produto).",
+    "- Em legenda de Instagram, link não é clicável: chame pro 'link na bio' ou direct. O checkout_url exato só entra quando o formato pedir o link por extenso (copy_cta, bio, stories com link).",
+    "",
+    ...produtos.map((p) => {
+      const partes = [p.nome];
+      if (p.tipo) partes.push(`(${p.tipo.replace(/_/g, " ")})`);
+      if (p.preco_texto) partes.push(`— ${p.preco_texto}`);
+      partes.push(`— link: ${p.checkout_url}`);
+      return `- ${partes.join(" ")}`;
+    }),
+  ];
 }
 
 export type AnguloPost =
@@ -228,6 +266,53 @@ Responda APENAS com JSON válido neste schema:
   "copy_cta": "call to action que conecta com a dor/desejo do post (máx 50 chars)",
   "hashtags": ["hashtag1", "hashtag2"],
   "angulo_copy": "${params.angulo}"${schemaExtra}
+}`;
+}
+
+/**
+ * Prompt pra gerar 1 POST DE VENDA de um produto específico do Scanner
+ * Tratamentos. Usado pela seção /dashboard/posts-venda. O produto vem do
+ * cache produtos_scanner — descrição, preço e link são REAIS.
+ */
+export function buildPromptPostVenda(params: {
+  produto: ProdutoContexto & { descricao?: string };
+  tipo: TipoPost;
+  incluir_preco: boolean;
+}): string {
+  const { produto, tipo, incluir_preco } = params;
+
+  const isCarrossel = tipo === "feed_carrossel";
+  const schemaExtra = isCarrossel
+    ? `,
+  "slides": ["texto slide 1 (capa/hook)", "texto slide 2", "...", "texto slide final (CTA)"]`
+    : "";
+
+  return `Gere 1 post de Instagram do tipo "${tipo}" de VENDA do produto abaixo.
+
+PRODUTO (dados reais — não altere nada):
+- Nome: ${produto.nome}
+${produto.tipo ? `- Formato: ${produto.tipo.replace(/_/g, " ")}` : ""}
+${produto.descricao ? `- Descrição da nutri: ${produto.descricao}` : ""}
+${incluir_preco && produto.preco_texto ? `- Preço: ${produto.preco_texto}` : "- Preço: NÃO citar preço neste post"}
+- Link de compra (checkout real): ${produto.checkout_url}
+
+COMO VENDER SEM PARECER PANFLETO:
+- Comece pela DOR ou DESEJO que esse produto resolve — nunca pelo produto.
+- O produto entra como o próximo passo NATURAL, não como anúncio.
+- Cite o nome do produto VERBATIM (é marca própria da nutri).
+- ${incluir_preco && produto.preco_texto ? `Cite o preço UMA vez, com naturalidade (ex.: "investimento de ${produto.preco_texto}").` : "Não invente nem sugira preço."}
+- CTA: chame pro "link na bio" na legenda; no campo copy_cta, use o link real por extenso.
+- Máximo 1 post de venda a cada 5 posts — este é o post de venda, então capriche na conexão, não no volume de oferta.
+- Compliance CFN integral: nada de promessa de resultado, prazo ou cura.
+
+Responda APENAS com JSON válido neste schema:
+{
+  "headline": "texto curto que vai no criativo (máx 40 chars, impacto máximo)",
+  "subtitle": "texto secundário do criativo (máx 60 chars, opcional)",
+  "copy_legenda": "legenda completa (200-600 chars, hook forte na 1a linha, produto como próximo passo natural, CTA pro link na bio)",
+  "copy_cta": "CTA com o link real: ${produto.checkout_url}",
+  "hashtags": ["hashtag1", "hashtag2"],
+  "angulo_copy": "venda_produto"${schemaExtra}
 }`;
 }
 

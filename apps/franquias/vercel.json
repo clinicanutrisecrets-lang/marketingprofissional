@@ -43,6 +43,10 @@
     {
       "path": "/api/cron/criar-campanhas",
       "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/sincronizar-produtos",
+      "schedule": "0 7 * * *"
     }
   ]
 }

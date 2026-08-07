@@ -209,6 +209,33 @@ export type Database = {
         Update: { [key: string]: unknown };
         Relationships: [];
       };
+      franquia_onboardings: {
+        Row: {
+          criado_em: string | null;
+          email: string;
+          email_enviado_em: string | null;
+          franqueada_id: string | null;
+          id: string;
+          nome: string;
+          onboarding_concluido_em: string | null;
+          onboarding_iniciado_em: string | null;
+          onboarding_token: string;
+          origem_payload: Record<string, unknown> | null;
+          plano_anterior: string | null;
+          scanner_user_id: string;
+          status: string | null;
+          whatsapp: string | null;
+        };
+        Insert: {
+          email: string;
+          nome: string;
+          onboarding_token: string;
+          scanner_user_id: string;
+          [key: string]: unknown;
+        };
+        Update: { [key: string]: unknown };
+        Relationships: [];
+      };
       funis_destino: {
         Row: {
           ativo: boolean | null;
@@ -285,6 +312,32 @@ export type Database = {
       posts_agendados: {
         Row: { [key: string]: unknown };
         Insert: { franqueada_id: string; [key: string]: unknown };
+        Update: { [key: string]: unknown };
+        Relationships: [];
+      };
+      produtos_scanner: {
+        Row: {
+          ativo: boolean | null;
+          checkout_url: string;
+          criado_em: string | null;
+          descricao: string | null;
+          franqueada_id: string;
+          id: string;
+          nome: string;
+          parcelas_max: number | null;
+          preco_centavos: number | null;
+          produto_id: string;
+          scanner_produto_id: string | null;
+          sincronizado_em: string | null;
+          tipo: string | null;
+        };
+        Insert: {
+          checkout_url: string;
+          franqueada_id: string;
+          nome: string;
+          produto_id: string;
+          [key: string]: unknown;
+        };
         Update: { [key: string]: unknown };
         Relationships: [];
       };

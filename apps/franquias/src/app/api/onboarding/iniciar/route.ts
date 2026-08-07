@@ -29,6 +29,11 @@ export const maxDuration = 30;
  *   email: string,
  *   whatsapp?: string,
  *   plano_anterior?: string,
+ *   perfil?: object,   // perfil da nutri no vocabulário do Hub (nicho,
+ *                      // cor_marca, bio_curta, instagram…). Fica no
+ *                      // origem_payload e pré-preenche o wizard quando a
+ *                      // nutri abre o /onboarding?token= — ver
+ *                      // lib/onboarding/prefill.ts (de-para único).
  * }
  */
 export async function POST(req: Request) {
@@ -53,6 +58,7 @@ export async function POST(req: Request) {
     email?: string;
     whatsapp?: string;
     plano_anterior?: string;
+    perfil?: Record<string, unknown>;
   };
   try {
     body = JSON.parse(rawBody);
