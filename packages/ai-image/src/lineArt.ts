@@ -466,3 +466,47 @@ export function svgIlustracao(
     .join("")}</g></svg>`;
   return Buffer.from(svg);
 }
+
+/**
+ * Sugere automaticamente a ilustração que combina com o texto do post
+ * (palavras-chave em pt-BR). Determinístico: mesmo texto → mesma escolha.
+ */
+export function sugerirIlustracao(texto: string): IlustracaoId {
+  const t = texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+
+  const regras: Array<[RegExp, IlustracaoId]> = [
+    [/microbiot|bacteri|probiotic|disbiose|fermentad|kefir|estrobolom/, "microbiota"],
+    [/\bdna\b|genetic|nutrigen|polimorfism|\bgene\b|genes\b|mthfr|comt|\brs\d/, "dna"],
+    [/intestin|colon|constipa|diarreia|sii\b|barriga inchad/, "intestino"],
+    [/exame|laborator|marcador|vitamina d|ferritina|hemogram|sangue/, "exame"],
+    [/celula|mitocondr|inflamac|imunidad|autoimun|hashimoto|tireoid/, "celulas"],
+    [/investigar|investigac|detetive|descobrir|sinais|diagnostic|causa raiz/, "lupa"],
+    [/balanca|\bpeso\b|emagrec|metabolism|imc\b/, "balanca"],
+    [/cafe\b|cafein/, "cafe"],
+    [/\bcha\b|chas\b|camomila|erva|infusao|matcha/, "cha"],
+    [/suco|smoothie|vitamina de fruta|detox liquid/, "suco"],
+    [/salada|verdura|folhosa|legume(?!minosa)|vegetal/, "salada"],
+    [/leguminosa|feijao|lentilha|grao de bico|ervilha/, "leguminosas"],
+    [/cereal|aveia|trigo|arroz|integral|granola|fibra/, "cereais"],
+    [/peixe|salmao|sardinha|omega|frutos do mar/, "peixe"],
+    [/\bovo(s)?\b|proteina|colageno|aminoacid/, "ovo"],
+    [/abacate|gordura boa|azeite|castanha/, "abacate"],
+    [/uva|resveratrol|antioxidante|polifenol/, "uvas"],
+    [/morango|frutas vermelhas|berries|mirtilo/, "morango"],
+    [/maca\b|macas\b|pectina|lanche/, "maca"],
+    [/laranja|citric|vitamina c|limao/, "laranja"],
+    [/prato|refeicao|almoco|jantar|comer|alimentac|receita/, "prato"],
+    [/coracao|cardio|colesterol|pressao|apob|ldl/, "coracao"],
+    [/consulta|clinic|atendiment|paciente|saude(?! da mulher)/, "estetoscopio"],
+    [/mulher|menopausa|hormon|tpm|sop\b|endometriose|gestante|feminin/, "mulher"],
+  ];
+
+  for (const [re, id] of regras) {
+    if (re.test(t)) return id;
+  }
+  // fallback elegante e neutro
+  return "folhas";
+}

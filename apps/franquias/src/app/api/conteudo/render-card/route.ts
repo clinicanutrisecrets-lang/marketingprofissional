@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { renderCard, ILUSTRACOES_DISPONIVEIS, type CardLayout, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
+import { renderCard, ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type CardLayout, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -88,9 +88,13 @@ export async function POST(request: Request) {
   else layout = fotoBuffer ? "foto" : "hero";
 
   const ilustracaoRaw = String(form.get("ilustracao") ?? "");
-  const ilustracao = ILUSTRACOES_DISPONIVEIS.some((i) => i.id === ilustracaoRaw)
-    ? (ilustracaoRaw as IlustracaoId)
-    : undefined;
+  let ilustracao: IlustracaoId | undefined;
+  if (ilustracaoRaw === "auto") {
+    // O sistema escolhe pelo tema do texto — evita ficar regerando pra testar
+    ilustracao = sugerirIlustracao(`${headline} ${subtitle} ${eyebrow}`);
+  } else if (ILUSTRACOES_DISPONIVEIS.some((i) => i.id === ilustracaoRaw)) {
+    ilustracao = ilustracaoRaw as IlustracaoId;
+  }
 
   const salvar = String(form.get("salvar") ?? "") === "1";
 

@@ -22,6 +22,7 @@ const LAYOUTS = [
 ];
 
 const ILUSTRACOES = [
+  { id: "auto", nome: "✨ Automática (o sistema escolhe pelo tema)" },
   { id: "", nome: "Sem ilustração" },
   { id: "mulher", nome: "Mulher (traço)" },
   { id: "folhas", nome: "Ramo de folhas" },
@@ -71,7 +72,7 @@ export function EditorArte(props: {
   const [layout, setLayout] = useState("auto");
   const [fotoPos, setFotoPos] = useState("centro");
   const [itens, setItens] = useState("");
-  const [ilustracao, setIlustracao] = useState("");
+  const [ilustracao, setIlustracao] = useState("auto");
   const [salvando, setSalvando] = useState(false);
   const [salvoMsg, setSalvoMsg] = useState<string | null>(null);
   const logoRef = useRef<HTMLInputElement>(null);

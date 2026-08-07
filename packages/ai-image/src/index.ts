@@ -9,7 +9,7 @@ import type { RenderRequest, RenderResult } from "./types";
 export * from "./types";
 export { buildPrompt } from "./promptBuilder";
 export { renderCard } from "./cardDesigner";
-export { ILUSTRACOES_DISPONIVEIS, type IlustracaoId } from "./lineArt";
+export { ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type IlustracaoId } from "./lineArt";
 export { renderReceita } from "./cardDesigner";
 export type { CardInput, CardLayout } from "./cardDesigner";
 
