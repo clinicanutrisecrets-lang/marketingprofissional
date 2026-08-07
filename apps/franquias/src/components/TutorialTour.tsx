@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
  * "❓ Tutorial". Carrossel didático com progresso e ações diretas.
  */
 
-const CHAVE = "tutorial_plataforma_v1";
+const CHAVE = "tutorial_plataforma_v2";
 
 type Passo = {
   emoji: string;
@@ -39,8 +39,10 @@ const PASSOS: Passo[] = [
     emoji: "🎥",
     titulo: "Teleprompter de reels",
     texto:
-      "Nas sugestões de reel, toque em 'Gravar com teleprompter': o roteiro rola na tela enquanto a câmera te filma. Você lê olhando pra câmera, baixa o vídeo e posta. Dá pra ajustar velocidade e tamanho da letra.",
-    dica: "Grave na vertical, com luz de frente pra você (janela ou ring light).",
+      "O roteiro rola na tela enquanto a câmera te filma — você lê olhando pra câmera, baixa o vídeo e posta. Dois caminhos: os roteiros prontos da semana ficam no Estúdio (cards com etiqueta REEL), e no menu 'Teleprompter' você cola qualquer roteiro seu e grava na hora.",
+    dica: "Grave na vertical, com luz de frente pra você (janela ou ring light). Dá pra ajustar velocidade e tamanho da letra.",
+    href: "/dashboard/teleprompter",
+    hrefLabel: "Abrir o Teleprompter",
   },
   {
     emoji: "🖼️",
