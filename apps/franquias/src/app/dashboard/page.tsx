@@ -130,6 +130,13 @@ export default async function DashboardPage() {
           </h2>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             <ActionCard
+              icone="🎨"
+              titulo="Estúdio de conteúdo"
+              descricao="Artes prontas, legendas e teleprompter de reels"
+              href="/dashboard/conteudo"
+              disponivel={true}
+            />
+            <ActionCard
               icone="✅"
               titulo="Aprovar semana"
               descricao="Revise os 7-10 posts da semana"
