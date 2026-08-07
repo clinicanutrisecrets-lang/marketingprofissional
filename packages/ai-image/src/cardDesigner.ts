@@ -25,6 +25,11 @@ export type CardInput = {
   fotoBuffer?: Buffer;
   /** Força um esquema de cor (0..2); default = hash do headline */
   schemeIndex?: number;
+  /** Cor de fundo personalizada (hex) — as cores de texto se adaptam
+   *  automaticamente por luminância para manter contraste */
+  corFundoHex?: string;
+  /** Logo (PNG/JPG) composta no topo-centro do card */
+  logoBuffer?: Buffer;
 };
 
 type Scheme = {
@@ -97,6 +102,39 @@ function esquemas(corPrimaria: string): Scheme[] {
       handle: shade(prim, 0.35),
     },
   ];
+}
+
+/** Luminância relativa aproximada (0 = preto, 1 = branco). */
+function luminancia(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+}
+
+/**
+ * Esquema derivado de uma cor de fundo escolhida pela usuária: as cores de
+ * texto se adaptam por luminância pra nunca perder contraste.
+ */
+function esquemaCustom(bgHex: string, corPrimaria: string): Scheme {
+  const prim = /^#[0-9a-fA-F]{6}$/.test(corPrimaria) ? corPrimaria : "#2F5D50";
+  const escuro = luminancia(bgHex) < 0.55;
+  if (escuro) {
+    return {
+      bg: bgHex,
+      titulo: CREME,
+      sub: "#EFE9DC",
+      kicker: "#DE9A74",
+      pill: CREME,
+      handle: "#D8D0BF",
+    };
+  }
+  return {
+    bg: bgHex,
+    titulo: shade(prim, 0.15),
+    sub: TEXTO_ESCURO,
+    kicker: shade(TERRACOTA, 0.12),
+    pill: shade(prim, 0.15),
+    handle: shade(prim, 0.25),
+  };
 }
 
 function hashString(s: string): number {
@@ -239,9 +277,16 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const [W, H] = dimensoes.split("x").map(Number) as [number, number];
   const stories = H / W > 1.5;
 
-  const lista = esquemas(brand.corPrimariaHex || "#2F5D50");
-  const idx = input.schemeIndex ?? hashString(conteudo.headline || "x") % lista.length;
-  const scheme = lista[Math.abs(idx) % lista.length]!;
+  const corFundoValida =
+    input.corFundoHex && /^#[0-9a-fA-F]{6}$/.test(input.corFundoHex) ? input.corFundoHex : null;
+  let scheme: Scheme;
+  if (corFundoValida) {
+    scheme = esquemaCustom(corFundoValida, brand.corPrimariaHex || "#2F5D50");
+  } else {
+    const lista = esquemas(brand.corPrimariaHex || "#2F5D50");
+    const idx = input.schemeIndex ?? hashString(conteudo.headline || "x") % lista.length;
+    scheme = lista[Math.abs(idx) % lista.length]!;
+  }
 
   const handle = derivarHandle(brand);
 
@@ -273,6 +318,23 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
       fotoStrip = { buf: foto, w: fotoW, h: fotoH };
     } catch {
       // foto falhou — card segue tipográfico puro
+    }
+  }
+
+  // Logo no topo-centro (estilo @patibianco). Empurra o conteúdo pra baixo.
+  let logoComposite: { buf: Buffer; w: number; h: number } | null = null;
+  if (input.logoBuffer) {
+    try {
+      const maxLogoH = Math.round(H * 0.055);
+      const maxLogoW = Math.round(W * 0.34);
+      const logoPng = await sharp(input.logoBuffer)
+        .resize(maxLogoW, maxLogoH, { fit: "inside", withoutEnlargement: true })
+        .png()
+        .toBuffer();
+      const meta = await sharp(logoPng).metadata();
+      logoComposite = { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
+    } catch {
+      // logo inválida — segue sem
     }
   }
 
@@ -311,12 +373,21 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const alturaFoto = fotoStrip ? fotoStrip.h + Math.round(gapUnit * 0.6) : 0;
   const alturaGrupo =
     alturaFoto + itens.reduce((acc, x) => acc + x.gapAntes + x.bloco.altura, 0);
-  const areaTopo = Math.round(H * 0.07);
+  // Com logo, a área útil começa abaixo dela
+  const areaTopo = Math.round(H * 0.07) + (logoComposite ? logoComposite.h + Math.round(H * 0.02) : 0);
   // Base da área útil: acima do handle (que fica fixo no rodapé)
   const areaBase = H - Math.round(H * (stories ? 0.13 : 0.12));
   const centrado = Math.round(areaTopo + (areaBase - areaTopo - alturaGrupo) * 0.46);
   // Nunca deixa o grupo invadir o rodapé: se for alto demais, ancora no teto
   let y = Math.max(areaTopo, Math.min(centrado, areaBase - alturaGrupo));
+
+  if (logoComposite) {
+    composites.push({
+      input: logoComposite.buf,
+      top: Math.round(H * 0.045),
+      left: Math.round((W - logoComposite.w) / 2),
+    });
+  }
 
   if (fotoStrip) {
     composites.push({ input: fotoStrip.buf, top: y, left: Math.round((W - fotoStrip.w) / 2) });

@@ -14,15 +14,24 @@ const FORMATOS = [
   { valor: "stories", nome: "Stories 9:16" },
 ];
 
-export function EditorArte() {
-  const [eyebrow, setEyebrow] = useState("nutrição de precisão");
-  const [headline, setHeadline] = useState("");
-  const [subtitle, setSubtitle] = useState("");
+export function EditorArte(props: {
+  headlineInicial?: string;
+  eyebrowInicial?: string;
+  subtitleInicial?: string;
+}) {
+  const [eyebrow, setEyebrow] = useState(props.eyebrowInicial || "nutrição de precisão");
+  const [headline, setHeadline] = useState(props.headlineInicial ?? "");
+  const [subtitle, setSubtitle] = useState(props.subtitleInicial ?? "");
   const [cta, setCta] = useState("");
   const [esquema, setEsquema] = useState(0);
   const [formato, setFormato] = useState("feed");
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoNome, setFotoNome] = useState<string>("");
+  const [logo, setLogo] = useState<File | null>(null);
+  const [logoNome, setLogoNome] = useState<string>("");
+  const [usarCorCustom, setUsarCorCustom] = useState(false);
+  const [corFundo, setCorFundo] = useState("#2F5D50");
+  const logoRef = useRef<HTMLInputElement>(null);
 
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -44,7 +53,9 @@ export function EditorArte() {
       fd.set("cta", cta);
       fd.set("esquema", String(esquema));
       fd.set("formato", formato);
+      if (usarCorCustom) fd.set("corFundo", corFundo);
       if (foto) fd.set("foto", foto);
+      if (logo) fd.set("logo", logo);
 
       const res = await fetch("/api/conteudo/render-card", { method: "POST", body: fd });
       if (!res.ok) {
@@ -146,6 +157,48 @@ export function EditorArte() {
           </div>
         </Campo>
 
+        <Campo label="Sua logo (opcional — topo do card)">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => logoRef.current?.click()}
+              className="rounded-lg bg-brand-primary/10 px-3 py-2 text-xs font-semibold text-brand-primary hover:bg-brand-primary/20"
+            >
+              🏷️ {logoNome ? "Trocar logo" : "Subir logo"}
+            </button>
+            {logoNome && (
+              <span className="flex items-center gap-2 text-xs text-brand-text/60">
+                {logoNome}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLogo(null);
+                    setLogoNome("");
+                    if (logoRef.current) logoRef.current.value = "";
+                  }}
+                  className="text-red-500"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+            <input
+              ref={logoRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setLogo(f);
+                setLogoNome(f?.name ?? "");
+              }}
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-brand-text/40">
+            Dica: PNG com fundo transparente fica melhor.
+          </p>
+        </Campo>
+
         <div className="grid grid-cols-2 gap-4">
           <Campo label="Estilo de cor">
             <div className="flex flex-col gap-1.5">
@@ -153,13 +206,38 @@ export function EditorArte() {
                 <label key={e.valor} className="flex cursor-pointer items-center gap-2 text-xs">
                   <input
                     type="radio"
-                    checked={esquema === e.valor}
-                    onChange={() => setEsquema(e.valor)}
+                    checked={esquema === e.valor && !usarCorCustom}
+                    onChange={() => {
+                      setEsquema(e.valor);
+                      setUsarCorCustom(false);
+                    }}
                   />
                   <span className="font-semibold">{e.nome}</span>
                   <span className="text-brand-text/50">{e.desc}</span>
                 </label>
               ))}
+              <label className="flex cursor-pointer items-center gap-2 text-xs">
+                <input
+                  type="radio"
+                  checked={usarCorCustom}
+                  onChange={() => setUsarCorCustom(true)}
+                />
+                <span className="font-semibold">Cor personalizada</span>
+                <input
+                  type="color"
+                  value={corFundo}
+                  onChange={(e) => {
+                    setCorFundo(e.target.value);
+                    setUsarCorCustom(true);
+                  }}
+                  className="h-6 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
+                />
+              </label>
+              {usarCorCustom && (
+                <p className="text-[11px] text-brand-text/40">
+                  As cores do texto se ajustam sozinhas pra manter a leitura.
+                </p>
+              )}
             </div>
           </Campo>
 

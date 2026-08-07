@@ -5,7 +5,11 @@ import { EditorArte } from "./EditorArte";
 
 export const dynamic = "force-dynamic";
 
-export default async function EditorPage() {
+export default async function EditorPage({
+  searchParams,
+}: {
+  searchParams?: { titulo?: string; categoria?: string; apoio?: string };
+}) {
   const supabase = createClient();
   const {
     data: { user },
@@ -37,7 +41,11 @@ export default async function EditorPage() {
           </p>
         </header>
 
-        <EditorArte />
+        <EditorArte
+          headlineInicial={searchParams?.titulo ?? ""}
+          eyebrowInicial={searchParams?.categoria ?? ""}
+          subtitleInicial={searchParams?.apoio ?? ""}
+        />
       </div>
     </main>
   );

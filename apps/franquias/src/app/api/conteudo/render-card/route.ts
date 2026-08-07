@@ -51,6 +51,18 @@ export async function POST(request: Request) {
     fotoBuffer = Buffer.from(await foto.arrayBuffer());
   }
 
+  let logoBuffer: Buffer | undefined;
+  const logo = form.get("logo");
+  if (logo && logo instanceof File && logo.size > 0) {
+    if (logo.size > 8 * 1024 * 1024) {
+      return NextResponse.json({ erro: "logo acima de 8MB" }, { status: 400 });
+    }
+    logoBuffer = Buffer.from(await logo.arrayBuffer());
+  }
+
+  const corFundoRaw = String(form.get("corFundo") ?? "").trim();
+  const corFundoHex = /^#[0-9a-fA-F]{6}$/.test(corFundoRaw) ? corFundoRaw : undefined;
+
   const layout: CardLayout = fotoBuffer ? "foto" : "hero";
 
   try {
@@ -64,6 +76,8 @@ export async function POST(request: Request) {
       conteudo: { headline, eyebrow, subtitle, cta },
       fotoBuffer,
       schemeIndex: esquema >= 0 && esquema <= 2 ? esquema : undefined,
+      corFundoHex,
+      logoBuffer,
     });
 
     return new NextResponse(new Uint8Array(buffer), {
