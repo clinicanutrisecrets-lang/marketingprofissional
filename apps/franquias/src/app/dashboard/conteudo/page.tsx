@@ -59,7 +59,21 @@ export default async function ConteudoPage() {
               teleprompter — é só gravar e postar.
             </p>
           </div>
-          <GerarSugestoesButton />
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/dashboard/conteudo/editor"
+              className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-primary shadow-sm ring-1 ring-brand-primary/20 hover:bg-brand-primary/5"
+            >
+              🖼️ Editor de arte
+            </Link>
+            <Link
+              href="/dashboard/biblioteca-posts"
+              className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-primary shadow-sm ring-1 ring-brand-primary/20 hover:bg-brand-primary/5"
+            >
+              📚 Posts prontos
+            </Link>
+            <GerarSugestoesButton />
+          </div>
         </header>
 
         {porSemana.size === 0 ? (

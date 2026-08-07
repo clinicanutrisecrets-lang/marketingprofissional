@@ -137,6 +137,20 @@ export default async function DashboardPage() {
               disponivel={true}
             />
             <ActionCard
+              icone="🖼️"
+              titulo="Editor de arte"
+              descricao="Monte um post na sua marca — com a sua foto"
+              href="/dashboard/conteudo/editor"
+              disponivel={true}
+            />
+            <ActionCard
+              icone="📚"
+              titulo="Posts prontos (Canva)"
+              descricao="30+ modelos da equipe: edite com sua logo e baixe"
+              href="/dashboard/biblioteca-posts"
+              disponivel={true}
+            />
+            <ActionCard
               icone="✅"
               titulo="Aprovar semana"
               descricao="Revise os 7-10 posts da semana"
