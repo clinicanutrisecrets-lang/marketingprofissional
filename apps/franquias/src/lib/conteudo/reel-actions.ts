@@ -22,7 +22,7 @@ const GLIFOS_VALIDOS = [
 ];
 
 const SYSTEM_SPEC = `
-Você escreve SPECs de reels animados 9:16 no formato "Detetive da Saúde" para nutricionistas integrativas. Saída: APENAS JSON válido, sem markdown.
+Você escreve SPECs de reels animados 9:16 no formato "Detetive da Saúde" para profissionais de saúde integrativa (nutricionistas, médicos, biomédicos etc.). NUNCA cite a profissão no texto das cenas — linguagem neutra de investigação. Saída: APENAS JSON válido, sem markdown.
 
 FORMATO EXATO (siga à risca — o renderizador é rígido):
 {
@@ -46,7 +46,7 @@ REGRAS DURAS:
 - alvo: uma de: head, eyes, neck, chest, belly, hips.
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
-- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — a profissional é uma "detetive da saúde" que investiga com testes. A cena "virada" deve reenquadrar nessa direção (ex.: "Não é força de vontade. É informação que você ainda não investigou."). A cena "cta" convida pra investigação: l1 tipo "Quer investigar sua saúde com precisão?", l2 tipo "Me chama no direct ou toca no link da bio." (varie as palavras).
+- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção (ex.: "Não é força de vontade. É informação que você ainda não investigou."). A cena "cta" convida pra investigação: l1 tipo "Quer investigar sua saúde com precisão?", l2 tipo "Me chama no direct ou toca no link da bio." (varie as palavras).
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
 `.trim();
 
@@ -83,9 +83,9 @@ export async function gerarReelAnimadoAction(
 
   // 1. Agente escreve o SPEC
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  // Assinatura neutra: nome + registro de conselho (sem presumir profissão)
   const assinatura = [
     f.nome_completo,
-    "nutricionista",
     f.crn_numero ? `CRN${f.crn_estado ?? ""} ${f.crn_numero}` : null,
   ]
     .filter(Boolean)
