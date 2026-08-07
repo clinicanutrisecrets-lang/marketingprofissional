@@ -1,5 +1,12 @@
 # Studio Aline — automacao de posts (organico)
 
+> **DESATIVADO (ago/2026, a pedido da Aline)**: os crons `gerar-pack-semanal`
+> (quinta 12h UTC, gastava Claude API toda semana) e `publicar` (15 em 15 min)
+> foram removidos do `vercel.json` — ela nao usava o fluxo e a aprovacao da
+> Meta nunca saiu. As rotas em `/api/cron/*` continuam no codigo; pra
+> reativar, basta devolver o bloco `crons` ao `vercel.json`. O plano atual de
+> conteudo esta em `broll/` (banco de B-roll + montagem entregue pronta).
+
 ## O que esta sessao adicionou
 
 - **Migration `006_publicacao_helpers.sql`** — RPCs `aline.get_perfil_publicacao` e `aline.set_perfil_instagram_credenciais` (encrypt/decrypt via pgsodium).
