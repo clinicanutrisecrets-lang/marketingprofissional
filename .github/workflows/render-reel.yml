@@ -2,11 +2,8 @@ name: Render Reel Animado
 
 # Worker de vídeo: renderiza um reel MP4 (Python/PIL + ffmpeg) e sobe pro
 # Supabase Storage. Disparado pela plataforma via API do GitHub
-# (workflow_dispatch) — sem precisar de servidor dedicado.
-#
-# Secrets necessários no repositório:
-#   SUPABASE_URL           ex.: https://xxxx.supabase.co
-#   SUPABASE_SERVICE_ROLE  service role key (Storage write)
+# (workflow_dispatch). As credenciais do Supabase vêm como INPUTS (enviadas
+# pelo app, que já as tem na Vercel) — com fallback para secrets do repo.
 
 on:
   workflow_dispatch:
@@ -15,21 +12,32 @@ on:
         description: "SPEC do reel em JSON, codificado em base64"
         required: true
       destino_path:
-        description: "Caminho no bucket franqueadas-assets (ex.: <id>/reels/rec.mp4)"
+        description: "Caminho no bucket franqueadas-assets"
         required: true
       handle:
-        description: "Handle exibido na assinatura (ex.: @fulana)"
         required: false
         default: "@nutri_secrets"
       anuncio:
-        description: "true para versão anúncio (carimbo no rodapé)"
         required: false
         default: "false"
+      reel_id:
+        description: "id na tabela reels_animados (pra marcar pronto/erro)"
+        required: false
+        default: ""
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
 
 jobs:
   render:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
     steps:
       - uses: actions/checkout@v4
 
@@ -53,8 +61,28 @@ jobs:
       - name: Upload pro Supabase Storage
         run: |
           curl -sf -X POST \
-            "${{ secrets.SUPABASE_URL }}/storage/v1/object/franqueadas-assets/${{ inputs.destino_path }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
+            "$SB_URL/storage/v1/object/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer $SB_KEY" \
             -H "Content-Type: video/mp4" \
+            -H "x-upsert: true" \
             --data-binary @/tmp/reel.mp4
           echo "enviado: ${{ inputs.destino_path }}"
+
+      - name: Marcar como pronto
+        if: inputs.reel_id != ''
+        run: |
+          SIGNED=$(curl -sf -X POST "$SB_URL/storage/v1/object/sign/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"expiresIn":31536000}' | python3 -c "import json,sys;print(json.load(sys.stdin)['signedURL'])")
+          curl -sf -X PATCH "$SB_URL/rest/v1/reels_animados?id=eq.${{ inputs.reel_id }}" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\":\"pronto\",\"path\":\"${{ inputs.destino_path }}\",\"url\":\"$SB_URL/storage/v1$SIGNED\"}"
+
+      - name: Marcar erro
+        if: failure() && inputs.reel_id != ''
+        run: |
+          curl -s -X PATCH "$SB_URL/rest/v1/reels_animados?id=eq.${{ inputs.reel_id }}" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"status":"erro"}' || true

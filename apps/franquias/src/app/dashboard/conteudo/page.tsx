@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { GerarSugestoesButton } from "./GerarSugestoesButton";
 import { SugestaoCard, type Sugestao } from "./SugestaoCard";
+import { ReelAnimadoSection, type ReelAnimado } from "./ReelAnimadoSection";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,14 @@ export default async function ConteudoPage() {
     .limit(60);
 
   const sugestoes = (sugestoesData ?? []) as Sugestao[];
+
+  const { data: reelsData } = await supabase
+    .from("reels_animados")
+    .select("id, tema, duracao, status, url, criado_em")
+    .eq("franqueada_id", f.id)
+    .order("criado_em", { ascending: false })
+    .limit(10);
+  const reels = (reelsData ?? []) as ReelAnimado[];
 
   // Agrupa por semana
   const porSemana = new Map<string, Sugestao[]>();
@@ -75,6 +84,8 @@ export default async function ConteudoPage() {
             <GerarSugestoesButton />
           </div>
         </header>
+
+        <ReelAnimadoSection reels={reels} />
 
         {porSemana.size === 0 ? (
           <div className="rounded-2xl border border-dashed border-brand-text/20 bg-white p-10 text-center">
