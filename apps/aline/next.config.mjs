@@ -8,7 +8,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    serverComponentsExternalPackages: ["sharp", "@scanner/ai-image"],
+    serverComponentsExternalPackages: ["sharp", "@scanner/ai-image", "opentype.js"],
   },
   // Marca sharp como external pro webpack não bundlar (tem binário nativo).
   // Em route handlers o serverComponentsExternalPackages nao basta — precisa

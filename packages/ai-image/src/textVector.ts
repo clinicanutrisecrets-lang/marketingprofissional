@@ -1,4 +1,10 @@
-import opentype from "opentype.js";
+import * as opentypeNS from "opentype.js";
+
+// opentype.js é UMD: dependendo do bundler (Next server bundle vs tsx),
+// o módulo chega como default OU como namespace. Esta resolução cobre os dois
+// — sem ela, `opentype.parse` vira undefined em produção.
+const opentype = ((opentypeNS as { default?: typeof opentypeNS }).default ??
+  opentypeNS) as typeof opentypeNS;
 import { PLAYFAIR_DISPLAY_B64 } from "./fonts/playfair";
 import { MONTSERRAT_B64 } from "./fonts/montserrat";
 import { CAVEAT_B64 } from "./fonts/caveat";
@@ -17,16 +23,16 @@ import { CAVEAT_B64 } from "./fonts/caveat";
  * um SVG minúsculo (<8KB) posicionado com precisão pelas métricas da fonte.
  */
 
-let _playfair: opentype.Font | null = null;
-let _montserrat: opentype.Font | null = null;
-let _caveat: opentype.Font | null = null;
+let _playfair: opentypeNS.Font | null = null;
+let _montserrat: opentypeNS.Font | null = null;
+let _caveat: opentypeNS.Font | null = null;
 
 function b64ToArrayBuffer(b64: string): ArrayBuffer {
   const buf = Buffer.from(b64, "base64");
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 }
 
-function getFont(familia: FamiliaFonte): opentype.Font {
+function getFont(familia: FamiliaFonte): opentypeNS.Font {
   if (familia === "serif") {
     if (!_playfair) _playfair = opentype.parse(b64ToArrayBuffer(PLAYFAIR_DISPLAY_B64));
     return _playfair;

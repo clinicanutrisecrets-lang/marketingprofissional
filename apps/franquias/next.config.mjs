@@ -10,7 +10,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    serverComponentsExternalPackages: ["sharp", "@scanner/ai-image"],
+    serverComponentsExternalPackages: ["sharp", "@scanner/ai-image", "opentype.js"],
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
