@@ -67,8 +67,10 @@ Critérios de reprovação (pedir substituição, não treinar com foto ruim):
 Boas práticas: ângulos variados (frente, 3/4 esq/dir), luzes diferentes,
 expressões diferentes, distâncias diferentes, nitidez ≥ 1024×1024, JPEG/PNG.
 
-Como enviar: commitar nesta pasta (repo privado) ou anexar na conversa da
-sessão que for treinar.
+Como enviar: **anexar na conversa da sessão** (como arquivo, não colada na
+mensagem). ⚠️ **Este repositório é PÚBLICO no GitHub — nunca commitar
+fotos pessoais, documentos com dados de paciente ou qualquer material
+sensível.** As pastas locais têm .gitignore pra impedir commit acidental.
 
 Treino (uma vez só):
 
