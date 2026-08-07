@@ -77,7 +77,8 @@ export default async function DashboardPage() {
         </header>
 
         {/* Status e ações */}
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
+          {/* Card Instagram oculto até a Meta App Review aprovar a conexão.
           <StatusCard
             titulo="Instagram"
             status={instagramConectado ? "ok" : "alerta"}
@@ -87,7 +88,7 @@ export default async function DashboardPage() {
                 : "Não conectado"
             }
             acao={instagramConectado ? null : { label: "Conectar", href: "/onboarding?step=6" }}
-          />
+          /> */}
           <StatusCard
             titulo="Plano"
             status="info"
@@ -104,7 +105,7 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* Métricas principais */}
+        {/* Métricas ocultas até a Meta aprovar (dependem da API do Instagram).
         <section className="mb-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Essa semana
@@ -114,7 +115,7 @@ export default async function DashboardPage() {
             <MetricCard titulo="Alcance total" valor="—" />
             <MetricCard titulo="Engajamento" valor="—" />
           </div>
-        </section>
+        </section> */}
 
         {/* Tendencias + datas comemorativas */}
         <section className="mb-6">
@@ -179,13 +180,14 @@ export default async function DashboardPage() {
               href="/dashboard/biblioteca-videos"
               disponivel={true}
             />
+            {/* Oculto até a Meta aprovar (relatório depende de métricas do IG).
             <ActionCard
               icone="📊"
               titulo="Relatório semanal"
               descricao="Performance + recomendações"
               href="/dashboard/relatorios"
               disponivel={true}
-            />
+            /> */}
             {/* Anúncios oculto até a aprovação da Meta App Review —
                 reative este card quando a publicação/ads estiver liberada.
             <ActionCard
@@ -195,6 +197,7 @@ export default async function DashboardPage() {
               href="/dashboard/anuncios"
               disponivel={true}
             /> */}
+            {/* Oculto até a Meta aprovar.
             <ActionCard
               icone="📸"
               titulo="Perfil Instagram"
@@ -202,11 +205,11 @@ export default async function DashboardPage() {
               href="/dashboard/perfil-instagram"
               disponivel={instagramConectado}
               badge={instagramConectado ? undefined : "conecte"}
-            />
+            /> */}
           </div>
         </section>
 
-        {/* LP personalizada */}
+        {/* LP oculta até estar pronta pra entrega.
         <section className="mb-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Sua Landing Page
@@ -229,7 +232,7 @@ export default async function DashboardPage() {
               </span>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Configurações */}
         <section>
@@ -255,6 +258,7 @@ export default async function DashboardPage() {
                 Seu @ do Instagram e outras redes
               </div>
             </Link>
+            {/* Oculto até a Meta aprovar (horários valem pra publicação automática).
             <Link
               href="/onboarding?step=9"
               className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
@@ -263,7 +267,7 @@ export default async function DashboardPage() {
               <div className="mt-1 text-xs text-brand-text/60">
                 Como revisar e quando publicar
               </div>
-            </Link>
+            </Link> */}
           </div>
         </section>
 
