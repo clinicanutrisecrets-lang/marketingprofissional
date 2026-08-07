@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import { buscarPautasQuentes } from "./trends";
-import { renderCard, type IlustracaoId } from "@scanner/ai-image";
+import { renderCard, renderReceita, type IlustracaoId } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca } from "@scanner/ai-image";
 
 const MODEL = "claude-sonnet-4-5";
@@ -27,6 +27,8 @@ type SugestaoIA = {
   cta_card?: string;
   slides?: Array<{ headline: string; corpo?: string; subtitle?: string; cta?: string }>;
   ilustracao?: string;
+  receita_slug?: string;
+  condicao?: string;
   copy_legenda: string;
   hashtags: string[];
   roteiro?: {
@@ -74,9 +76,16 @@ CARDS (arte tipográfica premium — sem foto):
 - CARROSSEL: 4 a 6 slides; slide 1 = capa (headline forte); slides internos = headline curta + corpo de 2-3 parágrafos curtos; último slide = CTA
 - Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
+RECEITAS TERAPÊUTICAS (quando o input trouxer "receitas_disponiveis"):
+- Escolha UMA receita que converse com o nicho e as pautas da semana e crie uma sugestão EXTRA de tipo feed_imagem com:
+  - "receita_slug": o slug exato da receita escolhida
+  - "condicao": complemento curto tipo "para quem tem Hashimoto" (adequado ao nicho)
+  - "copy_legenda": explique POR QUE a receita ajuda naquela condição, citando 1-2 genes relevantes, o papel da microbiota e os sintomas que ela apoia — didático, lúdico e CFN-compliant (nada de "cura" ou prescrição; sempre "converse com sua nutricionista").
+  - headline = título da receita (não invente outro)
+
 Saída: APENAS JSON válido:
 {"sugestoes": [SugestaoIA, ...]}
-com exatamente: 2 feed_imagem, 1 feed_carrossel, 2 reel.
+com exatamente: 2 feed_imagem, 1 feed_carrossel, 2 reel — e +1 feed_imagem de receita quando houver receitas disponíveis.
 `.trim();
 
 export async function gerarSugestoesSemana(params: {
@@ -122,6 +131,14 @@ export async function gerarSugestoesSemana(params: {
     nichoSecundario: f.nicho_secundario,
   });
 
+  // Receitas da biblioteca central (fotos reais no git da marca)
+  const { data: receitasData } = await admin
+    .from("biblioteca_receitas")
+    .select("slug, titulo, url")
+    .eq("ativo", true)
+    .limit(12);
+  const receitas = (receitasData ?? []) as Array<{ slug: string; titulo: string; url: string }>;
+
   // 2. Agente de conteúdo
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
   const input = {
@@ -137,6 +154,7 @@ export async function gerarSugestoesSemana(params: {
       diferenciais: f.diferenciais,
     },
     manchetes_recentes: manchetes.map((m) => `${m.titulo} (${m.fonte})`),
+    receitas_disponiveis: receitas.map((r) => ({ slug: r.slug, titulo: r.titulo })),
     semana_ref: params.semanaRef,
   };
 
@@ -185,7 +203,38 @@ export async function gerarSugestoesSemana(params: {
     ordem++;
     const artes: Array<{ url: string; path?: string; slide: number }> = [];
     try {
-      if (s.tipo === "feed_imagem") {
+      if (s.tipo === "feed_imagem" && s.receita_slug) {
+        // Post de receita: foto REAL da biblioteca + título + condição
+        const receita = receitas.find((r) => r.slug === s.receita_slug);
+        if (receita) {
+          try {
+            const res = await fetch(receita.url, { signal: AbortSignal.timeout(15000) });
+            if (res.ok) {
+              const fotoBuffer = Buffer.from(await res.arrayBuffer());
+              const buffer = await renderReceita({
+                dimensoes: "1080x1350",
+                brand,
+                fotoBuffer,
+                titulo: receita.titulo,
+                condicao: s.condicao,
+                eyebrow: "receita terapêutica",
+              });
+              const path = `${params.franqueadaId}/ai-image/${Date.now()}_receita.png`;
+              const { error: upErr } = await admin.storage
+                .from("franqueadas-assets")
+                .upload(path, buffer, { contentType: "image/png", upsert: false });
+              if (!upErr) {
+                const { data: signed } = await admin.storage
+                  .from("franqueadas-assets")
+                  .createSignedUrl(path, 365 * 24 * 60 * 60);
+                artes.push({ url: signed?.signedUrl ?? path, path, slide: 1 });
+              }
+            }
+          } catch {
+            // foto indisponível — sugestão vale pela copy
+          }
+        }
+      } else if (s.tipo === "feed_imagem") {
         const conteudo: ConteudoPeca = {
           headline: s.headline,
           eyebrow: s.eyebrow,

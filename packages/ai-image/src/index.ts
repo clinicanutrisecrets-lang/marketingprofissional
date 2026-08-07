@@ -10,6 +10,7 @@ export * from "./types";
 export { buildPrompt } from "./promptBuilder";
 export { renderCard } from "./cardDesigner";
 export { ILUSTRACOES_DISPONIVEIS, type IlustracaoId } from "./lineArt";
+export { renderReceita } from "./cardDesigner";
 export type { CardInput, CardLayout } from "./cardDesigner";
 
 export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> {

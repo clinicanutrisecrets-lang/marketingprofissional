@@ -830,3 +830,88 @@ async function renderEditorial(params: {
     .png()
     .toBuffer();
 }
+
+// ————— Layout receita (foto dominante + título + condição) —————
+
+export async function renderReceita(params: {
+  dimensoes: Dimensoes;
+  brand: BrandGuidelines;
+  /** Foto REAL da receita (da biblioteca da marca) */
+  fotoBuffer: Buffer;
+  /** Título da receita, ex.: "Torta de cacau com abacate" */
+  titulo: string;
+  /** Condição/tema, ex.: "para quem tem Hashimoto" */
+  condicao?: string;
+  eyebrow?: string; // ex.: "receita terapêutica"
+}): Promise<Buffer> {
+  const { dimensoes, brand, fotoBuffer, titulo, condicao, eyebrow } = params;
+  const [W, H] = dimensoes.split("x").map(Number) as [number, number];
+
+  const prim = /^#[0-9a-fA-F]{6}$/.test(brand.corPrimariaHex) ? brand.corPrimariaHex : "#2F5D50";
+  const corTitulo = luminancia(prim) < 0.5 ? prim : shade(prim, 0.45);
+  const handle = derivarHandle(brand);
+
+  // Foto ocupa o topo (~58%), painel creme embaixo
+  const fotoH = Math.round(H * 0.58);
+  const foto = await sharp(fotoBuffer)
+    .resize(W, fotoH, { fit: "cover", position: "attention" })
+    .png()
+    .toBuffer();
+
+  const composites: sharp.OverlayOptions[] = [{ input: foto, top: 0, left: 0 }];
+
+  // Sombra suave na emenda foto/painel
+  const sombra = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="40"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#000" stop-opacity="0.18"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></linearGradient></defs><rect width="${W}" height="40" fill="url(#s)"/></svg>`,
+  );
+  composites.push({ input: sombra, top: fotoH, left: 0 });
+
+  const contentW = Math.round(W * 0.84);
+  let y = fotoH + Math.round(H * 0.045);
+
+  // Pill de categoria
+  const pill = blocoPill(eyebrow || "receita terapêutica", corTitulo, W);
+  if (pill) {
+    composites.push(...posicionar(pill, Math.round((W - pill.largura) / 2), y));
+    y += pill.altura + Math.round(H * 0.02);
+  }
+
+  // Título da receita em caps serif
+  const tituloBloco = blocoTitulo(
+    titulo.toUpperCase(),
+    corTitulo,
+    contentW,
+    H * 0.16,
+    Math.round(W * 0.062),
+  );
+  composites.push(...posicionar(tituloBloco, Math.round((W - tituloBloco.largura) / 2), y));
+  y += tituloBloco.altura + Math.round(H * 0.012);
+
+  // Condição em manuscrita dourada
+  if (condicao) {
+    const cond = blocoDeTexto(condicao, "manuscrita", DOURADO, Math.round(W * 0.055), contentW, {
+      lineHeight: 1.15,
+    });
+    composites.push(...posicionar(cond, Math.round((W - cond.largura) / 2), y));
+  }
+
+  // Handle
+  if (handle) {
+    const fsH = Math.round(W * 0.02);
+    const hBloco = blocoDeTexto(handle, "sans", shade(prim, 0.2), fsH, contentW, {
+      letterSpacing: Math.round(fsH * 0.18),
+      peso: 0.5,
+    });
+    composites.push(
+      ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.038) - hBloco.altura),
+    );
+  }
+
+  const [bgR, bgG, bgB] = hexToRgb(CREME);
+  return sharp({
+    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
+  })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
