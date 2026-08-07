@@ -32,6 +32,16 @@ export type SlideRef = {
   referenciaImagem?: Buffer;
 };
 
+/**
+ * Estilo de arte:
+ * - "design": card tipográfico desenhado (determinístico, custo zero,
+ *   nunca falha) — PADRÃO.
+ * - "design_foto": card tipográfico com tirinha de foto gerada por IA no
+ *   topo; se a IA falhar, sai o card puro (nunca quebra o post).
+ * - "foto_ia": legado — foto de IA em tela cheia com overlay de texto.
+ */
+export type EstiloArte = "design" | "design_foto" | "foto_ia";
+
 export type RenderRequest = {
   tipo: TipoPeca;
   provider: Provider;
@@ -41,6 +51,7 @@ export type RenderRequest = {
   dimensoes?: Dimensoes;
   slide?: SlideRef;
   modoTexto?: ModoTexto;
+  estilo?: EstiloArte;
   timeoutMs?: number;
 };
 

@@ -24,8 +24,9 @@ function providerDefault(): Provider {
 function resolverApiKey(provider: Provider): string {
   const key =
     provider === "openai" ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY;
-  if (!key) throw new Error(`API key ausente para provider ${provider}`);
-  return key;
+  // O estilo padrão "design" (cards tipográficos) não usa IA de imagem —
+  // sem chave o render funciona normalmente com custo zero.
+  return key ?? "";
 }
 
 export type GerarPostInput = {

@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import type { ConteudoPeca, Dimensoes, BrandGuidelines, TipoPeca } from "./types";
-import { renderTextoVetorial } from "./textVector";
+import { comporTexto, type PedacoTexto } from "./textVector";
 
 type OverlayInput = {
   imagemIA: Buffer;
@@ -9,6 +9,10 @@ type OverlayInput = {
   brand: BrandGuidelines;
   conteudo: ConteudoPeca;
 };
+
+function posicionar(pedacos: PedacoTexto[], left: number, top: number): sharp.OverlayOptions[] {
+  return pedacos.map((p) => ({ input: p.svg, left: left + p.left, top: top + p.top }));
+}
 
 export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> {
   const { imagemIA, dimensoesFinal, tipo, brand, conteudo } = input;
@@ -21,15 +25,10 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
   const padding = Math.round(largura * paddingRel);
   const textWidth = largura - padding * 2;
 
-  const fontSizeTituloRel = tipo === "stories" ? 0.06 : 0.064;
-  const fontSizeHandleRel = tipo === "stories" ? 0.022 : 0.024;
-  const fontSizeEyebrowRel = tipo === "stories" ? 0.02 : 0.022;
-  const larguraAcentoRel = tipo === "stories" ? 0.16 : 0.18;
-
-  const fontSizeTitulo = Math.round(largura * fontSizeTituloRel);
-  const fontSizeHandle = Math.round(largura * fontSizeHandleRel);
-  const fontSizeEyebrow = Math.round(largura * fontSizeEyebrowRel);
-  const larguraAcento = Math.round(largura * larguraAcentoRel);
+  const fontSizeTitulo = Math.round(largura * (tipo === "stories" ? 0.06 : 0.064));
+  const fontSizeHandle = Math.round(largura * (tipo === "stories" ? 0.022 : 0.024));
+  const fontSizeEyebrow = Math.round(largura * (tipo === "stories" ? 0.02 : 0.022));
+  const larguraAcento = Math.round(largura * (tipo === "stories" ? 0.16 : 0.18));
   const logoLargura = Math.round(largura * 0.085);
 
   const baseNormalizada = await sharp(imagemIA)
@@ -38,14 +37,12 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
 
   const composites: sharp.OverlayOptions[] = [];
 
-  // Render dos textos como vetores (geometria pura — nunca vira □□□)
   const headlineText = (conteudo.headline ?? "").trim();
   const eyebrowText = (conteudo.eyebrow ?? conteudo.subtitle ?? "").trim();
   const handleText = handle.toUpperCase().trim();
 
-  // Bloco do título (serif, branco)
   const tituloVet = headlineText
-    ? renderTextoVetorial({
+    ? comporTexto({
         texto: headlineText,
         familia: "serif",
         fontSize: fontSizeTitulo,
@@ -55,9 +52,8 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
       })
     : null;
 
-  // Eyebrow / subtítulo (sans caixa alta, com espaçamento)
   const eyebrowVet = eyebrowText
-    ? renderTextoVetorial({
+    ? comporTexto({
         texto: eyebrowText.toUpperCase(),
         familia: "sans",
         fontSize: fontSizeEyebrow,
@@ -68,10 +64,9 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
       })
     : null;
 
-  // Handle (@usuario) (sans caixa alta)
   const handleVet =
     handleText && handleText !== "@"
-      ? renderTextoVetorial({
+      ? comporTexto({
           texto: handleText,
           familia: "sans",
           fontSize: fontSizeHandle,
@@ -82,49 +77,41 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
         })
       : null;
 
-  // Posicionamento ANCORADO NA BASE: calcula a altura total do bloco
-  // (eyebrow + título + acento + handle) e empilha de baixo pra cima, garantindo
-  // que nada seja cortado por mais longo que seja o título.
+  // Posicionamento ancorado na base: empilha de baixo pra cima
   const gapEyebrow = Math.round(fontSizeTitulo * 0.4);
   const gapAcento = Math.round(fontSizeTitulo * 0.4);
   const gapHandle = Math.round(fontSizeHandle * 0.8);
   const acentoAltura = Math.max(2, Math.round(largura * 0.004));
   const bottomPadding = Math.round(altura * (tipo === "stories" ? 0.1 : 0.07));
 
-  // Handle fica na base; sobe: acento, título, eyebrow
   let y = altura - bottomPadding;
 
-  const acentoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larguraAcento}" height="${acentoAltura}"><rect width="${larguraAcento}" height="${acentoAltura}" fill="${corPrimaria}"/></svg>`;
-
-  const handleComposite = handleVet
-    ? { input: Buffer.from(handleVet.svg), left: padding, top: 0 }
-    : null;
-  if (handleVet && handleComposite) {
+  let handlePos: number | null = null;
+  if (handleVet) {
     y -= handleVet.altura;
-    handleComposite.top = y;
+    handlePos = y;
     y -= gapHandle;
   }
 
   y -= acentoAltura;
-  const acentoComposite = { input: Buffer.from(acentoSvg), left: padding, top: y };
+  const acentoPos = y;
   y -= gapAcento;
 
-  let tituloComposite: sharp.OverlayOptions | null = null;
+  let tituloPos: number | null = null;
   if (tituloVet) {
     y -= tituloVet.altura;
-    tituloComposite = { input: Buffer.from(tituloVet.svg), left: padding, top: y };
+    tituloPos = y;
     y -= gapEyebrow;
   }
 
-  let eyebrowComposite: sharp.OverlayOptions | null = null;
+  let eyebrowPos: number | null = null;
   if (eyebrowVet) {
     y -= eyebrowVet.altura;
     y = Math.max(padding, y);
-    eyebrowComposite = { input: Buffer.from(eyebrowVet.svg), left: padding, top: y };
+    eyebrowPos = y;
   }
 
-  // Gradiente adaptativo: começa um pouco acima do topo real do bloco de texto
-  // para garantir legibilidade independente de quantas linhas o título tem.
+  // Gradiente adaptativo ao topo real do bloco de texto
   const topoBloco = y;
   const inicioGradiente = Math.max(
     Math.round(altura * 0.45),
@@ -148,11 +135,11 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
 </svg>`;
   composites.push({ input: Buffer.from(gradienteSvg), top: 0, left: 0 });
 
-  // Empurra na ordem visual (cima -> baixo)
-  if (eyebrowComposite) composites.push(eyebrowComposite);
-  if (tituloComposite) composites.push(tituloComposite);
-  composites.push(acentoComposite);
-  if (handleComposite) composites.push(handleComposite);
+  if (eyebrowVet && eyebrowPos !== null) composites.push(...posicionar(eyebrowVet.pedacos, padding, eyebrowPos));
+  if (tituloVet && tituloPos !== null) composites.push(...posicionar(tituloVet.pedacos, padding, tituloPos));
+  const acentoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larguraAcento}" height="${acentoAltura}"><rect width="${larguraAcento}" height="${acentoAltura}" fill="${corPrimaria}"/></svg>`;
+  composites.push({ input: Buffer.from(acentoSvg), left: padding, top: acentoPos });
+  if (handleVet && handlePos !== null) composites.push(...posicionar(handleVet.pedacos, padding, handlePos));
 
   // Logo (opcional, canto superior esquerdo)
   if (brand.logoUrl) {
@@ -174,9 +161,9 @@ export async function aplicarOverlayTexto(input: OverlayInput): Promise<Buffer> 
 function derivarHandle(brand: BrandGuidelines): string {
   const nome = (brand.nomeMarca || "").trim();
   if (!nome) return "@";
-  if (nome.startsWith("@")) return nome;
-  const semEspaco = nome.replace(/\s+/g, "").toLowerCase();
-  return `@${semEspaco}`;
+  const semAcento = nome.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if (semAcento.startsWith("@")) return semAcento;
+  return `@${semAcento.replace(/\s+/g, "").toLowerCase()}`;
 }
 
 async function baixarImagem(url: string): Promise<Buffer> {
