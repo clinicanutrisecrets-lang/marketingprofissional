@@ -48,6 +48,7 @@ trecho bom de 4-6s. Meta: **50-70 clipes aproveitáveis**.
 | 3. Cafeteria | xícara perto do rosto olhando janela; lendo caderno fechado/genérico; olhar pra rua | ORG |
 | 4. Laboratório | observando placa de Petri; analisando folha de resultado; ao microscópio (mãos paradas) | AMBOS |
 | 5. Consultório / prática clínica | explicando exame ao paciente (de costas, desfocado); à mesa revisando pasta; acolhendo na porta; em pé ao lado da mesa, postura de escuta | AMBOS |
+| 5b. Análise / leitura | lendo um exame impresso à mesa (folha genérica, conteúdo desfocado); lendo relatório encadernado; no computador de perfil, tela desfocada — enquadrada deixando espaço livre ao lado pra entrar a "segunda tela" na edição | AMBOS |
 | 6. Palestra | em pé com microfone de mão abaixado, público desfocado; gesto estático apontando slide desfocado; caminhando devagar no palco | ADS |
 | 7. Professora / aula | à frente de sala pequena com alunos de costas desfocados; ao lado de lousa com traços genéricos; mesa de estudo com livros fechados | ADS |
 | Extras (se sobrar janela) | home office/abas abertas; lousinha; caminhada ao ar livre; escrivaninha escrevendo parada | ORG |
@@ -85,6 +86,24 @@ saida/banco/
 Índice em `saida/banco/INDICE.md` com: arquivo, cenário, ação, movimento
 de câmera, trecho bom (in/out), e em quais reels já foi usado — pra não
 repetir o mesmo clipe em reels consecutivos.
+
+## Overlays de telas reais ("segunda tela")
+
+Telas e documentos NUNCA são gerados por IA (sai texto embaralhado). O
+conteúdo real entra na montagem, por cima do B-roll:
+
+1. Aline manda o PDF (ou print) do layout real — plano alimentar, laudo de
+   interpretação de exame, painel genético — **sem dados de paciente real**
+   (usar exemplo/dados fictícios; se vier algo pessoal, eu confiro e
+   mascaro nome/CPF/data antes de usar — nada identificável vai pro vídeo).
+2. Eu renderizo o PDF em imagem, recorto a área boa e limpo.
+3. Na edição, o print entra como "segunda tela": card flutuante ao lado
+   dela no computador, ou insert em tela cheia de 1-2s entre cenas, com
+   moldura na paleta da marca (mockup de navegador/tablet quando couber).
+
+Efeito: o vídeo mostra o SEU sistema de verdade — autoridade que IA
+nenhuma imita — e as cenas 5b já são geradas com respiro no enquadramento
+pra esse overlay encaixar.
 
 ## Montagem dos reels
 
