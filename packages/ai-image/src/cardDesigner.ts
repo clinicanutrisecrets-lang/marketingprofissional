@@ -67,33 +67,34 @@ const TERRACOTA = "#C0765A";
 
 function esquemas(corPrimaria: string): Scheme[] {
   const prim = /^#[0-9a-fA-F]{6}$/.test(corPrimaria) ? corPrimaria : "#2F5D50";
+  // Contraste alto em todos os papéis — texto de apoio nunca "some" no fundo
   return [
     // 1. Profundo — bloco na cor da marca, texto creme (capa/premium)
     {
       bg: shade(prim, 0.18),
       titulo: CREME,
-      sub: tint(prim, 0.78),
-      kicker: tint(prim, 0.6),
+      sub: "#EFE9DC",
+      kicker: "#DE9A74", // terracota clara: destaca no fundo escuro
       pill: CREME,
-      handle: tint(prim, 0.55),
+      handle: "#D8D0BF",
     },
     // 2. Creme — fundo linho, título na cor da marca (leve/clean)
     {
       bg: CREME,
       titulo: shade(prim, 0.12),
       sub: TEXTO_ESCURO,
-      kicker: TERRACOTA,
+      kicker: shade(TERRACOTA, 0.12),
       pill: shade(prim, 0.12),
-      handle: shade(prim, 0.05),
+      handle: shade(prim, 0.2),
     },
     // 3. Suave — pastel da marca, contraste alto (variação)
     {
       bg: tint(prim, 0.84),
-      titulo: shade(prim, 0.32),
+      titulo: shade(prim, 0.38),
       sub: TEXTO_ESCURO,
-      kicker: shade(prim, 0.05),
-      pill: shade(prim, 0.32),
-      handle: shade(prim, 0.2),
+      kicker: shade(TERRACOTA, 0.1),
+      pill: shade(prim, 0.38),
+      handle: shade(prim, 0.35),
     },
   ];
 }
@@ -257,14 +258,16 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const composites: sharp.OverlayOptions[] = [];
 
   // ——— hero / foto: pilha central ———
+  // Com foto, tudo encolhe um pouco pra sobrar respiro (a foto rouba ~22% da altura)
+  const esc = layout === "foto" && fotoBuffer ? 0.86 : 1;
   type Item = { bloco: Bloco; gapAntes: number; foto?: Buffer };
   const itens: Item[] = [];
-  const gapUnit = Math.round(H * (stories ? 0.028 : 0.038));
+  const gapUnit = Math.round(H * (stories ? 0.028 : 0.038) * esc);
 
   let fotoStrip: { buf: Buffer; w: number; h: number } | null = null;
   if (layout === "foto" && fotoBuffer) {
     const fotoW = contentW;
-    const fotoH = Math.round(H * (stories ? 0.24 : 0.26));
+    const fotoH = Math.round(H * (stories ? 0.2 : 0.22));
     try {
       const foto = await fotoArredondada(fotoBuffer, fotoW, fotoH, Math.round(W * 0.024));
       fotoStrip = { buf: foto, w: fotoW, h: fotoH };
@@ -279,19 +282,19 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
 
   if (headline) {
-    const budget = H * (stories ? 0.34 : fotoStrip ? 0.28 : 0.38);
+    const budget = H * (stories ? 0.34 : fotoStrip ? 0.24 : 0.38);
     const titulo = blocoTitulo(
       headline,
       scheme.titulo,
       contentW,
       budget,
-      Math.round(W * (stories ? 0.095 : 0.1)),
+      Math.round(W * (stories ? 0.095 : 0.1) * esc),
     );
     itens.push({ bloco: titulo, gapAntes: itens.length || fotoStrip ? Math.round(gapUnit * 1.15) : 0 });
   }
 
   if (subtitle) {
-    const sub = blocoDeTexto(subtitle, "sans", scheme.sub, Math.round(W * 0.041), Math.round(W * 0.78), {
+    const sub = blocoDeTexto(subtitle, "sans", scheme.sub, Math.round(W * 0.041 * esc), Math.round(W * 0.78), {
       peso: 1.1,
       lineHeight: 1.42,
     });
@@ -299,7 +302,7 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
 
   if (kicker) {
-    const k = blocoDeTexto(kicker, "manuscrita", scheme.kicker, Math.round(W * 0.07), Math.round(W * 0.8), {
+    const k = blocoDeTexto(kicker, "manuscrita", scheme.kicker, Math.round(W * 0.07 * esc), Math.round(W * 0.8), {
       lineHeight: 1.15,
     });
     itens.push({ bloco: k, gapAntes: gapUnit });
@@ -309,8 +312,11 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const alturaGrupo =
     alturaFoto + itens.reduce((acc, x) => acc + x.gapAntes + x.bloco.altura, 0);
   const areaTopo = Math.round(H * 0.07);
-  const areaBase = H - Math.round(H * (stories ? 0.12 : 0.11));
-  let y = Math.max(areaTopo, Math.round(areaTopo + (areaBase - areaTopo - alturaGrupo) * 0.46));
+  // Base da área útil: acima do handle (que fica fixo no rodapé)
+  const areaBase = H - Math.round(H * (stories ? 0.13 : 0.12));
+  const centrado = Math.round(areaTopo + (areaBase - areaTopo - alturaGrupo) * 0.46);
+  // Nunca deixa o grupo invadir o rodapé: se for alto demais, ancora no teto
+  let y = Math.max(areaTopo, Math.min(centrado, areaBase - alturaGrupo));
 
   if (fotoStrip) {
     composites.push({ input: fotoStrip.buf, top: y, left: Math.round((W - fotoStrip.w) / 2) });

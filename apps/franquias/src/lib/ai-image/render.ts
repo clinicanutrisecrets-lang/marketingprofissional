@@ -35,6 +35,8 @@ export type GerarPostInput = {
   brand: BrandGuidelines;
   conteudo: ConteudoPeca;
   provider?: Provider;
+  /** "design" (card puro) | "design_foto" (card + tirinha de foto IA, com fallback) | "foto_ia" (legado) */
+  estilo?: RenderRequest["estilo"];
 };
 
 export async function gerarEUploadImagem(input: GerarPostInput): Promise<{
@@ -51,6 +53,7 @@ export async function gerarEUploadImagem(input: GerarPostInput): Promise<{
     apiKey,
     brand: input.brand,
     conteudo: input.conteudo,
+    estilo: input.estilo,
   });
 
   const path = `${input.franqueadaId}/ai-image/${Date.now()}_${input.tipo}.png`;

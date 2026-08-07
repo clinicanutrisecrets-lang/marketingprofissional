@@ -183,6 +183,9 @@ export async function gerarSugestoesSemana(params: {
           tipo: "feed_imagem",
           brand,
           conteudo,
+          // card com tirinha de foto gerada por IA no topo; se a foto
+          // falhar, sai o card tipográfico puro (nunca quebra)
+          estilo: "design_foto",
         });
         artes.push({ url: r.url, path: r.path, slide: 1 });
       } else if (s.tipo === "feed_carrossel" && s.slides?.length) {
