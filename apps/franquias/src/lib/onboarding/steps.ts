@@ -26,7 +26,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 2,
     slug: "especialidade",
     label: "Sua especialidade",
-    descricao: "Nicho, experiência e público-alvo",
+    descricao: "Sua área de atuação e pra quem você atende",
     camposObrigatorios: ["nicho_principal", "publico_alvo_descricao"],
     camposOpcionais: [
       "nicho_secundario",
@@ -39,7 +39,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 3,
     slug: "atendimento",
     label: "Atendimento e valores",
-    descricao: "Modalidade, localização e pricing",
+    descricao: "Onde e como você atende, e seus valores",
     camposObrigatorios: ["modalidade_atendimento", "link_agendamento"],
     camposOpcionais: [
       "cidade",
@@ -65,7 +65,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 5,
     slug: "visual",
     label: "Identidade visual",
-    descricao: "Cores, estilo e arquivos de marca",
+    descricao: "Suas cores, sua logo e sua foto",
     camposObrigatorios: ["cor_primaria_hex", "estilo_visual"],
     camposOpcionais: [
       "cor_secundaria_hex",
@@ -79,7 +79,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 6,
     slug: "redes",
     label: "Redes sociais",
-    descricao: "Instagram + outras redes (conectar via OAuth)",
+    descricao: "Seu @ do Instagram e outras redes",
     camposObrigatorios: ["instagram_handle"],
     camposOpcionais: [
       "tiktok_handle",
@@ -92,7 +92,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 7,
     slug: "voz",
     label: "Voz e comunicação",
-    descricao: "Tom de conteúdo, palavras-chave, hashtags",
+    descricao: "Seu jeito de falar com as pacientes",
     camposObrigatorios: ["tom_comunicacao"],
     camposOpcionais: [
       "palavras_evitar",
@@ -104,27 +104,22 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 8,
     slug: "provasocial",
-    label: "Depoimentos e prova social",
-    descricao: "Cases e validação do seu trabalho",
+    label: "Depoimentos",
+    descricao: "Histórias de pacientes que deram certo",
     camposObrigatorios: [],
     camposOpcionais: ["tem_depoimentos", "depoimentos_formato"],
   },
   {
     id: 9,
     slug: "automacao",
-    label: "Configurações de automação",
-    descricao: "Aprovação semanal, horários, CTA dos anúncios",
-    camposObrigatorios: ["aprovacao_modo", "link_cta_anuncio", "tipo_cta_anuncio"],
+    label: "Seus posts",
+    descricao: "Como revisar e quando publicar",
+    camposObrigatorios: ["aprovacao_modo"],
     camposOpcionais: [
       "horario_preferido_post",
       "dias_post_semana",
       "frequencia_stories",
       "frequencia_reels",
-      "faz_anuncio_pago",
-      "budget_anuncio_mensal",
-      "objetivo_anuncio",
-      "texto_cta_botao",
-      "mensagem_inicial_whatsapp",
     ],
   },
   {

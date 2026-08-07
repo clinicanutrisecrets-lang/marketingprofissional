@@ -124,6 +124,10 @@ export function Wizard({ initialData, initialStep = 1 }: WizardProps) {
               style={{ width: `${percentualAtual}%` }}
             />
           </div>
+          <p className="mt-3 text-xs text-brand-text/50">
+            💾 Suas respostas são salvas automaticamente — pode sair e voltar
+            quando quiser, de onde parou. E tudo pode ser mudado depois.
+          </p>
         </div>
 
         {/* Conteúdo da etapa */}

@@ -109,11 +109,10 @@ export default async function DashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
             Essa semana
           </h2>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3">
             <MetricCard titulo="Posts publicados" valor="—" hint="aguardando primeira semana" />
             <MetricCard titulo="Alcance total" valor="—" />
             <MetricCard titulo="Engajamento" valor="—" />
-            <MetricCard titulo="Leads (ads)" valor="—" />
           </div>
         </section>
 
@@ -187,13 +186,15 @@ export default async function DashboardPage() {
               href="/dashboard/relatorios"
               disponivel={true}
             />
+            {/* Anúncios oculto até a aprovação da Meta App Review —
+                reative este card quando a publicação/ads estiver liberada.
             <ActionCard
               icone="🎯"
               titulo="Anúncios"
               descricao="Gerencie suas campanhas"
               href="/dashboard/anuncios"
               disponivel={true}
-            />
+            /> */}
             <ActionCard
               icone="📸"
               titulo="Perfil Instagram"
@@ -249,18 +250,18 @@ export default async function DashboardPage() {
               href="/onboarding?step=6"
               className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
             >
-              <div className="text-sm font-medium text-brand-text">Integrações</div>
+              <div className="text-sm font-medium text-brand-text">Redes sociais</div>
               <div className="mt-1 text-xs text-brand-text/60">
-                Instagram, Meta Ads, reconectar
+                Seu @ do Instagram e outras redes
               </div>
             </Link>
             <Link
               href="/onboarding?step=9"
               className="group rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
             >
-              <div className="text-sm font-medium text-brand-text">Automação e CTA</div>
+              <div className="text-sm font-medium text-brand-text">Posts e horários</div>
               <div className="mt-1 text-xs text-brand-text/60">
-                Aprovação, horários, anúncios
+                Como revisar e quando publicar
               </div>
             </Link>
           </div>
