@@ -93,7 +93,7 @@ export function Teleprompter(props: {
       rec.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mime || "video/webm" });
         setVideoUrl(URL.createObjectURL(blob));
-        void marcarStatusSugestao(props.sugestaoId, "gravado");
+        if (props.sugestaoId) void marcarStatusSugestao(props.sugestaoId, "gravado");
       };
       rec.start(1000);
       recorderRef.current = rec;
@@ -162,7 +162,7 @@ export function Teleprompter(props: {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href={videoUrl}
-              download={`reel-${props.sugestaoId.slice(0, 6)}.${extensao}`}
+              download={`reel-${(props.sugestaoId || "gravacao").slice(0, 8)}.${extensao}`}
               className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-bold text-white"
             >
               ⬇️ Baixar vídeo

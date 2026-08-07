@@ -12,6 +12,7 @@ const ITENS = [
   { href: "/dashboard/aprovar", icone: "✅", label: "Aprovar semana" },
   { href: "/dashboard/briefings", icone: "📝", label: "Pedir conteúdo" },
   { href: "/dashboard/posts/novo", icone: "✨", label: "Post manual" },
+  { href: "/dashboard/teleprompter", icone: "🎥", label: "Teleprompter" },
   { href: "/dashboard/biblioteca-videos", icone: "🎬", label: "Vídeos" },
 ];
 
