@@ -27,12 +27,11 @@ export default async function BibliotecaVideosPage() {
 
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">
-            💬 Legendar vídeo com IA
+            🎬 Meus vídeos
           </h1>
           <p className="text-sm text-brand-text/60">
-            1) Suba seu vídeo na aba &quot;Upload meu vídeo&quot; · 2) vá na aba
-            &quot;Reel com IA&quot;, escolha o estilo de legenda e pronto — baixa
-            e posta.
+            Guarde aqui seus vídeos curtos e clipes do Pexels pra usar nos seus
+            reels quando quiser.
           </p>
         </header>
 

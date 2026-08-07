@@ -38,21 +38,7 @@ export default async function VideosHubPage() {
       </header>
 
       {/* Os 3 caminhos */}
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
-        <Link
-          href="/dashboard/biblioteca-videos"
-          className="group rounded-2xl bg-white p-6 shadow-sm transition hover:shadow-md"
-        >
-          <div className="text-3xl">💬</div>
-          <h2 className="mt-3 font-bold text-brand-text">Legendar vídeo com IA</h2>
-          <p className="mt-1 text-sm text-brand-text/60">
-            Suba um vídeo seu e a IA adiciona legendas animadas
-            automaticamente — pronto pra postar.
-          </p>
-          <span className="mt-3 inline-block text-sm font-semibold text-brand-primary">
-            Começar →
-          </span>
-        </Link>
+      <div className="mb-8 grid gap-4 md:grid-cols-2">
 
         <Link
           href="/dashboard/teleprompter"

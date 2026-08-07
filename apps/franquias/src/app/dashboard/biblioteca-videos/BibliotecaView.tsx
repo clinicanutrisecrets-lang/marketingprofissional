@@ -21,38 +21,10 @@ export function BibliotecaView({ videos: initial }: { videos: Video[] }) {
   return (
     <>
       <div className="mb-4 flex gap-2 rounded-lg bg-white p-1 shadow-sm">
-        <button
-          type="button"
-          onClick={() => setAba("upload")}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
-            aba === "upload" ? "bg-brand-primary text-white" : "text-brand-text/60"
-          }`}
-        >
-          📤 Upload meu vídeo
-        </button>
-        <button
-          type="button"
-          onClick={() => setAba("pexels")}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
-            aba === "pexels" ? "bg-brand-primary text-white" : "text-brand-text/60"
-          }`}
-        >
-          🔎 Buscar no Pexels
-        </button>
-        <button
-          type="button"
-          onClick={() => setAba("reel-ia")}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
-            aba === "reel-ia" ? "bg-brand-primary text-white" : "text-brand-text/60"
-          }`}
-        >
-          🎬 Reel com IA
-        </button>
       </div>
 
       {aba === "upload" && <UploadForm onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
       {aba === "pexels" && <PexelsSearch onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
-      {aba === "reel-ia" && <ReelIA videos={videos} onAdded={(v) => setVideos((prev) => [v, ...prev])} />}
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text/60">
