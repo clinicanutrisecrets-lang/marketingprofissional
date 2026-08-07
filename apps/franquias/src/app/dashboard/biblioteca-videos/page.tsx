@@ -27,11 +27,12 @@ export default async function BibliotecaVideosPage() {
 
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">
-            🎬 Biblioteca de vídeos
+            💬 Legendar vídeo com IA
           </h1>
           <p className="text-sm text-brand-text/60">
-            Suba vídeos curtos seus (cozinha, atendimento, natureza, etc) e tagueie.
-            A IA usa eles automaticamente nos seus reels quando o tema combinar.
+            1) Suba seu vídeo na aba &quot;Upload meu vídeo&quot; · 2) vá na aba
+            &quot;Reel com IA&quot;, escolha o estilo de legenda e pronto — baixa
+            e posta.
           </p>
         </header>
 
