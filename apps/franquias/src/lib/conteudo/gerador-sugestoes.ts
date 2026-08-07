@@ -53,7 +53,7 @@ LINHA EDITORIAL OBRIGATÓRIA (o pano de fundo de TODO conteúdo):
 - Sempre que o tema permitir, conecte o assunto a COMO a genética ou a microbiota explicam a resposta individual ("por que funciona pra uma pessoa e não pra outra").
 - CTA das legendas: SEMPRE fechar com convite de investigação, variando a forma. Exemplos do padrão: "Quer investigar sua saúde com precisão? Me chama no direct." / "Quer descobrir o que o seu corpo está tentando te dizer? Link na bio." / "Comente INVESTIGAR que eu te explico como fazemos essa leitura." — sem promessa de resultado (CFN), sempre convite pra conversa no direct ou link na bio.
 
-O SEGREDO DO FORMATO: pegar o assunto que está na mídia (ex.: famosos com câncer colorretal) e traduzir para a ciência que só uma nutri integrativa de precisão domina (ex.: polimorfismos da família GST e detoxificação, crucíferas e sulforafano, Fusobacterium nucleatum no exame de microbiota, chá verde/EGCG, reduzir carne vermelha tostada e poluentes). Isso posiciona quem assina o perfil como AUTORIDADE que conecta o assunto do momento à conduta clínica.
+O SEGREDO DO FORMATO: pegar o assunto que está na mídia (ex.: famosos com câncer colorretal) e traduzir para a ciência que só um profissional de saúde integrativa de precisão domina (ex.: polimorfismos da família GST e detoxificação, crucíferas e sulforafano, Fusobacterium nucleatum no exame de microbiota, chá verde/EGCG, reduzir carne vermelha tostada e poluentes). Isso posiciona quem assina o perfil como AUTORIDADE que conecta o assunto do momento à conduta clínica.
 
 REGRAS DE COMPLIANCE (normas dos conselhos de saúde — CFN/CFM/CFF — INEGOCIÁVEL):
 - ZERO promessa de cura, prevenção garantida ou resultado
