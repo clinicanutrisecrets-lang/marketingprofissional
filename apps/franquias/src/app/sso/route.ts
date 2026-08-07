@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 
@@ -142,8 +143,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
   }
 
+  // redirect() do next/navigation (não NextResponse.redirect) é o padrão
+  // documentado do Supabase SSR depois de verifyOtp: garante que os cookies
+  // de sessão gravados pelo client vão junto na resposta. Ele lança uma
+  // exceção de controle do Next — por isso fica FORA de qualquer try/catch.
   const destino = f.onboarding_completo ? "/dashboard" : "/onboarding";
-  return NextResponse.redirect(new URL(destino, req.url));
+  redirect(destino);
 }
 
 /**
