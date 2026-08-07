@@ -46,6 +46,7 @@ REGRAS DURAS:
 - alvo: uma de: head, eyes, neck, chest, belly, hips.
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
+- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — a profissional é uma "detetive da saúde" que investiga com testes. A cena "virada" deve reenquadrar nessa direção (ex.: "Não é força de vontade. É informação que você ainda não investigou."). A cena "cta" convida pra investigação: l1 tipo "Quer investigar sua saúde com precisão?", l2 tipo "Me chama no direct ou toca no link da bio." (varie as palavras).
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
 `.trim();
 
