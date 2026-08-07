@@ -16,8 +16,21 @@ const FORMATOS = [
 
 const LAYOUTS = [
   { valor: "auto", nome: "Clássico", desc: "título grande (+ foto se subir)" },
+  { valor: "editorial", nome: "Editorial", desc: "dois tons + ilustração em traço" },
   { valor: "citacao", nome: "Citação", desc: "frase de impacto com aspas" },
   { valor: "lista", nome: "Lista", desc: "título + itens com marcadores" },
+];
+
+const ILUSTRACOES = [
+  { id: "", nome: "Sem ilustração" },
+  { id: "mulher", nome: "Mulher (traço)" },
+  { id: "folhas", nome: "Ramo de folhas" },
+  { id: "ramo", nome: "Ramo fino" },
+  { id: "laranja", nome: "Laranja" },
+  { id: "cha", nome: "Xícara de chá" },
+  { id: "coracao", nome: "Coração botânico" },
+  { id: "intestino", nome: "Intestino" },
+  { id: "dna", nome: "DNA" },
 ];
 
 export function EditorArte(props: {
@@ -40,6 +53,7 @@ export function EditorArte(props: {
   const [layout, setLayout] = useState("auto");
   const [fotoPos, setFotoPos] = useState("centro");
   const [itens, setItens] = useState("");
+  const [ilustracao, setIlustracao] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [salvoMsg, setSalvoMsg] = useState<string | null>(null);
   const logoRef = useRef<HTMLInputElement>(null);
@@ -60,6 +74,7 @@ export function EditorArte(props: {
     fd.set("layout", layout);
     fd.set("fotoPos", fotoPos);
     fd.set("itens", itens);
+    fd.set("ilustracao", ilustracao);
     if (usarCorCustom) fd.set("corFundo", corFundo);
     if (foto) fd.set("foto", foto);
     if (logo) fd.set("logo", logo);
@@ -162,6 +177,20 @@ export function EditorArte(props: {
             placeholder="1-2 frases complementando o título"
           />
         </Campo>
+
+        {layout === "editorial" && (
+          <Campo label="Ilustração (desenho em traço)">
+            <select
+              value={ilustracao}
+              onChange={(e) => setIlustracao(e.target.value)}
+              className="w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
+            >
+              {ILUSTRACOES.map((i) => (
+                <option key={i.id} value={i.id}>{i.nome}</option>
+              ))}
+            </select>
+          </Campo>
+        )}
 
         {layout === "lista" && (
           <Campo label="Itens da lista (um por linha)">

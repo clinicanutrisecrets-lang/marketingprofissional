@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import type { BrandGuidelines, ConteudoPeca, Dimensoes } from "./types";
 import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
+import { svgIlustracao, type IlustracaoId } from "./lineArt";
 
 /**
  * Motor de cards tipográficos — arte de estúdio, 100% determinística.
@@ -14,7 +15,7 @@ import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
  * Zero chamadas de IA → zero custo, zero surpresa, zero revisão.
  */
 
-export type CardLayout = "hero" | "foto" | "conteudo" | "citacao" | "lista";
+export type CardLayout = "hero" | "foto" | "conteudo" | "citacao" | "lista" | "editorial";
 
 export type CardInput = {
   layout: CardLayout;
@@ -32,6 +33,8 @@ export type CardInput = {
   corFundoHex?: string;
   /** Logo (PNG/JPG) composta no topo-centro do card */
   logoBuffer?: Buffer;
+  /** Ilustração line-art da biblioteca interna (layout editorial) */
+  ilustracao?: IlustracaoId;
 };
 
 type Scheme = {
@@ -307,6 +310,9 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
   if (layout === "lista") {
     return renderLista({ W, H, scheme, conteudo, handle });
+  }
+  if (layout === "editorial") {
+    return renderEditorial({ W, H, scheme, conteudo, handle, ilustracao: input.ilustracao });
   }
 
   const headline = (conteudo.headline ?? "").trim();
@@ -673,6 +679,143 @@ async function renderLista(params: {
   }
 
   const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
+  return sharp({
+    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
+  })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
+
+// ————— Layout editorial (headline em dois tons + ramos + ilustração) —————
+
+const DOURADO = "#A9803F";
+
+async function renderEditorial(params: {
+  W: number;
+  H: number;
+  scheme: Scheme;
+  conteudo: ConteudoPeca;
+  handle: string;
+  ilustracao?: IlustracaoId;
+}): Promise<Buffer> {
+  const { W, H, scheme, conteudo, handle, ilustracao } = params;
+  // Editorial vive melhor no fundo claro: força creme se o esquema for escuro
+  const bgClaro = luminancia(scheme.bg) >= 0.55 ? scheme.bg : CREME;
+  const verde = luminancia(bgClaro) >= 0.55 ? scheme.bg !== bgClaro ? shade("#2F5D50", 0.1) : (luminancia(scheme.titulo) < 0.5 ? scheme.titulo : shade("#2F5D50", 0.1)) : CREME;
+  const dourado = shade(DOURADO, 0);
+
+  const composites: sharp.OverlayOptions[] = [];
+
+  // Ramos decorativos nos cantos (traço fino, discretos)
+  const ramoTam = Math.round(W * 0.26);
+  const ramoTR = svgIlustracao("folhas", ramoTam, verde, 0.5);
+  if (ramoTR) {
+    composites.push({
+      input: await sharp(ramoTR).rotate(180, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer(),
+      top: -Math.round(ramoTam * 0.22),
+      left: W - ramoTam + Math.round(ramoTam * 0.18),
+    });
+  }
+  const ramoBL = svgIlustracao("ramo", ramoTam, verde, 0.5);
+  if (ramoBL) {
+    composites.push({
+      input: await sharp(ramoBL).png().toBuffer(),
+      top: H - ramoTam + Math.round(ramoTam * 0.15),
+      left: -Math.round(ramoTam * 0.18),
+    });
+  }
+
+  const headline = (conteudo.headline ?? "").trim().toUpperCase();
+  const subtitle = (conteudo.subtitle ?? "").trim();
+  const temIlustracao = !!ilustracao;
+
+  const margem = Math.round(W * 0.09);
+  const larguraTexto = temIlustracao ? Math.round(W * 0.52) : Math.round(W * 0.72);
+  let fs = Math.round(W * 0.072);
+
+  // Quebra manual em linhas para alternar as cores (verde/dourado)
+  const quebrar = (tam: number): string[] => {
+    const palavras = headline.split(/\s+/).filter(Boolean);
+    const linhas: string[] = [];
+    let atual = "";
+    for (const p of palavras) {
+      const teste = atual ? `${atual} ${p}` : p;
+      if (atual && medirTexto(teste, "serif", tam) > larguraTexto) {
+        linhas.push(atual);
+        atual = p;
+      } else {
+        atual = teste;
+      }
+    }
+    if (atual) linhas.push(atual);
+    return linhas;
+  };
+
+  let linhas = quebrar(fs);
+  while (linhas.length * fs * 1.22 > H * 0.5 && fs > 30) {
+    fs = Math.floor(fs * 0.92);
+    linhas = quebrar(fs);
+  }
+
+  // Bloco de texto: começa no terço superior, alinhado à esquerda
+  let y = Math.round(H * (temIlustracao ? 0.16 : 0.18));
+  const lineGap = Math.round(fs * 1.22);
+  linhas.forEach((linha, i) => {
+    const dourada = i % 3 === 2; // a cada 3 linhas, uma dourada (ritmo das referências)
+    const bloco = blocoDeTexto(linha, "serif", dourada ? dourado : verde, fs, larguraTexto + 40, {
+      align: "left",
+      lineHeight: 1.05,
+    });
+    composites.push(...posicionar(bloco, margem, y));
+    y += lineGap;
+  });
+
+  // Separador: linha fina + losango
+  y += Math.round(fs * 0.5);
+  const sepW = Math.round(W * 0.2);
+  const sep = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${sepW + 20}" height="14"><line x1="0" y1="7" x2="${sepW}" y2="7" stroke="${dourado}" stroke-width="1.6"/><rect x="${sepW + 4}" y="3" width="8" height="8" transform="rotate(45 ${sepW + 8} 7)" fill="${dourado}"/></svg>`,
+  );
+  composites.push({ input: sep, top: y, left: margem });
+  y += Math.round(fs * 0.9);
+
+  // Subtítulo
+  if (subtitle) {
+    const sub = blocoDeTexto(subtitle, "sans", TEXTO_ESCURO, Math.round(W * 0.032), larguraTexto, {
+      align: "left",
+      lineHeight: 1.5,
+      peso: 0.5,
+    });
+    composites.push(...posicionar(sub, margem, y));
+  }
+
+  // Ilustração à direita (grande, na cor verde)
+  if (ilustracao) {
+    const tam = Math.round(W * 0.42);
+    const il = svgIlustracao(ilustracao, tam, verde);
+    if (il) {
+      composites.push({
+        input: await sharp(il).png().toBuffer(),
+        top: Math.round(H * 0.42),
+        left: W - tam - Math.round(W * 0.06),
+      });
+    }
+  }
+
+  // Handle dourado na base, centralizado
+  if (handle) {
+    const fsH = Math.round(W * 0.021);
+    const hBloco = blocoDeTexto(handle.toUpperCase(), "sans", dourado, fsH, W, {
+      letterSpacing: Math.round(fsH * 0.22),
+      peso: 0.5,
+    });
+    composites.push(
+      ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.05) - hBloco.altura),
+    );
+  }
+
+  const [bgR, bgG, bgB] = hexToRgb(bgClaro);
   return sharp({
     create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
   })

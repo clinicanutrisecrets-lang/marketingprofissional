@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { renderCard, type CardLayout, type Dimensoes } from "@scanner/ai-image";
+import { renderCard, ILUSTRACOES_DISPONIVEIS, type CardLayout, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -84,7 +84,13 @@ export async function POST(request: Request) {
   let layout: CardLayout;
   if (layoutRaw === "citacao") layout = "citacao";
   else if (layoutRaw === "lista") layout = "lista";
+  else if (layoutRaw === "editorial") layout = "editorial";
   else layout = fotoBuffer ? "foto" : "hero";
+
+  const ilustracaoRaw = String(form.get("ilustracao") ?? "");
+  const ilustracao = ILUSTRACOES_DISPONIVEIS.some((i) => i.id === ilustracaoRaw)
+    ? (ilustracaoRaw as IlustracaoId)
+    : undefined;
 
   const salvar = String(form.get("salvar") ?? "") === "1";
 
@@ -103,6 +109,7 @@ export async function POST(request: Request) {
       schemeIndex: esquema >= 0 && esquema <= 2 ? esquema : undefined,
       corFundoHex,
       logoBuffer,
+      ilustracao,
     });
 
     if (salvar) {

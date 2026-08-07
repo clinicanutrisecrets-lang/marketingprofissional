@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import { buscarPautasQuentes } from "./trends";
+import { renderCard, type IlustracaoId } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca } from "@scanner/ai-image";
 
 const MODEL = "claude-sonnet-4-5";
@@ -25,6 +26,7 @@ type SugestaoIA = {
   subtitle?: string;
   cta_card?: string;
   slides?: Array<{ headline: string; corpo?: string; subtitle?: string; cta?: string }>;
+  ilustracao?: string;
   copy_legenda: string;
   hashtags: string[];
   roteiro?: {
@@ -70,6 +72,7 @@ CARDS (arte tipográfica premium — sem foto):
 - subtitle: complemento de 1-2 frases (opcional)
 - cta_card: frase manuscrita curta tipo "salva esse post" (opcional)
 - CARROSSEL: 4 a 6 slides; slide 1 = capa (headline forte); slides internos = headline curta + corpo de 2-3 parágrafos curtos; último slide = CTA
+- Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: "mulher" | "folhas" | "ramo" | "laranja" | "cha" | "coracao" | "intestino" | "dna" — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
 Saída: APENAS JSON válido:
 {"sugestoes": [SugestaoIA, ...]}
@@ -189,16 +192,38 @@ export async function gerarSugestoesSemana(params: {
           subtitle: s.subtitle,
           cta: s.cta_card,
         };
-        const r = await gerarEUploadImagem({
-          franqueadaId: params.franqueadaId,
-          tipo: "feed_imagem",
-          brand,
-          conteudo,
-          // card com tirinha de foto gerada por IA no topo; se a foto
-          // falhar, sai o card tipográfico puro (nunca quebra)
-          estilo: "design_foto",
-        });
-        artes.push({ url: r.url, path: r.path, slide: 1 });
+        const ILUSTRACOES_VALIDAS = ["mulher","folhas","ramo","laranja","cha","coracao","intestino","dna"];
+        if (s.ilustracao && ILUSTRACOES_VALIDAS.includes(s.ilustracao)) {
+          // Layout editorial com ilustração em traço (zero custo de IA)
+          const buffer = await renderCard({
+            layout: "editorial",
+            dimensoes: "1080x1080",
+            brand,
+            conteudo,
+            ilustracao: s.ilustracao as IlustracaoId,
+          });
+          const path = `${params.franqueadaId}/ai-image/${Date.now()}_editorial.png`;
+          const { error: upErr } = await admin.storage
+            .from("franqueadas-assets")
+            .upload(path, buffer, { contentType: "image/png", upsert: false });
+          if (!upErr) {
+            const { data: signed } = await admin.storage
+              .from("franqueadas-assets")
+              .createSignedUrl(path, 365 * 24 * 60 * 60);
+            artes.push({ url: signed?.signedUrl ?? path, path, slide: 1 });
+          }
+        } else {
+          const r = await gerarEUploadImagem({
+            franqueadaId: params.franqueadaId,
+            tipo: "feed_imagem",
+            brand,
+            conteudo,
+            // card com tirinha de foto gerada por IA no topo; se a foto
+            // falhar, sai o card tipográfico puro (nunca quebra)
+            estilo: "design_foto",
+          });
+          artes.push({ url: r.url, path: r.path, slide: 1 });
+        }
       } else if (s.tipo === "feed_carrossel" && s.slides?.length) {
         const slides: ConteudoPeca[] = s.slides.map((sl) => ({
           headline: sl.headline,
