@@ -88,10 +88,10 @@ higgsfield soul-id wait <id>
   digitar. Ação já em curso e lenta.
 - Nenhum rótulo, embalagem ou texto legível em cena.
 - Pele natural, com textura. Nada de acabamento de campanha.
-- Modelo de vídeo: **Seedance 2.5** enquanto valer a janela ilimitada do
-  plano PLUS (ver `banco-broll.md`); **Kling 3.0** como reserva/plano B.
-  Confirmar `job_type` e parâmetros com `higgsfield model list` e
-  `higgsfield model get <job_type>`.
+- Modelo de vídeo: **`kling3_0`** (ou `kling3_0_turbo`) para toda cena com o
+  rosto da Aline — é o único que aceita `start_image`, ou seja, animar o
+  frame aprovado. `seedance_2_5` **não** aceita frame inicial; serve só para
+  cenas sem rosto (text-to-video). Ver `banco-broll.md`.
 - Formato: 9:16, 5 segundos, image-to-video a partir do frame aprovado.
 
 ## Cenas

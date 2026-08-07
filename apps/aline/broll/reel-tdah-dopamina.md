@@ -183,10 +183,13 @@ sinalização. Linguagem sempre "participa", "é cofator", "favorece" — nunca
 
 ## Produção (quando o login + Soul ID estiverem prontos)
 
-1. Gerar os 5 frames Soul ID (cenas 1, 3, 4, 5, 6) + confirmar `job_type`
-   do Kling 3.0 → mostrar frames pra Aline.
+1. Gerar os 5 frames Soul ID (cenas 1, 3, 4, 5, 6) → mostrar pra Aline.
 2. Após aprovação: `higgsfield generate cost` do lote (6 cenas × 2
    variações = 12 clipes) → mostrar custo → esperar o ok.
-3. Animar e salvar em `saida/` como `tdah-1-computador-v1.mp4` … 
-   `tdah-6-lousinha-v2.mp4`.
-4. Montagem, texto e áudio: CapCut (fora deste fluxo).
+3. Animar: cenas com rosto (1, 3, 4, 5, 6) em `kling3_0` com
+   `--start-image <frame aprovado>`; cena 2 (molécula, sem rosto) em
+   `seedance_2_5` text-to-video. Salvar em `saida/` como
+   `tdah-1-computador-v1.mp4` … `tdah-6-lousinha-v2.mp4`.
+4. Montagem: unir cenas na ordem + queimar textos de tela na paleta da marca
+   (ffmpeg). Áudio: ElevenLabs via API ou áudio da Aline; só música em alta
+   fica pro app do Instagram.

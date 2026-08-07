@@ -1,26 +1,42 @@
-# Banco de B-roll — estratégia dos 33 dias ilimitados
+# Banco de B-roll — biblioteca reutilizável da Aline
 
-Objetivo: aproveitar a janela de **Seedance 2.5 ilimitado (33 dias)** do
-plano PLUS pra gerar uma biblioteca de B-roll reutilizável da Aline, em vez
-de gerar reel por reel. Vídeo na janela custa zero crédito; os 1.000
-créditos/mês ficam reservados pro treino do Soul ID e pros frames.
-
-B-roll é reutilizável por natureza: sem fala, sem texto legível, boca
+Objetivo: gerar uma biblioteca de B-roll reutilizável em vez de gerar reel a
+reel. B-roll é reutilizável por natureza: sem fala, sem texto legível, boca
 fechada, ação genérica e lenta. O mesmo clipe da cozinha serve pro reel de
-TDAH, de cortisol, de microbiota — o que muda é o texto por cima (CapCut ou
-overlay queimado na montagem).
+TDAH, de cortisol, de microbiota — o que muda é o texto por cima (overlay
+queimado na montagem ou CapCut).
 
-## A conta
+## Motor de geração (revisado em 2026-08-07 pela sessão local)
 
-- Pagando por crédito (Kling 3.0): ~20-25 créditos/clipe → 1.000 créditos
-  ≈ 2-3 reels/mês. **Não é esse o plano.**
-- Com Seedance 2.5 ilimitado: clipes de vídeo = 0 crédito por 33 dias.
-  Limite real vira tempo de fila ("unlimited mode allows fewer parallel
-  gens") — irrelevante, eu deixo gerando em lote em background.
-- Créditos pagos: Soul ID (uma vez) + frames estáticos. Nos 7 primeiros
-  dias, Nano Banana 2 ilimitado (2K) ajuda a baratear teste de frames.
-- Resultado esperado: um mês de assinatura → banco que abastece meses de
-  reels.
+A estratégia original apostava em **Seedance 2.5 ilimitado** como motor
+principal. **Isso caiu**: o `seedance_2_5` não aceita `start_image` — só
+`image_references` + `mode omni_reference`, que usa a imagem como referência
+de aparência e **não preserva o enquadramento aprovado**. E entrega no
+máximo 720p, contra até 4k do Kling.
+
+Como o fluxo obrigatório é *frame aprovado → animar aquele frame*, o motor
+das cenas com o rosto da Aline é o **Kling 3.0** (`kling3_0`, que aceita
+`start_image`/`end_image`). O `kling3_0_turbo` é a versão mais barata —
+comparar custo real com `generate cost` antes de escolher.
+
+Divisão:
+
+| Tipo de cena | Motor | Por quê |
+|---|---|---|
+| Com o rosto da Aline (frame Soul aprovado → animar) | `kling3_0` (ou `_turbo`) | único que aceita `start_image` |
+| Sem rosto (molécula, comida, ambiente, mãos desfocadas) | `seedance_2_5` text-to-video | não depende de frame; aproveita ilimitado se houver |
+
+## Orçamento
+
+- Conta é plano **ultra**, com **3010 créditos** (não é o PLUS de 1.000/mês
+  que a estratégia antiga assumia).
+- A ~20-25 créditos/clipe no Kling, 3010 créditos ≈ 120-150 clipes — cabe
+  nos 50-70 da meta, **mas sem margem infinita pra descarte e regeração**.
+  Logo: gerar frame bom primeiro, animar só o aprovado, e medir com
+  `generate cost` antes de cada lote.
+- **A confirmar no site da Higgsfield** (o CLI não informa): se o plano ultra
+  inclui alguma janela ilimitada. Se incluir, as cenas sem rosto saem de
+  graça e os créditos ficam todos pras cenas com rosto.
 
 ## Dois destinos, um banco
 
@@ -38,8 +54,9 @@ O banco abastece duas frentes — cada clipe recebe tag de uso no índice:
 
 Por cenário: 3-4 frames-base diferentes (enquadramento/luz/figurino) e, de
 cada frame aprovado, 2-3 animações com movimentos de câmera distintos.
-Cada clipe em 10s (duração padrão do ilimitado) — na edição eu corto o
-trecho bom de 4-6s. Meta: **50-70 clipes aproveitáveis**.
+Duração por clipe: a mais curta que o modelo oferecer (5s cobre o corte de
+4-6s usado na edição e economiza crédito). Meta: **50-70 clipes
+aproveitáveis**.
 
 | Cenário | Variações de ação | Uso |
 |---|---|---|
@@ -51,26 +68,26 @@ trecho bom de 4-6s. Meta: **50-70 clipes aproveitáveis**.
 | 5b. Análise / leitura | lendo um exame impresso à mesa (folha genérica, conteúdo desfocado); lendo relatório encadernado; no computador de perfil, tela desfocada — enquadrada deixando espaço livre ao lado pra entrar a "segunda tela" na edição | AMBOS |
 | 6. Palestra | em pé com microfone de mão abaixado, público desfocado; gesto estático apontando slide desfocado; caminhando devagar no palco | ADS |
 | 7. Professora / aula | à frente de sala pequena com alunos de costas desfocados; ao lado de lousa com traços genéricos; mesa de estudo com livros fechados | ADS |
-| Extras (se sobrar janela) | home office/abas abertas; lousinha; caminhada ao ar livre; escrivaninha escrevendo parada | ORG |
+| Extras (se sobrar orçamento) | home office/abas abertas; lousinha; caminhada ao ar livre; escrivaninha escrevendo parada | ORG |
 
 Todos seguem as regras fixas do `README.md`: um movimento de câmera,
 boca fechada, sem manipulação fina, nenhum texto legível, pele natural.
 Nas cenas [ADS], figurino um degrau mais formal (blazer, jaleco limpo) e
 enquadramentos que deixem respiro pra headline do anúncio.
 
-## Cronograma da janela de 33 dias
+## Ordem de produção
 
-| Fase | Dias | O quê |
-|---|---|---|
-| 0 | antes de assinar | Fotos de treino prontas e revisadas + login feito. Só assinar com isso pronto, pra janela contar produzindo. |
-| 1 | 1-2 | Treinar Soul ID `aline`. Confirmar custos reais (`generate cost`) e se o Seedance 2.5 ilimitado aceita image-to-video com frame Soul. |
-| 2 | 2-7 | Frames de TODOS os cenários (Nano Banana 2 ilimitado nos 7 primeiros dias + Soul frames). Aprovação da Aline em lote. |
-| 3 | 8-30 | Animação em massa dos frames aprovados no Seedance ilimitado. QC meu (descarte e regeneração ilimitada). Entrega parcial semanal. |
-| 4 | 30-33 | Últimas regenerações e organização final do banco. |
+| Fase | O quê |
+|---|---|
+| 1 | Treinar Soul ID `aline` (uma vez). Medir custo real de 1 frame e 1 clipe com `generate cost` e reportar à Aline. |
+| 2 | **Piloto**: 1 cenário completo (sugerido: consultório/análise, que serve ORG e ADS) — frames → aprovação → 2 clipes. Valida qualidade e custo antes de escalar. |
+| 3 | Frames dos demais cenários, em lote, pra aprovação da Aline. |
+| 4 | Animar só os frames aprovados, cenário a cenário, com relatório de créditos gastos a cada lote. |
+| 5 | Organização do banco + índice. |
 
-Plano B se o ilimitado não aceitar Soul/image-to-video: cenas com a Aline
-vão pro Kling 3.0 pago (~12-15 clipes escolhidos a dedo cabem nos créditos)
-e o ilimitado cobre cenas sem rosto (moléculas, comida, ambientes).
+O piloto existe pra não descobrir problema de qualidade depois de gastar
+metade dos créditos. Frames custam pouco perto de vídeo — errar no frame é
+barato, errar no vídeo não.
 
 ## Organização do banco
 
