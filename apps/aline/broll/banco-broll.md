@@ -104,6 +104,59 @@ saida/banco/
 de câmera, trecho bom (in/out), e em quais reels já foi usado — pra não
 repetir o mesmo clipe em reels consecutivos.
 
+## Cenas sem pessoa (o material mais fácil e mais barato)
+
+Não dependem de Soul ID nem de frame aprovado → `seedance_2_5`
+text-to-video direto, e são as que a IA acerta com mais facilidade (sem
+rosto, sem mãos, sem manipulação fina). Se o plano tiver janela ilimitada,
+saem de graça. Gerar bastante: enchem qualquer reel e nunca "gastam" a
+imagem da Aline.
+
+### a) Comida (referência: vídeo que a Aline mandou, 2026-08-08)
+
+Plano macro sobre o prato, movimento lento, luz de restaurante, 8s vertical.
+Higgsfield faz esse tipo muito bem. Padrão de prompt:
+
+> Extreme close-up food cinematography, [prato], shallow depth of field,
+> slow [orbit / push in / pan] over the plate, warm natural light, steam
+> rising gently, glistening sauce, no hands, no text or labels, vertical 9:16
+
+Cardápio a gerar: café da manhã (ovos, frutas vermelhas, iogurte com chia),
+almoço colorido (proteína + folhas + raízes), jantar leve, sobremesa
+saudável, chá sendo servido, café passando, tigela de folhas verdes.
+Um movimento por clipe, sem mão em quadro (mão é onde a IA erra).
+
+### b) Cenário vazio, sem personagem
+
+Ainda mais confiável que comida. Laboratório de genética, bancada com
+pipetas paradas, consultório vazio ao amanhecer, sala de aula vazia,
+cozinha com luz de manhã. Servem de abertura, transição e respiro.
+
+> Empty modern genetics laboratory, cool clinical lighting, centrifuges and
+> sequencing equipment, shallow depth of field, slow dolly forward, no
+> people, no readable text or labels, photorealistic, vertical 9:16
+
+### c) Ciência dentro da célula — atenção
+
+A IA gera imagem **bonita** de interior celular, hélice de DNA, moléculas
+brilhando — mas **não gera bioquímica correta**. Ela não sabe desenhar o
+ciclo da metilação nem a estrutura real de uma vitamina; produz formas
+plausíveis e genéricas. Para o público da Aline (inclusive colegas na
+formação), animação "científica" errada é risco de credibilidade.
+
+**Regra**: vídeo de IA entra como **fundo atmosférico**, nunca como
+diagrama explicativo. O mecanismo correto vai **por cima**, em diagrama
+animado que eu construo (SVG/HTML → vídeo), na paleta da marca — mesma
+solução da lousinha do reel de TDAH.
+
+- Fundo (IA): interior celular abstrato, partículas, hélice girando devagar
+- Camada por cima (construída): a via real, com nomes corretos e setas
+  (ex.: folato → 5-MTHF → homocisteína → metionina → SAM → grupo metil no
+  DNA; ou proteína → tirosina → [B6 como cofator] → dopamina)
+
+Assim o reel fica bonito **e** correto — e o diagrama é reaproveitável em
+carrossel e slide da formação.
+
 ## Overlays de telas reais ("segunda tela")
 
 Telas e documentos NUNCA são gerados por IA (sai texto embaralhado). O
