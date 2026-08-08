@@ -50,6 +50,12 @@ sync**. O texto entra por cima na edição.
 5. **Nada de pele artificialmente perfeita.** Palavras dela: "Quero parecer
    eu, não um render de campanha." Se um frame sair plastificado, descartar
    e regerar — não mostrar pra ela.
+7. **Realismo máximo, sem cor de marca dentro da imagem.** Decisão dela em
+   2026-08-08: nada de laboratório puxado pro Tiffany, nada de molécula na
+   paleta. A identidade visual entra no texto e no grafismo por cima. Nos
+   prompts: `neutral color grading, true to life colors, photorealistic,
+   documentary style`; fora: `neon`, `glowing`, `bioluminescent`,
+   `vibrant`, `stylized` e nomes de cor.
 6. **9:16**, clipes curtos (o corte usado na edição é de 4-6s).
 
 ---

@@ -132,27 +132,39 @@ Ainda mais confiável que comida. Laboratório de genética, bancada com
 pipetas paradas, consultório vazio ao amanhecer, sala de aula vazia,
 cozinha com luz de manhã. Servem de abertura, transição e respiro.
 
-> Empty modern genetics laboratory, cool clinical lighting, centrifuges and
-> sequencing equipment, shallow depth of field, slow dolly forward, no
-> people, no readable text or labels, photorealistic, vertical 9:16
+> Empty modern genetics laboratory, cool white fluorescent lighting,
+> centrifuges and sequencing equipment, neutral color grading, shallow depth
+> of field, slow dolly forward, no people, no readable text or labels,
+> photorealistic documentary style, vertical 9:16
 
-### c) Ciência dentro da célula — atenção
+### c) Ciência dentro da célula
 
-A IA gera imagem **bonita** de interior celular, hélice de DNA, moléculas
-brilhando — mas **não gera bioquímica correta**. Ela não sabe desenhar o
-ciclo da metilação nem a estrutura real de uma vitamina; produz formas
-plausíveis e genéricas. Para o público da Aline (inclusive colegas na
-formação), animação "científica" errada é risco de credibilidade.
+**Decisão da Aline (2026-08-08): tudo o mais realista possível, sem cor de
+marca dentro da imagem.** Nem no laboratório, nem nas moléculas. A
+identidade visual entra no texto e no grafismo por cima, nunca tingindo a
+cena.
 
-**Regra**: vídeo de IA entra como **fundo atmosférico**, nunca como
-diagrama explicativo. O mecanismo correto vai **por cima**, em diagrama
-animado que eu construo (SVG/HTML → vídeo), na paleta da marca — mesma
-solução da lousinha do reel de TDAH.
+Estilo-alvo: **documentário científico / imagem de microscopia**, não arte
+digital colorida.
 
-- Fundo (IA): interior celular abstrato, partículas, hélice girando devagar
-- Camada por cima (construída): a via real, com nomes corretos e setas
-  (ex.: folato → 5-MTHF → homocisteína → metionina → SAM → grupo metil no
-  DNA; ou proteína → tirosina → [B6 como cofator] → dopamina)
+> Photorealistic scientific documentary animation, [assunto], physically
+> based rendering, translucent membranes with subsurface scattering,
+> crowded molecular environment, natural desaturated colors, soft
+> volumetric light, realistic depth of field, slow orbit, no text no labels
+> no letters, vertical 9:16
+
+Puxam pro realismo: `photorealistic`, `documentary`, `physically based
+rendering`, `subsurface scattering`, `natural desaturated colors`,
+`electron microscopy look`.
+Estragam: `neon`, `glowing`, `bioluminescent`, `vibrant`, `stylized` e
+qualquer nome de cor.
+
+**Limite honesto**: a IA acerta a *aparência*, não a bioquímica — ela não
+desenha o ciclo da metilação corretamente. Para o Instagram, a Aline
+decidiu que plausível basta. **Para a formação**, onde há colega olhando, o
+mecanismo correto continua entrando em diagrama construído por cima (a via
+real com nomes e setas: folato → 5-MTHF → homocisteína → metionina → SAM →
+grupo metil no DNA; ou proteína → tirosina → [B6 cofator] → dopamina).
 
 Assim o reel fica bonito **e** correto — e o diagrama é reaproveitável em
 carrossel e slide da formação.

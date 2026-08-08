@@ -58,14 +58,16 @@ Sem Soul ID — text-to-video puro no Kling 3.0.
 > sem ela, começar qualquer tarefa vira uma montanha.
 
 **Prompt (text-to-video)**:
-> Cinematic 3D medical animation, a glowing dopamine molecule floating
-> between neurons inside the brain, soft teal and magenta bioluminescent
-> lighting on dark background, synapses firing gently in the distance,
-> elegant scientific visualization style, no text no labels no letters,
+> Photorealistic scientific documentary animation, a dopamine molecule
+> drifting across a synaptic gap between two neurons, dendrites and vesicles
+> in the surrounding tissue, physically based rendering, subsurface
+> scattering on translucent membranes, natural desaturated colors, soft
+> volumetric light, realistic depth of field, no text no labels no letters,
 > vertical 9:16
 
 **Movimento**: slow orbit ao redor da molécula (único movimento).
-Paleta da marca embutida no prompt (teal + magenta).
+Sem cor de marca dentro da imagem — realismo de documentário científico.
+A identidade visual entra no texto por cima.
 
 ## Cena 3 — Laboratório de genética (`tdah-3-lab-genetica`)
 
@@ -75,7 +77,7 @@ Paleta da marca embutida no prompt (teal + magenta).
 
 **Frame (prompt Soul ID)**:
 > Medium shot, woman in a white lab coat in a modern genetics laboratory,
-> cool clinical lighting with subtle teal tones, she examines a DNA gel
+> cool white clinical lighting, neutral color grading, she examines a DNA gel
 > result sheet held in one hand, focused analytical expression, lips closed,
 > lab equipment softly blurred in background, no readable labels or text,
 > natural skin texture, vertical 9:16

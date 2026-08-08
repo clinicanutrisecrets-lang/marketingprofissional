@@ -90,8 +90,8 @@ manipulação são onde a IA erra feio.
 | Luz clínica correta | `cool white clinical lighting, fluorescent ceiling panels` |
 | Profundidade | `shallow depth of field, equipment blurred in background` |
 | Ar de ambiente real | `subtle haze, soft reflections on stainless steel` |
-| Toque de marca | `subtle teal accents` (o Tiffany da marca) |
 | Realismo | `photorealistic, documentary style, natural imperfections` |
+| Cor natural | `neutral color grading, true to life colors` |
 
 **Evitar**: `futuristic`, `sci-fi`, `neon`, `holographic` — vira ficção
 científica e perde credibilidade clínica.
@@ -102,20 +102,30 @@ científica e perde credibilidade clínica.
 
 ## 6. Como fazer as MOLÉCULAS (para o Instagram)
 
-Decisão da Aline: para o feed, precisa ser **plausível e bonita**, não
-exata. (Para a formação, o mecanismo correto entra em diagrama por cima —
-outro fluxo.)
+Decisão da Aline: para o feed, precisa ser **plausível e realista**, não
+exata no rigor. **Sem cor de marca dentro da imagem** — a identidade entra
+no texto e no grafismo por cima, nunca tingindo a cena.
+
+Referência de estilo: documentário científico (tipo BBC / animação médica
+de faculdade), não arte digital colorida.
 
 Base que funciona:
 
 ```
-Cinematic 3D medical animation, [assunto], glowing molecular structures,
-teal and magenta bioluminescent lighting on dark background, floating
-particles, soft depth of field, elegant scientific visualization,
-slow orbit, no text no labels no letters, vertical 9:16
+Photorealistic scientific documentary animation, [assunto], physically
+based rendering, translucent membranes with subsurface scattering,
+crowded molecular environment, natural desaturated colors, soft
+volumetric light, realistic depth of field, slow orbit,
+no text no labels no letters, vertical 9:16
 ```
 
-Teal + magenta = paleta da marca, então já sai "cara de Nutri Secrets".
+Palavras que puxam pro realismo: `photorealistic`, `documentary`,
+`physically based rendering`, `subsurface scattering`, `natural desaturated
+colors`, `microscopy footage look`.
+
+Palavras que estragam (viram arte digital genérica): `neon`, `glowing`,
+`bioluminescent`, `vibrant`, `magical`, `stylized`, nomes de cor.
+
 `no text no labels no letters` é obrigatório: legenda gerada por IA sempre
 sai embaralhada.
 
@@ -184,10 +194,10 @@ neste mesmo formato.)*
 ## 8. Prompts prontos — CENÁRIOS vazios
 
 **Laboratório de genética**
-> Empty modern genetics laboratory, cool white clinical lighting,
-> sequencing equipment and centrifuges, subtle teal accents, soft
-> reflections on stainless steel, shallow depth of field, subtle haze,
-> slow dolly forward, no people, no readable text or labels,
+> Empty modern genetics laboratory, cool white fluorescent ceiling
+> lighting, sequencing equipment and centrifuges, soft reflections on
+> stainless steel, neutral color grading, shallow depth of field, subtle
+> haze, slow dolly forward, no people, no readable text or labels,
 > photorealistic documentary style, vertical 9:16
 
 **Bancada de laboratório em detalhe**
@@ -216,35 +226,44 @@ neste mesmo formato.)*
 
 ## 9. Prompts prontos — MOLÉCULAS e célula
 
+Todos sem cor de marca — estilo documentário científico.
+
 **Dopamina no cérebro** (reel de TDAH)
-> Cinematic 3D medical animation, a glowing dopamine molecule floating
-> between neurons, synapses firing gently in the distance, teal and magenta
-> bioluminescent lighting on dark background, soft depth of field, slow
-> orbit, no text no labels no letters, vertical 9:16
+> Photorealistic scientific documentary animation, a dopamine molecule
+> drifting across a synaptic gap between two neurons, dendrites and vesicles
+> in the surrounding tissue, physically based rendering, subsurface
+> scattering on translucent membranes, natural desaturated colors, soft
+> volumetric light, realistic depth of field, slow orbit, no text no labels
+> no letters, vertical 9:16
 
 **DNA / metilação** (nutrigenética)
-> Cinematic 3D medical animation, a DNA double helix slowly rotating with
-> small glowing methyl groups attaching along the strand, teal and magenta
-> bioluminescent lighting on dark background, floating particles, soft
-> depth of field, slow orbit, no text no labels no letters, vertical 9:16
+> Photorealistic scientific documentary animation, a DNA double helix
+> slowly rotating with small methyl groups attaching along the backbone,
+> realistic molecular surfaces, physically based rendering, natural
+> desaturated colors, soft volumetric light, shallow realistic depth of
+> field, slow orbit, no text no labels no letters, vertical 9:16
 
 **Vitamina sendo metabolizada na célula**
-> Cinematic 3D medical animation, interior of a human cell, glowing vitamin
-> molecules entering and transforming near the mitochondria, teal and
-> magenta bioluminescent lighting, floating particles, soft depth of field,
-> slow push in, no text no labels no letters, vertical 9:16
+> Photorealistic scientific documentary animation, interior of a human cell,
+> vitamin molecules moving through the crowded cytoplasm toward a
+> mitochondrion, realistic organelle surfaces with subsurface scattering,
+> physically based rendering, natural desaturated colors, soft volumetric
+> light, realistic depth of field, slow push in, no text no labels no
+> letters, vertical 9:16
 
 **Microbiota intestinal**
-> Cinematic 3D medical animation, beneficial bacteria colonies glowing
-> softly along the intestinal wall lining, warm teal bioluminescent
-> lighting on dark background, gentle organic movement, soft depth of
-> field, slow pan, no text no labels no letters, vertical 9:16
+> Photorealistic scientific documentary animation, bacteria colonies on the
+> intestinal villi lining, wet mucosal surface, realistic bacterial shapes
+> and organic movement, electron microscopy documentary look, natural
+> desaturated colors, soft volumetric light, realistic depth of field,
+> slow pan, no text no labels no letters, vertical 9:16
 
 **Receptor / hormônio se encaixando**
-> Cinematic 3D medical animation, a glowing hormone molecule slowly docking
-> into a cell surface receptor, teal and magenta bioluminescent lighting on
-> dark background, particles drifting, soft depth of field, slow orbit,
-> no text no labels no letters, vertical 9:16
+> Photorealistic scientific documentary animation, a hormone molecule slowly
+> docking into a receptor protein on a cell membrane, realistic protein
+> surfaces, physically based rendering, subsurface scattering, natural
+> desaturated colors, soft volumetric light, realistic depth of field,
+> slow orbit, no text no labels no letters, vertical 9:16
 
 ---
 
@@ -258,6 +277,8 @@ neste mesmo formato.)*
 | Câmera mexendo demais / enjoativo | deixar **um** movimento; tirar do texto qualquer outro verbo de movimento |
 | Laboratório com cara de ficção | tirar `futuristic/neon/holographic`; acrescentar `documentary style, photorealistic` |
 | Molécula genérica demais | citar o objeto concreto (neurônio, hélice, mitocôndria) em vez de "science" |
+| Molécula com cara de arte digital colorida | tirar `glowing/neon/vibrant` e qualquer cor; acrescentar `photorealistic, physically based rendering, natural desaturated colors` |
+| Cena "tingida" de alguma cor | acrescentar `neutral color grading, true to life colors` |
 | Ficou escuro/sem graça | trocar a luz: `soft side light`, `warm backlight rim`, `golden light through blinds` |
 
 ---
