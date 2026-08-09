@@ -48,6 +48,9 @@ BRANCO = "#FFFFFF"
 FONT_BOLD = "/usr/share/fonts/truetype/montserrat/Montserrat-Bold.ttf"
 FONT_SEMI = "/usr/share/fonts/truetype/montserrat/Montserrat-SemiBold.ttf"
 FONT_MED = "/usr/share/fonts/truetype/montserrat/Montserrat-Medium.ttf"
+FONT_LIGHT = "/usr/share/fonts/truetype/montserrat/Montserrat-Light.ttf"
+# serifada italic pro destaque, no estilo das referências que a Aline mandou
+FONT_SERIF_IT = "/usr/share/fonts/opentype/ebgaramond/EBGaramond12-Italic.otf"
 
 W, H = 720, 1280          # 9:16
 FPS = 30
@@ -62,21 +65,58 @@ def esc(txt):
 
 
 def drawtext(texto, fonte, tam, cor, y, enable=None, box=False,
-             box_cor="black@0.55", box_pad=18, line_spacing=10):
+             box_cor="black@0.55", box_pad=18, line_spacing=10,
+             sombra=False, x=None):
     partes = [
         f"fontfile={fonte}",
         f"text='{esc(texto)}'",
         f"fontsize={tam}",
         f"fontcolor={cor}",
-        "x=(w-text_w)/2",
+        x if x else "x=(w-text_w)/2",
         f"y={y}",
         f"line_spacing={line_spacing}",
     ]
+    if sombra:
+        # sombra dupla: dá leitura sobre qualquer fundo sem precisar de caixa
+        partes += ["shadowcolor=black@0.75", "shadowx=0", "shadowy=4",
+                   "borderw=2", "bordercolor=black@0.35"]
     if box:
         partes += ["box=1", f"boxcolor={box_cor}", f"boxborderw={box_pad}"]
     if enable:
         partes.append(f"enable='{enable}'")
     return "drawtext=" + ":".join(partes)
+
+
+def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
+               risco=None, tam_palavra=104, tam_apoio=44):
+    """Texto grande no centro, sem caixa — estilo das referências.
+
+    `pre` entra pequeno em cima, `palavra` grande em serifada italic no
+    meio, `pos` pequeno embaixo. `risco` desenha uma linha por cima da
+    palavra (o efeito do 'Energia' riscado de vermelho).
+    """
+    f_pal = ImageFont.truetype(FONT_SERIF_IT, tam_palavra)
+    larg_pal = f_pal.getlength(palavra)
+
+    filtros = []
+    y = y_centro - tam_palavra // 2
+    if pre:
+        filtros.append(drawtext(pre, FONT_MED, tam_apoio, BRANCO,
+                                y - tam_apoio - 14, enable=enable,
+                                sombra=True))
+    filtros.append(drawtext(palavra, FONT_SERIF_IT, tam_palavra, cor_palavra,
+                            y, enable=enable, sombra=True))
+    if risco:
+        y_risco = y + int(tam_palavra * 0.52)
+        x0 = int((W - larg_pal) / 2) - 14
+        filtros.append(
+            f"drawbox=x={x0}:y={y_risco}:w={int(larg_pal) + 28}:h=7"
+            f":color={risco}:t=fill:enable='{enable}'")
+    if pos:
+        filtros.append(drawtext(pos, FONT_LIGHT, tam_apoio, BRANCO,
+                                y + int(tam_palavra * 1.05), enable=enable,
+                                sombra=True))
+    return filtros
 
 
 def quebra(texto, fonte, tam, largura):
@@ -229,18 +269,28 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
 
     filtros = [f"scale={W}:{H}", f"fps={FPS}"]
     for leg in legendas:
-        tam = leg.get("tam", 40)
+        quando = f"between(t,{leg['de']},{leg['ate']})"
+
+        if leg.get("estilo") == "hero":
+            filtros += bloco_hero(
+                leg.get("pre"), leg["palavra"], leg.get("pos"),
+                leg.get("y", int(H * 0.44)), quando,
+                cor_palavra=leg.get("cor", BRANCO),
+                risco=leg.get("risco"),
+                tam_palavra=leg.get("tam", 104))
+            continue
+
+        # texto grande centralizado, sem caixa — legibilidade pela sombra
+        tam = leg.get("tam", 62)
         cor = MAGENTA if leg.get("destaque") else BRANCO
-        linhas = quebra(" ".join(leg["texto"].split("\n")), FONT_SEMI, tam,
-                        W - 140)
-        alt_linha = int(tam * 1.35)
-        # bloco cresce pra cima a partir da faixa segura
-        y0 = H - RODAPE_SEGURO - 60 - alt_linha * len(linhas)
+        linhas = quebra(" ".join(leg["texto"].split("\n")), FONT_BOLD, tam,
+                        W - 120)
+        alt_linha = int(tam * 1.2)
+        y0 = leg.get("y", int(H * 0.46)) - alt_linha * len(linhas) // 2
         for k, linha in enumerate(linhas):
             filtros.append(drawtext(
-                linha, FONT_SEMI, tam, cor, y0 + alt_linha * k,
-                enable=f"between(t,{leg['de']},{leg['ate']})",
-                box=True, box_cor="black@0.55", box_pad=16))
+                linha, FONT_BOLD, tam, cor, y0 + alt_linha * k,
+                enable=quando, sombra=True))
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(fonte)]
     if ate is not None:
         cmd += ["-t", str(ate)]
