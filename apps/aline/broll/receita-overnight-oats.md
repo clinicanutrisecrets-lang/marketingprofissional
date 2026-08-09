@@ -54,12 +54,45 @@ líquido**. Correção: descrever a mistura na ACTION, a dispersão na PHYSICS,
 e travar `no separate layers` nos LOCKS. A colher voltou (o teste provou
 que "entra de cima, fora do quadro" segura bem a ausência de mão).
 
-Prompt corrigido: ver a resposta da sessão de 2026-08-08 — estrutura em
-blocos (SCENE CONTEXT / LOCATION MAP / FIRST FRAME / FORMAT MODE / OPTICS /
-CAMERA / ACTION / PHYSICS / LIGHTING / STYLE / POSITIVE LOCKS), no padrão
-da skill `seedance-clean`.
-
 ⚠️ Conferir **9:16** no gerador — o primeiro teste saiu em 16:9.
+Duração: ~19s funciona bem (dá tempo de todas as etapas).
+
+### Prompt corrigido
+
+```
+SCENE CONTEXT
+Overnight oats being assembled inside a glass jar on a kitchen counter, morning. The ingredients end up fully mixed, not layered.
+
+LOCATION MAP
+Foreground: a clear glass mason jar on a light wooden kitchen counter. Background: blurred neutral kitchen. Camera at jar height, straight on. Light from a window on the left.
+
+FIRST FRAME / BLOCKING
+The empty jar is already centred in frame, rolled oats beginning to fall into it.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Rolled oats pour into the jar and settle. Black chia seeds sprinkle over them. Creamy coconut milk pours in with force and floods the jar. A wooden spoon enters from the top of the frame and stirs in slow circles until the oats and chia are evenly dispersed through the milk into one uniform speckled cream. The spoon lifts out. Fresh diced mango cubes and cracked walnut pieces drop on top of the mixed cream.
+
+PHYSICS
+The milk swirls with real fluid motion, chia seeds tumble and spread through the liquid instead of sinking in a layer, the mixture thickens as it is stirred, mango cubes displace the surface when they land.
+
+LIGHTING
+Soft morning window light from the left, gentle highlight on the wet surface of the mixture.
+
+STYLE
+Photoreal food cinematography, natural texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+Everything falls or enters from above, outside the frame. Only the spoon is visible, no hands, no arms, no people, no bowls or pitchers. The oats and chia end up evenly mixed into the milk, no separate layers. No text or labels.
+```
 
 ## Os 8 planos (alternativa, um clipe por etapa)
 
