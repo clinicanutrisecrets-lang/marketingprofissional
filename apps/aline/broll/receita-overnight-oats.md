@@ -42,7 +42,26 @@ Os planos abaixo estão marcados 🟢 (seguro) ou 🟡 (gerar variações).
 
 ---
 
-## Os 8 planos
+## Versão em plano único (testada em 2026-08-08)
+
+A montagem inteira num vídeo só, câmera parada, ingredientes entrando em
+sequência — funciona e casa com o plano 8 gerado separado.
+
+**Erro do primeiro teste**: o prompt dizia `layers building up one after
+another` e o modelo fez exatamente isso — camadas separadas, chia seca no
+fundo. Chia em camada não hidrata; ela precisa estar **dispersa no
+líquido**. Correção: descrever a mistura na ACTION, a dispersão na PHYSICS,
+e travar `no separate layers` nos LOCKS. A colher voltou (o teste provou
+que "entra de cima, fora do quadro" segura bem a ausência de mão).
+
+Prompt corrigido: ver a resposta da sessão de 2026-08-08 — estrutura em
+blocos (SCENE CONTEXT / LOCATION MAP / FIRST FRAME / FORMAT MODE / OPTICS /
+CAMERA / ACTION / PHYSICS / LIGHTING / STYLE / POSITIVE LOCKS), no padrão
+da skill `seedance-clean`.
+
+⚠️ Conferir **9:16** no gerador — o primeiro teste saiu em 16:9.
+
+## Os 8 planos (alternativa, um clipe por etapa)
 
 ### Plano 1 🟢 — Ingredientes na bancada (abertura)
 > Extreme close-up food cinematography, an empty clear glass mason jar on a
