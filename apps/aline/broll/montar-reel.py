@@ -59,9 +59,14 @@ RODAPE_SEGURO = 260       # área de baixo que a UI do Instagram cobre
 
 
 def esc(txt):
-    """Escapa texto pro drawtext do ffmpeg."""
+    """Escapa texto pro drawtext do ffmpeg.
+
+    O `%` precisa de barra dupla: o filtergraph come uma e o drawtext
+    precisa da outra pra não tentar expandir `%{...}` — com uma só, o
+    ffmpeg avisa "Stray %" e não desenha nada.
+    """
     return (txt.replace("\\", "\\\\").replace(":", "\\:")
-               .replace("'", "’").replace("%", "\\%"))
+               .replace("'", "’").replace("%", "\\\\%"))
 
 
 def drawtext(texto, fonte, tam, cor, y, enable=None, box=False,
@@ -88,14 +93,17 @@ def drawtext(texto, fonte, tam, cor, y, enable=None, box=False,
 
 
 def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
-               risco=None, tam_palavra=104, tam_apoio=44):
+               risco=None, tam_palavra=104, tam_apoio=44, fonte="serif"):
     """Texto grande no centro, sem caixa — estilo das referências.
 
     `pre` entra pequeno em cima, `palavra` grande em serifada italic no
     meio, `pos` pequeno embaixo. `risco` desenha uma linha por cima da
     palavra (o efeito do 'Energia' riscado de vermelho).
     """
-    f_pal = ImageFont.truetype(FONT_SERIF_IT, tam_palavra)
+    # sigla de gene em sans: a serifada italic usa algarismo antigo e o "1"
+    # de FADS1 sai parecendo "i"
+    fonte_pal = FONT_BOLD if fonte == "sans" else FONT_SERIF_IT
+    f_pal = ImageFont.truetype(fonte_pal, tam_palavra)
     larg_pal = f_pal.getlength(palavra)
 
     filtros = []
@@ -104,7 +112,7 @@ def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
         filtros.append(drawtext(pre, FONT_MED, tam_apoio, BRANCO,
                                 y - tam_apoio - 14, enable=enable,
                                 sombra=True))
-    filtros.append(drawtext(palavra, FONT_SERIF_IT, tam_palavra, cor_palavra,
+    filtros.append(drawtext(palavra, fonte_pal, tam_palavra, cor_palavra,
                             y, enable=enable, sombra=True))
     if risco:
         y_risco = y + int(tam_palavra * 0.52)
@@ -277,7 +285,8 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
                 leg.get("y", int(H * 0.44)), quando,
                 cor_palavra=leg.get("cor", BRANCO),
                 risco=leg.get("risco"),
-                tam_palavra=leg.get("tam", 104))
+                tam_palavra=leg.get("tam", 104),
+                fonte=leg.get("fonte", "serif"))
             continue
 
         # texto grande centralizado, sem caixa — legibilidade pela sombra
