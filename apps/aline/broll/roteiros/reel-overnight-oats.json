@@ -3,154 +3,27 @@
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4"
   ],
-  "cortar": {
-    "0": 13.9
-  },
-  "trechos": {
-    "1": [
-      [
-        0.0,
-        2.8
-      ],
-      [
-        5.2,
-        6.9
-      ],
-      [
-        8.0,
-        14.6
-      ]
-    ]
-  },
+  "cortar": {"0": 13.9},
+  "trechos": {"1": [[0.0, 2.8], [5.2, 6.9], [8.0, 14.6]]},
   "cartelas": [],
   "legendas": [
-    {
-      "clipe": 0,
-      "de": 0.2,
-      "ate": 2.4,
-      "estilo": "hero",
-      "pre": "acorda sem",
-      "palavra": "Energia",
-      "pos": "e sem memória?",
-      "risco": "#D6336C",
-      "tam": 110
-    },
-    {
-      "clipe": 0,
-      "de": 2.6,
-      "ate": 3.4,
-      "texto": "aveia",
-      "tam": 72
-    },
-    {
-      "clipe": 0,
-      "de": 3.5,
-      "ate": 5.0,
-      "texto": "fibra que alimenta\nsuas bactérias boas",
-      "tam": 52
-    },
-    {
-      "clipe": 0,
-      "de": 5.1,
-      "ate": 5.9,
-      "texto": "chia",
-      "tam": 72
-    },
-    {
-      "clipe": 0,
-      "de": 6.0,
-      "ate": 7.1,
-      "texto": "magnésio:\nenergia na célula",
-      "tam": 52
-    },
-    {
-      "clipe": 0,
-      "de": 7.2,
-      "ate": 8.0,
-      "texto": "um fio de mel",
-      "tam": 58
-    },
-    {
-      "clipe": 0,
-      "de": 8.2,
-      "ate": 9.2,
-      "texto": "leite de coco",
-      "tam": 66
-    },
-    {
-      "clipe": 0,
-      "de": 9.3,
-      "ate": 10.2,
-      "texto": "gordura boa",
-      "tam": 62,
-      "destaque": true
-    },
-    {
-      "clipe": 0,
-      "de": 10.3,
-      "ate": 11.2,
-      "texto": "+ triptofano",
-      "tam": 62,
-      "destaque": true
-    },
-    {
-      "clipe": 0,
-      "de": 11.3,
-      "ate": 12.6,
-      "texto": "matéria-prima\nda serotonina",
-      "tam": 54
-    },
-    {
-      "clipe": 0,
-      "de": 12.7,
-      "ate": 13.8,
-      "texto": "saciedade\naté o almoço",
-      "tam": 54
-    },
-    {
-      "clipe": 1,
-      "de": 0.3,
-      "ate": 2.3,
-      "texto": "8 horas\nna geladeira",
-      "tam": 58
-    },
-    {
-      "clipe": 1,
-      "de": 3.0,
-      "ate": 4.1,
-      "texto": "manga",
-      "tam": 72
-    },
-    {
-      "clipe": 1,
-      "de": 4.2,
-      "ate": 5.4,
-      "texto": "vitamina A e fibra",
-      "tam": 56
-    },
-    {
-      "clipe": 1,
-      "de": 5.6,
-      "ate": 6.6,
-      "texto": "nozes",
-      "tam": 72
-    },
-    {
-      "clipe": 1,
-      "de": 6.7,
-      "ate": 8.2,
-      "texto": "ômega-3:\nmemória e disposição",
-      "tam": 52
-    },
-    {
-      "clipe": 1,
-      "de": 8.5,
-      "ate": 11.2,
-      "estilo": "hero",
-      "pre": "não é dieta,",
-      "palavra": "é direção",
-      "pos": "@nutri_secrets",
-      "tam": 92
-    }
+    {"clipe":0,"de":0.2,"ate":2.6,"estilo":"hero","pre":"acorda sem",
+     "palavra":"Energia","pos":"e com a memória ruim?","risco":"#D6336C","tam":110},
+    {"clipe":0,"de":2.8,"ate":4.0,"texto":"aveia:\nbeta-glucana","tam":58},
+    {"clipe":0,"de":4.1,"ate":5.5,"texto":"a fibra que vira gel\ne alimenta suas bactérias boas","tam":46},
+    {"clipe":0,"de":5.6,"ate":6.6,"texto":"chia: magnésio","tam":58},
+    {"clipe":0,"de":6.7,"ate":7.6,"texto":"um fio de mel","tam":58},
+    {"clipe":0,"de":7.7,"ate":8.7,"texto":"leite de coco","tam":64},
+    {"clipe":0,"de":8.8,"ate":9.7,"texto":"gordura boa","tam":62,"destaque":true},
+    {"clipe":0,"de":9.8,"ate":10.7,"texto":"+ triptofano","tam":62,"destaque":true},
+    {"clipe":0,"de":10.8,"ate":12.1,"texto":"matéria-prima\nda serotonina","tam":54},
+    {"clipe":0,"de":12.2,"ate":13.8,"texto":"gordura + fibra\n= saciedade","tam":54},
+    {"clipe":1,"de":0.3,"ate":2.2,"texto":"8 horas\nna geladeira","tam":58},
+    {"clipe":1,"de":2.8,"ate":4.0,"texto":"manga","tam":72},
+    {"clipe":1,"de":4.1,"ate":5.3,"texto":"vitamina A e fibra","tam":56},
+    {"clipe":1,"de":5.5,"ate":6.5,"texto":"nozes","tam":72},
+    {"clipe":1,"de":6.6,"ate":8.1,"texto":"ômega-3:\nmemória e disposição","tam":52},
+    {"clipe":1,"de":8.4,"ate":11.2,"estilo":"hero","pre":"não é dieta,",
+     "palavra":"é direção","pos":"@nutri_secrets","tam":92}
   ]
 }

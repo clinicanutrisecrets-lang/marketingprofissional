@@ -53,6 +53,11 @@ FONT_LIGHT = "/usr/share/fonts/truetype/montserrat/Montserrat-Light.ttf"
 FONT_SERIF_IT = "/usr/share/fonts/opentype/ebgaramond/EBGaramond12-Italic.otf"
 
 W, H = 720, 1280          # 9:16
+# faixa/matriz de cor iguais em TODOS os pedaços — senão o concat mistura
+# marcações e o congelamento sai lavado ao lado do vídeo
+COR = ["-color_range", "tv", "-colorspace", "bt709",
+       "-color_primaries", "bt709", "-color_trc", "bt709"]
+FMT = "scale=out_range=tv:out_color_matrix=bt709,format=yuv420p"
 FPS = 30
 MARGEM = 72               # margem lateral segura
 RODAPE_SEGURO = 260       # área de baixo que a UI do Instagram cobre
@@ -166,11 +171,11 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     """Congela o frame em `t` e escreve o texto dentro de um painel."""
     # alturas de cada bloco, pra dimensionar o painel
     H_CHAPEU, TAM_CHAPEU = 46, 30
-    TAM_TITULO, LH_TITULO = 54, 72
+    TAM_TITULO, LH_TITULO = 48, 64
     TAM_CORPO, LH_CORPO = 34, 46
     PAD = 44
 
-    painel_x, painel_w = 44, W - 88
+    painel_x, painel_w = 30, W - 60
     texto_w = painel_w - PAD * 2          # largura útil dentro do painel
 
     linhas_tit = quebra(titulo, FONT_BOLD, TAM_TITULO, texto_w) if titulo else []
@@ -242,9 +247,9 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
         "-loop", "1", "-i", str(saida) + ".png", "-t", str(dur),
-        "-vf", zoom + "," + ",".join(filtros),
+        "-vf", zoom + "," + ",".join(filtros) + "," + FMT,
         "-r", str(FPS), "-pix_fmt", "yuv420p",
-        "-c:v", "libx264", "-crf", "18", str(saida),
+        *COR, "-c:v", "libx264", "-crf", "18", str(saida),
     ], check=True)
 
 
@@ -264,9 +269,9 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
             subprocess.run([
                 "ffmpeg", "-v", "error", "-y", "-i", str(clipe),
                 "-ss", str(de), "-to", str(ate_t),
-                "-vf", f"scale={W}:{H},fps={FPS}", "-an",
+                "-vf", f"scale={W}:{H},fps={FPS}," + FMT, "-an",
                 "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
-                str(p)], check=True)
+                *COR, str(p)], check=True)
             partes.append(p)
         lista = tmpdir / f"{Path(saida).stem}_lista.txt"
         lista.write_text("".join(f"file '{p}'\n" for p in partes))
@@ -303,9 +308,9 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(fonte)]
     if ate is not None:
         cmd += ["-t", str(ate)]
-    cmd += ["-vf", ",".join(filtros), "-an",
+    cmd += ["-vf", ",".join(filtros) + "," + FMT, "-an",
             "-r", str(FPS), "-pix_fmt", "yuv420p",
-            "-c:v", "libx264", "-crf", "18", str(saida)]
+            *COR, "-c:v", "libx264", "-crf", "18", str(saida)]
     subprocess.run(cmd, check=True)
 
 
@@ -339,7 +344,7 @@ def main():
                     "ffmpeg", "-v", "error", "-y", "-i", str(base),
                     "-ss", str(inicio), "-to", str(t),
                     "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
-                    str(trecho)], check=True)
+                    *COR, str(trecho)], check=True)
                 pedacos.append(trecho)
             cart_mp4 = tmp / f"c{i}_cart{j}.mp4"
             faz_cartela(base, t, cart["dur"], cart_mp4,
@@ -355,7 +360,7 @@ def main():
             subprocess.run([
                 "ffmpeg", "-v", "error", "-y", "-i", str(base),
                 "-ss", str(inicio), "-c:v", "libx264", "-crf", "18",
-                "-pix_fmt", "yuv420p", str(resto)], check=True)
+                "-pix_fmt", "yuv420p", *COR, str(resto)], check=True)
             pedacos.append(resto)
 
     lista = tmp / "lista.txt"
@@ -363,7 +368,7 @@ def main():
     subprocess.run([
         "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
         "-i", str(lista), "-c:v", "libx264", "-crf", "18",
-        "-pix_fmt", "yuv420p", "-movflags", "+faststart", saida,
+        "-pix_fmt", "yuv420p", *COR, "-movflags", "+faststart", saida,
     ], check=True)
     print(f"pronto: {saida} ({dur_video(saida):.1f}s)")
 
