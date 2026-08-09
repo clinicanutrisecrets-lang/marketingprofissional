@@ -33,7 +33,10 @@ import json
 import subprocess
 import sys
 import tempfile
+import textwrap
 from pathlib import Path
+
+from PIL import ImageFont
 
 # Paleta Nutri Secrets
 TIFFANY = "0xABAB5"[0:0] or "#0ABAB5"
@@ -76,6 +79,32 @@ def drawtext(texto, fonte, tam, cor, y, enable=None, box=False,
     return "drawtext=" + ":".join(partes)
 
 
+def quebra(texto, fonte, tam, largura):
+    """Quebra o texto pra caber na largura, medindo com a fonte real.
+
+    Respeita as quebras que o roteiro já trouxe (\n) e só reparte a linha
+    que passa da largura — evita frase cortada pela borda do painel.
+    """
+    f = ImageFont.truetype(fonte, tam)
+    saida = []
+    for bruta in texto.split("\n"):
+        if f.getlength(bruta) <= largura:
+            saida.append(bruta)
+            continue
+        linha = ""
+        for palavra in bruta.split():
+            teste = f"{linha} {palavra}".strip()
+            if f.getlength(teste) <= largura:
+                linha = teste
+            else:
+                if linha:
+                    saida.append(linha)
+                linha = palavra
+        if linha:
+            saida.append(linha)
+    return saida
+
+
 def dur_video(path):
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -85,7 +114,7 @@ def dur_video(path):
 
 
 def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
-                corpo=None, rodape=None, escurecer=0.35):
+                corpo=None, rodape=None, escurecer=0.0):
     """Congela o frame em `t` e escreve o texto dentro de um painel."""
     # alturas de cada bloco, pra dimensionar o painel
     H_CHAPEU, TAM_CHAPEU = 46, 30
@@ -93,39 +122,56 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     TAM_CORPO, LH_CORPO = 34, 46
     PAD = 44
 
-    n_tit = titulo.count("\n") + 1 if titulo else 0
-    n_cor = corpo.count("\n") + 1 if corpo else 0
+    painel_x, painel_w = 44, W - 88
+    texto_w = painel_w - PAD * 2          # largura útil dentro do painel
+
+    linhas_tit = quebra(titulo, FONT_BOLD, TAM_TITULO, texto_w) if titulo else []
+    # corpo reflui como parágrafo: quebra do roteiro vira espaço, senão
+    # sobram linhas órfãs de uma palavra
+    linhas_cor = (quebra(" ".join(corpo.split("\n")), FONT_MED, TAM_CORPO,
+                         texto_w) if corpo else [])
 
     alt = PAD * 2
     alt += H_CHAPEU + 16 if chapeu else 0
-    alt += LH_TITULO * n_tit + (18 if corpo else 0) if titulo else 0
-    alt += LH_CORPO * n_cor if corpo else 0
+    alt += LH_TITULO * len(linhas_tit) + (18 if corpo else 0) if titulo else 0
+    alt += LH_CORPO * len(linhas_cor) if corpo else 0
 
-    painel_x, painel_w = 44, W - 88
     painel_y = (H - RODAPE_SEGURO) // 2 - alt // 2
 
-    filtros = [
-        f"scale={W}:{H}",
-        f"drawbox=x=0:y=0:w={W}:h={H}:color=black@{escurecer}:t=fill",
+    filtros = []
+    if escurecer:
+        filtros.append(
+            f"drawbox=x=0:y=0:w={W}:h={H}:color=black@{escurecer}:t=fill")
+    filtros += [
         f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h={alt}"
-        f":color=black@0.72:t=fill",
+        f":color=black@0.82:t=fill",
         # filete magenta no topo do painel, assinatura da marca
         f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h=6"
         f":color={MAGENTA}:t=fill",
     ]
 
+    # revelação escalonada: cada bloco entra um pouco depois do anterior
+    passo = 0.28
+    quando = 0.0
+
     y = painel_y + PAD
     if chapeu:
         filtros.append(drawtext(chapeu.upper(), FONT_SEMI, TAM_CHAPEU,
-                                MAGENTA, y))
+                                MAGENTA, y, enable=f"gte(t,{quando:.2f})"))
         y += H_CHAPEU + 16
-    if titulo:
-        filtros.append(drawtext(titulo, FONT_BOLD, TAM_TITULO, BRANCO, y,
-                                line_spacing=LH_TITULO - TAM_TITULO))
-        y += LH_TITULO * n_tit + (18 if corpo else 0)
-    if corpo:
-        filtros.append(drawtext(corpo, FONT_MED, TAM_CORPO, BEGE, y,
-                                line_spacing=LH_CORPO - TAM_CORPO))
+        quando += passo
+    for linha in linhas_tit:
+        filtros.append(drawtext(linha, FONT_BOLD, TAM_TITULO, BRANCO, y,
+                                enable=f"gte(t,{quando:.2f})"))
+        y += LH_TITULO
+        quando += passo
+    if linhas_tit and corpo:
+        y += 18
+    for linha in linhas_cor:
+        filtros.append(drawtext(linha, FONT_MED, TAM_CORPO, BEGE, y,
+                                enable=f"gte(t,{quando:.2f})"))
+        y += LH_CORPO
+        quando += passo * 0.7
     if rodape:
         filtros.append(drawtext(rodape, FONT_SEMI, 32, BEGE,
                                 H - RODAPE_SEGURO + 40))
@@ -133,20 +179,54 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
         "-ss", str(t), "-i", str(clipe), "-frames:v", "1",
-        "-vf", ",".join(filtros), "-f", "image2", "-update", "1",
+        "-vf", f"scale={W}:{H}", "-f", "image2", "-update", "1",
         str(saida) + ".png",
     ], check=True)
+
+    frames = max(2, int(dur * FPS))
+    # zoom lento no frame congelado: nunca fica parado de verdade.
+    # eq compensa o painel escuro, que puxa a cor média pra baixo e faz o
+    # congelamento parecer desbotado ao lado do vídeo em movimento.
+    zoom = (f"zoompan=z='min(zoom+0.0005,1.05)':d={frames}"
+            f":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}"
+            f",eq=saturation=1.18:brightness=0.03")
 
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
         "-loop", "1", "-i", str(saida) + ".png", "-t", str(dur),
+        "-vf", zoom + "," + ",".join(filtros),
         "-r", str(FPS), "-pix_fmt", "yuv420p",
         "-c:v", "libx264", "-crf", "18", str(saida),
     ], check=True)
 
 
-def prepara_clipe(clipe, legendas, saida, ate=None):
-    """Normaliza o clipe e queima as legendas em movimento."""
+def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
+    """Normaliza o clipe, tira os trechos ruins e queima as legendas.
+
+    `trechos` é uma lista [[de, ate], ...] com o que APROVEITAR — serve pra
+    pular momentos em que a IA desenhou uma mão. As legendas são aplicadas
+    depois do corte, então seus tempos são do vídeo já limpo.
+    """
+    fonte = clipe
+    if trechos:
+        partes = []
+        tmpdir = Path(saida).parent
+        for k, (de, ate_t) in enumerate(trechos):
+            p = tmpdir / f"{Path(saida).stem}_t{k}.mp4"
+            subprocess.run([
+                "ffmpeg", "-v", "error", "-y", "-i", str(clipe),
+                "-ss", str(de), "-to", str(ate_t),
+                "-vf", f"scale={W}:{H},fps={FPS}", "-an",
+                "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
+                str(p)], check=True)
+            partes.append(p)
+        lista = tmpdir / f"{Path(saida).stem}_lista.txt"
+        lista.write_text("".join(f"file '{p}'\n" for p in partes))
+        fonte = tmpdir / f"{Path(saida).stem}_juntos.mp4"
+        subprocess.run([
+            "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
+            "-i", str(lista), "-c", "copy", str(fonte)], check=True)
+
     filtros = [f"scale={W}:{H}", f"fps={FPS}"]
     for leg in legendas:
         y = H - RODAPE_SEGURO - 90
@@ -154,7 +234,7 @@ def prepara_clipe(clipe, legendas, saida, ate=None):
             leg["texto"], FONT_SEMI, 40, BRANCO, y,
             enable=f"between(t,{leg['de']},{leg['ate']})",
             box=True, box_cor="black@0.5"))
-    cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(clipe)]
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(fonte)]
     if ate is not None:
         cmd += ["-t", str(ate)]
     cmd += ["-vf", ",".join(filtros), "-an",
@@ -180,7 +260,8 @@ def main():
 
         base = tmp / f"clipe{i}.mp4"
         prepara_clipe(clipe, legendas, base,
-                      ate=roteiro.get("cortar", {}).get(str(i)))
+                      ate=roteiro.get("cortar", {}).get(str(i)),
+                      trechos=roteiro.get("trechos", {}).get(str(i)))
         total = dur_video(base)
 
         inicio = 0.0

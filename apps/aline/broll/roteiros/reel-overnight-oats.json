@@ -1,0 +1,30 @@
+{
+  "clipes": [
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4"
+  ],
+  "cortar": {"0": 13.9},
+  "trechos": {"1": [[0.0, 2.8], [5.2, 6.9], [8.0, 14.6]]},
+  "cartelas": [
+    {"clipe":0,"t":0.3,"dur":2.6,
+     "chapeu":"CANSAÇO E NÉVOA MENTAL",
+     "titulo":"O café da manhã\nque trabalha\nenquanto você dorme"},
+    {"clipe":0,"t":2.5,"dur":2.6,
+     "chapeu":"AVEIA + CHIA",
+     "titulo":"Fibra que alimenta\nsuas bactérias boas"},
+    {"clipe":1,"t":9.2,"dur":3.2,
+     "chapeu":"A SINERGIA",
+     "titulo":"A vitamina C da manga\najuda a absorver\no ferro da aveia",
+     "rodape":"@nutri_secrets"}
+  ],
+  "legendas": [
+    {"clipe":0,"de":0.4,"ate":1.5,"texto":"aveia"},
+    {"clipe":0,"de":1.9,"ate":2.4,"texto":"chia"},
+    {"clipe":0,"de":3.4,"ate":5.0,"texto":"um fio de mel"},
+    {"clipe":0,"de":6.4,"ate":8.0,"texto":"leite de coco"},
+    {"clipe":0,"de":12.9,"ate":13.8,"texto":"baunilha"},
+    {"clipe":1,"de":0.3,"ate":2.4,"texto":"8 horas na geladeira"},
+    {"clipe":1,"de":3.0,"ate":4.3,"texto":"manga"},
+    {"clipe":1,"de":4.7,"ate":6.0,"texto":"nozes"}
+  ]
+}

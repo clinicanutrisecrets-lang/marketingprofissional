@@ -1,0 +1,34 @@
+{
+  "clipes": [
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4"
+  ],
+  "cortar": {"0": 13.9},
+  "trechos": {"1": [[0.0, 2.8], [5.2, 6.9], [8.0, 14.6]]},
+  "cartelas": [
+    {"clipe":0,"t":0.3,"dur":3.0,
+     "chapeu":"ATENÇÃO, NUTRICIONISTA",
+     "titulo":"Você sabe montar\ncardápio para a\ngenética do paciente\nque vive cansado?"},
+    {"clipe":0,"t":1.6,"dur":2.4,
+     "chapeu":"AVEIA · TPH1",
+     "titulo":"Serotonina\ncomeça no intestino"},
+    {"clipe":0,"t":2.6,"dur":2.4,
+     "chapeu":"CHIA · COMT",
+     "titulo":"Magnésio é cofator\nda COMT"},
+    {"clipe":0,"t":5.0,"dur":2.2,
+     "chapeu":"MEL · ANKK1",
+     "titulo":"Recompensa\ntem genótipo"},
+    {"clipe":0,"t":8.0,"dur":2.4,
+     "chapeu":"LEITE DE COCO · BDNF",
+     "titulo":"Memória pede\ngordura boa"},
+    {"clipe":1,"t":2.0,"dur":2.4,
+     "chapeu":"O RITUAL · CLOCK",
+     "titulo":"Horário também\né prescrição"},
+    {"clipe":1,"t":9.2,"dur":3.4,
+     "chapeu":"FORMAÇÃO EM SAÚDE INTEGRATIVA",
+     "titulo":"Do laudo ao prato",
+     "corpo":"Nutrigenética aplicada à clínica. Link na bio.",
+     "rodape":"@nutri_secrets"}
+  ],
+  "legendas": []
+}
