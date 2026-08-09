@@ -57,7 +57,93 @@ que "entra de cima, fora do quadro" segura bem a ausência de mão).
 ⚠️ Conferir **9:16** no gerador — o primeiro teste saiu em 16:9.
 Duração: ~19s funciona bem (dá tempo de todas as etapas).
 
-### Prompt corrigido
+### Versão final: 2 vídeos (receita completa)
+
+Dez etapas não cabem em 19s. Divide em dois, com o mesmo pote / bancada /
+luz — emendam sem costura na montagem.
+
+#### Vídeo A — Montagem (até tampar e guardar)
+
+```
+SCENE CONTEXT
+Overnight oats being assembled inside a glass jar on a kitchen counter, morning. The ingredients end up fully mixed into one cream, never in separate layers.
+
+LOCATION MAP
+Foreground: a clear glass mason jar on a light wooden kitchen counter. Background: blurred neutral kitchen. Camera at jar height, straight on. Light from a window on the left.
+
+FIRST FRAME / BLOCKING
+The empty jar is already centred in frame, rolled oats beginning to fall into it.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Rolled oats pour into the jar and settle. Tiny black chia seeds sprinkle over them. A thin amber ribbon of honey falls slowly and coils on the surface. Two dark drops of vanilla extract fall and bloom into the mixture. Creamy coconut milk pours in with force and floods the jar. A wooden spoon enters from the top of the frame and stirs in slow circles until oats, chia and honey are evenly dispersed into one uniform speckled cream. The spoon lifts out. A metal lid lowers onto the jar and seals it.
+
+PHYSICS
+Honey falls as a slow viscous ribbon that folds on itself before sinking. Vanilla drops disperse in dark swirls. The milk swirls with real fluid motion, chia seeds tumble and spread through the liquid instead of sinking in a layer. The mixture thickens visibly as it is stirred.
+
+LIGHTING
+Soft morning window light from the left, gentle highlight on the wet surface of the mixture, warm glow through the glass.
+
+STYLE
+Photoreal food cinematography, individual oat flakes with visible ridges, tiny speckled chia seeds, natural uneven texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+Everything falls or enters from above, outside the frame. Only the spoon and the lid are visible, no hands, no arms, no people, no bowls or pitchers. The oats and chia end up evenly mixed into the milk, no separate layers. No text or labels.
+```
+
+#### Vídeo B — Da geladeira à colherada
+
+```
+SCENE CONTEXT
+The finished overnight oats rest in the fridge overnight, then are opened, topped and served the next morning.
+
+LOCATION MAP
+CUT 1 is inside a refrigerator, the closed jar on a wire shelf. CUT 2 to CUT 4 are on the same light wooden kitchen counter, camera at jar height, straight on, window light from the left.
+
+FIRST FRAME / BLOCKING
+The closed jar already sits on the refrigerator shelf, thick mixture visible through the glass.
+
+FORMAT MODE
+Sequence of cuts, no timecodes. Cuts only at the specified points, the camera does not cut on its own.
+
+CUT 1 — The closed jar on the refrigerator shelf, fine condensation beading on the cold glass, cold light dimming as the fridge door closes.
+CUT 2 — The same jar on the wooden counter in warm morning light, the metal lid lifts straight up and away, revealing a thick set cream.
+CUT 3 — Fresh diced mango cubes and cracked walnut pieces drop onto the surface from above, then a wooden spoon stirs them gently through the top layer.
+CUT 4 — The spoon lifts a thick creamy scoop out of the jar and holds it, a slow drip falling back down.
+
+OPTICS
+Extreme close-up throughout, 50mm equivalent, shallow depth of field, no drift mid-segment.
+
+CAMERA
+Static locked off in every cut.
+
+PHYSICS
+The set mixture holds its shape and keeps the mark of the spoon. Mango cubes press into the surface when they land. The scoop on the spoon holds its form, a single thick drip falling back into the jar.
+
+PERFORMANCE
+Texture is the subject: chia seeds swollen into translucent gel beads, oats softened and plump, matte creamy surface, glistening mango edges, dry cracked walnut pieces.
+
+LIGHTING
+CUT 1: cold refrigerator light. CUT 2 to CUT 4: soft warm morning window light from the left, gentle sheen on the cream.
+
+STYLE
+Photoreal food cinematography, natural uneven texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+Same jar, same wooden counter, same window light from the left in every cut after the fridge. Only the lid and the spoon are visible, no hands, no arms, no people. The mixture stays thick and set, not liquid. No text or labels.
+```
+
+---
+
+### Prompt anterior (só a montagem, sem mel/baunilha/geladeira)
 
 ```
 SCENE CONTEXT
