@@ -85,25 +85,50 @@ def dur_video(path):
 
 
 def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
-                corpo=None, rodape=None, escurecer=0.55):
-    """Congela o frame em `t` e escreve o texto por cima."""
-    filtros = [f"scale={W}:{H}", f"drawbox=x=0:y=0:w={W}:h={H}"
-               f":color=black@{escurecer}:t=fill"]
+                corpo=None, rodape=None, escurecer=0.35):
+    """Congela o frame em `t` e escreve o texto dentro de um painel."""
+    # alturas de cada bloco, pra dimensionar o painel
+    H_CHAPEU, TAM_CHAPEU = 46, 30
+    TAM_TITULO, LH_TITULO = 54, 72
+    TAM_CORPO, LH_CORPO = 34, 46
+    PAD = 44
 
-    # bloco de texto centralizado verticalmente, acima da área da UI
-    y = H // 2 - 200
+    n_tit = titulo.count("\n") + 1 if titulo else 0
+    n_cor = corpo.count("\n") + 1 if corpo else 0
+
+    alt = PAD * 2
+    alt += H_CHAPEU + 16 if chapeu else 0
+    alt += LH_TITULO * n_tit + (18 if corpo else 0) if titulo else 0
+    alt += LH_CORPO * n_cor if corpo else 0
+
+    painel_x, painel_w = 44, W - 88
+    painel_y = (H - RODAPE_SEGURO) // 2 - alt // 2
+
+    filtros = [
+        f"scale={W}:{H}",
+        f"drawbox=x=0:y=0:w={W}:h={H}:color=black@{escurecer}:t=fill",
+        f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h={alt}"
+        f":color=black@0.72:t=fill",
+        # filete magenta no topo do painel, assinatura da marca
+        f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h=6"
+        f":color={MAGENTA}:t=fill",
+    ]
+
+    y = painel_y + PAD
     if chapeu:
-        filtros.append(drawtext(chapeu.upper(), FONT_SEMI, 30, MAGENTA, y))
-        y += 70
+        filtros.append(drawtext(chapeu.upper(), FONT_SEMI, TAM_CHAPEU,
+                                MAGENTA, y))
+        y += H_CHAPEU + 16
     if titulo:
-        n = titulo.count("\\n") + titulo.count("\n") + 1
-        filtros.append(drawtext(titulo, FONT_BOLD, 58, BRANCO, y))
-        y += 78 * n + 24
+        filtros.append(drawtext(titulo, FONT_BOLD, TAM_TITULO, BRANCO, y,
+                                line_spacing=LH_TITULO - TAM_TITULO))
+        y += LH_TITULO * n_tit + (18 if corpo else 0)
     if corpo:
-        filtros.append(drawtext(corpo, FONT_MED, 36, BEGE, y))
+        filtros.append(drawtext(corpo, FONT_MED, TAM_CORPO, BEGE, y,
+                                line_spacing=LH_CORPO - TAM_CORPO))
     if rodape:
         filtros.append(drawtext(rodape, FONT_SEMI, 32, BEGE,
-                                H - RODAPE_SEGURO))
+                                H - RODAPE_SEGURO + 40))
 
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
@@ -120,7 +145,7 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     ], check=True)
 
 
-def prepara_clipe(clipe, legendas, saida):
+def prepara_clipe(clipe, legendas, saida, ate=None):
     """Normaliza o clipe e queima as legendas em movimento."""
     filtros = [f"scale={W}:{H}", f"fps={FPS}"]
     for leg in legendas:
@@ -129,12 +154,13 @@ def prepara_clipe(clipe, legendas, saida):
             leg["texto"], FONT_SEMI, 40, BRANCO, y,
             enable=f"between(t,{leg['de']},{leg['ate']})",
             box=True, box_cor="black@0.5"))
-    subprocess.run([
-        "ffmpeg", "-v", "error", "-y", "-i", str(clipe),
-        "-vf", ",".join(filtros), "-an",
-        "-r", str(FPS), "-pix_fmt", "yuv420p",
-        "-c:v", "libx264", "-crf", "18", str(saida),
-    ], check=True)
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(clipe)]
+    if ate is not None:
+        cmd += ["-t", str(ate)]
+    cmd += ["-vf", ",".join(filtros), "-an",
+            "-r", str(FPS), "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-crf", "18", str(saida)]
+    subprocess.run(cmd, check=True)
 
 
 def main():
@@ -153,7 +179,8 @@ def main():
                         key=lambda c: c["t"])
 
         base = tmp / f"clipe{i}.mp4"
-        prepara_clipe(clipe, legendas, base)
+        prepara_clipe(clipe, legendas, base,
+                      ate=roteiro.get("cortar", {}).get(str(i)))
         total = dur_video(base)
 
         inicio = 0.0
