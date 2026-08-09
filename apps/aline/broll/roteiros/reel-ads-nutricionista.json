@@ -3,40 +3,190 @@
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4"
   ],
-  "cortar": {"0": 13.9},
-  "trechos": {"1": [[0.0, 2.8], [5.2, 6.9], [8.0, 14.6]]},
+  "cortar": {
+    "0": 13.9
+  },
+  "trechos": {
+    "1": [
+      [
+        0.0,
+        2.8
+      ],
+      [
+        5.2,
+        6.9
+      ],
+      [
+        8.0,
+        14.6
+      ]
+    ]
+  },
   "cartelas": [
-    {"clipe":0,"t":0.25,"dur":3.4,
-     "chapeu":"ATENÇÃO, NUTRICIONISTA",
-     "titulo":"Você sabe prescrever\ndieta baseada na\ngenética do seu\npaciente?"},
-    {"clipe":1,"t":10.6,"dur":4.6,
-     "chapeu":"AULA GRATUITA · EXCLUSIVA PARA NUTRICIONISTAS",
-     "titulo":"Venha aprender mais\nsobre Nutrigenética",
-     "corpo":"Link na bio",
-     "rodape":"@nutri_secrets"}
+    {
+      "clipe": 0,
+      "t": 0.25,
+      "dur": 3.4,
+      "chapeu": "ATENÇÃO, NUTRICIONISTA",
+      "titulo": "Você sabe prescrever\ndieta baseada na\ngenética do seu\npaciente?"
+    },
+    {
+      "clipe": 1,
+      "t": 10.6,
+      "dur": 4.8,
+      "chapeu": "AULA GRATUITA",
+      "titulo": "Venha aprender mais\nsobre Nutrigenética",
+      "corpo": "Exclusiva para nutricionistas",
+      "rodape": "@nutri_secrets"
+    }
   ],
   "legendas": [
-    {"clipe":0,"de":0.3,"ate":1.6,"estilo":"hero","pre":"gene da",
-     "palavra":"COMT","pos":"AA · mais estresse","tam":96,"cor":"#D6336C","fonte":"sans"},
-    {"clipe":0,"de":1.7,"ate":3.0,"texto":"beta-glucana da aveia","tam":56},
-    {"clipe":0,"de":3.1,"ate":4.4,"texto":"+ L-teanina\npara modular GABA","tam":52},
-    {"clipe":0,"de":4.5,"ate":5.8,"estilo":"hero","pre":"gene do",
-     "palavra":"CLOCK","pos":"CC · paciente noturno","tam":96,"cor":"#D6336C","fonte":"sans"},
-    {"clipe":0,"de":5.9,"ate":7.0,"texto":"altera a % de macros\ndo dia","tam":52},
-    {"clipe":0,"de":7.1,"ate":8.2,"texto":"doce pela manhã:\num fio de mel","tam":52},
-    {"clipe":0,"de":8.3,"ate":9.6,"estilo":"hero","pre":"gene do",
-     "palavra":"FTO","pos":"A · menos saciedade","tam":96,"cor":"#D6336C","fonte":"sans"},
-    {"clipe":0,"de":9.7,"ate":11.1,"texto":"gordura do coco\n+ fibra da aveia e da chia","tam":48},
-    {"clipe":0,"de":11.2,"ate":12.4,"texto":"saciedade que\nsegura a manhã","tam":52},
-    {"clipe":0,"de":12.5,"ate":13.8,"texto":"triptofano do coco","tam":56},
-    {"clipe":1,"de":0.3,"ate":2.2,"texto":"8 horas na geladeira:\npraticidade prescrita","tam":50},
-    {"clipe":1,"de":2.5,"ate":3.9,"estilo":"hero","pre":"gene do",
-     "palavra":"BCMO1","pos":"TT · baixo convertedor","tam":92,"cor":"#D6336C","fonte":"sans"},
-    {"clipe":1,"de":4.0,"ate":5.4,"texto":"o betacaroteno da manga\nnão vira retinol","tam":50},
-    {"clipe":1,"de":5.6,"ate":6.9,"estilo":"hero","pre":"gene do",
-     "palavra":"FADS1","pos":"dessaturase lenta","tam":92,"cor":"#D6336C","fonte":"sans"},
-    {"clipe":1,"de":7.0,"ate":8.5,"texto":"o ALA das nozes\nnão vira EPA e DHA","tam":50},
-    {"clipe":1,"de":8.7,"ate":10.4,"estilo":"hero","pre":"o mesmo prato",
-     "palavra":"não serve","pos":"a dois genótipos","tam":88}
+    {
+      "clipe": 0,
+      "de": 0.3,
+      "ate": 1.6,
+      "estilo": "hero",
+      "pre": "gene da",
+      "palavra": "COMT AA",
+      "pos": "mais estresse",
+      "tam": 88,
+      "cor": "#0ABAB5",
+      "fonte": "sans"
+    },
+    {
+      "clipe": 0,
+      "de": 1.7,
+      "ate": 3.0,
+      "texto": "beta-glucana da aveia",
+      "tam": 56
+    },
+    {
+      "clipe": 0,
+      "de": 3.1,
+      "ate": 4.4,
+      "texto": "+ L-teanina\npara modular GABA",
+      "tam": 52
+    },
+    {
+      "clipe": 0,
+      "de": 4.5,
+      "ate": 5.8,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "CLOCK CC",
+      "pos": "paciente noturno",
+      "tam": 88,
+      "cor": "#0ABAB5",
+      "fonte": "sans"
+    },
+    {
+      "clipe": 0,
+      "de": 5.9,
+      "ate": 7.0,
+      "texto": "altera a % de macros\ndo dia",
+      "tam": 52
+    },
+    {
+      "clipe": 0,
+      "de": 7.1,
+      "ate": 8.2,
+      "texto": "doce pela manhã:\num fio de mel",
+      "tam": 52
+    },
+    {
+      "clipe": 0,
+      "de": 8.3,
+      "ate": 9.6,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "FTO A",
+      "pos": "menos saciedade",
+      "tam": 88,
+      "cor": "#0ABAB5",
+      "fonte": "sans"
+    },
+    {
+      "clipe": 0,
+      "de": 9.7,
+      "ate": 11.1,
+      "texto": "gordura do coco\n+ fibra da aveia e da chia",
+      "tam": 48
+    },
+    {
+      "clipe": 0,
+      "de": 11.2,
+      "ate": 12.4,
+      "texto": "saciedade que\nsegura a manhã",
+      "tam": 52
+    },
+    {
+      "clipe": 0,
+      "de": 12.5,
+      "ate": 13.8,
+      "texto": "triptofano do coco",
+      "tam": 56
+    },
+    {
+      "clipe": 1,
+      "de": 0.3,
+      "ate": 1.5,
+      "texto": "pode ser preparada\nna noite anterior",
+      "tam": 52
+    },
+    {
+      "clipe": 1,
+      "de": 1.6,
+      "ate": 2.5,
+      "texto": "praticidade\naumenta adesão",
+      "tam": 52
+    },
+    {
+      "clipe": 1,
+      "de": 2.8,
+      "ate": 4.1,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "BCMO1 TT",
+      "pos": "baixo convertedor",
+      "tam": 82,
+      "cor": "#0ABAB5",
+      "fonte": "sans"
+    },
+    {
+      "clipe": 1,
+      "de": 4.2,
+      "ate": 5.4,
+      "texto": "o betacaroteno da manga\nnão vira retinol",
+      "tam": 50
+    },
+    {
+      "clipe": 1,
+      "de": 5.6,
+      "ate": 6.9,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "FADS1",
+      "pos": "dessaturase lenta",
+      "tam": 88,
+      "cor": "#0ABAB5",
+      "fonte": "sans"
+    },
+    {
+      "clipe": 1,
+      "de": 7.0,
+      "ate": 8.5,
+      "texto": "o ALA das nozes\nnão vira EPA e DHA",
+      "tam": 50
+    },
+    {
+      "clipe": 1,
+      "de": 8.7,
+      "ate": 10.4,
+      "estilo": "hero",
+      "pre": "o mesmo prato",
+      "palavra": "não serve",
+      "pos": "a dois genótipos",
+      "tam": 88
+    }
   ]
 }

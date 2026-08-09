@@ -36,7 +36,7 @@ import tempfile
 import textwrap
 from pathlib import Path
 
-from PIL import ImageFont
+from PIL import Image, ImageFont
 
 # Paleta Nutri Secrets
 TIFFANY = "0xABAB5"[0:0] or "#0ABAB5"
@@ -166,8 +166,40 @@ def dur_video(path):
     return float(out.stdout.strip())
 
 
+def degrade_png(caminho, y, alt, opacidade=0.82, cor_filete=None):
+    """Gera o degradê como PNG, pixel a pixel.
+
+    Desenhar o degradê com faixas de `drawbox` deixa listras visíveis; a
+    imagem gerada aqui tem rampa contínua e some suave nas duas pontas.
+    """
+    margem = int(alt * 0.55)
+    topo, base = y - margem, y + alt + margem
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    px = img.load()
+    for yy in range(max(0, topo), min(H, base)):
+        if yy < y:                        # rampa de entrada
+            f = (yy - topo) / max(1, y - topo)
+        elif yy > y + alt:                # rampa de saída
+            f = (base - yy) / max(1, base - (y + alt))
+        else:
+            f = 1.0
+        a = int(255 * opacidade * max(0.0, min(1.0, f)) ** 1.4)
+        if a <= 0:
+            continue
+        for xx in range(W):
+            px[xx, yy] = (0, 0, 0, a)
+    if cor_filete:
+        rgb = tuple(int(cor_filete.lstrip("#")[i:i + 2], 16)
+                    for i in (0, 2, 4))
+        for yy in range(max(0, y - 4), max(0, y - 1)):
+            for xx in range(W):
+                px[xx, yy] = rgb + (235,)
+    img.save(caminho)
+
+
 def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
-                corpo=None, rodape=None, escurecer=0.0):
+                corpo=None, rodape=None, escurecer=0.0,
+                cor_apoio=None):
     """Congela o frame em `t` e escreve o texto dentro de um painel."""
     # alturas de cada bloco, pra dimensionar o painel
     H_CHAPEU, TAM_CHAPEU = 46, 30
@@ -175,6 +207,7 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     TAM_CORPO, LH_CORPO = 34, 46
     PAD = 44
 
+    cor_apoio = cor_apoio or TIFFANY
     painel_x, painel_w = 30, W - 60
     texto_w = painel_w - PAD * 2          # largura útil dentro do painel
 
@@ -184,8 +217,11 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     linhas_cor = (quebra(" ".join(corpo.split("\n")), FONT_MED, TAM_CORPO,
                          texto_w) if corpo else [])
 
+    linhas_cha = quebra(chapeu.upper(), FONT_SEMI, TAM_CHAPEU,
+                        texto_w) if chapeu else []
+
     alt = PAD * 2
-    alt += H_CHAPEU + 16 if chapeu else 0
+    alt += (H_CHAPEU * len(linhas_cha)) + 16 if chapeu else 0
     alt += LH_TITULO * len(linhas_tit) + (18 if corpo else 0) if titulo else 0
     alt += LH_CORPO * len(linhas_cor) if corpo else 0
 
@@ -195,23 +231,20 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     if escurecer:
         filtros.append(
             f"drawbox=x=0:y=0:w={W}:h={H}:color=black@{escurecer}:t=fill")
-    filtros += [
-        f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h={alt}"
-        f":color=black@0.82:t=fill",
-        # filete magenta no topo do painel, assinatura da marca
-        f"drawbox=x={painel_x}:y={painel_y}:w={painel_w}:h=6"
-        f":color={MAGENTA}:t=fill",
-    ]
+    grad = str(saida) + ".grad.png"
+    degrade_png(grad, painel_y, alt, cor_filete=cor_apoio)
 
     # revelação escalonada: cada bloco entra um pouco depois do anterior
     passo = 0.28
     quando = 0.0
 
     y = painel_y + PAD
-    if chapeu:
-        filtros.append(drawtext(chapeu.upper(), FONT_SEMI, TAM_CHAPEU,
-                                MAGENTA, y, enable=f"gte(t,{quando:.2f})"))
-        y += H_CHAPEU + 16
+    for linha in linhas_cha:
+        filtros.append(drawtext(linha, FONT_SEMI, TAM_CHAPEU, cor_apoio, y,
+                                enable=f"gte(t,{quando:.2f})", sombra=True))
+        y += H_CHAPEU
+    if linhas_cha:
+        y += 16
         quando += passo
     for linha in linhas_tit:
         filtros.append(drawtext(linha, FONT_BOLD, TAM_TITULO, BRANCO, y,
@@ -244,10 +277,14 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
             f":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}"
             f",eq=saturation=1.18:brightness=0.03")
 
+    corrente = [f"[0:v]{zoom}[base]", "[base][1:v]overlay=0:0[fundo]"]
+    corrente.append("[fundo]" + ",".join(filtros or ["null"]) + ","
+                    + FMT + "[saida]")
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
-        "-loop", "1", "-i", str(saida) + ".png", "-t", str(dur),
-        "-vf", zoom + "," + ",".join(filtros) + "," + FMT,
+        "-loop", "1", "-i", str(saida) + ".png",
+        "-loop", "1", "-i", grad, "-t", str(dur),
+        "-filter_complex", ";".join(corrente), "-map", "[saida]",
         "-r", str(FPS), "-pix_fmt", "yuv420p",
         *COR, "-c:v", "libx264", "-crf", "18", str(saida),
     ], check=True)
@@ -283,6 +320,23 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
     filtros = [f"scale={W}:{H}", f"fps={FPS}"]
     for leg in legendas:
         quando = f"between(t,{leg['de']},{leg['ate']})"
+
+        if leg.get("estilo") == "selo":
+            # retângulo Tiffany com texto branco — chamada final
+            tam = leg.get("tam", 46)
+            f = ImageFont.truetype(FONT_BOLD, tam)
+            larg = int(f.getlength(leg["texto"]))
+            pad_x, pad_y = 34, 22
+            cx = (W - larg) // 2 - pad_x
+            cy = leg.get("y", int(H * 0.63))
+            filtros.append(
+                f"drawbox=x={cx}:y={cy}:w={larg + pad_x * 2}"
+                f":h={tam + pad_y * 2}:color={leg.get('cor', TIFFANY)}"
+                f":t=fill:enable='{quando}'")
+            filtros.append(drawtext(
+                leg["texto"], FONT_BOLD, tam, BRANCO,
+                cy + pad_y - int(tam * 0.12), enable=quando))
+            continue
 
         if leg.get("estilo") == "hero":
             filtros += bloco_hero(
@@ -349,6 +403,7 @@ def main():
             cart_mp4 = tmp / f"c{i}_cart{j}.mp4"
             faz_cartela(base, t, cart["dur"], cart_mp4,
                         chapeu=cart.get("chapeu"),
+                        cor_apoio=cart.get("cor_apoio"),
                         titulo=cart.get("titulo"),
                         corpo=cart.get("corpo"),
                         rodape=cart.get("rodape"),
