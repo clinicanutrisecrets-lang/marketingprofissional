@@ -24,3 +24,5 @@ next-env.d.ts
 coverage
 *.tsbuildinfo
 .claude/
+__pycache__/
+*.pyc
