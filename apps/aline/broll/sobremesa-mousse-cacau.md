@@ -17,6 +17,7 @@ sobrenome.
 | **APOE** | ε4 | maior sensibilidade à gordura saturada | gordura monoinsaturada do abacate e do azeite no lugar de creme de leite |
 | **ANKK1** | A1 (Taq1A) | menor densidade de receptores D2, recompensa mais difícil de saciar | sobremesa planejada e com fibra, não proibida |
 | **MTHFR** | C677T TT | metilação comprometida | abacate entra também pelo folato |
+| **TCF7L2** | variante de risco | pior resposta glicêmica ao doce | canela e a fibra do abacate junto do melado, nunca doce isolado |
 
 A tese, de novo: **o mesmo doce não serve a dois genótipos.**
 
@@ -44,10 +45,10 @@ CAMERA
 Static locked off, no movement.
 
 ACTION
-Soft ripe avocado flesh drops into the glass and settles. Dark cocoa powder sifts down over it in a fine cloud. A thin ribbon of dark date syrup falls slowly and coils on the surface. A splash of coconut milk pours in. A spoon enters from the top of the frame and folds everything in slow circles until it becomes one smooth glossy dark chocolate mousse, no streaks left. The spoon lifts out.
+Soft ripe avocado flesh drops into the glass and settles. Dark cocoa powder sifts down over it in a fine cloud. A thin ribbon of dark sugarcane molasses falls slowly and coils on the surface. A very light dusting of ground cinnamon falls over it. A splash of almond milk pours in. A spoon enters from the top of the frame and folds everything in slow circles until it becomes one smooth glossy dark chocolate mousse, no streaks left. The spoon lifts out.
 
 PHYSICS
-Cocoa powder falls as a fine dust cloud and settles. The syrup falls as a slow viscous ribbon that folds on itself. The mousse thickens and becomes glossy as it is folded, holding soft peaks.
+Cocoa powder falls as a fine dust cloud and settles. The molasses falls as a slow thick ribbon that folds on itself. Only a pinch of cinnamon falls, barely visible. The mousse thickens and becomes glossy as it is folded, holding soft peaks.
 
 LIGHTING
 Soft afternoon window light from the left, gentle sheen on the glossy surface.
@@ -122,6 +123,7 @@ Miolo, gene colado no alelo, em Tiffany:
 | calda | gene do **ANKK1 A1** · recompensa → *doce planejado, não proibido* |
 | abacate / leite | gene da **APOE ε4** → *monoinsaturada no lugar da saturada* |
 | mexendo | gene do **CYP1A2 CC** · metabolizador lento → *teobromina à noite tira o sono* |
+| canela | gene do **TCF7L2** → *canela e fibra junto do doce, nunca doce sozinho* |
 | final | gene da **MTHFR C677T** → *folato do abacate entra na metilação* |
 
 Fecho:
