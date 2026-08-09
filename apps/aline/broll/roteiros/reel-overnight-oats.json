@@ -9,22 +9,26 @@
     {"clipe":0,"t":0.3,"dur":2.6,
      "chapeu":"CANSAÇO E NÉVOA MENTAL",
      "titulo":"O café da manhã\nque trabalha\nenquanto você dorme"},
-    {"clipe":0,"t":2.5,"dur":2.6,
-     "chapeu":"AVEIA + CHIA",
-     "titulo":"Fibra que alimenta\nsuas bactérias boas"},
     {"clipe":1,"t":9.2,"dur":3.2,
      "chapeu":"A SINERGIA",
      "titulo":"A vitamina C da manga\najuda a absorver\no ferro da aveia",
      "rodape":"@nutri_secrets"}
   ],
   "legendas": [
-    {"clipe":0,"de":0.4,"ate":1.5,"texto":"aveia"},
-    {"clipe":0,"de":1.9,"ate":2.4,"texto":"chia"},
-    {"clipe":0,"de":3.4,"ate":5.0,"texto":"um fio de mel"},
-    {"clipe":0,"de":6.4,"ate":8.0,"texto":"leite de coco"},
-    {"clipe":0,"de":12.9,"ate":13.8,"texto":"baunilha"},
-    {"clipe":1,"de":0.3,"ate":2.4,"texto":"8 horas na geladeira"},
-    {"clipe":1,"de":3.0,"ate":4.3,"texto":"manga"},
-    {"clipe":1,"de":4.7,"ate":6.0,"texto":"nozes"}
+    {"clipe":0,"de":0.4,"ate":1.4,"texto":"aveia","tam":46},
+    {"clipe":0,"de":1.5,"ate":2.6,"texto":"fibra que alimenta suas bactérias boas","tam":40},
+    {"clipe":0,"de":2.7,"ate":3.3,"texto":"chia","tam":46},
+    {"clipe":0,"de":3.5,"ate":4.6,"texto":"magnésio: energia dentro da célula","tam":40},
+    {"clipe":0,"de":4.7,"ate":5.6,"texto":"um fio de mel","tam":44},
+    {"clipe":0,"de":6.3,"ate":7.2,"texto":"leite de coco","tam":46},
+    {"clipe":0,"de":7.3,"ate":8.3,"texto":"gordura boa","tam":44,"destaque":true},
+    {"clipe":0,"de":8.4,"ate":9.4,"texto":"+ triptofano","tam":44,"destaque":true},
+    {"clipe":0,"de":9.5,"ate":10.9,"texto":"triptofano é a matéria-prima da serotonina","tam":38},
+    {"clipe":0,"de":11.0,"ate":12.1,"texto":"gordura digere devagar","tam":40},
+    {"clipe":0,"de":12.2,"ate":13.0,"texto":"saciedade até o almoço","tam":40},
+    {"clipe":0,"de":13.1,"ate":13.8,"texto":"baunilha","tam":44},
+    {"clipe":1,"de":0.3,"ate":2.4,"texto":"8 horas na geladeira","tam":42},
+    {"clipe":1,"de":3.0,"ate":4.2,"texto":"manga","tam":46},
+    {"clipe":1,"de":4.6,"ate":6.0,"texto":"nozes","tam":46}
   ]
 }

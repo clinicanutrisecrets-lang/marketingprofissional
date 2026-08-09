@@ -229,11 +229,18 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
 
     filtros = [f"scale={W}:{H}", f"fps={FPS}"]
     for leg in legendas:
-        y = H - RODAPE_SEGURO - 90
-        filtros.append(drawtext(
-            leg["texto"], FONT_SEMI, 40, BRANCO, y,
-            enable=f"between(t,{leg['de']},{leg['ate']})",
-            box=True, box_cor="black@0.5"))
+        tam = leg.get("tam", 40)
+        cor = MAGENTA if leg.get("destaque") else BRANCO
+        linhas = quebra(" ".join(leg["texto"].split("\n")), FONT_SEMI, tam,
+                        W - 140)
+        alt_linha = int(tam * 1.35)
+        # bloco cresce pra cima a partir da faixa segura
+        y0 = H - RODAPE_SEGURO - 60 - alt_linha * len(linhas)
+        for k, linha in enumerate(linhas):
+            filtros.append(drawtext(
+                linha, FONT_SEMI, tam, cor, y0 + alt_linha * k,
+                enable=f"between(t,{leg['de']},{leg['ate']})",
+                box=True, box_cor="black@0.55", box_pad=16))
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", str(fonte)]
     if ate is not None:
         cmd += ["-t", str(ate)]
