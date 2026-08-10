@@ -33,7 +33,7 @@ LOCATION MAP
 Foreground: a clear straight-sided glass on a dark wooden kitchen counter. Background: blurred neutral kitchen. Camera at glass height, straight on. Light from a window on the left.
 
 FIRST FRAME / BLOCKING
-The empty glass is already centred in frame, soft ripe avocado flesh beginning to fall into it.
+The glass already holds smooth pale green avocado purée filling one third of it, its surface soft and even. Dark cocoa powder is beginning to fall over it.
 
 FORMAT MODE
 One continuous shot, the camera does not cut on its own.
@@ -45,10 +45,10 @@ CAMERA
 Static locked off, no movement.
 
 ACTION
-Soft ripe avocado flesh drops into the glass and settles. Dark cocoa powder sifts down over it in a fine cloud. A thin ribbon of dark sugarcane molasses falls slowly and coils on the surface. A very light dusting of ground cinnamon falls over it. A splash of almond milk pours in. A spoon enters from the top of the frame and folds everything in slow circles until it becomes one smooth glossy dark chocolate mousse, no streaks left. The spoon lifts out.
+Dark cocoa powder sifts down over the green purée in a fine cloud and settles on its surface. A thin ribbon of dark sugarcane molasses falls slowly and coils on top. A pinch of ground cinnamon falls over it. A small splash of almond milk pours in and the level rises only slightly. A spoon enters from the top of the frame and starts folding the purée over on itself. At first only thin brown streaks appear across the pale green surface. As the folding continues the streaks multiply and spread, and the surface turns patchy light brown. The folding goes on, the last green patches slowly disappear, and the whole mixture becomes one uniform deep cocoa brown, glossy and smooth. The spoon lifts out, leaving a soft swirl on the surface.
 
 PHYSICS
-Cocoa powder falls as a fine dust cloud and settles. The molasses falls as a slow thick ribbon that folds on itself. Only a pinch of cinnamon falls, barely visible. The mousse thickens and becomes glossy as it is folded, holding soft peaks.
+Cocoa powder falls as a fine dust cloud. The molasses falls as a slow thick ribbon that folds on itself. The purée is dense and folds in soft heavy waves, never splashing, never running like liquid. The colour changes gradually and continuously across the whole shot, never jumping from green to brown between frames. The mousse holds the mark of the spoon.
 
 LIGHTING
 Soft afternoon window light from the left, gentle sheen on the glossy surface.
@@ -57,7 +57,7 @@ STYLE
 Photoreal food cinematography, visible natural texture, true to life colors, fine grain.
 
 POSITIVE LOCKS
-Everything falls or enters from above, outside the frame. Only the spoon is visible, no hands, no arms, no people, no bowls or packaging. The mixture ends up uniform and glossy, no green streaks, no separate layers. No text or labels.
+The avocado is a smooth purée from the very first frame, never in slices, halves or chunks. The mixture stays thick like a dense mousse at all times, never liquid, never runny. The level starts at one third of the glass and never rises above half. The green turns brown progressively through the whole folding, not in a single jump. Everything falls or enters from above, outside the frame. Only the spoon is visible, no hands, no arms, no people. By the end there is no green left. No text or labels.
 ```
 
 ## Vídeo B — o final

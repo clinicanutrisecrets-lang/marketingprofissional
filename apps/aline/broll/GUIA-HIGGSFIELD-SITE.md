@@ -291,3 +291,70 @@ serve pra qualquer tema futuro.
 
 A montagem (juntar cenas, cortes no ritmo, texto queimado na paleta da
 marca, áudio) é feita depois — a Aline não edita.
+
+---
+
+## 12. Regras de ouro (aprendidas testando, ago/2026)
+
+Cada uma dessas custou uma geração perdida. Aplicar em TODO prompt novo.
+
+### 1. Descreva o caminho, não o resultado
+O erro mais caro. "Mexe até ficar homogêneo" faz o modelo pular direto pro
+final — a mistura muda de cor de um frame pro outro. Descreva a
+progressão em etapas:
+
+> ❌ `folds until it becomes one uniform dark mousse`
+> ✅ `at first only thin brown streaks appear across the pale green surface.
+> As the folding continues the streaks multiply and spread, and the surface
+> turns patchy light brown. The last green patches slowly disappear until
+> the whole mixture is one uniform deep cocoa brown`
+
+Vale pra qualquer transformação: derreter, dourar, encher, murchar, gelar.
+
+### 2. Nada de mudança grande de volume
+O modelo não multiplica quantidade — o copo "incha" sozinho. Comece perto
+do estado final e trave com número:
+`the level starts at one third of the glass and never rises above half`.
+
+### 3. Ingrediente entra na forma final
+Ele não amassa, não pica, não bate. Abacate entra como **purê**, não em
+metades. Se a forma precisa mudar, ou mostre já pronto, ou é outro plano.
+
+### 4. Nada de mão, nada de gente
+`no hands, no arms, no people` + `everything falls or enters from above,
+outside the frame`. Mão malfeita estraga o clipe inteiro. Se a receita
+exige mexer, deixe **só a colher** visível.
+
+### 5. Nada de texto gerado
+`no text or labels, no letters, no packaging`. IA escreve garatuja. Tela,
+rótulo e papel entram **desfocados** — e o conteúdo real vira overlay na
+montagem.
+
+### 6. Um movimento de câmera por clipe
+Ou `static locked off`, ou **um** movimento. Dois movimentos brigam.
+
+### 7. Peça imperfeição
+`rustic imperfect plating, visible texture, crumbs and drips` deixa real.
+`perfect`, `flawless`, `hyperreal`, `8k` deixam com cara de propaganda.
+
+### 8. Descreva a física do material
+Mel não cai, **enrola**: `slow viscous ribbon that folds on itself`. Purê
+não respinga: `folds in soft heavy waves, never splashing`. É a física que
+convence o olho.
+
+### 9. Nunca escreva "camadas" se quer mistura
+`layers building up one after another` produziu chia seca no fundo. Use
+`evenly dispersed`, `one uniform speckled cream`, `no separate layers`.
+
+### 10. Continuidade entre clipes = bloco repetido + referência
+Repetir palavra por palavra o mesmo recipiente, bancada e direção de luz
+em todos os prompts. Para emendar de verdade, subir o **último frame** do
+clipe anterior em "Add elements or references" e travar com
+`100% matches the reference`.
+
+### 11. Duração proporcional ao número de etapas
+Quatro etapas em 5s se atropelam. Conte as etapas e dê pelo menos ~3s por
+etapa, ou divida em dois vídeos.
+
+### 12. Sigla técnica não vai em fonte serifada italic
+Algarismo antigo transforma FADS1 em "FADSı". Sigla de gene em sans-serif.
