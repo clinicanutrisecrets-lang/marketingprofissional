@@ -296,6 +296,13 @@ ${produto.descricao ? `- Descrição da nutri: ${produto.descricao}` : ""}
 ${incluir_preco && produto.preco_texto ? `- Preço: ${produto.preco_texto}` : "- Preço: NÃO citar preço neste post"}
 - Link de compra (checkout real): ${produto.checkout_url}
 
+⚠️ A descrição acima é interna (catálogo da nutri) e PODE conter nome de doença
+(ex.: "SOP", "endometriose", "TEA"). O post é conteúdo público, visto por
+paciente: NUNCA reproduza nome de diagnóstico. Traduza para PROCESSO FUNCIONAL
+— "modulação hormonal feminina", "cuidado intestinal", "cuidado
+neuroendócrino", "melhora hepática", "fase reprodutiva feminina" etc. Nutri não
+diagnostica (CFN); descrever o processo é o que a lei permite.
+
 COMO VENDER SEM PARECER PANFLETO:
 - Comece pela DOR ou DESEJO que esse produto resolve — nunca pelo produto.
 - O produto entra como o próximo passo NATURAL, não como anúncio.
