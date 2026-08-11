@@ -97,16 +97,28 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── 2. Garante o usuário de auth (createUser é idempotente na prática:
-  //       se já existe, o erro "already registered" é esperado e ignorado) ──
-  const { error: createErr } = await admin.auth.admin.createUser({
-    email: emailToken,
-    email_confirm: true,
-    user_metadata: { nome: nomeToken, sso_origem: "scanner-saas" },
-  });
-  if (createErr && !/already|exists|registered|duplicate/i.test(createErr.message)) {
-    console.error("[sso] createUser falhou:", createErr.message);
-    return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+  // ── 2. Garante o usuário de auth ──────────────────────────────────────
+  // Só tenta criar quando ainda NÃO temos um usuário conhecido. E, se a
+  // criação falhar, NÃO aborta: quem decide é o generateLink logo abaixo.
+  //
+  // 🔴 Regressão corrigida (Juliana, 11/08): eu chamava createUser em toda
+  // entrada e só engolia o erro se a mensagem casasse com uma lista de
+  // palavras chutada ("already", "registered"…). Pra quem já tinha conta —
+  // que é o caso normal a partir da segunda visita — bastava a Supabase usar
+  // outro texto pra eu abortar com sso_login e a nutri ficar trancada do
+  // lado de fora. Quem nunca tinha entrado (Viviane) passava, porque aí a
+  // criação dava certo de verdade. Erro de mensagem NUNCA deve virar erro de
+  // login: o teste real é conseguir o link, não adivinhar a frase do erro.
+  if (!franq?.auth_user_id) {
+    const { error: createErr } = await admin.auth.admin.createUser({
+      email: emailToken,
+      email_confirm: true,
+      user_metadata: { nome: nomeToken, sso_origem: "scanner-saas" },
+    });
+    if (createErr) {
+      // Esperado quando o usuário já existe. Só registra e segue.
+      console.warn("[sso] createUser não criou (segue pro magic link):", createErr.message);
+    }
   }
 
   // ── 3. Magic link consumido no servidor: devolve o hash da sessão E o
