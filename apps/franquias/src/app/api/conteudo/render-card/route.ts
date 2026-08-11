@@ -132,7 +132,23 @@ export async function POST(request: Request) {
           conteudo: conteudos[i]!,
           schemeIndex: ehCapa || ehUltimo ? 0 : 1,
           corFundoHex,
-          logoBuffer: ehCapa ? logoBuffer : undefined,
+          // Logo em TODOS os slides (antes só na capa — os miolos saíam sem
+          // marca nenhuma). Sem upload, o renderer cai na logo do onboarding.
+          logoBuffer,
+          // Ilustração por slide, escolhida pelo texto DAQUELE slide. Antes o
+          // carrossel nem repassava o campo, então nenhum slide vinha com
+          // ícone. Capa e CTA seguem tipográficos, sem ícone.
+          // Em "auto", cada slide ganha o ícone do PRÓPRIO texto (senão os 8
+          // sairiam com o mesmo desenho, escolhido pelo título da capa).
+          // Ícone escolhido à mão vale pra todos.
+          ilustracao:
+            ehCapa || ehUltimo
+              ? undefined
+              : ilustracaoRaw === "auto"
+                ? sugerirIlustracao(
+                    `${conteudos[i]!.headline ?? ""} ${conteudos[i]!.corpo ?? ""}`,
+                  )
+                : ilustracao,
         });
         buffers.push(buf);
       }

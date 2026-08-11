@@ -303,7 +303,14 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   const handle = derivarHandle(brand);
 
   if (layout === "conteudo") {
-    return renderConteudo({ W, H, scheme, conteudo, handle });
+    // Logo e ilustração também valem aqui (slides de carrossel). Antes só o
+    // caminho hero/foto desenhava logo, então a marca sumia dos slides
+    // internos e a ilustração era calculada e descartada.
+    return renderConteudo({
+      W, H, scheme, conteudo, handle,
+      logoComposite: await prepararLogo(input, brand, W, H),
+      ilustracao: input.ilustracao,
+    });
   }
   if (layout === "citacao") {
     return renderCitacao({ W, H, scheme, conteudo, handle });
@@ -348,30 +355,7 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
 
   // Logo no topo-centro (estilo @patibianco). Empurra o conteúdo pra baixo.
   // Usa o buffer enviado ou baixa da logoUrl da marca (onboarding).
-  let logoBruta: Buffer | undefined = input.logoBuffer;
-  if (!logoBruta && brand.logoUrl) {
-    try {
-      const res = await fetch(brand.logoUrl, { signal: AbortSignal.timeout(8000) });
-      if (res.ok) logoBruta = Buffer.from(await res.arrayBuffer());
-    } catch {
-      // logo remota indisponível — segue sem
-    }
-  }
-  let logoComposite: { buf: Buffer; w: number; h: number } | null = null;
-  if (logoBruta) {
-    try {
-      const maxLogoH = Math.round(H * 0.055);
-      const maxLogoW = Math.round(W * 0.34);
-      const logoPng = await sharp(logoBruta)
-        .resize(maxLogoW, maxLogoH, { fit: "inside", withoutEnlargement: true })
-        .png()
-        .toBuffer();
-      const meta = await sharp(logoPng).metadata();
-      logoComposite = { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
-    } catch {
-      // logo inválida — segue sem
-    }
-  }
+  const logoComposite = await prepararLogo(input, brand, W, H);
 
   if (eyebrow) {
     const pill = blocoPill(eyebrow, scheme.pill, W);
@@ -462,33 +446,100 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
 
 // ————— Slide de conteúdo (carrossel interno) —————
 
+/**
+ * Prepara a logo pra composição: usa o upload da nutri ou, na falta dele, a
+ * logo do onboarding (brand.logoUrl). Extraído do caminho hero pra poder ser
+ * reusado nos slides de carrossel — a marca precisa aparecer em todos.
+ */
+async function prepararLogo(
+  input: CardInput,
+  brand: CardInput["brand"],
+  W: number,
+  H: number,
+): Promise<{ buf: Buffer; w: number; h: number } | null> {
+  let logoBruta: Buffer | undefined = input.logoBuffer;
+  if (!logoBruta && brand.logoUrl) {
+    try {
+      const res = await fetch(brand.logoUrl, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) logoBruta = Buffer.from(await res.arrayBuffer());
+    } catch {
+      // logo remota indisponível — segue sem
+    }
+  }
+  if (!logoBruta) return null;
+  try {
+    const maxLogoH = Math.round(H * 0.055);
+    const maxLogoW = Math.round(W * 0.34);
+    const logoPng = await sharp(logoBruta)
+      .resize(maxLogoW, maxLogoH, { fit: "inside", withoutEnlargement: true })
+      .png()
+      .toBuffer();
+    const meta = await sharp(logoPng).metadata();
+    return { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
+  } catch {
+    return null; // logo inválida — segue sem
+  }
+}
+
 async function renderConteudo(params: {
   W: number;
   H: number;
   scheme: Scheme;
   conteudo: ConteudoPeca;
   handle: string;
+  logoComposite?: { buf: Buffer; w: number; h: number } | null;
+  ilustracao?: IlustracaoId;
 }): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle } = params;
+  const { W, H, scheme, conteudo, handle, logoComposite, ilustracao } = params;
   const contentW = Math.round(W * 0.82);
   const composites: sharp.OverlayOptions[] = [];
 
   const headline = (conteudo.headline ?? "").trim();
   const corpo = (conteudo.corpo ?? conteudo.subtitle ?? "").trim();
 
-  let y = Math.round(H * 0.1);
+  // ── Passo 1: MEDIR tudo antes de desenhar ─────────────────────────────
+  // Antes o texto começava num y fixo (H*0.1) e só empilhava pra baixo: os
+  // slides do carrossel ficavam colados no topo enquanto a capa (layout hero)
+  // vinha centralizada, e o conjunto parecia desalinhado. Agora medimos o
+  // grupo inteiro e centralizamos, igual o hero faz.
+  type Peca = { desenhar: (topo: number) => void; altura: number; gapAntes: number };
+  const pecas: Peca[] = [];
+
+  // Ilustração temática (line-art) como cabeçalho do slide — some quando não
+  // há tema reconhecido. Fica ACIMA do título pra nunca colidir com o texto.
+  if (ilustracao) {
+    const tam = Math.round(W * 0.13);
+    const il = svgIlustracao(ilustracao, tam, scheme.kicker, 0.9);
+    if (il) {
+      const buf = await sharp(il).png().toBuffer();
+      pecas.push({
+        altura: tam,
+        gapAntes: 0,
+        desenhar: (topo) =>
+          composites.push({ input: buf, top: topo, left: Math.round((W - tam) / 2) }),
+      });
+    }
+  }
 
   if (headline) {
     const titulo = blocoTitulo(headline, scheme.titulo, contentW, H * 0.24, Math.round(W * 0.062));
-    composites.push(...posicionar(titulo, Math.round((W - titulo.largura) / 2), y));
-    y += titulo.altura + Math.round(H * 0.015);
+    pecas.push({
+      altura: titulo.altura,
+      gapAntes: pecas.length ? Math.round(H * 0.022) : 0,
+      desenhar: (topo) =>
+        composites.push(...posicionar(titulo, Math.round((W - titulo.largura) / 2), topo)),
+    });
 
     const linhaW = Math.round(W * 0.1);
     const linha = Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="${linhaW}" height="3"><rect width="${linhaW}" height="3" rx="1.5" fill="${scheme.kicker}"/></svg>`,
     );
-    composites.push({ input: linha, top: y + 8, left: Math.round((W - linhaW) / 2) });
-    y += Math.round(H * 0.05);
+    pecas.push({
+      altura: 3,
+      gapAntes: Math.round(H * 0.015) + 8,
+      desenhar: (topo) =>
+        composites.push({ input: linha, top: topo, left: Math.round((W - linhaW) / 2) }),
+    });
   }
 
   if (corpo) {
@@ -497,17 +548,49 @@ async function renderConteudo(params: {
       .map((p) => p.replace(/\n/g, " ").trim())
       .filter(Boolean);
     const fontSize = Math.round(W * 0.034);
-    const maxY = H - Math.round(H * 0.14);
+    let primeiro = true;
     for (const p of paragrafos) {
       const bloco = blocoDeTexto(p, "sans", scheme.sub, fontSize, contentW, {
         lineHeight: 1.52,
         align: "left",
         peso: 0.4,
       });
-      if (y + bloco.altura > maxY) break; // não estoura o card
-      composites.push(...posicionar(bloco, Math.round((W - contentW) / 2), y));
-      y += bloco.altura + Math.round(fontSize * 1.1);
+      pecas.push({
+        altura: bloco.altura,
+        gapAntes: primeiro ? Math.round(H * 0.035) : Math.round(fontSize * 1.1),
+        desenhar: (topo) =>
+          composites.push(...posicionar(bloco, Math.round((W - contentW) / 2), topo)),
+      });
+      primeiro = false;
     }
+  }
+
+  // ── Passo 2: descartar o que não cabe (de trás pra frente) ────────────
+  const areaTopo =
+    Math.round(H * 0.08) + (logoComposite ? logoComposite.h + Math.round(H * 0.02) : 0);
+  const areaBase = H - Math.round(H * 0.13); // acima do @handle do rodapé
+  const alturaDisponivel = areaBase - areaTopo;
+  const somar = (lista: Peca[]) =>
+    lista.reduce((acc, x) => acc + x.gapAntes + x.altura, 0);
+  while (pecas.length > 1 && somar(pecas) > alturaDisponivel) pecas.pop();
+
+  // ── Passo 3: centralizar o grupo e desenhar ───────────────────────────
+  const alturaGrupo = somar(pecas);
+  const centrado = Math.round(areaTopo + (alturaDisponivel - alturaGrupo) * 0.46);
+  let y = Math.max(areaTopo, Math.min(centrado, areaBase - alturaGrupo));
+
+  if (logoComposite) {
+    composites.push({
+      input: logoComposite.buf,
+      top: Math.round(H * 0.045),
+      left: Math.round((W - logoComposite.w) / 2),
+    });
+  }
+
+  for (const peca of pecas) {
+    y += peca.gapAntes;
+    peca.desenhar(y);
+    y += peca.altura;
   }
 
   if (handle) {
