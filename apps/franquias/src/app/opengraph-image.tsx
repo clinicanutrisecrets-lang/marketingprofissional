@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Scanner da Saúde — Plataforma Franquia Digital";
+export const alt = "Scanner da Saúde — Marketing Profissional";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function OpengraphImage() {
             maxWidth: 960,
           }}
         >
-          Plataforma Franquia Digital
+          Marketing Profissional
         </div>
         <div
           style={{
