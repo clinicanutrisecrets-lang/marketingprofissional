@@ -47,22 +47,32 @@ export default function LoginPage() {
         <h1 className="mb-2 text-2xl font-bold text-brand-text">
           Marketing Profissional
         </h1>
-        {/* Não prometemos "a senha que você recebeu": ninguém envia senha. O
-            caminho normal é o SSO pelo menu do Scanner. Esta tela é fallback
-            pra quem já cadastrou senha própria. */}
-        <div className="mb-6 rounded-lg bg-brand-muted p-3 text-sm leading-relaxed text-brand-text/70">
-          O jeito normal de entrar é pelo <strong>menu do Scanner da Saúde</strong>{" "}
-          (Crescimento Profissional → Marketing Profissional): lá você entra com o
-          mesmo login, sem senha separada.{" "}
+        {/* 🔴 Esta tela é o fallback, não a porta principal — e antes ela era um
+            beco: dizia "entre pelo menu do Scanner" e deixava a pessoa digitando
+            uma senha que nunca existiu ("Invalid login credentials"). Foi o que
+            aconteceu com a Juliana em 11/08.
+            Agora o botão FAZ o login: bate no /api/sso/marketing-token do
+            Scanner, que devolve ela pra cá já logada. Se a sessão do Scanner
+            tiver expirado, ele pede o login DE LÁ e volta pra cá sozinho. */}
+        <div className="mb-6 rounded-lg bg-brand-muted p-4 text-sm leading-relaxed text-brand-text/70">
+          <p className="mb-3">
+            Você não tem senha aqui — entra com o{" "}
+            <strong>mesmo login do Scanner da Saúde</strong>.
+          </p>
           <a
-            href="https://scannerdasaude.com/nutri/marketing-profissional"
-            className="font-medium text-brand-primary hover:underline"
+            href="https://scannerdasaude.com/api/sso/marketing-token"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-brand-primary px-4 py-2.5 font-semibold text-white transition hover:opacity-90"
           >
-            Ir para o Scanner →
+            Entrar com meu login do Scanner →
           </a>
+          <p className="mt-3 text-xs text-brand-text/50">
+            No Scanner, esse botão também fica em <strong>Crescimento
+            Profissional → Consultório de Precisão</strong>, ao lado de
+            &ldquo;Entrar na minha área de membros&rdquo;.
+          </p>
         </div>
         <p className="mb-6 text-sm text-brand-text/60">
-          Se você já cadastrou uma senha própria aqui, pode usá-la abaixo.
+          Só use o formulário abaixo se você cadastrou uma senha própria aqui.
         </p>
 
         <form onSubmit={handleLogin} className="space-y-4">
