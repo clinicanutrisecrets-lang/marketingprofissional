@@ -37,11 +37,23 @@ export async function GET(request: Request) {
 
   const resultados: Array<{ postId: string; ok: boolean; erro?: string; instagramPostId?: string }> = [];
 
+  let semCanal = 0;
   for (const p of posts) {
     const post = p as { id: string };
     const r = await publicarPost(post.id);
-    // FIX 3: Always update to "erro" on failure (not just thrown exceptions)
-    if (!r.ok) {
+
+    if (!r.ok && r.semCanal) {
+      // Conta sem canal de publicação (Meta sem aprovação, Publer não
+      // configurado): não é erro do post. Devolve pra "aprovado" — se
+      // ficasse em "publicando" (setado em lote acima) sumiria da fila pra
+      // sempre — e segue sem marcar vermelho na tela da nutri.
+      await admin
+        .from("posts_agendados")
+        .update({ status: "aprovado" })
+        .eq("id", post.id);
+      semCanal += 1;
+    } else if (!r.ok) {
+      // FIX 3: Always update to "erro" on failure (not just thrown exceptions)
       await admin
         .from("posts_agendados")
         .update({ status: "erro", erro_mensagem: r.erro ?? "Falha desconhecida" })
@@ -60,7 +72,8 @@ export async function GET(request: Request) {
     ok: true,
     total: posts.length,
     publicados: sucesso,
-    falhas: posts.length - sucesso,
+    sem_canal: semCanal,
+    falhas: posts.length - sucesso - semCanal,
     detalhes: resultados,
   });
 }

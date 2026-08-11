@@ -18,7 +18,7 @@ export default async function EditorPage({
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id")
+    .select("id, cor_primaria_hex")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   if (!franqueada) redirect("/onboarding");
@@ -53,6 +53,9 @@ export default async function EditorPage({
           headlineInicial={searchParams?.titulo ?? ""}
           eyebrowInicial={searchParams?.categoria ?? ""}
           subtitleInicial={searchParams?.apoio ?? ""}
+          corMarca={
+            (franqueada as { cor_primaria_hex?: string | null }).cor_primaria_hex ?? null
+          }
         />
       </div>
     </main>

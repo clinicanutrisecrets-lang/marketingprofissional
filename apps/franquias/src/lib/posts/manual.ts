@@ -103,17 +103,17 @@ export async function criarPostManual(params: {
   copy_cta?: string;
   hashtags?: string[];
   briefing_nutri?: string;
-  data_hora_agendada: string;
+  /**
+   * Opcional de propósito. Enquanto a publicação automática não existe
+   * (depende da aprovação do app na Meta / do Publer configurado), as telas
+   * NÃO pedem data: o post fica salvo e a nutri publica quando quiser.
+   * Sem data o cron de publicação nunca pega o post — ele filtra por
+   * `data_hora_agendada <= agora`, e comparação com NULL nunca é verdadeira.
+   */
+  data_hora_agendada?: string | null;
   url_imagem?: string;
   url_video?: string;
   legenda_gerada_ia?: boolean;
-  /**
-   * Default 'aprovado' (comportamento original). 'aguardando_aprovacao'
-   * é usado quando o post ainda não tem mídia — o cron de publicação só
-   * pega 'aprovado', então o post não vai pro Instagram sem arte (evita
-   * cair em status 'erro' com "Post sem mídia" no horário agendado).
-   */
-  status?: "aprovado" | "aguardando_aprovacao";
 }): Promise<{ ok: boolean; postId?: string; erro?: string; redistribuidos?: number }> {
   const supabase = createClient();
   const {
@@ -130,34 +130,37 @@ export async function criarPostManual(params: {
   if (!f) return { ok: false, erro: "Franqueada não encontrada" };
   const franqueadaId = (f as { id: string }).id;
 
-  // 1. Redistribui posts IA conflitantes na mesma janela (±3h)
-  const dataPost = new Date(params.data_hora_agendada);
-  const janelaInicio = new Date(dataPost.getTime() - 3 * 60 * 60 * 1000);
-  const janelaFim = new Date(dataPost.getTime() + 3 * 60 * 60 * 1000);
-
-  const { data: conflitantes } = await supabase
-    .from("posts_agendados")
-    .select("id, data_hora_agendada")
-    .eq("franqueada_id", franqueadaId)
-    .eq("tipo_post", params.tipo)
-    .eq("origem", "ia_automatico")
-    .in("status", ["aguardando_aprovacao", "aprovado"])
-    .gte("data_hora_agendada", janelaInicio.toISOString())
-    .lte("data_hora_agendada", janelaFim.toISOString());
-
+  // 1. Só faz sentido remanejar a agenda quando existe agenda: sem data, não
+  //    há janela pra conflitar (nem publicação automática pra atrapalhar).
   let redistribuidos = 0;
-  if (conflitantes && conflitantes.length > 0) {
-    for (const c of conflitantes) {
-      const conf = c as { id: string; data_hora_agendada: string };
-      const novoHorario = new Date(dataPost.getTime() + 4 * 60 * 60 * 1000 + redistribuidos * 24 * 60 * 60 * 1000);
-      await supabase
-        .from("posts_agendados")
-        .update({
-          data_hora_agendada: novoHorario.toISOString(),
-          redistribuido_de: conf.data_hora_agendada,
-        })
-        .eq("id", conf.id);
-      redistribuidos += 1;
+  if (params.data_hora_agendada) {
+    const dataPost = new Date(params.data_hora_agendada);
+    const janelaInicio = new Date(dataPost.getTime() - 3 * 60 * 60 * 1000);
+    const janelaFim = new Date(dataPost.getTime() + 3 * 60 * 60 * 1000);
+
+    const { data: conflitantes } = await supabase
+      .from("posts_agendados")
+      .select("id, data_hora_agendada")
+      .eq("franqueada_id", franqueadaId)
+      .eq("tipo_post", params.tipo)
+      .eq("origem", "ia_automatico")
+      .in("status", ["aguardando_aprovacao", "aprovado"])
+      .gte("data_hora_agendada", janelaInicio.toISOString())
+      .lte("data_hora_agendada", janelaFim.toISOString());
+
+    if (conflitantes && conflitantes.length > 0) {
+      for (const c of conflitantes) {
+        const conf = c as { id: string; data_hora_agendada: string };
+        const novoHorario = new Date(dataPost.getTime() + 4 * 60 * 60 * 1000 + redistribuidos * 24 * 60 * 60 * 1000);
+        await supabase
+          .from("posts_agendados")
+          .update({
+            data_hora_agendada: novoHorario.toISOString(),
+            redistribuido_de: conf.data_hora_agendada,
+          })
+          .eq("id", conf.id);
+        redistribuidos += 1;
+      }
     }
   }
 
@@ -167,7 +170,7 @@ export async function criarPostManual(params: {
     .insert({
       franqueada_id: franqueadaId,
       tipo_post: params.tipo,
-      status: params.status ?? "aprovado", // manual já é aprovado
+      status: "aprovado", // manual já nasce pronto pra usar
       origem: "manual_nutri",
       prioridade: 100,
       bloqueado_horario: true,
@@ -176,7 +179,7 @@ export async function criarPostManual(params: {
       hashtags: params.hashtags,
       briefing_nutri: params.briefing_nutri,
       legenda_gerada_ia: params.legenda_gerada_ia ?? false,
-      data_hora_agendada: params.data_hora_agendada,
+      data_hora_agendada: params.data_hora_agendada ?? null,
       imagem_upload_url: params.url_imagem,
       video_upload_url: params.url_video,
       url_imagem_final: params.url_imagem,

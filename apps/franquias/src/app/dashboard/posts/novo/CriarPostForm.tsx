@@ -28,13 +28,6 @@ export function CriarPostForm() {
   const [legenda, setLegenda] = useState("");
   const [cta, setCta] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);
-  const [dataHora, setDataHora] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    d.setHours(8, 0, 0, 0);
-    return d.toISOString().slice(0, 16);
-  });
-
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [urlMidia, setUrlMidia] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -79,9 +72,12 @@ export function CriarPostForm() {
     }
   }
 
-  async function handleAgendar() {
+  // Sem data e sem "agendar": a publicação automática depende da aprovação
+  // do app na Meta, que ainda não saiu. O post fica salvo aqui e a nutri
+  // publica no Instagram dela quando quiser.
+  async function handleSalvar() {
     if (!legenda) {
-      setErro("Preencha a legenda antes de agendar");
+      setErro("Escreva a legenda antes de salvar");
       return;
     }
     setErro(null);
@@ -92,15 +88,12 @@ export function CriarPostForm() {
         copy_cta: cta,
         hashtags,
         briefing_nutri: briefing,
-        data_hora_agendada: new Date(dataHora).toISOString(),
         url_imagem: tipo === "reels" ? undefined : urlMidia ?? undefined,
         url_video: tipo === "reels" ? urlMidia ?? undefined : undefined,
         legenda_gerada_ia: gerandoIA,
       });
       if (r.ok) {
-        setMsg(
-          `Post agendado! ${r.redistribuidos ? `(${r.redistribuidos} posts IA foram reagendados)` : ""}`,
-        );
+        setMsg("Post salvo! Ele fica na sua biblioteca — é só copiar a legenda e publicar no seu Instagram.");
         setTimeout(() => router.push("/dashboard/aprovar"), 1500);
       } else {
         setErro(r.erro ?? "Erro");
@@ -198,26 +191,22 @@ export function CriarPostForm() {
         rows={2}
       />
 
-      <Field
-        label="Data e hora do post"
-        name="data_hora"
-        type="text"
-        value={dataHora}
-        onChange={setDataHora}
-        hint="Formato YYYY-MM-DDTHH:MM. Posts IA conflitantes (±3h) serão reagendados automaticamente."
-      />
-
       {msg && <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">{msg}</div>}
       {erro && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{erro}</div>}
 
       <button
         type="button"
-        onClick={handleAgendar}
+        onClick={handleSalvar}
         disabled={isPending}
         className="w-full rounded-lg bg-brand-primary px-5 py-3 text-base font-semibold text-white hover:bg-brand-primary/90 disabled:opacity-60"
       >
-        {isPending ? "Agendando..." : "📅 Agendar post"}
+        {isPending ? "Salvando..." : "Salvar post"}
       </button>
+      <p className="text-center text-xs leading-relaxed text-brand-text/50">
+        O post fica salvo na sua biblioteca. A publicação no Instagram é feita
+        por você — publicar automático depende de uma liberação da Meta que
+        ainda não saiu.
+      </p>
     </div>
   );
 }

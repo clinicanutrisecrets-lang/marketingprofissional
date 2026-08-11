@@ -57,6 +57,13 @@ export function EditorArte(props: {
   headlineInicial?: string;
   eyebrowInicial?: string;
   subtitleInicial?: string;
+  /**
+   * Cor da marca da nutri (franqueadas.cor_primaria_hex), preenchida no
+   * onboarding. Antes o seletor "Cor personalizada" abria num verde fixo do
+   * código (#2F5D50) e ignorava a cor que ela já tinha informado — parecia
+   * que o cadastro não havia salvado.
+   */
+  corMarca?: string | null;
 }) {
   const [eyebrow, setEyebrow] = useState(props.eyebrowInicial || "nutrição de precisão");
   const [headline, setHeadline] = useState(props.headlineInicial ?? "");
@@ -69,7 +76,7 @@ export function EditorArte(props: {
   const [logo, setLogo] = useState<File | null>(null);
   const [logoNome, setLogoNome] = useState<string>("");
   const [usarCorCustom, setUsarCorCustom] = useState(false);
-  const [corFundo, setCorFundo] = useState("#2F5D50");
+  const [corFundo, setCorFundo] = useState(normalizarHex(props.corMarca) ?? "#2F5D50");
   const [layout, setLayout] = useState("auto");
   const [fotoPos, setFotoPos] = useState("centro");
   const [itens, setItens] = useState("");
@@ -513,4 +520,11 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
       {children}
     </div>
   );
+}
+
+/** Aceita "#RRGGBB" ou "RRGGBB"; devolve null se não for hex válido. */
+function normalizarHex(valor: string | null | undefined): string | null {
+  if (!valor) return null;
+  const m = valor.trim().match(/^#?([0-9a-fA-F]{6})$/);
+  return m ? `#${m[1].toLowerCase()}` : null;
 }

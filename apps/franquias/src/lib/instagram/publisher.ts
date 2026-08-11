@@ -17,7 +17,7 @@ import {
  */
 export async function publicarPost(
   postId: string,
-): Promise<{ ok: boolean; instagramPostId?: string; erro?: string }> {
+): Promise<{ ok: boolean; instagramPostId?: string; erro?: string; semCanal?: boolean }> {
   const admin = createAdminClient();
 
   const { data: postData } = await admin
@@ -99,7 +99,11 @@ export async function publicarPost(
     // pronto pra nutri baixar e postar. Mensagem precisa dizer isso — antes
     // apontava pra um "passo de conexão no onboarding" que não existe
     // enquanto o Publer está desligado.
-    if (!temTokenDireto) return { ok: false, erro: "Publicação automática não está ativa nesta conta — baixe a arte e a legenda e publique direto no seu Instagram." };
+    // `semCanal` avisa o cron de que NÃO é falha de publicação: esta conta
+    // simplesmente não tem por onde publicar (Meta sem aprovação, Publer não
+    // configurado). Sem isso o cron marcava o post como "erro", e a nutri via
+    // vermelho num post que está perfeito — só esperando ela publicar.
+    if (!temTokenDireto) return { ok: false, semCanal: true, erro: "Publicação automática não está ativa nesta conta — baixe a arte e a legenda e publique direto no seu Instagram." };
     if (tokenExpirado) return { ok: false, erro: "Token Instagram expirado — reconecte no painel." };
   }
 

@@ -38,10 +38,9 @@ export function PostsVendaClient(props: {
   const [gerando, setGerando] = useState(false);
   const [post, setPost] = useState<PostGerado | null>(null);
 
-  const [dataAgendar, setDataAgendar] = useState("");
   const [urlImagem, setUrlImagem] = useState("");
   const [agendando, startAgendar] = useTransition();
-  const [agendado, setAgendado] = useState(false);
+  const [agendado, setAgendado] = useState(false); // "salvo"
   const [copiado, setCopiado] = useState<string | null>(null);
 
   async function sincronizar() {
@@ -82,8 +81,11 @@ export function PostsVendaClient(props: {
     setGerando(false);
   }
 
-  function agendar() {
-    if (!post || !dataAgendar) return;
+  // Salva sem data: publicação automática depende da aprovação do app na
+  // Meta, que ainda não saiu. Pedir data e dizer "agendar" prometeria o que
+  // o sistema não faz — a nutri copia a legenda e publica no Instagram dela.
+  function salvar() {
+    if (!post) return;
     setErro(null);
     const imagem = urlImagem.trim();
     startAgendar(async () => {
@@ -93,17 +95,13 @@ export function PostsVendaClient(props: {
         copy_cta: post.copy_cta,
         hashtags: post.hashtags,
         briefing_nutri: `Post de venda: ${produtoAtivo?.nome ?? ""}`,
-        data_hora_agendada: new Date(dataAgendar).toISOString(),
         url_imagem: imagem || undefined,
         legenda_gerada_ia: true,
-        // Sem arte o post NÃO publica sozinho — fica aguardando aprovação
-        // (o cron de publicação falharia com "Post sem mídia")
-        status: imagem ? "aprovado" : "aguardando_aprovacao",
       });
       if (r.ok) {
         setAgendado(true);
       } else {
-        setErro(r.erro ?? "Não foi possível agendar.");
+        setErro(r.erro ?? "Não foi possível salvar.");
       }
     });
   }
@@ -263,15 +261,6 @@ export function PostsVendaClient(props: {
               />
 
               <div className="flex flex-wrap items-end gap-3 rounded-xl bg-brand-muted p-4">
-                <label className="text-xs text-brand-text/70">
-                  Agendar publicação
-                  <input
-                    type="datetime-local"
-                    value={dataAgendar}
-                    onChange={(e) => setDataAgendar(e.target.value)}
-                    className="mt-1 block rounded-lg border border-brand-text/15 bg-white px-3 py-2 text-sm"
-                  />
-                </label>
                 <label className="min-w-[240px] flex-1 text-xs text-brand-text/70">
                   URL da imagem (da sua galeria — opcional)
                   <input
@@ -283,16 +272,16 @@ export function PostsVendaClient(props: {
                   />
                 </label>
                 <button
-                  onClick={agendar}
-                  disabled={agendando || !dataAgendar || agendado}
+                  onClick={salvar}
+                  disabled={agendando || agendado}
                   className="rounded-full bg-brand-text px-5 py-2 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
                 >
-                  {agendado ? "✓ Agendado" : agendando ? "Agendando…" : "Agendar este post"}
+                  {agendado ? "✓ Salvo" : agendando ? "Salvando…" : "Salvar post"}
                 </button>
                 <p className="basis-full text-[11px] text-brand-text/50">
-                  Com imagem, o post publica sozinho no horário. Sem imagem, ele entra na
-                  fila <strong>aguardando aprovação</strong> e não publica até você anexar
-                  a arte (gera uma no Estúdio de conteúdo ou usa a Minha galeria).
+                  O post fica salvo na sua biblioteca pra você copiar e publicar no seu
+                  Instagram quando quiser. Publicar automático depende de uma liberação da
+                  Meta que ainda não saiu.
                 </p>
               </div>
             </div>
