@@ -3,6 +3,7 @@ import { gerarImagemOpenAI } from "./providers/openai";
 import { gerarImagemGemini } from "./providers/gemini";
 import { aplicarOverlayTexto } from "./overlay";
 import { renderCard } from "./cardDesigner";
+import { sugerirIlustracao } from "./lineArt";
 import { DIMENSOES_POR_TIPO } from "./types";
 import type { RenderRequest, RenderResult } from "./types";
 
@@ -165,6 +166,15 @@ export async function renderCarrossel(params: {
         brand: params.brand,
         conteudo,
         schemeIndex,
+        // Ícone temático por slide, escolhido pelo texto DAQUELE slide.
+        // Antes o carrossel gerado automaticamente não repassava nada e
+        // saía sem ilustração nenhuma. Capa e CTA seguem tipográficos.
+        ilustracao:
+          ehCapa || ehUltimo
+            ? undefined
+            : sugerirIlustracao(
+                `${conteudo.headline ?? ""} ${conteudo.corpo ?? ""} ${conteudo.subtitle ?? ""}`,
+              ),
       });
       resultados.push({
         buffer,

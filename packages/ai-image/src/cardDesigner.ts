@@ -357,9 +357,31 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   // Usa o buffer enviado ou baixa da logoUrl da marca (onboarding).
   const logoComposite = await prepararLogo(input, brand, W, H);
 
+  // Ilustração temática também no card único (hero/foto). Antes só o layout
+  // "editorial" a desenhava, então a arte padrão saía sem ícone nenhum —
+  // sugerirIlustracao() rodava e o resultado ia pro lixo. Entra no topo do
+  // grupo, que é medido e centralizado logo abaixo.
+  if (input.ilustracao && !fotoStrip) {
+    const tamIl = Math.round(W * 0.13);
+    const il = svgIlustracao(input.ilustracao, tamIl, scheme.kicker, 0.9);
+    if (il) {
+      const bufIl = await sharp(il).png().toBuffer();
+      itens.push({
+        // Bloco no formato que `posicionar()` entende (pedacos com svg/left/top),
+        // pra a ilustração ser medida e centralizada junto com os textos.
+        bloco: {
+          largura: tamIl,
+          altura: tamIl,
+          pedacos: [{ svg: bufIl, left: 0, top: 0 }],
+        },
+        gapAntes: 0,
+      });
+    }
+  }
+
   if (eyebrow) {
     const pill = blocoPill(eyebrow, scheme.pill, W);
-    if (pill) itens.push({ bloco: pill, gapAntes: 0 });
+    if (pill) itens.push({ bloco: pill, gapAntes: itens.length ? Math.round(gapUnit * 0.8) : 0 });
   }
 
   if (headline) {
