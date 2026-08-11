@@ -5,6 +5,7 @@ import { gerarPostVenda, type PostVendaGerado } from "@/lib/claude/generate";
 import type { ContextoFranqueada, TipoPost } from "@/lib/claude/prompts";
 import { sincronizarProdutosScanner } from "./sync";
 import { carregarProdutosContexto, formatarPrecoBR } from "./contexto";
+import { traduzirErroClaude } from "@/lib/claude/erros";
 import { revalidatePath } from "next/cache";
 
 export type ProdutoScannerLista = {
@@ -182,6 +183,6 @@ export async function gerarPostVendaAction(params: {
     return { ok: true, post };
   } catch (e) {
     console.error("[posts-venda] geração falhou:", e);
-    return { ok: false, erro: "A geração falhou. Tenta de novo — se persistir, avisa o suporte." };
+    return { ok: false, erro: traduzirErroClaude(e).mensagem };
   }
 }

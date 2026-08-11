@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { buildSystemPrompt } from "@/lib/claude/prompts";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
+import { traduzirErroClaude } from "@/lib/claude/erros";
 import { revalidatePath } from "next/cache";
 
 type ContextoFranqueada = Parameters<typeof buildSystemPrompt>[0];
@@ -90,7 +91,9 @@ Gere a legenda, CTA e hashtags pra esse post. Responda APENAS JSON:
       hashtags: parsed.hashtags,
     };
   } catch (e) {
-    return { ok: false, erro: (e as Error).message };
+    // Nunca devolver o erro cru da API pra tela (vazava o JSON da Anthropic).
+    console.error("[gerarLegendaManual] falhou:", e);
+    return { ok: false, erro: traduzirErroClaude(e).mensagem };
   }
 }
 

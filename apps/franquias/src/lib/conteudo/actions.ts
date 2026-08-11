@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { gerarSugestoesSemana } from "./gerador-sugestoes";
+import { traduzirErroClaude } from "@/lib/claude/erros";
 
 async function franqueadaDoUsuario() {
   const supabase = createClient();
@@ -32,10 +33,18 @@ export async function gerarSugestoesAction(regerar = false): Promise<{ ok: boole
   if (!franqueadaId) return { ok: false, msg: "sessão inválida" };
 
   const semanaRef = proximaSegunda();
-  const r = await gerarSugestoesSemana({ franqueadaId, semanaRef, regerar });
-  revalidatePath("/dashboard/conteudo");
-  if (r.erro) return { ok: r.criadas > 0, msg: r.erro };
-  return { ok: true, msg: `${r.criadas} sugestões criadas para a semana de ${semanaRef}` };
+  // Sem este try/catch, uma falha da API do Claude sobe como exceção do
+  // server action e o Next troca a TELA INTEIRA pelo "Ops, algo deu errado"
+  // — a nutri perde o contexto e não sabe o que aconteceu.
+  try {
+    const r = await gerarSugestoesSemana({ franqueadaId, semanaRef, regerar });
+    revalidatePath("/dashboard/conteudo");
+    if (r.erro) return { ok: r.criadas > 0, msg: r.erro };
+    return { ok: true, msg: `${r.criadas} sugestões criadas para a semana de ${semanaRef}` };
+  } catch (e) {
+    console.error("[gerarSugestoesAction] falhou:", e);
+    return { ok: false, msg: traduzirErroClaude(e).mensagem };
+  }
 }
 
 export async function excluirArteGaleria(id: string): Promise<{ ok: boolean }> {
