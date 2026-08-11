@@ -32,9 +32,19 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Rotas protegidas da franqueada
+  // Rotas protegidas da franqueada.
+  //
+  // 🔴 /onboarding?token=… é EXCEÇÃO: o link de convite do Scanner chega com
+  // a pessoa deslogada, e a própria página valida o token e oferece o acesso
+  // por link mágico. Sem esta exceção o middleware mandava pro /login pedindo
+  // "a senha que você recebeu" — senha que nunca foi enviada — e o convite
+  // virava beco sem saída (foi o que travou a Juliana). O token é um UUID que
+  // só permite pedir um link pro e-mail já cadastrado, não dá acesso sozinho.
+  const convitePorToken =
+    pathname.startsWith("/onboarding") && !!request.nextUrl.searchParams.get("token");
+
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
-    if (!user) {
+    if (!user && !convitePorToken) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       return NextResponse.redirect(url);

@@ -45,10 +45,24 @@ export default function LoginPage() {
           ← Voltar
         </Link>
         <h1 className="mb-2 text-2xl font-bold text-brand-text">
-          Painel da Nutri
+          Marketing Profissional
         </h1>
+        {/* Não prometemos "a senha que você recebeu": ninguém envia senha. O
+            caminho normal é o SSO pelo menu do Scanner. Esta tela é fallback
+            pra quem já cadastrou senha própria. */}
+        <div className="mb-6 rounded-lg bg-brand-muted p-3 text-sm leading-relaxed text-brand-text/70">
+          O jeito normal de entrar é pelo <strong>menu do Scanner da Saúde</strong>{" "}
+          (Crescimento Profissional → Marketing Profissional): lá você entra com o
+          mesmo login, sem senha separada.{" "}
+          <a
+            href="https://scannerdasaude.com/nutri/marketing-profissional"
+            className="font-medium text-brand-primary hover:underline"
+          >
+            Ir para o Scanner →
+          </a>
+        </div>
         <p className="mb-6 text-sm text-brand-text/60">
-          Acesse com o email e senha que você recebeu.
+          Se você já cadastrou uma senha própria aqui, pode usá-la abaixo.
         </p>
 
         <form onSubmit={handleLogin} className="space-y-4">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
 
 export const dynamic = "force-dynamic";
 
@@ -12,16 +13,24 @@ export const dynamic = "force-dynamic";
  * contraparte do GET scannerdasaude.com/api/sso/marketing-token,
  * especificado em docs/SSO_MARKETING.md do repo scanner-saude.
  *
- * O Scanner só emite o token pra nutri com plano='franquia' (Consultório
- * de Precisão Avançado) e status='ativo'. Aqui:
+ * A nutri entra com O MESMO LOGIN DO SCANNER: nenhum e-mail é enviado,
+ * nenhuma senha é pedida. O Scanner só emite o token pra conta com
+ * plano='franquia' e status='ativo', então quem chega aqui com token
+ * válido já está autenticada do outro lado.
+ *
+ * Fluxo:
  *   1. Valida o JWT HS256 (MARKETING_SSO_SECRET, iss/aud/exp) — verificação
- *      manual com node:crypto, sem dependência nova (mesmo padrão do
- *      receptor SSO do Scanner Cursos).
- *   2. Acha a franqueada por scanner_saas_user_id (fallback: email).
- *   3. Sem franqueada → se há onboarding pendente (franquia_onboardings),
- *      manda pro wizard; senão devolve pro Scanner com ?precisa_ativar=1.
- *   4. Com franqueada → magic link admin (generateLink) + verifyOtp no
- *      client de cookies = sessão criada sem email nem senha.
+ *      manual com node:crypto, sem dependência nova.
+ *   2. Acha a franqueada por scanner_saas_user_id (fallback: e-mail).
+ *   3. NÃO ACHOU → cria a conta aqui mesmo (usuário de auth + linha em
+ *      franqueadas) e aplica o pré-preenchimento vindo do Scanner.
+ *      🔴 Antes isto redirecionava pra /onboarding?token=…, mas o
+ *      middleware barra /onboarding de quem não está logada e jogava a
+ *      nutri no /login pedindo "a senha que você recebeu" — senha que
+ *      nunca existiu. Foi o que travou a Juliana no primeiro teste.
+ *   4. Cria a sessão via magic link server-side (generateLink + verifyOtp):
+ *      o link nunca é enviado por e-mail, é consumido aqui.
+ *   5. Manda pro /dashboard (onboarding pronto) ou /onboarding (a completar).
  */
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -43,28 +52,41 @@ export async function GET(req: NextRequest) {
   const scannerUserId = typeof payload.sub === "string" ? payload.sub : "";
   const emailToken =
     typeof payload.email === "string" ? payload.email.toLowerCase().trim() : "";
-  if (!scannerUserId) {
+  const nomeToken = typeof payload.nome === "string" ? payload.nome.trim() : "";
+  if (!scannerUserId || !emailToken) {
     return NextResponse.redirect(new URL("/login?erro=sso_invalido", req.url));
   }
 
   const admin = createAdminClient();
 
-  // 1. Franqueada por vínculo direto; fallback por email (e grava o vínculo)
-  let { data: franq } = await admin
+  type FranqueadaSSO = {
+    id: string;
+    email: string;
+    auth_user_id: string | null;
+    onboarding_completo: boolean | null;
+    scanner_saas_user_id: string | null;
+  };
+  const COLUNAS = "id, email, auth_user_id, onboarding_completo, scanner_saas_user_id";
+
+  // ── 1. Acha a franqueada: vínculo direto, depois e-mail ──
+  let franq: FranqueadaSSO | null = null;
+
+  const { data: porVinculo } = await admin
     .from("franqueadas")
-    .select("id, email, auth_user_id, onboarding_completo, scanner_saas_user_id")
+    .select(COLUNAS)
     .eq("scanner_saas_user_id", scannerUserId)
     .maybeSingle();
+  franq = (porVinculo as FranqueadaSSO | null) ?? null;
 
-  if (!franq && emailToken) {
+  if (!franq) {
     const { data: porEmail } = await admin
       .from("franqueadas")
-      .select("id, email, auth_user_id, onboarding_completo, scanner_saas_user_id")
+      .select(COLUNAS)
       .eq("email", emailToken)
       .maybeSingle();
-    if (porEmail) {
-      franq = porEmail;
-      const pe = porEmail as { id: string; scanner_saas_user_id: string | null };
+    const pe = porEmail as FranqueadaSSO | null;
+    if (pe) {
+      franq = pe;
       if (!pe.scanner_saas_user_id) {
         const { error } = await admin
           .from("franqueadas")
@@ -75,64 +97,66 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // 2. Sem franqueada → onboarding pendente ou volta pro Scanner ativar
-  if (!franq) {
-    const { data: ob } = await admin
-      .from("franquia_onboardings")
-      .select("onboarding_token")
-      .eq("scanner_user_id", scannerUserId)
-      .maybeSingle();
-
-    const obToken = (ob as { onboarding_token?: string } | null)?.onboarding_token;
-    if (obToken) {
-      return NextResponse.redirect(
-        new URL(`/onboarding?token=${encodeURIComponent(obToken)}`, req.url),
-      );
-    }
-
-    const scannerUrl = process.env.SCANNER_SAAS_URL ?? "https://scannerdasaude.com";
-    return NextResponse.redirect(
-      `${scannerUrl}/nutri/marketing-profissional?precisa_ativar=1`,
-    );
+  // ── 2. Garante o usuário de auth (createUser é idempotente na prática:
+  //       se já existe, o erro "already registered" é esperado e ignorado) ──
+  const { error: createErr } = await admin.auth.admin.createUser({
+    email: emailToken,
+    email_confirm: true,
+    user_metadata: { nome: nomeToken, sso_origem: "scanner-saas" },
+  });
+  if (createErr && !/already|exists|registered|duplicate/i.test(createErr.message)) {
+    console.error("[sso] createUser falhou:", createErr.message);
+    return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
   }
 
-  const f = franq as {
-    id: string;
-    email: string;
-    auth_user_id: string | null;
-    onboarding_completo: boolean | null;
-  };
-
-  // 3. Garante usuário de auth (franqueada normalmente já tem)
-  if (!f.auth_user_id) {
-    const { data: created, error: createErr } = await admin.auth.admin.createUser({
-      email: f.email,
-      email_confirm: true,
-    });
-    if (created?.user) {
-      const { error } = await admin
-        .from("franqueadas")
-        .update({ auth_user_id: created.user.id })
-        .eq("id", f.id);
-      if (error) console.error("[sso] falha ao gravar auth_user_id:", error.message);
-    } else if (createErr && !/already/i.test(createErr.message)) {
-      console.error("[sso] createUser falhou:", createErr.message);
-      return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
-    }
-  }
-
-  // 4. Magic link server-side → sessão via cookies (sem email enviado)
+  // ── 3. Magic link consumido no servidor: devolve o hash da sessão E o
+  //       usuário, então o id sai daqui — sem varrer a lista de usuários
+  //       (listUsers pagina de 50 em 50 e passaria a errar quando a base
+  //       crescesse: bug silencioso que só apareceria com o app cheio). ──
   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
     type: "magiclink",
-    email: f.email,
+    email: emailToken,
   });
 
   const tokenHash = linkData?.properties?.hashed_token;
-  if (linkErr || !tokenHash) {
+  const authUserId = linkData?.user?.id;
+  if (linkErr || !tokenHash || !authUserId) {
     console.error("[sso] generateLink falhou:", linkErr?.message);
     return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
   }
 
+  // ── 4. Sem franqueada → cria agora, sem e-mail e sem senha ──
+  if (!franq) {
+    const { data: nova, error } = await admin
+      .from("franqueadas")
+      .insert({
+        auth_user_id: authUserId,
+        email: emailToken,
+        nome_completo: nomeToken || emailToken,
+        scanner_saas_user_id: scannerUserId,
+      })
+      .select(COLUNAS)
+      .single();
+
+    if (error || !nova) {
+      console.error("[sso] falha ao criar franqueada:", error?.message);
+      return NextResponse.redirect(new URL("/login?erro=sso_conta", req.url));
+    }
+    franq = nova as FranqueadaSSO;
+  } else if (!franq.auth_user_id) {
+    const { error } = await admin
+      .from("franqueadas")
+      .update({ auth_user_id: authUserId })
+      .eq("id", franq.id);
+    if (error) console.error("[sso] falha ao gravar auth_user_id:", error.message);
+  }
+
+  // ── 5. Pré-preenchimento + marcação do onboarding (só até ele fechar) ──
+  if (!franq.onboarding_completo) {
+    await vincularOnboarding(admin, scannerUserId, franq.id);
+  }
+
+  // ── 6. Abre a sessão com o hash obtido no passo 3 ──
   const supabase = createClient();
   const { error: otpErr } = await supabase.auth.verifyOtp({
     type: "magiclink",
@@ -147,8 +171,56 @@ export async function GET(req: NextRequest) {
   // documentado do Supabase SSR depois de verifyOtp: garante que os cookies
   // de sessão gravados pelo client vão junto na resposta. Ele lança uma
   // exceção de controle do Next — por isso fica FORA de qualquer try/catch.
-  const destino = f.onboarding_completo ? "/dashboard" : "/onboarding";
+  const destino = franq.onboarding_completo ? "/dashboard" : "/onboarding";
   redirect(destino);
+}
+
+/**
+ * Liga o registro de franquia_onboardings à franqueada, marca como iniciado
+ * e aplica o pré-preenchimento que veio do Scanner. Nada aqui pode travar o
+ * login — falha vira log.
+ */
+async function vincularOnboarding(
+  admin: ReturnType<typeof createAdminClient>,
+  scannerUserId: string,
+  franqueadaId: string,
+): Promise<void> {
+  try {
+    const { data: ob } = await admin
+      .from("franquia_onboardings")
+      .select("id, status, origem_payload")
+      .eq("scanner_user_id", scannerUserId)
+      .maybeSingle();
+
+    if (!ob) return;
+    const reg = ob as {
+      id: string;
+      status: string | null;
+      origem_payload: Record<string, unknown> | null;
+    };
+
+    if (reg.status === "token_gerado" || reg.status === "email_enviado") {
+      await admin
+        .from("franquia_onboardings")
+        .update({
+          franqueada_id: franqueadaId,
+          status: "onboarding_iniciado",
+          onboarding_iniciado_em: new Date().toISOString(),
+        })
+        .eq("id", reg.id);
+    }
+
+    const perfil = reg.origem_payload?.perfil;
+    if (perfil && typeof perfil === "object") {
+      await aplicarPrefillScanner(
+        admin,
+        franqueadaId,
+        perfil as Record<string, unknown>,
+      );
+    }
+  } catch (e) {
+    console.error("[sso] vincularOnboarding falhou:", e);
+  }
 }
 
 /**
