@@ -90,6 +90,8 @@ export function EditorArte(props: {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewSlides, setPreviewSlides] = useState<string[]>([]);
   const [slidesTexto, setSlidesTexto] = useState("");
+  // Onde a sua foto entra no carrossel — repetir nos 8 slides pesa demais
+  const [fotoCarrossel, setFotoCarrossel] = useState("sem");
   const fileRef = useRef<HTMLInputElement>(null);
 
   function montarForm(): FormData {
@@ -105,6 +107,7 @@ export function EditorArte(props: {
     fd.set("itens", itens);
     fd.set("ilustracao", ilustracao);
     fd.set("slides", slidesTexto);
+    fd.set("fotoCarrossel", fotoCarrossel);
     if (usarCorCustom) fd.set("corFundo", corFundo);
     if (foto) fd.set("foto", foto);
     if (logo) fd.set("logo", logo);
@@ -254,6 +257,34 @@ export function EditorArte(props: {
               O título lá de cima vira a CAPA. A primeira linha de cada bloco é o título
               do slide; o resto é o texto. A frase manuscrita vira o slide final de CTA.
             </p>
+
+            <div className="mt-4">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-text/70">
+                Sua foto no carrossel
+              </label>
+              <div className="flex flex-wrap gap-3 text-sm">
+                {[
+                  { v: "sem", label: "Sem foto", desc: "só tipografia" },
+                  { v: "inicio", label: "Na capa", desc: "abre com você" },
+                  { v: "fim", label: "No slide final", desc: "junto do convite" },
+                ].map((o) => (
+                  <label key={o.v} className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="fotoCarrossel"
+                      checked={fotoCarrossel === o.v}
+                      onChange={() => setFotoCarrossel(o.v)}
+                    />
+                    <span className="font-semibold">{o.label}</span>
+                    <span className="text-brand-text/45">{o.desc}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-1 text-[11px] text-brand-text/40">
+                Suba a foto no campo &ldquo;Sua foto&rdquo; abaixo. Ela entra só no slide
+                escolhido — nos demais o carrossel segue tipográfico.
+              </p>
+            </div>
           </Campo>
         )}
 

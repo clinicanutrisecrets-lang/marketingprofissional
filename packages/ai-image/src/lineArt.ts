@@ -243,17 +243,23 @@ const LIB: Record<IlustracaoId, Ilustracao> = {
       "M120 126 L124 128 M138 136 L142 138",
     ],
   },
-  // Tubo de ensaio + gotas (exames)
+  // Erlenmeyer com líquido (exames de laboratório).
+  // Era um tubo de ensaio vertical alongado — a Aline apontou que a silhueta
+  // ficava fálica no card. Frasco cônico não tem essa ambiguidade e lê como
+  // laboratório na hora.
   exame: {
     viewBox: "0 0 200 200",
     strokeWidth: 2.2,
     paths: [
-      "M74 30 L74 130 C74 148 88 160 104 160 C120 160 134 148 134 130 L134 30",
-      "M64 30 L144 30",
-      "M74 92 L134 92",
-      "M88 112 C90 108 94 108 96 112 M112 128 C114 124 118 124 120 128",
-      // gota externa
-      "M52 96 C52 88 60 76 60 76 C60 76 68 88 68 96 C68 102 64 106 60 106 C56 106 52 102 52 96 Z",
+      // boca do frasco
+      "M76 34 L124 34",
+      // contorno: gargalo → corpo cônico → base
+      "M86 34 L86 80 L44 146 C40 153 45 162 53 162 L147 162 C155 162 160 153 156 146 L114 80 L114 34",
+      // linha do líquido
+      "M63 124 L137 124",
+      // bolhas
+      "M80 140 C82 136 86 136 88 140",
+      "M108 146 C110 142 114 142 116 146",
     ],
   },
   // Estetoscópio
@@ -434,7 +440,7 @@ export const ILUSTRACOES_DISPONIVEIS: Array<{ id: IlustracaoId; nome: string }> 
   { id: "dna", nome: "DNA / genética" },
   { id: "celulas", nome: "Células" },
   { id: "microbiota", nome: "Microbiota" },
-  { id: "exame", nome: "Exames (tubo)" },
+  { id: "exame", nome: "Exames (frasco)" },
   { id: "estetoscopio", nome: "Estetoscópio" },
   { id: "lupa", nome: "Lupa" },
   { id: "balanca", nome: "Balança" },

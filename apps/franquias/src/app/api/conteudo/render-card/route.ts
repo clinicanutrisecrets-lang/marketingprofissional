@@ -96,6 +96,12 @@ export async function POST(request: Request) {
     ilustracao = ilustracaoRaw as IlustracaoId;
   }
 
+  // Onde a foto entra no carrossel: "sem" (padrão), "inicio" (capa) ou
+  // "fim" (slide de CTA). Pedido da Aline — repetir a foto nos 8 slides
+  // ficaria pesado, mas ter a cara da nutri na abertura ou no convite final
+  // é justamente o que dá conexão.
+  const fotoCarrossel = String(form.get("fotoCarrossel") ?? "sem");
+
   const salvar = String(form.get("salvar") ?? "") === "1";
 
   const brandCard = {
@@ -125,8 +131,13 @@ export async function POST(request: Request) {
       for (let i = 0; i < conteudos.length; i++) {
         const ehCapa = i === 0;
         const ehUltimo = i === conteudos.length - 1 && conteudos.length > 1 && !!cta;
+        const levaFoto =
+          !!fotoBuffer &&
+          ((fotoCarrossel === "inicio" && ehCapa) || (fotoCarrossel === "fim" && ehUltimo));
         const buf = await renderCard({
-          layout: ehCapa || ehUltimo ? "hero" : "conteudo",
+          layout: levaFoto ? "foto" : ehCapa || ehUltimo ? "hero" : "conteudo",
+          fotoBuffer: levaFoto ? fotoBuffer : undefined,
+          fotoPosicao,
           dimensoes: "1080x1350",
           brand: brandCard,
           conteudo: conteudos[i]!,
