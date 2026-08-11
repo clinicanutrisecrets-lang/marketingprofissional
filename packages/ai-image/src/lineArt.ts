@@ -225,22 +225,29 @@ const LIB: Record<IlustracaoId, Ilustracao> = {
       "M120 36 C132 36 140 44 140 54 C140 64 132 72 120 72 C108 72 100 64 100 54 C100 44 108 36 120 36 Z",
     ],
   },
-  // Microbiota: bactérias variadas
+  // Microbiota: placa de Petri vista de cima, com colônias e cepas em vírgula.
+  // O desenho anterior tinha um bacilo grande e horizontal (cápsula alongada) —
+  // a Aline apontou a mesma silhueta ambígua do antigo tubo de ensaio. Placa
+  // redonda + colônias redondas resolve e continua lendo como "microbiota".
+  // Não confundir com o ícone `celulas`: ali são células soltas com núcleo,
+  // aqui há a borda da placa e as vírgulas (cepas).
   microbiota: {
     viewBox: "0 0 200 200",
     strokeWidth: 2.2,
     paths: [
-      // bacilo grande
-      "M46 60 L110 60 C122 60 130 70 130 80 C130 90 122 100 110 100 L46 100 C34 100 26 90 26 80 C26 70 34 60 46 60 Z",
-      "M46 74 L50 74 M62 84 L66 84 M82 72 L86 72 M100 84 L104 84",
-      // coco (redonda) com cílios
-      "M156 52 C170 52 180 62 180 76 C180 90 170 100 156 100 C142 100 132 90 132 76 C132 62 142 52 156 52 Z",
-      "M150 44 L148 36 M162 44 L164 36 M176 58 L184 54",
-      // espiral
-      "M50 128 C58 120 70 122 74 130 C78 138 72 146 64 146 C58 146 54 141 56 136 C58 132 63 131 66 134",
-      // bacilo pequeno inclinado
-      "M104 128 L148 152 C156 157 166 152 168 144 C170 136 164 128 156 126 L112 116",
-      "M120 126 L124 128 M138 136 L142 138",
+      // placa de Petri: borda externa + interna
+      "M100 26 C141 26 174 59 174 100 C174 141 141 174 100 174 C59 174 26 141 26 100 C26 59 59 26 100 26 Z",
+      "M100 38 C134 38 162 66 162 100 C162 134 134 162 100 162 C66 162 38 134 38 100 C38 66 66 38 100 38 Z",
+      // colônia maior, com anel interno
+      "M74 68 C89 68 101 80 101 95 C101 110 89 122 74 122 C59 122 47 110 47 95 C47 80 59 68 74 68 Z",
+      "M74 84 C80 84 85 89 85 95 C85 101 80 106 74 106 C68 106 63 101 63 95 C63 89 68 84 74 84 Z",
+      // colônia média
+      "M128 62 C139 62 148 71 148 82 C148 93 139 102 128 102 C117 102 108 93 108 82 C108 71 117 62 128 62 Z",
+      // colônia pequena
+      "M126 126 C134 126 140 132 140 140 C140 148 134 154 126 154 C118 154 112 148 112 140 C112 132 118 126 126 126 Z",
+      // cepas em vírgula (curtas e curvas, sem eixo alongado)
+      "M62 140 C68 132 80 132 84 140 C86 145 82 150 77 149",
+      "M148 112 C154 106 163 108 164 115 C165 120 160 123 157 120",
     ],
   },
   // Erlenmeyer com líquido (exames de laboratório).
@@ -353,21 +360,27 @@ const LIB: Record<IlustracaoId, Ilustracao> = {
       "M136 152 C142 148 148 152 146 158 C144 164 136 164 134 158 C133 155 134 153 136 152 Z",
     ],
   },
-  // Leguminosas: vagem + grãos de feijão/lentilha
+  // Leguminosas: vagem ABERTA (meia-casca) com os grãos à mostra.
+  // A vagem fechada anterior era um oval alongado na horizontal — mesma
+  // silhueta que a Aline pediu pra tirar do `exame` e do `microbiota`.
+  // Aberta, o desenho vira o ícone clássico de ervilhas na vagem.
   leguminosas: {
     viewBox: "0 0 200 200",
     strokeWidth: 2.2,
     paths: [
-      "M40 60 C70 40 130 40 162 66 C132 78 70 80 40 60 Z",
-      "M64 60 C66 66 66 70 64 74 M96 62 C98 68 98 72 96 76 M128 62 C130 68 130 72 128 76",
-      // grãos de feijão
-      "M60 110 C74 104 88 110 88 122 C88 134 74 140 62 134 C52 129 50 116 60 110 Z",
-      "M70 118 C72 122 70 126 66 128",
-      "M116 122 C130 116 144 122 144 134 C144 146 130 152 118 146 C108 141 106 128 116 122 Z",
-      "M126 130 C128 134 126 138 122 140",
-      // lentilhas
-      "M92 162 C98 162 102 165 102 168 C102 171 98 174 92 174 C86 174 82 171 82 168 C82 165 86 162 92 162 Z",
-      "M120 164 C126 164 130 167 130 170 C130 173 126 176 120 176 C114 176 110 173 110 170 C110 167 114 164 120 164 Z",
+      // casca inferior aberta (borda externa + interna)
+      "M26 98 C26 144 59 176 100 176 C141 176 174 144 174 98",
+      "M46 102 C46 138 70 160 100 160 C130 160 154 138 154 102",
+      "M26 98 L46 102 M174 98 L154 102",
+      // cabinho
+      "M100 176 L100 188 M100 188 C106 188 112 184 114 178",
+      // grãos redondos dentro da vagem
+      "M64 96 C74 96 82 104 82 114 C82 124 74 132 64 132 C54 132 46 124 46 114 C46 104 54 96 64 96 Z",
+      "M100 100 C111 100 120 109 120 120 C120 131 111 140 100 140 C89 140 80 131 80 120 C80 109 89 100 100 100 Z",
+      "M136 96 C146 96 154 104 154 114 C154 124 146 132 136 132 C126 132 118 124 118 114 C118 104 126 96 136 96 Z",
+      // grão solto ao lado
+      "M158 58 C168 58 176 66 176 76 C176 86 168 94 158 94 C148 94 140 86 140 76 C140 66 148 58 158 58 Z",
+      "M152 68 C156 66 161 67 163 71",
     ],
   },
   // Peixe
