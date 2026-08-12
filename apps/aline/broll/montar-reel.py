@@ -225,7 +225,9 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     alt += LH_TITULO * len(linhas_tit) + (18 if corpo else 0) if titulo else 0
     alt += LH_CORPO * len(linhas_cor) if corpo else 0
 
-    painel_y = (H - RODAPE_SEGURO) // 2 - alt // 2
+    # painel na metade de baixo: sai de cima do rosto e ainda fica
+    # acima da faixa que a UI do Instagram cobre
+    painel_y = int(H * 0.56) - alt // 2
 
     filtros = []
     if escurecer:

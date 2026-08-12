@@ -1,43 +1,51 @@
 {
   "clipes": [
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
-    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4"
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4"
   ],
-  "cortar": {"0": 5.9},
-  "trechos": {"1": [[9.0, 11.9], [0.2, 3.9], [4.2, 8.7], [12.1, 14.9]]},
-  "velocidade": {"0": 0.8, "1": 0.8},
+  "cortar": {"0": 5.5},
+  "trechos": {
+    "1": [[9.0, 11.9], [0.2, 3.9], [4.2, 8.7], [12.1, 14.9]],
+    "2": [[7.0, 14.9]]
+  },
+  "velocidade": {"0": 0.8, "1": 0.8, "2": 1.0},
   "cartelas": [
     {"clipe":0,"t":0.5,"dur":3.6,
      "chapeu":"ATENÇÃO",
      "titulo":"Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"},
-    {"clipe":1,"t":17.2,"dur":4.6,
+    {"clipe":2,"t":7.7,"dur":4.6,
      "chapeu":"IMERSÃO GRATUITA",
      "titulo":"Nutrigenética aplicada\nao emagrecimento",
      "corpo":"Exclusiva para nutricionistas",
      "rodape":"@nutri_secrets"}
   ],
   "legendas": [
-    {"clipe":0,"de":0.6,"ate":2.6,"texto":"O paciente emagrece","tam":60},
-    {"clipe":0,"de":2.7,"ate":4.6,"texto":"E perde massa magra","tam":58},
-    {"clipe":0,"de":4.7,"ate":7.2,"texto":"Cabelo e sono junto","tam":58},
+    {"clipe":0,"de":0.6,"ate":2.5,"texto":"Você já olhou ferritina","tam":56},
+    {"clipe":0,"de":2.6,"ate":4.4,"texto":"Vitamina D, B12, tireoide","tam":54},
+    {"clipe":0,"de":4.5,"ate":6.8,"texto":"E ainda não consegue\najudar seu paciente","tam":52},
 
-    {"clipe":1,"de":0.3,"ate":1.7,"texto":"A bioimpedância mostra\no que mudou","tam":50},
-    {"clipe":1,"de":1.9,"ate":3.5,"estilo":"hero","pre":"Ela não explica",
-     "palavra":"por quê","tam":92},
+    {"clipe":1,"de":0.3,"ate":1.9,"texto":"Mesmo fazendo\nbioimpedância","tam":54},
+    {"clipe":1,"de":2.1,"ate":3.5,"estilo":"hero","pre":"O que falta é",
+     "palavra":"nutrigenética","tam":80},
 
-    {"clipe":1,"de":3.9,"ate":5.5,"estilo":"hero","pre":"Gene do",
+    {"clipe":1,"de":3.9,"ate":5.6,"estilo":"hero","pre":"Gene do",
      "palavra":"GLP1R","pos":"Quem responde à medicação","tam":92,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":5.6,"ate":6.8,"texto":"Quem perde massa magra\nmais fácil","tam":50},
-    {"clipe":1,"de":6.9,"ate":8.2,"texto":"Quem tende à\nqueda de cabelo","tam":50},
+    {"clipe":1,"de":5.7,"ate":6.9,"texto":"Quem perde massa magra","tam":50},
+    {"clipe":1,"de":7.0,"ate":8.2,"texto":"Quem tende à\nqueda de cabelo","tam":50},
 
-    {"clipe":1,"de":8.6,"ate":9.9,"texto":"No sangue: ferritina e B12","tam":48},
-    {"clipe":1,"de":10.0,"ate":11.3,"texto":"Vitamina D e tireoide","tam":52},
-    {"clipe":1,"de":11.4,"ate":12.6,"texto":"As vitaminas que comandam\no metabolismo","tam":46},
-    {"clipe":1,"de":12.7,"ate":13.7,"texto":"Qual chá, qual café","tam":54},
+    {"clipe":1,"de":8.6,"ate":10.4,"estilo":"hero","pre":"Gene da",
+     "palavra":"COMT","pos":"Ansiedade e estresse","tam":92,"cor":"#0ABAB5","fonte":"sans"},
+    {"clipe":1,"de":10.6,"ate":12.4,"estilo":"hero","pre":"Gene do",
+     "palavra":"MC4R","pos":"Comer emocional","tam":92,"cor":"#0ABAB5","fonte":"sans"},
+    {"clipe":1,"de":12.5,"ate":13.8,"texto":"A fome que não é fome","tam":54},
 
-    {"clipe":1,"de":13.8,"ate":14.8,"texto":"Pra quem a cafeína\npiora a ansiedade","tam":48},
-    {"clipe":1,"de":14.9,"ate":16.1,"texto":"Quais alimentos são\nterapêuticos para cada gene","tam":46},
-    {"clipe":1,"de":16.2,"ate":17.1,"estilo":"hero","pre":"Emagrecer é uma coisa.",
+    {"clipe":1,"de":14.1,"ate":15.6,"texto":"Alimento certo","tam":58},
+    {"clipe":1,"de":15.7,"ate":17.3,"texto":"Para cada gene","tam":58},
+
+    {"clipe":2,"de":0.2,"ate":2.6,"texto":"Nutrientes que ligam","tam":56},
+    {"clipe":2,"de":2.7,"ate":5.0,"texto":"E silenciam genes","tam":56},
+    {"clipe":2,"de":5.1,"ate":7.6,"estilo":"hero","pre":"Emagrecer é uma coisa.",
      "palavra":"Tratar","pos":"é outra.","tam":88}
   ]
 }
