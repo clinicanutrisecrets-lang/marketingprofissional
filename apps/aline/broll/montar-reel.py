@@ -451,6 +451,13 @@ def main():
                         key=lambda c: c["t"])
 
         base = tmp / f"clipe{i}.mp4"
+        # cópia sem legendas: o congelamento tem que pegar a imagem limpa,
+        # senão a cartela nasce com a frase anterior queimada por baixo
+        base_limpa = tmp / f"clipe{i}_limpa.mp4"
+        prepara_clipe(clipe, [], base_limpa,
+                      ate=roteiro.get("cortar", {}).get(str(i)),
+                      trechos=roteiro.get("trechos", {}).get(str(i)),
+                      velocidade=roteiro.get("velocidade", {}).get(str(i)))
         prepara_clipe(clipe, legendas, base,
                       ate=roteiro.get("cortar", {}).get(str(i)),
                       trechos=roteiro.get("trechos", {}).get(str(i)),
@@ -469,7 +476,7 @@ def main():
                     *COR, str(trecho)], check=True)
                 pedacos.append(trecho)
             cart_mp4 = tmp / f"c{i}_cart{j}.mp4"
-            faz_cartela(base, t, cart["dur"], cart_mp4,
+            faz_cartela(base_limpa, t, cart["dur"], cart_mp4,
                         chapeu=cart.get("chapeu"),
                         cor_apoio=cart.get("cor_apoio"),
                         estilo=cart.get("estilo"), texto=cart.get("texto"),
