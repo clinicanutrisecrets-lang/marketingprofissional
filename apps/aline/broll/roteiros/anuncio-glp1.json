@@ -1,0 +1,40 @@
+{
+  "clipes": [
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4"
+  ],
+  "cortar": {"0": 5.9},
+  "trechos": {"1": [[9.0, 11.9], [0.2, 3.9], [4.2, 8.7], [12.1, 14.9]]},
+  "cartelas": [
+    {"clipe":0,"t":0.4,"dur":3.4,
+     "chapeu":"ATENÇÃO",
+     "titulo":"Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"},
+    {"clipe":1,"t":13.4,"dur":4.4,
+     "chapeu":"IMERSÃO GRATUITA",
+     "titulo":"Nutrigenética aplicada\nao emagrecimento",
+     "corpo":"Exclusiva para nutricionistas",
+     "rodape":"@nutri_secrets"}
+  ],
+  "legendas": [
+    {"clipe":0,"de":0.5,"ate":2.3,"texto":"o paciente emagrece","tam":62},
+    {"clipe":0,"de":2.4,"ate":4.2,"texto":"e perde massa magra,\ncabelo e sono junto","tam":54},
+    {"clipe":0,"de":4.3,"ate":5.8,"texto":"por que funciona\ncom uns e com outros não?","tam":50},
+
+    {"clipe":1,"de":0.2,"ate":1.5,"texto":"a bioimpedância mostra\no que mudou","tam":50},
+    {"clipe":1,"de":1.6,"ate":2.8,"estilo":"hero","pre":"ela não explica",
+     "palavra":"por quê","tam":92},
+
+    {"clipe":1,"de":3.1,"ate":4.4,"estilo":"hero","pre":"gene do",
+     "palavra":"GLP1R","pos":"quem responde à medicação","tam":92,"cor":"#0ABAB5","fonte":"sans"},
+    {"clipe":1,"de":4.5,"ate":5.5,"texto":"quem perde massa magra\nmais fácil","tam":50},
+    {"clipe":1,"de":5.6,"ate":6.5,"texto":"quem tende à\nqueda de cabelo","tam":50},
+
+    {"clipe":1,"de":6.9,"ate":8.2,"texto":"no sangue: ferritina, B12,\nvitamina D, tireoide","tam":46},
+    {"clipe":1,"de":8.3,"ate":9.4,"texto":"as vitaminas que comandam\no metabolismo","tam":46},
+    {"clipe":1,"de":9.5,"ate":11.0,"texto":"qual chá, qual café —\ne pra quem a cafeína\npiora a ansiedade","tam":46},
+
+    {"clipe":1,"de":11.3,"ate":12.4,"texto":"quais alimentos são\nterapêuticos para cada gene","tam":46},
+    {"clipe":1,"de":12.5,"ate":13.3,"estilo":"hero","pre":"emagrecer é uma coisa.",
+     "palavra":"tratar","pos":"é outra.","tam":88}
+  ]
+}

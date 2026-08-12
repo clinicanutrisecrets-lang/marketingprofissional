@@ -166,13 +166,13 @@ def dur_video(path):
     return float(out.stdout.strip())
 
 
-def degrade_png(caminho, y, alt, opacidade=0.82, cor_filete=None):
+def degrade_png(caminho, y, alt, opacidade=0.72, cor_filete=None):
     """Gera o degradê como PNG, pixel a pixel.
 
     Desenhar o degradê com faixas de `drawbox` deixa listras visíveis; a
     imagem gerada aqui tem rampa contínua e some suave nas duas pontas.
     """
-    margem = int(alt * 0.55)
+    margem = int(alt * 0.34)
     topo, base = y - margem, y + alt + margem
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     px = img.load()
@@ -235,7 +235,7 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     degrade_png(grad, painel_y, alt, cor_filete=cor_apoio)
 
     # revelação escalonada: cada bloco entra um pouco depois do anterior
-    passo = 0.28
+    passo = 0.20
     quando = 0.0
 
     y = painel_y + PAD
