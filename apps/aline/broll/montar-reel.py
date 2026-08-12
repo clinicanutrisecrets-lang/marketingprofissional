@@ -290,7 +290,8 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     ], check=True)
 
 
-def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
+def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None,
+                  velocidade=None):
     """Normaliza o clipe, tira os trechos ruins e queima as legendas.
 
     `trechos` é uma lista [[de, ate], ...] com o que APROVEITAR — serve pra
@@ -317,7 +318,11 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
             "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
             "-i", str(lista), "-c", "copy", str(fonte)], check=True)
 
-    filtros = [f"scale={W}:{H}", f"fps={FPS}"]
+    filtros = [f"scale={W}:{H}"]
+    if velocidade and velocidade != 1:
+        # setpts alonga o tempo; os tempos das legendas já vêm na base lenta
+        filtros.append(f"setpts={1 / velocidade:.4f}*PTS")
+    filtros.append(f"fps={FPS}")
     for leg in legendas:
         quando = f"between(t,{leg['de']},{leg['ate']})"
 
@@ -341,7 +346,7 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
         if leg.get("estilo") == "hero":
             filtros += bloco_hero(
                 leg.get("pre"), leg["palavra"], leg.get("pos"),
-                leg.get("y", int(H * 0.44)), quando,
+                leg.get("y", int(H * 0.60)), quando,
                 cor_palavra=leg.get("cor", BRANCO),
                 risco=leg.get("risco"),
                 tam_palavra=leg.get("tam", 104),
@@ -354,7 +359,7 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None):
         linhas = quebra(" ".join(leg["texto"].split("\n")), FONT_BOLD, tam,
                         W - 120)
         alt_linha = int(tam * 1.2)
-        y0 = leg.get("y", int(H * 0.46)) - alt_linha * len(linhas) // 2
+        y0 = leg.get("y", int(H * 0.62)) - alt_linha * len(linhas) // 2
         for k, linha in enumerate(linhas):
             filtros.append(drawtext(
                 linha, FONT_BOLD, tam, cor, y0 + alt_linha * k,
@@ -386,7 +391,8 @@ def main():
         base = tmp / f"clipe{i}.mp4"
         prepara_clipe(clipe, legendas, base,
                       ate=roteiro.get("cortar", {}).get(str(i)),
-                      trechos=roteiro.get("trechos", {}).get(str(i)))
+                      trechos=roteiro.get("trechos", {}).get(str(i)),
+                      velocidade=roteiro.get("velocidade", {}).get(str(i)))
         total = dur_video(base)
 
         inicio = 0.0

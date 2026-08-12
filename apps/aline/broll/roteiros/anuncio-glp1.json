@@ -5,36 +5,39 @@
   ],
   "cortar": {"0": 5.9},
   "trechos": {"1": [[9.0, 11.9], [0.2, 3.9], [4.2, 8.7], [12.1, 14.9]]},
+  "velocidade": {"0": 0.8, "1": 0.8},
   "cartelas": [
-    {"clipe":0,"t":0.4,"dur":3.4,
+    {"clipe":0,"t":0.5,"dur":3.6,
      "chapeu":"ATENÇÃO",
      "titulo":"Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"},
-    {"clipe":1,"t":13.4,"dur":4.4,
+    {"clipe":1,"t":17.2,"dur":4.6,
      "chapeu":"IMERSÃO GRATUITA",
      "titulo":"Nutrigenética aplicada\nao emagrecimento",
      "corpo":"Exclusiva para nutricionistas",
      "rodape":"@nutri_secrets"}
   ],
   "legendas": [
-    {"clipe":0,"de":0.5,"ate":2.3,"texto":"o paciente emagrece","tam":62},
-    {"clipe":0,"de":2.4,"ate":4.2,"texto":"e perde massa magra,\ncabelo e sono junto","tam":54},
-    {"clipe":0,"de":4.3,"ate":5.8,"texto":"por que funciona\ncom uns e com outros não?","tam":50},
+    {"clipe":0,"de":0.6,"ate":2.6,"texto":"O paciente emagrece","tam":60},
+    {"clipe":0,"de":2.7,"ate":4.6,"texto":"E perde massa magra","tam":58},
+    {"clipe":0,"de":4.7,"ate":7.2,"texto":"Cabelo e sono junto","tam":58},
 
-    {"clipe":1,"de":0.2,"ate":1.5,"texto":"a bioimpedância mostra\no que mudou","tam":50},
-    {"clipe":1,"de":1.6,"ate":2.8,"estilo":"hero","pre":"ela não explica",
+    {"clipe":1,"de":0.3,"ate":1.7,"texto":"A bioimpedância mostra\no que mudou","tam":50},
+    {"clipe":1,"de":1.9,"ate":3.5,"estilo":"hero","pre":"Ela não explica",
      "palavra":"por quê","tam":92},
 
-    {"clipe":1,"de":3.1,"ate":4.4,"estilo":"hero","pre":"gene do",
-     "palavra":"GLP1R","pos":"quem responde à medicação","tam":92,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":4.5,"ate":5.5,"texto":"quem perde massa magra\nmais fácil","tam":50},
-    {"clipe":1,"de":5.6,"ate":6.5,"texto":"quem tende à\nqueda de cabelo","tam":50},
+    {"clipe":1,"de":3.9,"ate":5.5,"estilo":"hero","pre":"Gene do",
+     "palavra":"GLP1R","pos":"Quem responde à medicação","tam":92,"cor":"#0ABAB5","fonte":"sans"},
+    {"clipe":1,"de":5.6,"ate":6.8,"texto":"Quem perde massa magra\nmais fácil","tam":50},
+    {"clipe":1,"de":6.9,"ate":8.2,"texto":"Quem tende à\nqueda de cabelo","tam":50},
 
-    {"clipe":1,"de":6.9,"ate":8.2,"texto":"no sangue: ferritina, B12,\nvitamina D, tireoide","tam":46},
-    {"clipe":1,"de":8.3,"ate":9.4,"texto":"as vitaminas que comandam\no metabolismo","tam":46},
-    {"clipe":1,"de":9.5,"ate":11.0,"texto":"qual chá, qual café —\ne pra quem a cafeína\npiora a ansiedade","tam":46},
+    {"clipe":1,"de":8.6,"ate":9.9,"texto":"No sangue: ferritina e B12","tam":48},
+    {"clipe":1,"de":10.0,"ate":11.3,"texto":"Vitamina D e tireoide","tam":52},
+    {"clipe":1,"de":11.4,"ate":12.6,"texto":"As vitaminas que comandam\no metabolismo","tam":46},
+    {"clipe":1,"de":12.7,"ate":13.7,"texto":"Qual chá, qual café","tam":54},
 
-    {"clipe":1,"de":11.3,"ate":12.4,"texto":"quais alimentos são\nterapêuticos para cada gene","tam":46},
-    {"clipe":1,"de":12.5,"ate":13.3,"estilo":"hero","pre":"emagrecer é uma coisa.",
-     "palavra":"tratar","pos":"é outra.","tam":88}
+    {"clipe":1,"de":13.8,"ate":14.8,"texto":"Pra quem a cafeína\npiora a ansiedade","tam":48},
+    {"clipe":1,"de":14.9,"ate":16.1,"texto":"Quais alimentos são\nterapêuticos para cada gene","tam":46},
+    {"clipe":1,"de":16.2,"ate":17.1,"estilo":"hero","pre":"Emagrecer é uma coisa.",
+     "palavra":"Tratar","pos":"é outra.","tam":88}
   ]
 }
