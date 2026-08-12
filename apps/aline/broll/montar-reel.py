@@ -98,7 +98,8 @@ def drawtext(texto, fonte, tam, cor, y, enable=None, box=False,
 
 
 def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
-               risco=None, tam_palavra=104, tam_apoio=44, fonte="serif"):
+               risco=None, tam_palavra=104, tam_apoio=44, fonte="serif",
+               fundo=None):
     """Texto grande no centro, sem caixa — estilo das referências.
 
     `pre` entra pequeno em cima, `palavra` grande em serifada italic no
@@ -113,6 +114,15 @@ def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
 
     filtros = []
     y = y_centro - tam_palavra // 2
+    if fundo:
+        # tarja atrás da palavra em destaque, colada no texto
+        pad_x, pad_y = 26, 14
+        cx = int((W - larg_pal) / 2) - pad_x
+        cond = f":enable='{enable}'" if enable else ""
+        filtros.append(
+            f"drawbox=x={cx}:y={y - pad_y}:w={int(larg_pal) + pad_x * 2}"
+            f":h={int(tam_palavra * 1.15) + pad_y}:color={fundo}"
+            f":t=fill{cond}")
     if pre:
         filtros.append(drawtext(pre, FONT_MED, tam_apoio, BRANCO,
                                 y - tam_apoio - 14, enable=enable,
@@ -122,9 +132,10 @@ def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
     if risco:
         y_risco = y + int(tam_palavra * 0.52)
         x0 = int((W - larg_pal) / 2) - 14
+        cond = f":enable='{enable}'" if enable else ""
         filtros.append(
             f"drawbox=x={x0}:y={y_risco}:w={int(larg_pal) + 28}:h=7"
-            f":color={risco}:t=fill:enable='{enable}'")
+            f":color={risco}:t=fill{cond}")
     if pos:
         filtros.append(drawtext(pos, FONT_LIGHT, tam_apoio, BRANCO,
                                 y + int(tam_palavra * 1.05), enable=enable,
@@ -197,10 +208,58 @@ def degrade_png(caminho, y, alt, opacidade=0.72, cor_filete=None):
     img.save(caminho)
 
 
+def _render_congelado(clipe, t, dur, saida, filtros):
+    """Congela o frame de `clipe` em `t` e aplica os filtros de texto."""
+    subprocess.run([
+        "ffmpeg", "-v", "error", "-y",
+        "-ss", str(t), "-i", str(clipe), "-frames:v", "1",
+        "-vf", f"scale={W}:{H}", "-f", "image2", "-update", "1",
+        str(saida) + ".png",
+    ], check=True)
+    frames = max(2, int(dur * FPS))
+    zoom = (f"zoompan=z='min(zoom+0.0005,1.05)':d={frames}"
+            f":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}"
+            f",eq=saturation=1.18:brightness=0.03")
+    subprocess.run([
+        "ffmpeg", "-v", "error", "-y",
+        "-loop", "1", "-i", str(saida) + ".png", "-t", str(dur),
+        "-vf", zoom + "," + ",".join(filtros or ["null"]) + "," + FMT,
+        "-r", str(FPS), "-pix_fmt", "yuv420p",
+        *COR, "-c:v", "libx264", "-crf", "18", str(saida),
+    ], check=True)
+
+
+def _cartela_simples(clipe, t, dur, saida, estilo, texto, tam, pre, palavra,
+                     pos, fundo, cor, y):
+    """Congelamento com o visual das legendas, sem painel."""
+    if estilo == "hero":
+        filtros = bloco_hero(pre, palavra, pos, y or int(H * 0.60), None,
+                             cor_palavra=cor or BRANCO,
+                             tam_palavra=tam or 90, fundo=fundo)
+    else:
+        t_ = tam or 56
+        linhas = quebra(" ".join(texto.split("\n")), FONT_BOLD, t_, W - 120)
+        alt_linha = int(t_ * 1.2)
+        y0 = (y or int(H * 0.62)) - alt_linha * len(linhas) // 2
+        filtros = [drawtext(l, FONT_BOLD, t_, cor or BRANCO, y0 + alt_linha * k,
+                            sombra=True) for k, l in enumerate(linhas)]
+    _render_congelado(clipe, t, dur, saida, filtros)
+
+
 def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
                 corpo=None, rodape=None, escurecer=0.0,
-                cor_apoio=None):
-    """Congela o frame em `t` e escreve o texto dentro de um painel."""
+                cor_apoio=None, estilo=None, texto=None, tam=None,
+                pre=None, palavra=None, pos=None, fundo=None, cor=None,
+                y=None):
+    """Congela o frame em `t` e escreve o texto por cima.
+
+    Sem `estilo`, desenha o painel com degradê (manchete/CTA). Com
+    `estilo` "texto" ou "hero", congela usando o mesmo visual das
+    legendas — serve pra segurar a imagem enquanto a frase é lida.
+    """
+    if estilo in ("texto", "hero"):
+        return _cartela_simples(clipe, t, dur, saida, estilo, texto, tam,
+                                pre, palavra, pos, fundo, cor, y)
     # alturas de cada bloco, pra dimensionar o painel
     H_CHAPEU, TAM_CHAPEU = 46, 30
     TAM_TITULO, LH_TITULO = 48, 64
@@ -352,7 +411,8 @@ def prepara_clipe(clipe, legendas, saida, ate=None, trechos=None,
                 cor_palavra=leg.get("cor", BRANCO),
                 risco=leg.get("risco"),
                 tam_palavra=leg.get("tam", 104),
-                fonte=leg.get("fonte", "serif"))
+                fonte=leg.get("fonte", "serif"),
+                fundo=leg.get("fundo"))
             continue
 
         # texto grande centralizado, sem caixa — legibilidade pela sombra
@@ -412,6 +472,11 @@ def main():
             faz_cartela(base, t, cart["dur"], cart_mp4,
                         chapeu=cart.get("chapeu"),
                         cor_apoio=cart.get("cor_apoio"),
+                        estilo=cart.get("estilo"), texto=cart.get("texto"),
+                        tam=cart.get("tam"), pre=cart.get("pre"),
+                        palavra=cart.get("palavra"), pos=cart.get("pos"),
+                        fundo=cart.get("fundo"), cor=cart.get("cor"),
+                        y=cart.get("y"),
                         titulo=cart.get("titulo"),
                         corpo=cart.get("corpo"),
                         rodape=cart.get("rodape"),

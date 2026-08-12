@@ -2,54 +2,54 @@
   "clipes": [
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
-    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4"
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4"
   ],
   "cortar": {"0": 4.6},
   "trechos": {
-    "1": [[9.0, 11.9], [0.2, 3.9], [4.2, 8.7], [12.1, 14.9]],
-    "2": [[2.0, 14.9]]
+    "1": [[9.0, 11.9], [0.2, 3.9], [4.4, 8.4]],
+    "2": [[8.5, 12.5]],
+    "3": [[3.2, 12.0]]
   },
-  "velocidade": {"0": 0.8, "1": 0.8, "2": 0.9},
+  "velocidade": {"0": 0.85, "1": 0.85, "2": 1.0, "3": 1.0},
   "cartelas": [
     {"clipe":0,"t":0.5,"dur":3.4,
      "chapeu":"ATENÇÃO",
      "titulo":"Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"},
-    {"clipe":2,"t":14.0,"dur":4.4,
+    {"clipe":0,"t":4.4,"dur":2.6,"estilo":"texto",
+     "texto":"E ainda não consegue\najudar seu paciente","tam":54},
+    {"clipe":1,"t":3.4,"dur":2.4,"estilo":"hero",
+     "pre":"O que falta é","palavra":"nutrigenética","tam":78,
+     "fundo":"black@0.45"},
+    {"clipe":3,"t":8.4,"dur":4.2,
      "chapeu":"IMERSÃO GRATUITA",
      "titulo":"Nutrigenética aplicada\nao emagrecimento",
      "corpo":"Exclusiva para nutricionistas",
      "rodape":"@nutri_secrets"}
   ],
   "legendas": [
-    {"clipe":0,"de":0.6,"ate":2.5,"texto":"Você já olhou ferritina","tam":56},
-    {"clipe":0,"de":2.6,"ate":4.2,"texto":"Vitamina D, B12, tireoide","tam":54},
-    {"clipe":0,"de":4.3,"ate":5.7,"texto":"E ainda não consegue\najudar seu paciente","tam":52},
+    {"clipe":0,"de":0.6,"ate":2.6,"texto":"Você já olhou ferritina","tam":56},
+    {"clipe":0,"de":2.7,"ate":4.3,"texto":"Vitamina D, B12, tireoide","tam":54},
 
-    {"clipe":1,"de":0.3,"ate":1.7,"texto":"Mesmo fazendo\nbioimpedância","tam":54},
-    {"clipe":1,"de":1.8,"ate":3.5,"texto":"E vendo a massa magra cair","tam":50},
+    {"clipe":1,"de":0.3,"ate":1.8,"texto":"Mesmo fazendo\nbioimpedância","tam":54},
+    {"clipe":1,"de":1.9,"ate":3.3,"texto":"E vendo a massa magra cair","tam":50},
 
-    {"clipe":1,"de":3.9,"ate":5.5,"estilo":"hero","pre":"Gene do",
-     "palavra":"GLP1R","pos":"Quem responde à medicação","tam":90,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":5.7,"ate":7.3,"estilo":"hero","pre":"Gene do",
-     "palavra":"FTO","pos":"Apetite e saciedade","tam":90,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":7.4,"ate":8.2,"texto":"E a queda de cabelo","tam":52},
+    {"clipe":1,"de":3.7,"ate":5.6,"estilo":"hero","pre":"Gene do",
+     "palavra":"GLP1R","pos":"Quem responde à medicação","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
+    {"clipe":1,"de":5.8,"ate":7.6,"estilo":"hero","pre":"Gene do",
+     "palavra":"FTO","pos":"Apetite e saciedade","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
 
-    {"clipe":1,"de":8.6,"ate":10.3,"estilo":"hero","pre":"Gene da",
-     "palavra":"COMT","pos":"Ansiedade e estresse","tam":90,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":10.5,"ate":12.2,"estilo":"hero","pre":"Gene do",
-     "palavra":"MC4R","pos":"Comer emocional","tam":90,"cor":"#0ABAB5","fonte":"sans"},
-    {"clipe":1,"de":12.4,"ate":13.7,"texto":"A fome que não é fome","tam":54},
+    {"clipe":1,"de":8.0,"ate":9.9,"estilo":"hero","pre":"Gene da",
+     "palavra":"COMT","pos":"Ansiedade e estresse","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
+    {"clipe":1,"de":10.1,"ate":12.0,"estilo":"hero","pre":"Gene do",
+     "palavra":"MC4R","pos":"Comer emocional","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
 
-    {"clipe":1,"de":14.1,"ate":15.6,"texto":"Alimento certo","tam":58},
-    {"clipe":1,"de":15.7,"ate":17.3,"texto":"Para cada gene","tam":58},
+    {"clipe":2,"de":0.2,"ate":2.0,"texto":"Alimento terapêutico","tam":56},
+    {"clipe":2,"de":2.1,"ate":3.9,"texto":"Para cada gene","tam":56},
 
-    {"clipe":2,"de":0.2,"ate":2.2,"texto":"Nutrientes que ligam","tam":56},
-    {"clipe":2,"de":2.3,"ate":4.3,"texto":"E silenciam genes","tam":56},
-    {"clipe":2,"de":4.6,"ate":6.9,"estilo":"hero","pre":"Gene não é informação,",
-     "palavra":"é direção","tam":86},
-    {"clipe":2,"de":7.1,"ate":8.9,"texto":"Para cada tipo genético","tam":54},
-    {"clipe":2,"de":9.0,"ate":10.8,"texto":"Um alimento\nterapêutico diferente","tam":52},
-    {"clipe":2,"de":11.0,"ate":12.4,"texto":"Mais precisão\nna sua conduta","tam":52},
-    {"clipe":2,"de":12.5,"ate":13.9,"texto":"Mais excelência\nno seu atendimento","tam":52}
+    {"clipe":3,"de":0.3,"ate":3.0,"estilo":"hero","pre":"Gene não é informação,",
+     "palavra":"é direção","tam":80,"y":880,"fundo":"black@0.45"},
+    {"clipe":3,"de":3.2,"ate":5.6,"texto":"Para cada tipo genético,\num alimento terapêutico diferente","tam":46,"y":900},
+    {"clipe":3,"de":5.8,"ate":8.3,"texto":"Mais precisão na conduta,\nmais excelência no atendimento","tam":46,"y":900}
   ]
 }
