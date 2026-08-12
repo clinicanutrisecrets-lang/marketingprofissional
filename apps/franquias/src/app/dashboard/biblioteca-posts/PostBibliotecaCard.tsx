@@ -48,12 +48,22 @@ export function PostBibliotecaCard({ post }: { post: PostBiblioteca }) {
         </button>
       )}
 
+      {/* 🔴 Aqui NÃO entra o "Personalizar aqui" (link pro editor de arte).
+          Ele existia e levava a nutri pro editor com o título na URL — mas o
+          editor abre em branco, então ela clicava e não achava nada. Dois
+          caminhos pro mesmo post confundem; o post pronto é um MODELO DO CANVA,
+          e o Canva é o único lugar onde ele de fato se personaliza.
+          (Juliana testando, 12/08: "leva pro editor mas lá não aparece nada".)
+          Quem quer criar arte do zero usa o Editor de arte pelo menu. */}
       <div className="mt-auto flex flex-wrap gap-2">
         <a
-          href={`/dashboard/conteudo/editor?titulo=${encodeURIComponent(post.titulo)}&categoria=${encodeURIComponent(post.mes_ref === "geral" ? "saúde integrativa" : "conteúdo do mês")}`}
+          href={post.canva_url}
+          target="_blank"
+          rel="noreferrer"
           className="rounded-lg bg-brand-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+          title="Abrir o modelo no Canva pra trocar a logo e baixar"
         >
-          🖌️ Personalizar aqui
+          🎨 Editar no Canva ↗
         </a>
         <button
           onClick={copiar}
@@ -61,15 +71,6 @@ export function PostBibliotecaCard({ post }: { post: PostBiblioteca }) {
         >
           {copiado ? "✓ Copiada!" : "📋 Copiar legenda"}
         </button>
-        <a
-          href={post.canva_url}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-text/50 ring-1 ring-brand-text/15 hover:text-brand-primary"
-          title="Abrir o modelo original no Canva"
-        >
-          Canva ↗
-        </a>
       </div>
     </article>
   );

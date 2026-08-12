@@ -12,6 +12,14 @@ export type ReelAnimado = {
   criado_em: string;
 };
 
+/** Render passou MUITO do prazo (~10 min): tratar como falha, não como espera. */
+const LIMITE_RENDER_MS = 40 * 60 * 1000;
+function travou(r: ReelAnimado): boolean {
+  if (r.status !== "gerando") return false;
+  const t = new Date(r.criado_em).getTime();
+  return Number.isFinite(t) && Date.now() - t > LIMITE_RENDER_MS;
+}
+
 export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
   const [tema, setTema] = useState("");
   const [duracao, setDuracao] = useState<"30s" | "60s">("60s");
@@ -89,6 +97,15 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
               ) : r.status === "erro" ? (
                 <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
                   erro — tente de novo
+                </span>
+              ) : travou(r) ? (
+                // 🔴 "renderizando" eterno é pior que erro: a nutri fica
+                // esperando algo que não vem. Quando o worker nem chega a
+                // rodar (ex.: a conta do GitHub travada por cobrança), ninguém
+                // marca 'erro' no banco — o registro fica em 'gerando' pra
+                // sempre. Passou muito do prazo, a tela assume a falha.
+                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                  não ficou pronto — gere de novo
                 </span>
               ) : (
                 <span className="animate-pulse rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">

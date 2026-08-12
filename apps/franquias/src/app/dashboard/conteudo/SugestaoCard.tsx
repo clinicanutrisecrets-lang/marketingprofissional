@@ -31,10 +31,59 @@ const LABEL_TIPO: Record<Sugestao["tipo"], { label: string; cor: string }> = {
   reel: { label: "REEL", cor: "bg-rose-600" },
 };
 
+/**
+ * Baixa de verdade — o atributo `download` do <a> só funciona same-origin, e
+ * as artes moram no Storage do Supabase (outro domínio). O navegador ignorava
+ * o `download` e, com target="_blank", ou abria a imagem numa aba ou era
+ * barrado como popup: pra Juliana o botão simplesmente "não fazia nada"
+ * (12/08). Buscando o arquivo e criando um blob local, o download acontece.
+ */
+async function baixarArquivo(url: string, nome: string): Promise<boolean> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return false;
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Revoga depois pra não cancelar o download em curso no Safari.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
   const [copiado, setCopiado] = useState(false);
+  const [baixando, setBaixando] = useState(false);
+  const [erroDownload, setErroDownload] = useState(false);
   const artes = s.artes ?? [];
   const t = LABEL_TIPO[s.tipo];
+
+  async function baixarArtes() {
+    if (baixando || artes.length === 0) return;
+    setBaixando(true);
+    setErroDownload(false);
+    let algumFalhou = false;
+    // Um a um: o navegador engasga com vários downloads simultâneos.
+    for (const a of artes) {
+      const ok = await baixarArquivo(a.url, `${s.tipo}-${s.ordem}-slide${a.slide}.png`);
+      if (!ok) algumFalhou = true;
+    }
+    if (algumFalhou) {
+      setErroDownload(true);
+      // Última cartada: abre a primeira arte pra ela salvar com o botão direito.
+      window.open(artes[0]!.url, "_blank", "noopener");
+    } else {
+      void marcarStatusSugestao(s.id, "baixado");
+    }
+    setBaixando(false);
+  }
 
   const legendaCompleta = [
     s.copy_legenda,
@@ -79,17 +128,19 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
             <a
               key={a.slide}
               href={a.url}
-              download={`arte-${s.tipo}-${a.slide}.png`}
               target="_blank"
               rel="noreferrer"
-              title={`Baixar slide ${a.slide}`}
+              title={`Abrir slide ${a.slide} em tamanho real`}
               className="shrink-0"
             >
+              {/* object-CONTAIN, não cover: a miniatura mostra a arte INTEIRA.
+                  Com cover, o card 1080x1350 aparecia cortado no meio e dava a
+                  impressão de arte sem texto — foi o que a Juliana viu. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={a.url}
                 alt={`Arte ${a.slide}`}
-                className="h-36 w-36 rounded-lg object-cover ring-1 ring-black/5 transition hover:ring-brand-primary"
+                className="h-36 w-36 rounded-lg bg-brand-muted object-contain ring-1 ring-black/5 transition hover:ring-brand-primary"
               />
             </a>
           ))}
@@ -118,16 +169,15 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
         </button>
 
         {artes.length > 0 && (
-          <a
-            href={artes[0]!.url}
-            download
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => void marcarStatusSugestao(s.id, "baixado")}
-            className="rounded-lg bg-brand-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+          <button
+            onClick={() => void baixarArtes()}
+            disabled={baixando}
+            className="rounded-lg bg-brand-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
-            ⬇️ Baixar arte{artes.length > 1 ? `s (${artes.length})` : ""}
-          </a>
+            {baixando
+              ? "Baixando…"
+              : `⬇️ Baixar arte${artes.length > 1 ? `s (${artes.length})` : ""}`}
+          </button>
         )}
 
         {s.tipo === "reel" && (
@@ -147,6 +197,13 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
           ✕
         </button>
       </div>
+
+      {erroDownload && (
+        <p className="mt-2 text-[11px] text-amber-700">
+          O download automático foi bloqueado pelo navegador. Abri a arte numa
+          aba — clique com o botão direito e escolha “Salvar imagem como”.
+        </p>
+      )}
     </article>
   );
 }

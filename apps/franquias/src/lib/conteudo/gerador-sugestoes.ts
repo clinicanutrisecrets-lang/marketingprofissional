@@ -9,6 +9,54 @@ import type { BrandGuidelines, ConteudoPeca } from "@scanner/ai-image";
 const MODEL = "claude-sonnet-4-5";
 
 /**
+ * Monta o texto do card a partir da sugestão, com rede de segurança.
+ *
+ * 🔴 Por que existe (Juliana, 12/08): duas artes de feed saíram com logo, foto
+ * e @ — e NENHUM texto. O renderizador estava certo (conferido com a cor da
+ * marca dela); o que faltou foi o `headline`, que o agente simplesmente não
+ * preencheu naquela resposta. Como o `tema` sempre vem (aparece certinho na
+ * tela), ele serve de origem: melhor um título derivado do tema do que uma
+ * arte muda.
+ *
+ * Devolve null quando não há absolutamente nada pra escrever — aí quem chama
+ * não gera arte nenhuma.
+ */
+function conteudoDoCard(s: {
+  headline?: string;
+  eyebrow?: string;
+  subtitle?: string;
+  cta_card?: string;
+  tema?: string;
+  copy_legenda?: string;
+}): ConteudoPeca | null {
+  const limpo = (v?: string) => (v ?? "").trim();
+
+  let headline = limpo(s.headline);
+  if (!headline) {
+    // O tema costuma vir como "Assunto — explicação"; a primeira parte é o
+    // título natural. Sem o separador, corta na frase.
+    const tema = limpo(s.tema);
+    headline = (tema.split(/\s+[—–-]\s+/)[0] || tema).split(/(?<=[.!?])\s/)[0] || tema;
+    if (headline.length > 95) headline = `${headline.slice(0, 92).trimEnd()}…`;
+  }
+  if (!headline) return null;
+
+  let subtitle = limpo(s.subtitle);
+  if (!subtitle) {
+    // Primeira frase da legenda — já está no tom da nutri.
+    const primeira = limpo(s.copy_legenda).split(/\n/)[0] ?? "";
+    if (primeira && primeira.length <= 160 && primeira !== headline) subtitle = primeira;
+  }
+
+  return {
+    headline,
+    eyebrow: limpo(s.eyebrow) || undefined,
+    subtitle: subtitle || undefined,
+    cta: limpo(s.cta_card) || undefined,
+  };
+}
+
+/**
  * Estúdio de Conteúdo — gera o pacote semanal de sugestões prontas:
  * pauta puxada de notícias quentes do nicho + arte pronta pra baixar +
  * legenda pra copiar + roteiro de reel com teleprompter.
@@ -198,7 +246,10 @@ export async function gerarSugestoesSemana(params: {
 
   const msg = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 8000,
+    // 6 sugestões, uma delas um carrossel de até 6 slides com parágrafos —
+    // 8000 tokens ficava perto do teto, e resposta cortada some com campos
+    // (foi um dos suspeitos das artes sem texto). Folga custa pouco.
+    max_tokens: 16000,
     system: SYSTEM,
     messages: [{ role: "user", content: JSON.stringify(input) }],
   });
@@ -272,14 +323,18 @@ export async function gerarSugestoesSemana(params: {
             // foto indisponível — sugestão vale pela copy
           }
         }
+      } else if (s.tipo === "feed_imagem" && !conteudoDoCard(s)) {
+        // Sem título nenhum, nem derivado do tema: NÃO renderiza. Card com
+        // logo, foto e @ e zero texto parece defeito — pior que a sugestão sem
+        // arte, que pelo menos entrega a legenda pronta. (Foi exatamente isso
+        // que a Juliana recebeu em 12/08: só a foto do abacate.)
+        console.error(
+          "[gerador-sugestoes] sugestão sem texto de card — arte não gerada",
+          { franqueadaId: params.franqueadaId, tema: s.tema },
+        );
       } else if (s.tipo === "feed_imagem") {
-        const conteudo: ConteudoPeca = {
-          headline: s.headline,
-          eyebrow: s.eyebrow,
-          subtitle: s.subtitle,
-          cta: s.cta_card,
-        };
-        const ILUSTRACOES_VALIDAS = ["mulher","folhas","ramo","laranja","cha","cafe","suco","coracao","intestino","dna","celulas","microbiota","exame","estetoscopio","lupa","balanca","prato","salada","maca","abacate","uvas","morango","cereais","leguminosas","peixe","ovo"];
+        const conteudo = conteudoDoCard(s)!;
+        const ILUSTRACOES_VALIDAS =["mulher","folhas","ramo","laranja","cha","cafe","suco","coracao","intestino","dna","celulas","microbiota","exame","estetoscopio","lupa","balanca","prato","salada","maca","abacate","uvas","morango","cereais","leguminosas","peixe","ovo"];
         if (s.ilustracao && ILUSTRACOES_VALIDAS.includes(s.ilustracao)) {
           // Layout editorial com ilustração em traço (zero custo de IA)
           const buffer = await renderCard({
