@@ -5,51 +5,236 @@
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4",
     "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4"
   ],
-  "cortar": {"0": 4.6},
-  "trechos": {
-    "1": [[9.0, 11.9], [0.2, 3.9], [4.4, 8.4]],
-    "2": [[8.5, 12.5]],
-    "3": [[3.2, 12.0]]
+  "cortar": {
+    "0": 4.6
   },
-  "velocidade": {"0": 0.85, "1": 0.85, "2": 1.0, "3": 1.0},
+  "trechos": {
+    "1": [
+      [
+        9.0,
+        11.9
+      ],
+      [
+        0.2,
+        3.9
+      ],
+      [
+        4.4,
+        8.4
+      ]
+    ],
+    "2": [
+      [
+        8.5,
+        12.5
+      ]
+    ],
+    "3": [
+      [
+        2.5,
+        12.0
+      ]
+    ]
+  },
+  "velocidade": {
+    "0": 0.85,
+    "1": 0.85,
+    "2": 1.0,
+    "3": 0.9
+  },
   "cartelas": [
-    {"clipe":0,"t":0.5,"dur":3.4,
-     "chapeu":"ATENÇÃO",
-     "titulo":"Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"},
-    {"clipe":0,"t":4.4,"dur":2.6,"estilo":"texto",
-     "texto":"E ainda não consegue\najudar seu paciente","tam":54},
-    {"clipe":1,"t":3.4,"dur":2.4,"estilo":"hero",
-     "pre":"O que falta é","palavra":"nutrigenética","tam":78,
-     "fundo":"black@0.45"},
-    {"clipe":3,"t":8.4,"dur":4.2,
-     "chapeu":"IMERSÃO GRATUITA",
-     "titulo":"Nutrigenética aplicada\nao emagrecimento",
-     "corpo":"Exclusiva para nutricionistas",
-     "rodape":"@nutri_secrets"}
+    {
+      "clipe": 0,
+      "t": 0.5,
+      "dur": 3.4,
+      "chapeu": "ATENÇÃO",
+      "titulo": "Nutricionistas que\ntrabalham com\nemagrecimento e GLP-1"
+    },
+    {
+      "clipe": 0,
+      "t": 4.4,
+      "dur": 2.6,
+      "estilo": "texto",
+      "texto": "E ainda não consegue\najudar seu paciente",
+      "tam": 54
+    },
+    {
+      "clipe": 1,
+      "t": 3.4,
+      "dur": 2.4,
+      "estilo": "hero",
+      "pre": "O que falta é",
+      "palavra": "nutrigenética",
+      "tam": 78,
+      "fundo": "black@0.45"
+    },
+    {
+      "clipe": 3,
+      "t": 10.4,
+      "dur": 4.2,
+      "chapeu": "IMERSÃO GRATUITA",
+      "titulo": "Nutrigenética aplicada\nao emagrecimento",
+      "corpo": "Exclusiva para nutricionistas",
+      "rodape": "@nutri_secrets"
+    }
   ],
   "legendas": [
-    {"clipe":0,"de":0.6,"ate":2.6,"texto":"Você já olhou ferritina","tam":56},
-    {"clipe":0,"de":2.7,"ate":4.3,"texto":"Vitamina D, B12, tireoide","tam":54},
-
-    {"clipe":1,"de":0.3,"ate":1.8,"texto":"Mesmo fazendo\nbioimpedância","tam":54},
-    {"clipe":1,"de":1.9,"ate":3.3,"texto":"E vendo a massa magra cair","tam":50},
-
-    {"clipe":1,"de":3.7,"ate":5.6,"estilo":"hero","pre":"Gene do",
-     "palavra":"GLP1R","pos":"Quem responde à medicação","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
-    {"clipe":1,"de":5.8,"ate":7.6,"estilo":"hero","pre":"Gene do",
-     "palavra":"FTO","pos":"Apetite e saciedade","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
-
-    {"clipe":1,"de":8.0,"ate":9.9,"estilo":"hero","pre":"Gene da",
-     "palavra":"COMT","pos":"Ansiedade e estresse","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
-    {"clipe":1,"de":10.1,"ate":12.0,"estilo":"hero","pre":"Gene do",
-     "palavra":"MC4R","pos":"Comer emocional","tam":90,"cor":"#0ABAB5","fonte":"sans","fundo":"black@0.42"},
-
-    {"clipe":2,"de":0.2,"ate":2.0,"texto":"Alimento terapêutico","tam":56},
-    {"clipe":2,"de":2.1,"ate":3.9,"texto":"Para cada gene","tam":56},
-
-    {"clipe":3,"de":0.3,"ate":3.0,"estilo":"hero","pre":"Gene não é informação,",
-     "palavra":"é direção","tam":80,"y":880,"fundo":"black@0.45"},
-    {"clipe":3,"de":3.2,"ate":5.6,"texto":"Para cada tipo genético,\num alimento terapêutico diferente","tam":46,"y":900},
-    {"clipe":3,"de":5.8,"ate":8.3,"texto":"Mais precisão na conduta,\nmais excelência no atendimento","tam":46,"y":900}
+    {
+      "clipe": 0,
+      "de": 0.6,
+      "ate": 2.6,
+      "texto": "Você já olhou ferritina",
+      "tam": 56
+    },
+    {
+      "clipe": 0,
+      "de": 2.7,
+      "ate": 4.3,
+      "texto": "Vitamina D, B12, tireoide",
+      "tam": 54
+    },
+    {
+      "clipe": 1,
+      "de": 0.3,
+      "ate": 1.8,
+      "texto": "Mesmo fazendo\nbioimpedância",
+      "tam": 54
+    },
+    {
+      "clipe": 1,
+      "de": 1.9,
+      "ate": 3.3,
+      "texto": "E vendo a massa magra cair",
+      "tam": 50
+    },
+    {
+      "clipe": 1,
+      "de": 3.7,
+      "ate": 5.6,
+      "estilo": "hero",
+      "pre": "Gene do",
+      "palavra": "GLP1R",
+      "pos": "Quem responde à medicação",
+      "tam": 90,
+      "cor": "#0ABAB5",
+      "fonte": "sans",
+      "fundo": "black@0.42"
+    },
+    {
+      "clipe": 1,
+      "de": 5.8,
+      "ate": 7.6,
+      "estilo": "hero",
+      "pre": "Gene do",
+      "palavra": "FTO",
+      "pos": "Apetite e saciedade",
+      "tam": 90,
+      "cor": "#0ABAB5",
+      "fonte": "sans",
+      "fundo": "black@0.42"
+    },
+    {
+      "clipe": 1,
+      "de": 8.0,
+      "ate": 9.9,
+      "estilo": "hero",
+      "pre": "Gene da",
+      "palavra": "COMT",
+      "pos": "Ansiedade e estresse",
+      "tam": 90,
+      "cor": "#0ABAB5",
+      "fonte": "sans",
+      "fundo": "black@0.42"
+    },
+    {
+      "clipe": 1,
+      "de": 10.1,
+      "ate": 12.0,
+      "estilo": "hero",
+      "pre": "Gene do",
+      "palavra": "MC4R",
+      "pos": "Comer emocional",
+      "tam": 90,
+      "cor": "#0ABAB5",
+      "fonte": "sans",
+      "fundo": "black@0.42"
+    },
+    {
+      "clipe": 2,
+      "de": 0.2,
+      "ate": 2.0,
+      "texto": "Alimento terapêutico",
+      "tam": 56
+    },
+    {
+      "clipe": 2,
+      "de": 2.1,
+      "ate": 3.9,
+      "texto": "Para cada gene",
+      "tam": 56
+    },
+    {
+      "clipe": 3,
+      "de": 0.3,
+      "ate": 2.4,
+      "estilo": "hero",
+      "pre": "Gene não é informação,",
+      "palavra": "é direção",
+      "tam": 70,
+      "y": 880,
+      "cor": "#0ABAB5",
+      "fundo": "black@0.52"
+    },
+    {
+      "clipe": 3,
+      "de": 2.5,
+      "ate": 4.3,
+      "estilo": "hero",
+      "pre": "Para cada tipo",
+      "palavra": "genético",
+      "tam": 70,
+      "y": 880,
+      "cor": "#0ABAB5",
+      "fundo": "black@0.52"
+    },
+    {
+      "clipe": 3,
+      "de": 4.4,
+      "ate": 6.3,
+      "estilo": "hero",
+      "pre": "um alimento",
+      "palavra": "terapêutico",
+      "tam": 70,
+      "y": 880,
+      "cor": "#0ABAB5",
+      "fundo": "black@0.52",
+      "pos": "diferente"
+    },
+    {
+      "clipe": 3,
+      "de": 6.4,
+      "ate": 8.3,
+      "estilo": "hero",
+      "pre": "Mais",
+      "palavra": "precisão",
+      "tam": 70,
+      "y": 880,
+      "cor": "#0ABAB5",
+      "fundo": "black@0.52",
+      "pos": "na sua conduta"
+    },
+    {
+      "clipe": 3,
+      "de": 8.4,
+      "ate": 10.4,
+      "estilo": "hero",
+      "pre": "Mais",
+      "palavra": "excelência",
+      "tam": 70,
+      "y": 880,
+      "cor": "#0ABAB5",
+      "fundo": "black@0.52",
+      "pos": "no seu atendimento"
+    }
   ]
 }
