@@ -1,203 +1,59 @@
 # Série "Um gene por post" — reels de 20s, uma cena só
 
-Formato viral: **uma cena, uma frase na tela, a ciência na legenda.**
-Sem cortes, sem produção. Cada post custa uma geração.
+**Uma cena, uma frase na tela, a ciência na legenda.** Sem cortes, sem
+produção, sem Soul ID. Cada post custa uma geração.
+
+Um post por foco clínico da Aline: autoimune, inflamação, intestino,
+menopausa, TPM, saúde mental, emagrecimento.
+
+Foco em **nutrigenômica**: genes que o alimento realmente liga, silencia
+ou desvia de rota — não só variantes herdadas.
 
 ## A fórmula
 
 | Segundo | O que aparece |
 |---|---|
-| 0–4 | **Gancho contraintuitivo** (uma frase, palavra em Tiffany) |
-| 5–10 | **O gene** (sigla grande em sans + o que ele faz, uma linha) |
-| 11–16 | **O alimento ou suplemento** que muda o jogo |
+| 0–4 | **Gancho contraintuitivo** (uma frase) |
+| 5–10 | **O gene** (sigla grande) + o que ele faz |
+| 11–16 | **O alimento** e o detalhe de preparo que muda tudo |
 | 17–20 | **"Você sabe o seu?"** + @nutri_secrets |
 
-Regras: nunca mais de 6 palavras por bloco, sempre uma palavra destacada,
-texto na metade de baixo, cena sem pessoa (comida ou objeto).
+Máximo 6 palavras por bloco, uma palavra em Tiffany, texto na metade de
+baixo, cena sem pessoa.
 
-O gancho tem que ser **algo que a pessoa vive e não sabe explicar** — é
-isso que faz salvar e marcar amigo.
+## O mapa
+
+| Foco | Gene | O que o alimento faz | Chave |
+|---|---|---|---|
+| Autoimune | **VDR** | liga a regulação imune | vitamina D + magnésio |
+| Inflamação | **NF-κB** | silencia a via inflamatória | ômega-3 + curcumina com pimenta |
+| Intestino | **FUT2** | define quem alimenta suas bifidobactérias | fibra prebiótica |
+| Menopausa | **CYP1A1** | desvia a rota do estrogênio | brássicas no vapor |
+| TPM | **COMT** | depende de cofator pra limpar | magnésio + B6 |
+| Saúde mental | **BDNF** | liga a plasticidade | ômega-3 + polifenóis |
+| Emagrecimento | **PPARG** | lê o tipo de gordura | monoinsaturada |
 
 ---
 
-# 1. TAS2R38 — "odeia brócolis"
-
-**Gancho**: Se você odeia brócolis, pode não ser frescura.
+# 1. AUTOIMUNE — VDR
 
 **Texto na tela**
-1. Odeia brócolis? Pode não ser **frescura**
-2. Gene **TAS2R38** · o gene do amargo
-3. Quem tem a variante sente o amargo **3x mais forte**
-4. A saída: **vapor + gordura boa**, nunca cru
+1. Tomou vitamina D e o exame **não subiu**?
+2. Gene **VDR** · o receptor que lê a vitamina D
+3. A ativação da vitamina D depende de **magnésio**
+4. Sem o cofator, a dose sobe e o efeito não
 5. Você sabe o seu? · @nutri_secrets
 
 **Cena (20s)**
 ```
 SCENE CONTEXT
-Fresh broccoli florets on a stone kitchen counter, morning light, steam rising from a nearby pan.
+Pumpkin seeds, almonds and dark leafy greens on a stone counter in strong morning sunlight.
 
 LOCATION MAP
-Foreground: raw broccoli florets scattered on a grey stone counter. Midground: a small pan with a little water and rising steam. Background: blurred bright kitchen. Camera at counter height, close.
+Foreground: a small pile of pumpkin seeds and almonds on a grey stone counter, dark green leaves beside them. Background: blurred kitchen with a bright window. Camera just above the counter.
 
 FIRST FRAME / BLOCKING
-The florets are already in frame, steam already rising from behind them.
-
-FORMAT MODE
-One continuous shot, the camera does not cut on its own.
-
-OPTICS
-Extreme close-up, 50mm equivalent, shallow depth of field.
-
-CAMERA
-Very slow push in, no other movement.
-
-ACTION
-Steam drifts slowly across the florets. A thin stream of olive oil falls over one floret and runs down its surface.
-
-PHYSICS
-Steam rises unevenly and drifts. The oil coats the floret and pools slightly at its base.
-
-LIGHTING
-Soft morning window light from the left, gentle rim on the steam.
-
-STYLE
-Photoreal food cinematography, visible natural texture, true to life colors, fine grain.
-
-POSITIVE LOCKS
-No hands, no arms, no people. No text or labels. Broccoli looks fresh and imperfect, not styled.
-```
-
-**Legenda**
-> "Eu simplesmente não consigo comer brócolis." Já ouvi isso mil vezes no
-> consultório — e quase sempre veio com culpa junto. 🔍
->
-> Existe um gene chamado **TAS2R38**. Ele codifica um receptor de sabor
-> amargo na sua língua. Dependendo da variante que você herdou, você
-> percebe compostos amargos das brássicas (brócolis, couve, rúcula,
-> couve-flor) com uma intensidade muito maior do que a pessoa do seu lado.
->
-> Não é implicância. É receptor.
->
-> **E o que fazer?** Amargor cede a duas coisas: calor e gordura.
-> • Vapor rápido em vez de cru
-> • Azeite generoso por cima
-> • Um toque de acidez (limão) no fim
->
-> Vale insistir? Vale. As brássicas trazem sulforafano, um composto que
-> participa das vias de detoxificação do fígado. Quem é mais sensível ao
-> amargo tende a comer menos vegetal — e é justamente quem mais precisa de
-> estratégia, não de força de vontade.
->
-> Como Detetive da Saúde, eu não trato sintoma isolado: eu investigo por
-> quê. 🧬
->
-> 💚 Marca alguém que odeia brócolis.
-> 📌 Salva pra testar o vapor com azeite.
->
-> @nutri_secrets
-
----
-
-# 2. CYP1A2 — o café que não sai do sangue
-
-**Gancho**: Seu café das 15h ainda está no seu sangue à meia-noite.
-
-**Texto na tela**
-1. Seu café das 15h ainda está no sangue **à meia-noite**
-2. Gene **CYP1A2** · a enzima que limpa a cafeína
-3. Metabolizador **lento**: a cafeína fica muito mais tempo
-4. Não é "café antes de dormir". É **café depois das 14h**
-5. Você sabe o seu? · @nutri_secrets
-
-**Cena (20s)**
-```
-SCENE CONTEXT
-Black coffee being poured into a ceramic cup on a wooden table, late afternoon light.
-
-LOCATION MAP
-Foreground: a plain ceramic cup on a dark wooden table. Midground: the falling stream of coffee. Background: blurred room with a window. Camera at table height, close.
-
-FIRST FRAME / BLOCKING
-The cup is already in frame and the stream of coffee is already falling into it.
-
-FORMAT MODE
-One continuous shot, the camera does not cut on its own.
-
-OPTICS
-Extreme close-up, 50mm equivalent, shallow depth of field.
-
-CAMERA
-Static locked off, no movement.
-
-ACTION
-Coffee pours into the cup, the level rises to two thirds and the stream stops. Crema swirls on the surface and slowly settles. Steam rises.
-
-PHYSICS
-The stream breaks the surface and creates a swirling crema that slowly stills. Steam rises unevenly.
-
-LIGHTING
-Warm late afternoon light from a window on the left, long soft shadow on the table.
-
-STYLE
-Photoreal food cinematography, true to life colors, fine grain.
-
-POSITIVE LOCKS
-No hands, no arms, no people, no coffee pot visible. No text or labels. The cup never overflows.
-```
-
-**Legenda**
-> Você dorme mal e jura que "café não te afeta". Talvez afete — e muito
-> mais tempo do que você imagina. ⏳
->
-> A cafeína é degradada principalmente pela enzima **CYP1A2**. Existe uma
-> variante comum nesse gene que deixa a enzima mais lenta: a mesma xícara
-> que sai do corpo de uma pessoa em poucas horas pode circular no seu por
-> muito mais tempo.
->
-> Metabolizador rápido e metabolizador lento tomam o mesmo café e vivem
-> dias diferentes.
->
-> **O que muda na prática:**
-> • Se você é lento, o corte não é "antes de dormir" — é **início da
->   tarde**
-> • Cafeína tarde tende a reduzir sono profundo, e sono ruim mexe em
->   cortisol, fome e glicemia no dia seguinte
-> • Chá verde e chá preto também contam
->
-> Estudos associam consumo alto de café em metabolizadores lentos a maior
-> risco cardiovascular (Cornelis et al., 2006) — enquanto nos rápidos a
-> associação não aparece. Mesmo alimento, respostas opostas.
->
-> ⚠️ Conteúdo educativo, não substitui avaliação individual.
->
-> 💚 Marca quem toma café o dia todo e dorme mal.
-> 📌 Salva pra testar cortar depois das 14h.
->
-> @nutri_secrets
-
----
-
-# 3. MTHFR — o ácido fólico que talvez não sirva
-
-**Gancho**: Você toma ácido fólico e mesmo assim a homocisteína não desce.
-
-**Texto na tela**
-1. Toma ácido fólico e a homocisteína **não desce**
-2. Gene **MTHFR** · a enzima da metilação
-3. A variante reduz a **conversão** para a forma ativa
-4. Investigar antes: **B12, B6 e folato ativo**
-5. Você sabe o seu? · @nutri_secrets
-
-**Cena (20s)**: folhas verde-escuras cruas
-```
-SCENE CONTEXT
-Fresh dark leafy greens on a stone counter with water droplets, morning light.
-
-LOCATION MAP
-Foreground: a loose pile of dark spinach and kale leaves on a grey stone counter, fine water droplets on the leaves. Background: blurred bright kitchen. Camera just above the leaves.
-
-FIRST FRAME / BLOCKING
-The leaves are already in frame, droplets already on them.
+The seeds and leaves are already arranged in frame, a hard shaft of sunlight already falling across them.
 
 FORMAT MODE
 One continuous shot, the camera does not cut on its own.
@@ -206,72 +62,150 @@ OPTICS
 Extreme close-up macro, shallow depth of field.
 
 CAMERA
-Very slow lateral tracking across the leaves.
+Very slow lateral tracking across the seeds.
 
 ACTION
-A few more water droplets fall onto the leaves and roll down the veins.
+A few more pumpkin seeds fall onto the pile from above and settle. Dust motes drift through the shaft of sunlight.
 
 PHYSICS
-Droplets bead on the waxy surface and run along the leaf veins with real surface tension.
+The seeds scatter with real weight, some sliding off the pile. Dust drifts slowly in the light beam.
 
 LIGHTING
-Soft morning window light from the left, highlights on the wet leaves.
+Hard morning sunlight from the left casting long defined shadows, dust visible in the beam.
 
 STYLE
-Photoreal food cinematography, deep natural greens, visible leaf texture, fine grain.
+Photoreal food cinematography, visible seed texture, true to life colors, fine grain.
 
 POSITIVE LOCKS
-No hands, no people. No text or labels. Leaves look fresh and irregular.
+No hands, no arms, no people. No text or labels. Ingredients look natural and irregular.
 ```
 
 **Legenda**
-> Suplementa ácido fólico há meses e a homocisteína continua alta. O
-> problema pode não ser a dose. Pode ser a rota. 🧬
+> Suplementa vitamina D há meses e o exame teima em não subir. Antes de
+> aumentar a dose, vale olhar o cofator. ☀️
 >
-> O gene **MTHFR** codifica uma enzima da via de metilação. Variantes
-> comuns (como a C677T) reduzem a atividade dessa enzima, e a conversão do
-> folato para a forma ativa fica menos eficiente. Homocisteína alta é um
-> dos marcadores que aparecem quando essa via não flui bem.
+> A vitamina D só age quando encontra o **VDR**, o receptor de vitamina D
+> — uma proteína que se liga ao DNA e regula a expressão de centenas de
+> genes, muitos deles ligados à **regulação imune**. É por isso que
+> vitamina D aparece tanto em conversa sobre autoimunidade: ela não é só
+> "osso".
 >
-> **Onde eu olho antes de mudar qualquer coisa:**
-> 🔬 homocisteína, B12, folato sérico
-> 🧬 o genótipo, porque ele muda a conduta
-> 🥬 a comida: folhas verde-escuras, leguminosas, abacate
+> **E o que quase ninguém checa:** as enzimas que convertem a vitamina D
+> nas formas ativas são **dependentes de magnésio**. Magnésio baixo é
+> comum, silencioso, e pode limitar a resposta à suplementação.
 >
-> E atenção: metilação não é só sobre um exame. Ela participa de humor,
-> desintoxicação e expressão gênica.
+> **Onde está o magnésio:**
+> 🎃 sementes de abóbora
+> 🌰 amêndoas e castanhas
+> 🥬 folhas verde-escuras
+> 🍫 cacau
 >
-> ⚠️ Forma e dose de suplemento exigem avaliação individual. Genética é
-> predisposição, não destino.
+> Como Detetive da Saúde, eu não olho um exame isolado. Olho a via
+> inteira: o marcador, o cofator e o receptor. 🧬
 >
-> 💚 Marca quem vive com homocisteína alta.
-> 📌 Salva pra levar pro seu nutricionista.
+> ⚠️ Doença autoimune exige acompanhamento individualizado.
+>
+> 💚 Marca quem toma vitamina D e não vê resultado.
+> 📌 Salva pra revisar o magnésio.
 >
 > @nutri_secrets
 
 ---
 
-# 4. FTO — a fome que não é fome
-
-**Gancho**: Tem gente que sente mais fome. Isso tem nome.
+# 2. INFLAMAÇÃO — NF-κB
 
 **Texto na tela**
-1. Tem gente que sente **mais fome**. Isso tem nome
-2. Gene **FTO** · apetite e saciedade
-3. A variante está associada a **comer mais** sem perceber
-4. A saída: **proteína no café da manhã**, não força de vontade
+1. Você toma cúrcuma na água? Está **perdendo** quase tudo
+2. Gene **NF-κB** · o interruptor da inflamação
+3. A curcumina ajuda a **silenciar** essa via
+4. Mas só absorve com **pimenta-preta e gordura**
 5. Você sabe o seu? · @nutri_secrets
 
-**Cena (20s)**: ovos mexidos cremosos
+**Cena (20s)**
 ```
 SCENE CONTEXT
-Soft scrambled eggs finishing in a pan, morning light, steam rising.
+A mound of golden turmeric powder with cracked black pepper on a stone counter, olive oil poured over it, warm light.
 
 LOCATION MAP
-Foreground: creamy soft scrambled eggs in a dark pan. Background: blurred bright kitchen. Camera just above the pan, close.
+Foreground: a small mound of golden turmeric powder on a grey stone counter, cracked black pepper beside it. Background: blurred kitchen. Camera at counter height, very close.
 
 FIRST FRAME / BLOCKING
-The eggs are already creamy and folding gently in the pan, steam already rising.
+The turmeric mound is already in frame.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up macro, shallow depth of field.
+
+CAMERA
+Very slow push in.
+
+ACTION
+Cracked black pepper falls over the turmeric. Then a thin stream of olive oil falls onto the mound and it darkens to deep orange where the oil soaks in, spreading outward.
+
+PHYSICS
+The pepper bounces once when it lands. The powder absorbs the oil and darkens progressively from the centre outward, never all at once.
+
+LIGHTING
+Warm side light from the left, strong texture on the powder.
+
+STYLE
+Photoreal food cinematography, vivid natural orange, visible powder texture, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people, no bottle or jar visible. No text or labels.
+```
+
+**Legenda**
+> Cúrcuma na água morna, todo dia, há meses. E a inflamação não cede.
+> O problema não é a cúrcuma. É a rota de absorção. 🔥
+>
+> O **NF-κB** é um fator de transcrição que funciona como chave-mestra:
+> quando ativado, liga de uma vez a expressão de dezenas de genes
+> inflamatórios. É uma via que responde ao que chega no prato.
+>
+> A curcumina está entre os compostos mais estudados na modulação dessa
+> sinalização. Só que ela tem um problema conhecido: **biodisponibilidade
+> baixíssima** sozinha.
+>
+> **A combinação que resolve:**
+> 🌿 curcumina + **pimenta-preta** — a piperina aumenta muito a
+> biodisponibilidade (Shoba et al., 1998)
+> 🫒 + **gordura**, porque a curcumina é lipossolúvel
+> 🐟 + **EPA e DHA**, que dão origem a mediadores pró-resolução
+>
+> Sinergia não é detalhe bonito. É o que faz o composto chegar onde
+> precisa.
+>
+> ⚠️ Doses e formas exigem avaliação individual.
+>
+> 💚 Marca quem toma cúrcuma na água.
+> 📌 Salva a combinação certa.
+>
+> @nutri_secrets
+
+---
+
+# 3. INTESTINO — FUT2
+
+**Texto na tela**
+1. Cerca de **1 em cada 5** pessoas é "não secretora"
+2. Gene **FUT2** · define o açúcar do seu muco intestinal
+3. É esse açúcar que **alimenta** suas bifidobactérias
+4. Não secretor precisa de mais **fibra prebiótica**, não de mais probiótico
+5. Você sabe o seu? · @nutri_secrets
+
+**Cena (20s)**
+```
+SCENE CONTEXT
+Natural yogurt in a bowl with hydrated chia and oats, morning light.
+
+LOCATION MAP
+Foreground: a shallow ceramic bowl of thick natural yogurt on a light wooden counter, hydrated chia seeds and rolled oats on top. Background: blurred bright kitchen. Camera just above the bowl.
+
+FIRST FRAME / BLOCKING
+The bowl is already in frame, the toppings already on the yogurt.
 
 FORMAT MODE
 One continuous shot, the camera does not cut on its own.
@@ -283,69 +217,298 @@ CAMERA
 Very slow push in.
 
 ACTION
-The eggs fold slowly over themselves as they finish cooking. Steam rises. A few chopped chives fall over them from above.
+A spoon of thick yogurt is lifted from the bowl and held, a slow thread falling back down.
 
 PHYSICS
-The eggs move in soft heavy folds, glossy and wet, never runny. Steam drifts.
+The yogurt is thick and holds its shape, falling back in one slow heavy thread.
 
 LIGHTING
-Soft morning window light from the left, gentle sheen on the eggs.
+Soft morning window light from the left, gentle sheen on the yogurt.
 
 STYLE
-Photoreal food cinematography, visible texture, true to life colors, fine grain.
+Photoreal food cinematography, visible creamy texture, true to life colors, fine grain.
 
 POSITIVE LOCKS
-No hands, no arms, no people, only the pan and the eggs. No text or labels.
+No hands, no arms, no people, only the spoon. No text or labels.
 ```
 
 **Legenda**
-> "Eu como e vinte minutos depois estou com fome de novo." Não é fraqueza.
-> Pode ser o **FTO**. 🧬
+> Você toma probiótico há meses e o intestino continua igual. Talvez o
+> problema não seja quem você **coloca** — é quem você **alimenta**. 🦠
 >
-> O FTO é um dos genes mais estudados na relação entre genética e peso.
-> Variantes desse gene estão associadas a maior ingestão calórica e menor
-> percepção de saciedade — a pessoa come mais sem perceber que comeu mais.
+> O gene **FUT2** determina se você é "secretor" ou "não secretor": ele
+> comanda a produção de certos açúcares na camada de muco que reveste seu
+> intestino. Cerca de 1 em cada 5 pessoas é não secretora.
 >
-> Repare na diferença: não é "metabolismo lento". É **sinal de saciedade
-> mais fraco**.
+> **Por que isso importa:** esses açúcares do muco são um dos alimentos
+> das suas bactérias — especialmente das **bifidobactérias**. Não
+> secretores tendem a ter perfis diferentes de microbiota, e o gene já
+> apareceu associado a variações de vitamina B12 e a risco aumentado de
+> algumas condições intestinais.
 >
-> **E o que funciona pra quem tem essa variante:**
-> 🥚 proteína logo no café da manhã, não só no almoço
-> 🥑 gordura boa junto, que retarda o esvaziamento gástrico
-> 🥬 fibra em toda refeição
-> 😴 sono, porque privação de sono derruba saciedade em qualquer genótipo
+> **Onde a conduta muda:**
+> 🌾 fibra prebiótica de verdade (aveia, cevada, banana verde, alho, cebola)
+> 🫐 polifenóis, que também alimentam a microbiota
+> 🥛 fermentados, mas como parte da estratégia e não como estratégia inteira
 >
-> Nutrição de precisão é isso: parar de exigir força de vontade de quem
-> precisa de estratégia.
+> Probiótico sem prebiótico é semente sem terra. 🌱
 >
-> 💚 Marca quem vive com fome o dia inteiro.
-> 📌 Salva pra montar o café da manhã.
+> 💚 Marca quem vive tomando probiótico sem resultado.
+> 📌 Salva pra revisar a fibra da semana.
 >
 > @nutri_secrets
 
 ---
 
-# 5. LCT — não é alergia, é genética
-
-**Gancho**: A maior parte dos adultos do mundo não digere lactose. E isso é o normal.
+# 4. MENOPAUSA — CYP1A1
 
 **Texto na tela**
-1. A maioria dos adultos **não digere** lactose bem
-2. Gene **LCT** · a lactase que deveria desligar
-3. Continuar produzindo na vida adulta é a **exceção**, não a regra
-4. Não é alergia. É **genética**
+1. O estrogênio não some. Ele **muda de rota**
+2. Gene **CYP1A1** · escolhe por onde o estrogênio sai
+3. As brássicas favorecem a rota mais **segura**
+4. Vapor de 3 minutos. Fervido perde a enzima
 5. Você sabe o seu? · @nutri_secrets
 
-**Cena (20s)**: leite sendo servido
+**Cena (20s)**
 ```
 SCENE CONTEXT
-Cold milk being poured into a clear glass on a light wooden table, morning light.
+Bright green broccoli florets steaming in a shallow pan, olive oil poured over them, morning light.
 
 LOCATION MAP
-Foreground: an empty clear glass on a light wooden table. Midground: the falling stream of milk. Background: blurred bright kitchen. Camera at glass height, straight on.
+Foreground: vivid green steamed broccoli florets in a shallow pan. Midground: steam rising. Background: blurred bright kitchen. Camera just above the pan, close.
 
 FIRST FRAME / BLOCKING
-The glass is already in frame and the stream of milk is already falling into it.
+The florets are already in the pan, bright green, steam already rising around them.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Very slow push in.
+
+ACTION
+Steam drifts across the florets. A thin stream of olive oil falls over them and runs down into the pan. A pinch of coarse mustard seeds falls over the top.
+
+PHYSICS
+Steam rises unevenly and drifts. The oil coats the florets and pools at the base. The seeds bounce once when they land.
+
+LIGHTING
+Soft morning window light from the left, gentle rim light on the steam.
+
+STYLE
+Photoreal food cinematography, vivid natural green, visible texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people. No text or labels. Broccoli looks freshly steamed and irregular, never mushy.
+```
+
+**Legenda**
+> Na menopausa a conversa costuma ser "quanto estrogênio". Quase nunca é
+> "**por qual rota**". E a rota muda tudo. 🧬
+>
+> O estrogênio é metabolizado por enzimas da família **CYP1A1 / CYP1B1**,
+> que o transformam em diferentes metabólitos. Alguns caminhos são
+> considerados mais favoráveis; outros geram compostos que exigem mais
+> trabalho do organismo. Depois, a **COMT** entra metilando esses
+> metabólitos pra que eles sejam eliminados.
+>
+> **Onde a comida entra:** compostos das brássicas (o indol-3-carbinol e o
+> DIM) estão associados a favorecer o caminho mais seguro dessa
+> metabolização.
+>
+> **E o detalhe de preparo que quase todo mundo erra:**
+> 🥦 a enzima que libera esses compostos é destruída pelo calor alto
+> ♨️ vapor rápido, 3 a 4 minutos, ainda crocante
+> 🌱 mostarda em pó por cima devolve a enzima
+> 🚫 fervido por 15 minutos perde grande parte do efeito
+>
+> Brócolis, couve-flor, rúcula, repolho e couve entram no mesmo time. E
+> como a COMT depende de **magnésio**, ele também faz parte da conversa.
+>
+> ⚠️ Menopausa pede acompanhamento individualizado.
+>
+> 💚 Marca quem está entrando na menopausa.
+> 📌 Salva o preparo certo das brássicas.
+>
+> @nutri_secrets
+
+---
+
+# 5. TPM — COMT
+
+**Texto na tela**
+1. TPM não é frescura. É **bioquímica** com data marcada
+2. Gene **COMT** · limpa dopamina e estrogênio do sistema
+3. A enzima é **dependente de magnésio**
+4. Magnésio e B6 na segunda metade do ciclo
+5. Você sabe o seu? · @nutri_secrets
+
+**Cena (20s)**
+```
+SCENE CONTEXT
+Dark chocolate squares, pumpkin seeds and a banana on a dark stone counter, warm afternoon light.
+
+LOCATION MAP
+Foreground: broken squares of dark chocolate and a small pile of pumpkin seeds on a dark stone counter, half a banana beside them. Background: blurred kitchen. Camera just above the counter.
+
+FIRST FRAME / BLOCKING
+The ingredients are already arranged in frame.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up macro, shallow depth of field.
+
+CAMERA
+Very slow lateral tracking across the ingredients.
+
+ACTION
+A few more pumpkin seeds fall over the chocolate and settle in the gaps.
+
+PHYSICS
+The seeds bounce once and settle between the chocolate pieces.
+
+LIGHTING
+Warm afternoon light from the left, sheen on the chocolate.
+
+STYLE
+Photoreal food cinematography, visible texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people. No text or labels.
+```
+
+**Legenda**
+> Irritabilidade, choro fácil, vontade de doce — sempre nos mesmos dias do
+> mês. Isso tem bioquímica, e tem gene. 🧬
+>
+> A **COMT** é a enzima que faz a limpeza: ela metila e ajuda a eliminar
+> catecolaminas (como dopamina e noradrenalina) e também metabólitos do
+> estrogênio.
+>
+> Existem variantes comuns que deixam essa enzima **mais lenta**. A pessoa
+> demora mais pra "baixar a bola" depois de um estímulo — e na segunda
+> metade do ciclo, quando o estrogênio também precisa dessa via, o sistema
+> fica sobrecarregado.
+>
+> **E a enzima não trabalha sozinha:** ela é dependente de **magnésio**.
+> A B6 entra como cofator na síntese de neurotransmissores.
+>
+> **O que colocar na segunda metade do ciclo:**
+> 🎃 sementes de abóbora
+> 🍫 cacau de verdade, acima de 70%
+> 🍌 banana e grão-de-bico pela B6
+> 🥬 folhas verde-escuras
+>
+> E sim: a vontade de chocolate na TPM tem lógica. Cacau é uma das maiores
+> fontes de magnésio da alimentação. O corpo estava pedindo o mineral. 🍫
+>
+> 💚 Marca quem sofre com TPM todo mês.
+> 📌 Salva pra montar a segunda metade do ciclo.
+>
+> @nutri_secrets
+
+---
+
+# 6. SAÚDE MENTAL — BDNF
+
+**Texto na tela**
+1. Seu cérebro pode **fabricar** o próprio adubo
+2. Gene **BDNF** · a proteína da plasticidade
+3. A expressão dele responde a **comida e movimento**
+4. Ômega-3, polifenóis e sono
+5. Você sabe o seu? · @nutri_secrets
+
+**Cena (20s)**
+```
+SCENE CONTEXT
+Walnuts, blueberries and dark chocolate on a stone counter, soft morning light.
+
+LOCATION MAP
+Foreground: cracked walnut halves and fresh blueberries on a grey stone counter, a few squares of dark chocolate beside them. Background: blurred kitchen. Camera just above the counter.
+
+FIRST FRAME / BLOCKING
+The ingredients are already arranged in frame.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up macro, shallow depth of field.
+
+CAMERA
+Very slow lateral tracking across the ingredients.
+
+ACTION
+A few more blueberries roll into frame and settle against the walnuts.
+
+PHYSICS
+The blueberries roll with real weight and stop against the nuts. Natural bloom visible on their skins.
+
+LIGHTING
+Soft morning window light from the left, deep colour on the fruit.
+
+STYLE
+Photoreal food cinematography, visible texture and bloom, true to life colors, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people. No text or labels.
+```
+
+**Legenda**
+> Existe uma proteína no seu cérebro que funciona como adubo: ela sustenta
+> a sobrevivência dos neurônios e a formação de novas conexões. Chama
+> **BDNF**. 🧠
+>
+> O ponto que muda tudo: **a expressão do BDNF responde ao ambiente.**
+> Alimentação, exercício, sono e estresse alteram o quanto o seu corpo
+> produz — isso é nutrigenômica na prática.
+>
+> Existe também uma variante conhecida do gene (Val66Met) que afeta a
+> secreção da proteína, e ela aparece com frequência em estudos sobre
+> memória, aprendizado e resposta ao estresse.
+>
+> **O que está associado a favorecer:**
+> 🌰 ômega-3, especialmente DHA — gordura estrutural da membrana neuronal
+> 🫐 polifenóis das frutas vermelhas e do cacau
+> 🏃‍♀️ exercício, que é dos estímulos mais consistentes
+> 😴 sono, porque é nele que a consolidação acontece
+>
+> Saúde mental não se resolve no prato. Mas ela também **passa** pelo
+> prato — e ignorar isso é deixar uma peça do quebra-cabeça fora. 🔍
+>
+> ⚠️ Sintomas de ansiedade e depressão pedem acompanhamento profissional.
+>
+> 💚 Marca alguém que precisa ler isso hoje.
+> 📌 Salva pra montar o prato do cérebro.
+>
+> @nutri_secrets
+
+---
+
+# 7. EMAGRECIMENTO — PPARG
+
+**Texto na tela**
+1. A mesma gordura engorda uma pessoa e **não engorda** outra
+2. Gene **PPARG** · o sensor de gordura da célula
+3. Ele **lê** o tipo de gordura e decide o que expressar
+4. Não é quanta gordura. É **qual** gordura
+5. Você sabe o seu? · @nutri_secrets
+
+**Cena (20s)**
+```
+SCENE CONTEXT
+Extra virgin olive oil being poured over a ripe avocado half on a stone counter, warm light.
+
+LOCATION MAP
+Foreground: a ripe avocado half, cut side up, on a grey stone counter. Midground: the falling stream of green olive oil. Background: blurred kitchen. Camera at counter height, close.
+
+FIRST FRAME / BLOCKING
+The avocado is already in frame and the oil is already falling onto it.
 
 FORMAT MODE
 One continuous shot, the camera does not cut on its own.
@@ -357,43 +520,46 @@ CAMERA
 Static locked off, no movement.
 
 ACTION
-Milk pours into the glass, the level rises to two thirds and the stream stops. Fine bubbles form on the surface and slowly settle. Condensation beads on the cold glass.
+Olive oil pours slowly over the avocado, pools in the hollow where the stone was, and overflows down one side. A few flakes of sea salt fall on top.
 
 PHYSICS
-The stream folds into the milk creating fine foam that slowly stills. Condensation forms on the outside of the glass.
+The oil pools with real surface tension and runs down in a single slow rivulet. The salt flakes bounce once and stick.
 
 LIGHTING
-Soft morning window light from the left, the milk glowing where the light passes through.
+Warm side light from the left, strong sheen on the oil.
+
+STYLE
+Photoreal food cinematography, rich natural green, visible texture, fine grain.
 
 POSITIVE LOCKS
-No hands, no arms, no people, no bottle or carton visible. No text or labels. The glass never overflows.
+No hands, no arms, no people, no bottle visible. No text or labels.
 ```
 
 **Legenda**
-> Você cresceu ouvindo que "leite faz bem pra todo mundo". A genética
-> conta outra história. 🥛
+> Duas pessoas comem a mesma gordura. Uma responde bem, a outra não. Não é
+> sorte, e não é falta de esforço. 🧬
 >
-> O gene **LCT** comanda a produção da lactase, a enzima que quebra a
-> lactose. No plano original da espécie, essa enzima diminui depois do
-> desmame. Quem continua produzindo lactase na vida adulta carrega uma
-> variante de **persistência** — que é comum em algumas populações e rara
-> em outras.
+> O **PPARG** é um receptor nuclear que funciona como sensor: ele detecta
+> ácidos graxos e, a partir disso, regula a expressão de genes ligados ao
+> armazenamento de gordura e à sensibilidade à insulina.
 >
-> Ou seja: não digerir lactose bem na vida adulta é o padrão ancestral. A
-> exceção é quem digere.
+> Traduzindo: **a gordura que você come conversa com o gene** — e o tipo
+> de gordura muda a conversa.
 >
-> **E isso não significa cortar tudo:**
-> 🧀 queijos maturados têm pouquíssima lactose
-> 🥛 fermentados como kefir e iogurte são mais bem tolerados
-> 🔍 o que importa é o seu limiar, que é individual
+> Existe uma variante comum (Pro12Ala) que altera essa resposta, e estudos
+> mostram interação entre o genótipo e a **proporção de gorduras da
+> dieta**: o efeito sobre sensibilidade à insulina depende de quanta
+> monoinsaturada e poli-insaturada a pessoa come, não só do total.
 >
-> Antes de cortar um grupo alimentar inteiro, vale entender **por quê** —
-> laticínio também carrega cálcio, proteína e vitamina B12.
+> **Na prática:**
+> 🫒 azeite extravirgem, abacate e oleaginosas como base
+> 🐟 ômega-3 marinho junto
+> 🚫 menos gordura industrial e ultraprocessada
 >
-> ⚠️ Sintomas persistentes merecem investigação individualizada.
+> Emagrecimento não é conta de calorias. É leitura de dados. 🔍
 >
-> 💚 Marca quem vive estufado depois do café com leite.
-> 📌 Salva pra testar os fermentados.
+> 💚 Marca quem ainda tem medo de comer gordura.
+> 📌 Salva pra revisar o tipo, não só a quantidade.
 >
 > @nutri_secrets
 
@@ -401,13 +567,31 @@ No hands, no arms, no people, no bottle or carton visible. No text or labels. Th
 
 ## Calendário sugerido
 
-Um por semana, nesta ordem (do mais viral pro mais técnico):
+Uma semana por foco, do mais compartilhável ao mais técnico:
 
-1. TAS2R38 (brócolis) — o mais compartilhável
-2. FTO (fome) — o que mais gera identificação
-3. CYP1A2 (café) — o que mais gera salvamento
-4. LCT (lactose) — o que mais gera comentário
-5. MTHFR (ácido fólico) — o que mais atrai profissional
+1. **TPM · COMT** — maior identificação imediata (e explica a vontade de chocolate)
+2. **Inflamação · NF-κB** — corrige um hábito popular, gera salvamento
+3. **Intestino · FUT2** — desfaz a fé cega no probiótico
+4. **Menopausa · CYP1A1** — público que mais busca resposta
+5. **Emagrecimento · PPARG** — desfaz medo de gordura
+6. **Saúde mental · BDNF** — maior alcance emocional
+7. **Autoimune · VDR** — atrai o público mais engajado e o profissional
 
-Todos terminam em "Você sabe o seu?" — a pergunta que prepara a venda do
-teste sem vender nada.
+Todos terminam em **"Você sabe o seu?"** — a pergunta que prepara a venda
+do teste sem vender nada.
+
+## Por que esses genes
+
+A Aline pediu genes que a nutrigenômica realmente aciona. Todos os sete
+são receptores nucleares, fatores de transcrição ou enzimas cuja atividade
+ou expressão responde diretamente a composto alimentar:
+
+| Gene | O alimento faz | Composto |
+|---|---|---|
+| VDR | liga a regulação imune | vitamina D + magnésio (cofator) |
+| NF-κB | silencia a via inflamatória | curcumina + piperina, EPA/DHA |
+| FUT2 | define quem é alimentado | fibra prebiótica |
+| CYP1A1 | desvia a rota do estrogênio | I3C/DIM das brássicas |
+| COMT | depende de cofator | magnésio, B6 |
+| BDNF | liga a plasticidade | DHA, polifenóis, exercício |
+| PPARG | lê o tipo de gordura | monoinsaturada, ômega-3 |
