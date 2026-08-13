@@ -1,0 +1,58 @@
+{
+  "clipes": [
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4"
+  ],
+  "cortar": {"0": 4.2},
+  "trechos": {
+    "1": [[4.4, 8.4], [9.0, 11.9], [0.2, 3.9], [12.1, 14.9]],
+    "2": [[9.0, 14.9]],
+    "3": [[2.5, 12.0]]
+  },
+  "velocidade": {"0": 0.85, "1": 0.85, "2": 1.0, "3": 1.0},
+  "cartelas": [
+    {"clipe":0,"t":0.4,"dur":4.0,"cor_apoio":"#D6336C",
+     "chapeu":"NUTRI,",
+     "titulo":"O que você sente\nquando a paciente volta\npela terceira vez\ne diz que não sentiu\ndiferença?"},
+    {"clipe":3,"t":9.3,"dur":4.4,"cor_apoio":"#D6336C",
+     "chapeu":"AULA GRATUITA",
+     "titulo":"Intensivo de\nNutrigenética",
+     "corpo":"Exclusiva para nutricionistas",
+     "rodape":"@nutri_secrets"}
+  ],
+  "legendas": [
+    {"clipe":0,"de":0.5,"ate":2.2,"texto":"Você troca o suplemento","tam":54},
+    {"clipe":0,"de":2.3,"ate":4.0,"texto":"Ajusta a dieta. Sorri por fora","tam":50},
+
+    {"clipe":1,"de":0.3,"ate":2.3,"estilo":"hero","pre":"Por dentro,",
+     "palavra":"você trava","tam":80,"cor":"#D6336C","fundo":"black@0.45"},
+    {"clipe":1,"de":2.5,"ate":4.5,"texto":"Não sabe mais o que testar","tam":52},
+
+    {"clipe":1,"de":5.0,"ate":6.4,"texto":"Essa insegurança tem nome","tam":52},
+    {"clipe":1,"de":6.6,"ate":8.0,"estilo":"hero","pre":"É o limite do que dá pra ver",
+     "palavra":"sem o gene","tam":76,"cor":"#D6336C","fundo":"black@0.45"},
+
+    {"clipe":1,"de":8.4,"ate":10.2,"estilo":"hero","pre":"Gene da",
+     "palavra":"COMT","pos":"Dopamina, estrogênio, cafeína","tam":90,"cor":"#D6336C","fonte":"sans","fundo":"black@0.45"},
+    {"clipe":1,"de":10.3,"ate":11.5,"texto":"AA · metaboliza devagar","tam":54},
+    {"clipe":1,"de":11.6,"ate":12.4,"texto":"Hiperproteica piora","tam":54},
+
+    {"clipe":1,"de":12.8,"ate":14.2,"texto":"Precisa de GABA e magnésio","tam":50},
+    {"clipe":1,"de":14.3,"ate":15.7,"texto":"Cuidado com cafeína\ne estrogênio","tam":50},
+
+    {"clipe":2,"de":0.2,"ate":2.0,"estilo":"hero","pre":"Já o",
+     "palavra":"GG","pos":"metaboliza rápido demais","tam":92,"cor":"#D6336C","fonte":"sans","fundo":"black@0.45"},
+    {"clipe":2,"de":2.1,"ate":3.9,"texto":"Precisa de mais proteína","tam":54},
+    {"clipe":2,"de":4.0,"ate":5.8,"texto":"E de vitamina D","tam":56},
+
+    {"clipe":3,"de":0.3,"ate":2.4,"estilo":"hero","pre":"Não é preguiça.",
+     "palavra":"É bioquímica","tam":78,"y":880,"cor":"#D6336C","fundo":"black@0.5"},
+    {"clipe":3,"de":2.6,"ate":4.6,"estilo":"hero","pre":"Motivação também",
+     "palavra":"tem gene","tam":78,"y":880,"cor":"#D6336C","fundo":"black@0.5"},
+    {"clipe":3,"de":4.8,"ate":6.8,"texto":"De que adianta uma dieta\nlinda de macros","tam":48,"y":900},
+    {"clipe":3,"de":6.9,"ate":9.2,"estilo":"hero","pre":"se ela não é",
+     "palavra":"terapêutica","pos":"para o gene?","tam":74,"y":880,"cor":"#D6336C","fundo":"black@0.5"}
+  ]
+}
