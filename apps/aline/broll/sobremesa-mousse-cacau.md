@@ -133,3 +133,137 @@ Fecho:
 > **AULA GRATUITA**
 > Venha aprender mais sobre Nutrigenética
 > Exclusiva para nutricionistas
+
+---
+
+## Cenas extras — pra alongar o reel e falar de nutrigenética
+
+Três cenas que emendam com o preparo e dão tempo de texto. Todas sem
+pessoa, sem Soul, geradas soltas.
+
+### Extra 1 — Os ingredientes na bancada (abertura)
+
+```
+SCENE CONTEXT
+The ingredients of a chocolate avocado mousse laid out on a dark wooden counter before cooking, afternoon light.
+
+LOCATION MAP
+Foreground: a halved ripe avocado, a small bowl of dark cocoa powder, a small jar of dark sugarcane molasses, a cinnamon stick and a small glass of almond milk, arranged loosely on a dark wooden counter. Background: blurred kitchen. Camera slightly above the counter looking down at an angle.
+
+FIRST FRAME / BLOCKING
+All the ingredients are already arranged in frame, nothing moving yet.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Wide close-up, 35mm equivalent, shallow depth of field.
+
+CAMERA
+Very slow lateral tracking from left to right across the ingredients.
+
+ACTION
+A small cloud of cocoa powder puffs up as a spoon rests into the bowl. Everything else stays still.
+
+PHYSICS
+The cocoa dust rises and settles slowly. Contact shadows under every object.
+
+LIGHTING
+Warm afternoon light from the left, long soft shadows across the wood.
+
+STYLE
+Photoreal food cinematography, rustic imperfect arrangement, visible texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people. No text, labels or packaging on the jar or glass. Ingredients look real and irregular, never styled.
+```
+
+### Extra 2 — Macro do cacau (o gene em foco)
+
+```
+SCENE CONTEXT
+Extreme macro of dark cocoa powder and cacao nibs on a dark stone surface, side light.
+
+LOCATION MAP
+Foreground: a small heap of fine dark cocoa powder with a few cacao nibs on a dark stone surface. Background: dark, out of focus. Camera almost level with the surface.
+
+FIRST FRAME / BLOCKING
+The powder and nibs are already in frame.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme macro, very shallow depth of field.
+
+CAMERA
+Very slow push in.
+
+ACTION
+A few cacao nibs fall onto the heap from above and settle, raising a fine puff of powder.
+
+PHYSICS
+The nibs bounce once. The powder puff rises and settles slowly.
+
+LIGHTING
+Hard side light from the left raking across the powder, deep shadows.
+
+STYLE
+Photoreal macro food cinematography, visible grain of the powder, true to life colors, fine grain.
+
+POSITIVE LOCKS
+No hands, no people. No text or labels.
+```
+
+### Extra 3 — O abacate cortado (a gordura)
+
+```
+SCENE CONTEXT
+A ripe avocado half on a dark wooden counter, olive oil poured into the hollow, afternoon light.
+
+LOCATION MAP
+Foreground: a ripe avocado half, cut side up, stone removed, on a dark wooden counter. Background: blurred kitchen. Camera at counter height, close.
+
+FIRST FRAME / BLOCKING
+The avocado half is already in frame and a thin stream of olive oil is already falling into the hollow.
+
+FORMAT MODE
+One continuous shot, the camera does not cut on its own.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Olive oil fills the hollow, pools, and a single slow rivulet runs down one side of the avocado.
+
+PHYSICS
+The oil pools with real surface tension and the rivulet moves slowly, held by the fruit surface.
+
+LIGHTING
+Warm side light from the left, strong sheen on the oil.
+
+STYLE
+Photoreal food cinematography, rich natural green, visible flesh texture, fine grain.
+
+POSITIVE LOCKS
+No hands, no arms, no people, no bottle visible. No text or labels.
+```
+
+### Ordem sugerida do reel completo
+
+| # | Cena | O que o texto fala |
+|---|---|---|
+| 1 | Extra 1 — ingredientes na bancada | manchete: seu paciente não resiste ao doce |
+| 2 | Extra 2 — macro do cacau | **TAS2R38** · o amargo que ele sente muito mais forte |
+| 3 | Preparo (cacau caindo) | **ANKK1** · recompensa tem genótipo |
+| 4 | Extra 3 — abacate com azeite | **APOE ε4** · monoinsaturada no lugar da saturada |
+| 5 | Preparo (canela) | **TCF7L2** · nunca doce isolado |
+| 6 | Preparo (mexendo) | **CYP1A2** · teobromina à noite tira o sono |
+| 7 | Final (colherada) | o mesmo doce **não serve** a dois genótipos |
+| 8 | Olhar direto | imersão gratuita |
+
+Com as três extras o reel vai de ~20s para ~45s, com tempo real de leitura
+em cada gene.
