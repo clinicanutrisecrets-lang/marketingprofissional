@@ -137,7 +137,7 @@ def bloco_hero(pre, palavra, pos, y_centro, enable, cor_palavra=BRANCO,
             f"drawbox=x={x0}:y={y_risco}:w={int(larg_pal) + 28}:h=7"
             f":color={risco}:t=fill{cond}")
     if pos:
-        filtros.append(drawtext(pos, FONT_LIGHT, tam_apoio, BRANCO,
+        filtros.append(drawtext(pos, FONT_SEMI, tam_apoio, BRANCO,
                                 y + int(tam_palavra * 1.05), enable=enable,
                                 sombra=True))
     return filtros
