@@ -358,3 +358,26 @@ etapa, ou divida em dois vídeos.
 
 ### 12. Sigla técnica não vai em fonte serifada italic
 Algarismo antigo transforma FADS1 em "FADSı". Sigla de gene em sans-serif.
+
+### 13. Cena com pessoa: no máximo 10 segundos
+Identidade deriva com o tempo. Em 20s o modelo "esquece" a referência e
+volta com cabelo de comprimento diferente de um lado, rosto mudado, mão a
+mais. Plano com a Aline: **10s**. Se precisar de mais tempo, são dois
+clipes, não um longo.
+
+### 14. Nunca escreva "comida" genérica
+`a plate with finished food` faz o modelo inventar — e o que ele inventa é
+purê marrom. Descrever componente por componente:
+`grilled salmon fillet, dark green leaves and roasted vegetables, each
+component clearly separate` + o lock
+`never a uniform mush`.
+
+### 15. Não peça sorriso no fim de ação composta
+Empurrar + soltar + olhar + sorrir = a última ação sai deformada. Sorriso
+gerado por IA já é arriscado sozinho; depois de três ações, quase sempre
+falha. Terminar em olhar calmo com `lips stay closed, no smile`.
+
+### 16. Trave o cabelo explicitamente
+`her hair keeps exactly the same length and shape on both sides through the
+entire shot, matching the reference` — cabelo é o primeiro detalhe a
+derivar, antes mesmo do rosto.
