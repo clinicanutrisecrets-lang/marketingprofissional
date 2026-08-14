@@ -381,3 +381,30 @@ falha. Terminar em olhar calmo com `lips stay closed, no smile`.
 `her hair keeps exactly the same length and shape on both sides through the
 entire shot, matching the reference` — cabelo é o primeiro detalhe a
 derivar, antes mesmo do rosto.
+
+### 17. Sem pessoa, clipe longo multi-cena compensa
+A regra 13 vale só quando tem gente em cena. Em comida e cenário **não
+existe identidade pra derivar**, então um clipe de 20s com quatro cenas
+encadeadas sai limpo e rende quatro blocos de montagem por um único
+gasto. Foi assim que saíram as cenas extras do mousse: ingredientes na
+bancada → macro do cacau → abacate com azeite → finalização, tudo num
+clipe só.
+
+Como escrever: numerar as cenas dentro do ACTION, com o tempo de cada uma,
+e deixar explícito que o corte é seco.
+
+```
+ACTION
+Scene 1 (0-3s): slow lateral tracking across the ingredients on the counter.
+Hard cut.
+Scene 2 (3-6s): extreme macro of the cocoa heap, nibs drop in.
+Hard cut.
+Scene 3 (6-11s): olive oil pours into the avocado hollow.
+Hard cut.
+Scene 4 (11-20s): the finished mousse is topped and a spoon lifts a scoop.
+```
+
+O `FORMAT MODE` aqui é o contrário do de sempre: em vez de
+`one continuous shot`, escrever `four separate shots with hard cuts between
+them, no dissolves`. E manter LOCATION MAP / LIGHTING / STYLE iguais nas
+quatro, senão cada cena vem com uma luz diferente e não emenda.

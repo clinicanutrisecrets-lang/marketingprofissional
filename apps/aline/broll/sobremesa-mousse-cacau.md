@@ -21,6 +21,19 @@ sobrenome.
 
 A tese, de novo: **o mesmo doce não serve a dois genótipos.**
 
+### Por que tem flor de sal no final
+
+Não é enfeite de food styling. O sódio **suprime a percepção do amargo** —
+é um efeito de interação entre gostos bem descrito, e é por isso que a
+confeitaria usa flor de sal em chocolate amargo. Ou seja: a pitada de sal
+é justamente a conduta para o **TAS2R38 PAV/PAV**, que rejeita o 70%
+porque sente o amargo com muito mais intensidade. Junto com a gordura do
+abacate (que também arredonda o amargor), é o que faz o supertaster
+aceitar um cacau alto sem precisar puxar o percentual pra baixo.
+
+A quantidade é pequena — uma pitada por porção, não muda o sódio do dia.
+Se ela preferir tirar, dá: é só cortar o trecho do sal na montagem.
+
 ---
 
 ## Vídeo A — o preparo (Seedance 2.5, ~15s, 9:16)
@@ -252,18 +265,59 @@ POSITIVE LOCKS
 No hands, no arms, no people, no bottle visible. No text or labels.
 ```
 
-### Ordem sugerida do reel completo
+---
 
-| # | Cena | O que o texto fala |
+## Montagem final — o que foi entregue
+
+Roteiro: `roteiros/reel-mousse-abacate.json` · saída:
+`saida/reel-mousse-abacate.mp4` (~42s, 9:16, sem áudio — o áudio em alta
+entra no app do Instagram).
+
+As quatro cenas extras vieram todas dentro de **um único clipe de 20s**
+(vídeo B), então o material dos 8 blocos já existe. Mapa dos dois clipes:
+
+| clipe | trecho | o que tem |
 |---|---|---|
-| 1 | Extra 1 — ingredientes na bancada | manchete: seu paciente não resiste ao doce |
-| 2 | Extra 2 — macro do cacau | **TAS2R38** · o amargo que ele sente muito mais forte |
-| 3 | Preparo (cacau caindo) | **ANKK1** · recompensa tem genótipo |
-| 4 | Extra 3 — abacate com azeite | **APOE ε4** · monoinsaturada no lugar da saturada |
-| 5 | Preparo (canela) | **TCF7L2** · nunca doce isolado |
-| 6 | Preparo (mexendo) | **CYP1A2** · teobromina à noite tira o sono |
-| 7 | Final (colherada) | o mesmo doce **não serve** a dois genótipos |
-| 8 | Olhar direto | imersão gratuita |
+| **A** (19s) | 0–2s | cacau caindo sobre o purê verde |
+| | 2–5s | melado escorrendo |
+| | 6–7s | canela |
+| | 8–9s | leite vegetal |
+| | 10–18s | verde virando marrom, progressivo |
+| **B** (20s) | 0–3s | ingredientes na bancada, travelling lateral |
+| | 4–6s | macro do cacau, nibs caindo |
+| | 7–11s | abacate com azeite escorrendo |
+| | 12–20s | nibs, framboesa, flor de sal, colherada |
 
-Com as três extras o reel vai de ~20s para ~45s, com tempo real de leitura
-em cada gene.
+### Ordem montada
+
+| # | Fonte | Vel. | Texto |
+|---|---|---|---|
+| 1 | B 0.5–3.6 | 1.0 | manchete + *não é* **disciplina** *é bioquímica* |
+| 2 | B 3.7–6.7 | 0.70 | **TAS2R38** · supertaster → sente o amargo do 70% muito mais forte |
+| 3 | A 0–2.3 | 0.60 | **ANKK1 A1** · recompensa → doce planejado, nunca proibido |
+| 4 | B 7.2–11.6 | 0.85 | **APOE4** · gordura → monoinsaturada no lugar da saturada |
+| 5 | A 3.0–7.4 | 0.90 | **TCF7L2** · glicemia → canela e fibra junto do doce |
+| 6 | A 13.2–18.8 | 0.90 | **CYP1A2 CC** · metabolizador lento → sobremesa mais cedo no dia |
+| 7 | B 12–19 | 1.0 | *a flor de sal* **corta o amargo** + o mesmo doce **não serve** a dois genótipos |
+| 8 | B 18.3–19.3 | 1.0 | cartela: aula gratuita |
+
+A câmera lenta (`velocidade` no roteiro) existe pra dar tempo de leitura
+sem precisar esticar o clipe — foi a correção do "está muito rápido".
+
+⚠️ **APOE ε4 vira `APOE4` na tela**: a Montserrat não tem o glifo ε e ele
+sai como quadradinho. Na legenda escrita dá pra usar ε4 normalmente.
+
+### Sempre achar o corte antes de recortar
+
+Num clipe multi-cena o corte nunca cai no segundo redondo. Cortar "de 4 a
+7" pegou 0,4s do fim da cena anterior, e o texto do TAS2R38 apareceu em
+cima dos ingredientes. O jeito certo é pedir pro ffmpeg mostrar onde estão
+os cortes e recortar com 0,12s de margem:
+
+```
+ffmpeg -v error -i CLIPE.mp4 \
+  -vf "select='gt(scene,0.25)',metadata=print:file=-" -f null - 2>&1 \
+  | grep pts_time
+```
+
+No vídeo B os cortes estavam em **4.083s, 7.375s e 11.833s**.

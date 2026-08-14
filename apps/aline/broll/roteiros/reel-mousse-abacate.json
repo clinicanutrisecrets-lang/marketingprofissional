@@ -1,0 +1,249 @@
+{
+  "_": "Sobremesa gene a gene - mousse de cacau 70% com abacate. [ADS] formacao.",
+  "_fontes": {
+    "A": "preparo: cacau, melado, canela, leite, verde virando marrom (19s)",
+    "B": "ingredientes 0-3 / macro cacau 4-6 / abacate+azeite 7-11 / final 12-20"
+  },
+  "clipes": [
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+    "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4"
+  ],
+  "trechos": {
+    "0": [
+      [
+        0.5,
+        3.95
+      ]
+    ],
+    "1": [
+      [
+        4.2,
+        7.28
+      ]
+    ],
+    "2": [
+      [
+        0.0,
+        2.3
+      ]
+    ],
+    "3": [
+      [
+        7.5,
+        11.75
+      ]
+    ],
+    "4": [
+      [
+        3.0,
+        7.4
+      ]
+    ],
+    "5": [
+      [
+        13.2,
+        18.8
+      ]
+    ],
+    "6": [
+      [
+        11.95,
+        19.0
+      ]
+    ],
+    "7": [
+      [
+        18.3,
+        19.3
+      ]
+    ]
+  },
+  "velocidade": {
+    "1": 0.7,
+    "2": 0.6,
+    "3": 0.85,
+    "4": 0.9,
+    "5": 0.9
+  },
+  "cortar": {
+    "7": 0.95
+  },
+  "cartelas": [
+    {
+      "clipe": 0,
+      "t": 0.0,
+      "dur": 2.9,
+      "chapeu": "ATENÇÃO, NUTRICIONISTA",
+      "titulo": "Seu paciente não resiste ao doce",
+      "corpo": "Falta de disciplina, ou é o genótipo dele?",
+      "rodape": "@nutri_secrets",
+      "escurecer": 0.3
+    },
+    {
+      "clipe": 7,
+      "t": 0.9,
+      "dur": 3.6,
+      "chapeu": "AULA GRATUITA",
+      "titulo": "Venha aprender mais sobre Nutrigenética",
+      "corpo": "Exclusiva para nutricionistas",
+      "rodape": "@nutri_secrets",
+      "escurecer": 0.3
+    }
+  ],
+  "legendas": [
+    {
+      "clipe": 0,
+      "de": 0.35,
+      "ate": 3.4,
+      "estilo": "hero",
+      "pre": "não é",
+      "palavra": "disciplina",
+      "pos": "é bioquímica",
+      "tam": 88,
+      "risco": "#D6336C",
+      "y": 800
+    },
+    {
+      "clipe": 1,
+      "de": 0.2,
+      "ate": 2.35,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "TAS2R38",
+      "pos": "supertaster",
+      "fonte": "sans",
+      "cor": "#0ABAB5",
+      "tam": 76,
+      "y": 800
+    },
+    {
+      "clipe": 1,
+      "de": 2.55,
+      "ate": 4.32,
+      "texto": "Sente o amargo do 70% muito mais forte",
+      "tam": 54,
+      "y": 810
+    },
+    {
+      "clipe": 2,
+      "de": 0.2,
+      "ate": 2.1,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "ANKK1 A1",
+      "pos": "recompensa",
+      "fonte": "sans",
+      "cor": "#0ABAB5",
+      "tam": 74,
+      "y": 800
+    },
+    {
+      "clipe": 2,
+      "de": 2.3,
+      "ate": 3.75,
+      "texto": "Doce planejado, nunca proibido",
+      "tam": 58,
+      "y": 810
+    },
+    {
+      "clipe": 3,
+      "de": 0.3,
+      "ate": 2.4,
+      "estilo": "hero",
+      "pre": "gene da",
+      "palavra": "APOE4",
+      "pos": "gordura",
+      "fonte": "sans",
+      "cor": "#0ABAB5",
+      "tam": 76,
+      "y": 800
+    },
+    {
+      "clipe": 3,
+      "de": 2.6,
+      "ate": 4.92,
+      "texto": "Monoinsaturada no lugar da saturada",
+      "tam": 54,
+      "y": 810
+    },
+    {
+      "clipe": 4,
+      "de": 0.2,
+      "ate": 2.3,
+      "estilo": "hero",
+      "pre": "gene do",
+      "palavra": "TCF7L2",
+      "pos": "glicemia",
+      "fonte": "sans",
+      "cor": "#0ABAB5",
+      "tam": 76,
+      "y": 800
+    },
+    {
+      "clipe": 4,
+      "de": 2.5,
+      "ate": 4.8,
+      "texto": "Canela e fibra junto do doce, nunca doce sozinho",
+      "tam": 52,
+      "y": 810
+    },
+    {
+      "clipe": 5,
+      "de": 0.3,
+      "ate": 2.4,
+      "estilo": "hero",
+      "pre": "gene da",
+      "palavra": "CYP1A2 CC",
+      "pos": "metabolizador lento",
+      "fonte": "sans",
+      "cor": "#0ABAB5",
+      "tam": 66,
+      "y": 800
+    },
+    {
+      "clipe": 5,
+      "de": 2.65,
+      "ate": 4.4,
+      "texto": "Teobromina do cacau demora a sair",
+      "tam": 54,
+      "y": 810
+    },
+    {
+      "clipe": 5,
+      "de": 4.6,
+      "ate": 6.15,
+      "texto": "Sobremesa mais cedo no dia",
+      "tam": 58,
+      "y": 810
+    },
+    {
+      "clipe": 6,
+      "de": 0.3,
+      "ate": 2.7,
+      "estilo": "hero",
+      "pre": "a flor de sal",
+      "palavra": "corta o amargo",
+      "pos": "conduta, não enfeite",
+      "tam": 68,
+      "y": 800
+    },
+    {
+      "clipe": 6,
+      "de": 3.0,
+      "ate": 6.9,
+      "estilo": "hero",
+      "pre": "o mesmo doce",
+      "palavra": "não serve",
+      "pos": "a dois genótipos",
+      "tam": 92,
+      "fundo": "#0ABAB5",
+      "y": 800
+    }
+  ]
+}
