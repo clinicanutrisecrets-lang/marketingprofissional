@@ -43,25 +43,59 @@
     }
   ],
   "abertura": {
-    "chapeu": "Nutricionista",
-    "tarja": [
-      214,
-      51,
-      108
+    "chapeu": "Nutri Secrets",
+    "titulo": [
+      {
+        "txt": "Meu dia como",
+        "tam": 0.4,
+        "peso": "Regular"
+      },
+      {
+        "txt": "NUTRI",
+        "tam": 1.3,
+        "peso": "Black"
+      },
+      {
+        "txt": "de nutrigenética",
+        "tam": 0.48,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
     ],
-    "titulo": "Meu dia como nutri\nde **nutrigenética**",
     "sub": "acompanhe um pouco da minha carreira",
     "dur": 4.0
   },
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
     "tarja": [
-      214,
-      51,
-      108
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
     ],
-    "titulo": "Aula gratuita e\n**mão na massa**",
-    "sub": "teoria descomplicada, para você cuidar do paciente com **precisão**",
+    "titulo": [
+      {
+        "txt": "Aula gratuita",
+        "tam": 0.46,
+        "peso": "Regular"
+      },
+      {
+        "txt": "MÃO NA MASSA",
+        "tam": 0.8,
+        "peso": "Black"
+      }
+    ],
+    "sub": "teoria descomplicada, para cuidar do paciente com precisão",
     "rodape": "@nutri_secrets",
     "dur": 6.0
   },

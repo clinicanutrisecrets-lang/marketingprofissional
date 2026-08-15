@@ -51,6 +51,13 @@ BRANCO = (255, 255, 255)
 FONT_BOLD = "/usr/share/fonts/truetype/montserrat/Montserrat-Bold.ttf"
 FONT_SEMI = "/usr/share/fonts/truetype/montserrat/Montserrat-SemiBold.ttf"
 FONT_MED = "/usr/share/fonts/truetype/montserrat/Montserrat-Medium.ttf"
+FONT_LIGHT = "/usr/share/fonts/truetype/montserrat/Montserrat-Light.ttf"
+
+# título de cartão em serifada de revista; o apoio e a legenda continuam
+# em Montserrat, que é a fonte da marca e lê melhor em movimento
+ED = "/usr/share/fonts/truetype/editorial/Playfair-%s.ttf"
+FONTE_ED = {"Regular": "Playfair Display", "SemiBold": "Playfair Display SemiBold",
+            "Black": "Playfair Display Black", "Italic": "Playfair Display Medium"}
 
 W, H = 1920, 1080         # o roteiro pode trocar por 9:16 com "saida"
 K = 1.0                   # fator de escala das medidas, derivado da largura
@@ -103,12 +110,14 @@ def caixa(x0, y0, x1, y1, cor, alfa=0, camada=1, de=0.0, ate=0.0):
 
 
 def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
-          alinha=8, espaco=0):
+          alinha=8, espaco=0, italico=False, familia=None):
     """Uma linha de texto posicionada, na cor e no tamanho pedidos."""
     esp = f"\\fsp{espaco}" if espaco else ""
+    it = "\\i1" if italico else ""
+    fam = familia or f"Montserrat {fonte}"
     return (f"Dialogue: {camada},{hms(de)},{hms(ate)},base,,0,0,0,,"
-            f"{{\\an{alinha}\\pos({x},{y})\\fnMontserrat {fonte}"
-            f"\\fs{tam}\\c{ass_cor(cor)}\\bord0\\shad0{esp}"
+            f"{{\\an{alinha}\\pos({x},{y})\\fn{fam}"
+            f"\\fs{tam}\\c{ass_cor(cor)}\\bord0\\shad0{esp}{it}"
             f"\\fad(180,180)}}{txt}")
 
 
@@ -132,57 +141,111 @@ def realce(txt, cor_base, cor_hl=None):
                   txt)
 
 
+def par_tarja(v):
+    """Aceita `[r,g,b]` ou `[[fundo],[texto]]` e devolve o par."""
+    if not v:
+        return None
+    if isinstance(v[0], (list, tuple)):
+        return (tuple(v[0]), tuple(v[1]))
+    return (tuple(v), BRANCO)
+
+
+def linhas_titulo(titulo, base):
+    """Normaliza o título em linhas com tamanho e peso próprios.
+
+    Aceita string simples (todas as linhas iguais) ou lista de blocos
+    `{"txt", "tam", "peso", "cor"}`. Os tamanhos são fatores do corpo
+    base — é o que dá a hierarquia de capa de revista, com a palavra que
+    importa muito maior que o resto.
+    """
+    if isinstance(titulo, str):
+        # sem hierarquia declarada, todas as linhas saem num corpo médio:
+        # o corpo base é calibrado pra palavra-herói de capa
+        return [{"txt": l, "tam": round(base * 0.55), "peso": "SemiBold",
+                 "cor": None} for l in titulo.split("\n")]
+    saida = []
+    for b in titulo:
+        saida.append({"txt": b["txt"],
+                      "tam": max(1, round(base * b.get("tam", 1))),
+                      "peso": b.get("peso", "SemiBold"),
+                      "cor": tuple(b["cor"]) if b.get("cor") else None})
+    return saida
+
+
 def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
                    rodape=None, hl=None):
-    """Cartão de tela cheia — tapa um trecho ruim da imagem sem tocar no áudio.
+    """Cartão de tela cheia.
 
-    `tarja` põe o chapéu dentro de um retângulo colorido, em branco e num
-    corpo maior — é o tratamento de chamada de atenção, forte demais pra
-    usar em todo cartão.
+    Também serve pra tapar um trecho ruim da imagem sem tocar no áudio.
+    `tarja` põe o chapéu dentro de um retângulo colorido; sem ela o
+    chapéu fica solto, entre dois filetes finos, que é o tratamento mais
+    sóbrio.
     """
     ev = [caixa(0, 0, W, H, fundo, 0, 1, de, ate)]
-    f_tit = ImageFont.truetype(FONT_BOLD, k(96))
-    linhas = quebra(espalha_realce(titulo), f_tit, W - k(MARGEM) * 2)
-    tam_cha, esp_cha = (k(64), k(10)) if tarja else (k(46), k(8))
-    alt_cha = (tam_cha + k(96)) if chapeu else 0
-    alt = len(linhas) * k(124) + alt_cha + (k(116) if sub else 0)
-    y = (H - alt) // 2 + k(40)
+    # corpo base generoso: numa capa editorial a palavra-herói tem que
+    # dominar o quadro, e o fator de cada linha parte daqui
+    blocos = linhas_titulo(titulo, k(180))
+    tam_cha, esp_cha = (k(46), k(14)) if tarja else (k(40), k(16))
+
+    alt = sum(round(b["tam"] * 1.34) for b in blocos)
+    alt += (tam_cha + k(110)) if chapeu else 0
+    alt += k(120) if sub else 0
+    y = (H - alt) // 2
+
     if chapeu:
         txt = chapeu.upper()
-        f_cha = ImageFont.truetype(FONT_SEMI, tam_cha)
+        f_cha = ImageFont.truetype(FONT_LIGHT, tam_cha)
         larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
         # chapéu longo num quadro estreito estoura a tarja pra fora da
         # tela; encolhe até caber com folga
-        limite = W - k(MARGEM)
-        while larg > limite and tam_cha > k(20):
+        limite = W - k(MARGEM) * 2
+        while larg > limite and tam_cha > k(18):
             tam_cha -= 2
-            esp_cha = max(1, esp_cha - 1) if tam_cha % 8 == 0 else esp_cha
-            f_cha = ImageFont.truetype(FONT_SEMI, tam_cha)
+            esp_cha = max(k(4), esp_cha - 1)
+            f_cha = ImageFont.truetype(FONT_LIGHT, tam_cha)
             larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
-        cor_cha = TIFFANY
+        cor_cha = tarja[1] if tarja else TIFFANY
         if tarja:
-            pad_x, pad_y = k(52), k(26)
+            pad_x, pad_y = k(46), k(22)
             x0 = int((W - larg) / 2) - pad_x
             ev.append(caixa(x0, y - pad_y, int(x0 + larg) + pad_x * 2,
-                            y + int(tam_cha * 1.18) + pad_y, tarja, 0, 1,
+                            y + int(tam_cha * 1.3) + pad_y, tarja[0], 0, 1,
                             de, ate))
-            cor_cha = BRANCO
+        else:
+            # dois filetes finos no lugar da tarja: o chapéu respira e o
+            # cartão fica menos anúncio, mais capa
+            fx = int((W - larg) / 2) - k(34)
+            fw = int(larg) + k(68)
+            for yy in (y - k(30), y + int(tam_cha * 1.3) + k(14)):
+                ev.append(caixa(fx, yy, fx + fw, yy + k(2), TIFFANY, 0x30,
+                                1, de, ate))
         ev.append(texto(txt, W // 2, y, tam_cha, cor_cha, de, ate,
-                        fonte="SemiBold", espaco=esp_cha))
-        y += tam_cha + k(96)
-    for linha in linhas:
-        ev.append(texto(realce(linha, BRANCO, hl), W // 2, y, k(96), BRANCO,
-                        de, ate))
-        y += k(124)
+                        fonte="Light", espaco=esp_cha))
+        y += tam_cha + k(110)
+
+    for b in blocos:
+        familia = FONTE_ED.get(b["peso"], FONTE_ED["SemiBold"])
+        # linha que estoura a largura encolhe sozinha, senão a palavra
+        # grande vaza pra fora do quadro
+        arq = ED % ("Black" if b["peso"] == "Black" else
+                    "SemiBold" if b["peso"] == "SemiBold" else "Regular")
+        limpo = b["txt"].replace("**", "")
+        while (b["tam"] > k(24) and ImageFont.truetype(arq, b["tam"])
+               .getlength(limpo) > W - k(MARGEM) * 2):
+            b["tam"] -= 3
+        ev.append(texto(realce(espalha_realce(b["txt"]), b["cor"] or BRANCO, hl),
+                        W // 2, y, b["tam"], b["cor"] or BRANCO, de, ate,
+                        familia=familia, italico=b["peso"] == "Italic"))
+        y += round(b["tam"] * 1.34)
+
     if sub:
         ev.append(texto(realce(espalha_realce(sub), BEGE, hl), W // 2,
-                        y + k(26), k(52), BEGE,
-                        de, ate, fonte="Medium"))
+                        y + k(34), k(52), BEGE, de, ate, fonte="Light"))
     if rodape:
         # a assinatura sai do meio e vai pro pé do cartão, senão disputa
         # atenção com a chamada
-        ev.append(texto(rodape, W // 2, H - k(132), k(44), TIFFANY, de, ate,
-                        fonte="SemiBold"))
+        ev.append(texto(rodape, W // 2, H - k(120), k(38), TIFFANY, de, ate,
+                        fonte="Medium", espaco=k(3)))
     return ev
 
 
@@ -374,8 +437,7 @@ def clipe_cartao(tmp, nome, cfg, saida):
     faz_ass(ass, [], [], 0.0,
             eventos_cartao(cfg.get("chapeu"), cfg["titulo"], cfg.get("sub"),
                            0.0, cfg["dur"],
-                           tarja=tuple(cfg["tarja"]) if cfg.get("tarja")
-                           else None,
+                           tarja=par_tarja(cfg.get("tarja")),
                            rodape=cfg.get("rodape"),
                            hl=tuple(cfg["hl"]) if cfg.get("hl") else None))
     caminho = str(ass).replace(":", r"\:")
@@ -383,7 +445,7 @@ def clipe_cartao(tmp, nome, cfg, saida):
         "ffmpeg", "-v", "error", "-y", "-f", "lavfi",
         "-i", f"color=c=0x0E5959:s={W}x{H}:r={FPS}:d={cfg['dur']}",
         "-vf", f"subtitles='{caminho}':"
-               f"fontsdir=/usr/share/fonts/truetype/montserrat," + FMT,
+               f"fontsdir=/usr/share/fonts/truetype," + FMT,
         "-pix_fmt", "yuv420p", *COR, "-c:v", "libx264", "-crf", "18",
         str(saida)], check=True)
 
@@ -458,7 +520,7 @@ def main():
         if m["tipo"] == "cheia":
             eventos += eventos_cartao(
                 m.get("chapeu"), m["texto"], m.get("sub"), de, ate,
-                tarja=tuple(m["tarja"]) if m.get("tarja") else None,
+                tarja=par_tarja(m.get("tarja")),
                 rodape=m.get("rodape"),
                 hl=tuple(m["hl"]) if m.get("hl") else None)
         elif m["tipo"] == "faixa":
@@ -509,7 +571,7 @@ def main():
         "ffmpeg", "-v", "error", "-y", *corte, "-i", video,
         "-vf", f"setpts=PTS+{dur_ab}/TB,"
                f"subtitles='{caminho}':"
-               f"fontsdir=/usr/share/fonts/truetype/montserrat,"
+               f"fontsdir=/usr/share/fonts/truetype,"
                f"setpts=PTS-{dur_ab}/TB," + FMT,
         "-r", str(FPS), "-pix_fmt", "yuv420p", *COR,
         "-c:v", "libx264", "-preset", "medium", "-crf", "20",

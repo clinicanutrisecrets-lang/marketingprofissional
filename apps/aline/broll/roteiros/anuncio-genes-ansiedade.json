@@ -12,22 +12,78 @@
   "abertura": {
     "chapeu": "Nutricionista",
     "tarja": [
-      214,
-      51,
-      108
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
     ],
-    "titulo": "A ansiedade da sua paciente\ntambém vai além do **emocional**",
+    "titulo": [
+      {
+        "txt": "A ansiedade da sua paciente",
+        "tam": 0.3,
+        "peso": "Regular"
+      },
+      {
+        "txt": "VAI ALÉM DO",
+        "tam": 0.34,
+        "peso": "SemiBold"
+      },
+      {
+        "txt": "emocional",
+        "tam": 0.72,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
     "sub": "pode estar na **genética** e no **estilo de vida**",
     "dur": 4.5
   },
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
     "tarja": [
-      214,
-      51,
-      108
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
     ],
-    "titulo": "Aprenda a ler esses\ngenes na **prática**",
+    "titulo": [
+      {
+        "txt": "Aprenda a ler",
+        "tam": 0.42,
+        "peso": "Regular"
+      },
+      {
+        "txt": "ESSES GENES",
+        "tam": 0.62,
+        "peso": "Black"
+      },
+      {
+        "txt": "na prática",
+        "tam": 0.42,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
     "sub": "**Aula gratuita**, exclusiva para nutricionistas",
     "rodape": "@nutri_secrets",
     "dur": 6.0
