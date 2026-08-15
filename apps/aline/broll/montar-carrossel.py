@@ -226,10 +226,23 @@ def slide_capa(fotos, chapeu, titulo, sub, rodape):
     return base
 
 
-def slide_foto(foto, texto, pos, tam, rodape, fundo, cor_base, cor_destaque):
-    """Foto grande e faixa de texto em cima ou embaixo."""
-    alt_faixa = k(470)
-    alt_foto = H - alt_faixa
+def slide_foto(foto, texto, pos, tam, rodape, fundo, cor_base, cor_destaque,
+               ajuste="cobrir"):
+    """Foto grande e faixa de texto em cima ou embaixo.
+
+    `ajuste="inteira"` usa a foto na proporção original, só esticada até a
+    largura, e a faixa fica com o que sobrar. Foto pequena e deitada
+    forçada num retrato precisa de upscale grande e sai pixelada; assim o
+    aumento cai pra razão da largura, que é bem menor.
+    """
+    if ajuste == "inteira":
+        with Image.open(foto) as im:
+            alt_foto = round(W * im.height / im.width)
+        alt_foto = min(alt_foto, H - k(300))     # a faixa precisa respirar
+        alt_faixa = H - alt_foto
+    else:
+        alt_faixa = k(470)
+        alt_foto = H - alt_faixa
     base = Image.new("RGB", (W, H), fundo)
     y_foto = alt_faixa if pos == "cima" else 0
     base.paste(cobre(foto, W, alt_foto), (0, y_foto))
@@ -286,7 +299,8 @@ def main():
                              tuple(s["fundo"]) if s.get("fundo") else BEGE,
                              tuple(s["cor"]) if s.get("cor") else DARK_TEAL,
                              tuple(s["destaque"]) if s.get("destaque")
-                             else TIFFANY)
+                             else TIFFANY,
+                             s.get("ajuste", "cobrir"))
         img.save(png)
         mp4 = tmp / f"s{i}.mp4"
         anima(png, s.get("dur", 4.0), mp4, zoom=s.get("zoom", True))

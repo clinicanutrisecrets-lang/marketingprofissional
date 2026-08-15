@@ -2,16 +2,16 @@
   "_": "Como funciona o raciocinio clinico de interpretacao de um teste nutrigenetico. [ORG] + [ADS]. 9:16, sem audio.",
   "rodape": "@nutri_secrets",
   "fotos": {
+    "exame": "fotos/exame.png",
     "computador": "fotos/c3a.png",
     "papeis": "fotos/c3b.png",
-    "perfil": "fotos/c2c.png",
     "ampla": "fotos/ampla.png"
   },
   "slides": [
     {
       "tipo": "capa",
       "fotos": [
-        "computador",
+        "exame",
         "papeis"
       ],
       "dur": 4.5,
@@ -22,51 +22,82 @@
     {
       "foto": "papeis",
       "pos": "baixo",
+      "ajuste": "inteira",
       "dur": 4.2,
       "texto": "Eu não começo pelo gene.\nComeço pela **queixa**."
     },
     {
-      "foto": "computador",
+      "foto": "exame",
       "pos": "cima",
+      "ajuste": "cobrir",
       "dur": 4.6,
       "texto": "O gene mostra a **tendência**.\nO exame mostra o **agora**."
     },
     {
-      "foto": "perfil",
+      "foto": "computador",
       "pos": "baixo",
+      "ajuste": "inteira",
       "dur": 4.4,
       "texto": "Gene isolado não fecha nada.\nQuem fecha é a **via inteira**."
     },
     {
-      "foto": "papeis",
+      "foto": "exame",
       "pos": "cima",
+      "ajuste": "cobrir",
       "dur": 4.4,
       "texto": "Separo **predisposição**\ndo que já está expresso."
     },
     {
       "foto": "ampla",
       "pos": "baixo",
+      "ajuste": "cobrir",
       "dur": 4.2,
       "texto": "Priorizo só o que\n**muda a conduta hoje**."
     },
     {
       "foto": "computador",
       "pos": "cima",
+      "ajuste": "inteira",
       "dur": 4.6,
       "texto": "Traduzo em alimento e dose.\nIsso é **nutrigenômica**."
     },
     {
-      "foto": "perfil",
+      "foto": "exame",
       "pos": "baixo",
+      "ajuste": "cobrir",
       "dur": 4.6,
       "texto": "Reavalio pelo exame.\nO gene não muda.\nA **expressão** muda."
     },
     {
       "foto": "ampla",
       "pos": "cima",
+      "ajuste": "cobrir",
       "dur": 4.5,
       "tam": 66,
-      "texto": "Gene não é informação.\nÉ **direção**.",
+      "texto": "Gene não é informação.\nÉ **direção**."
+    },
+    {
+      "foto": "exame",
+      "pos": "baixo",
+      "ajuste": "cobrir",
+      "dur": 5.2,
+      "tam": 54,
+      "texto": "Quer aprender sobre **nutrigenômica**?\nAula gratuita, exclusiva\npara nutricionistas.",
+      "fundo": [
+        10,
+        186,
+        181
+      ],
+      "cor": [
+        255,
+        255,
+        255
+      ],
+      "destaque": [
+        245,
+        230,
+        211
+      ],
       "rodape": "@nutri_secrets"
     }
   ],
