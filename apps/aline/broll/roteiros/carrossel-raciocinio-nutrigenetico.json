@@ -1,0 +1,73 @@
+{
+  "_": "Como funciona o raciocinio clinico de interpretacao de um teste nutrigenetico. [ORG] + [ADS]. 9:16, sem audio.",
+  "rodape": "@nutri_secrets",
+  "fotos": {
+    "computador": "FOTO_COMPUTADOR.png",
+    "papeis": "FOTO_PAPEIS.png",
+    "perfil": "FOTO_PERFIL.png",
+    "ampla": "FOTO_AMPLA.png"
+  },
+  "slides": [
+    {
+      "tipo": "capa",
+      "fotos": [
+        "computador",
+        "papeis"
+      ],
+      "dur": 4.5,
+      "chapeu": "NUTRIGENÉTICA NA PRÁTICA",
+      "titulo": "Como eu **interpreto** um teste genético",
+      "sub": "o meu raciocínio, passo a passo"
+    },
+    {
+      "foto": "papeis",
+      "pos": "baixo",
+      "dur": 4.2,
+      "texto": "Eu não começo pelo gene.\nComeço pela **queixa**."
+    },
+    {
+      "foto": "computador",
+      "pos": "cima",
+      "dur": 4.6,
+      "texto": "O gene mostra a **tendência**.\nO exame mostra o **agora**."
+    },
+    {
+      "foto": "perfil",
+      "pos": "baixo",
+      "dur": 4.4,
+      "texto": "Gene isolado não fecha nada.\nQuem fecha é a **via inteira**."
+    },
+    {
+      "foto": "papeis",
+      "pos": "cima",
+      "dur": 4.4,
+      "texto": "Separo **predisposição**\ndo que já está expresso."
+    },
+    {
+      "foto": "ampla",
+      "pos": "baixo",
+      "dur": 4.2,
+      "texto": "Priorizo só o que\n**muda a conduta hoje**."
+    },
+    {
+      "foto": "computador",
+      "pos": "cima",
+      "dur": 4.6,
+      "texto": "Traduzo em alimento e dose.\nIsso é **nutrigenômica**."
+    },
+    {
+      "foto": "perfil",
+      "pos": "baixo",
+      "dur": 4.6,
+      "texto": "Reavalio pelo exame.\nO gene não muda.\nA **expressão** muda."
+    },
+    {
+      "foto": "ampla",
+      "pos": "cima",
+      "dur": 4.5,
+      "tam": 66,
+      "texto": "Gene não é informação.\nÉ **direção**.",
+      "rodape": "@nutri_secrets"
+    }
+  ]
+}
