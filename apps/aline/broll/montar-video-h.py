@@ -52,9 +52,15 @@ FONT_BOLD = "/usr/share/fonts/truetype/montserrat/Montserrat-Bold.ttf"
 FONT_SEMI = "/usr/share/fonts/truetype/montserrat/Montserrat-SemiBold.ttf"
 FONT_MED = "/usr/share/fonts/truetype/montserrat/Montserrat-Medium.ttf"
 
-W, H = 1920, 1080
+W, H = 1920, 1080         # o roteiro pode trocar por 9:16 com "saida"
+K = 1.0                   # fator de escala das medidas, derivado da largura
 FPS = 25
 MARGEM = 140
+
+
+def k(v):
+    """Escala a medida pro formato de saída escolhido."""
+    return max(1, round(v * K))
 COR = ["-color_range", "tv", "-colorspace", "bt709",
        "-color_primaries", "bt709", "-color_trc", "bt709"]
 FMT = "scale=out_range=tv:out_color_matrix=bt709,format=yuv420p"
@@ -64,13 +70,18 @@ RODAPE_LEGENDA = 210
 
 
 def quebra(texto, fonte, largura):
-    """Quebra respeitando o \\n do roteiro e medindo com a fonte real."""
+    """Quebra respeitando o \\n do roteiro e medindo com a fonte real.
+
+    Os `**` de destaque não são medidos: eles somam quatro caracteres por
+    palavra e fariam a linha quebrar antes da hora, já que na tela viram
+    tag de cor e não ocupam espaço.
+    """
     linhas = []
     for bruta in texto.split("\n"):
         atual = ""
         for palavra in bruta.split():
             teste = f"{atual} {palavra}".strip()
-            if fonte.getlength(teste) <= largura or not atual:
+            if fonte.getlength(teste.replace("**", "")) <= largura or not atual:
                 atual = teste
             else:
                 linhas.append(atual)
@@ -101,6 +112,18 @@ def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
             f"\\fad(180,180)}}{txt}")
 
 
+def espalha_realce(txt):
+    """`**a b c**` vira `**a** **b** **c**`.
+
+    O realce é aplicado depois da quebra de linha; se um destaque de
+    várias palavras for partido em duas linhas, o regex não casa e os
+    asteriscos aparecem crus na tela.
+    """
+    return re.sub(r"\*\*([^*]+)\*\*",
+                  lambda m: " ".join(f"**{p}**" for p in m.group(1).split()),
+                  txt)
+
+
 def realce(txt, cor_base, cor_hl=None):
     """Troca **palavra** por mudança de cor inline no ASS."""
     hl = ass_cor(cor_hl or TIFFANY)
@@ -118,19 +141,27 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
     usar em todo cartão.
     """
     ev = [caixa(0, 0, W, H, fundo, 0, 1, de, ate)]
-    f_tit = ImageFont.truetype(FONT_BOLD, 96)
-    linhas = quebra(titulo, f_tit, W - MARGEM * 2)
-    tam_cha, esp_cha = (64, 10) if tarja else (46, 8)
-    alt_cha = (tam_cha + 96) if chapeu else 0
-    alt = len(linhas) * 124 + alt_cha + (116 if sub else 0)
-    y = (H - alt) // 2 + 40
+    f_tit = ImageFont.truetype(FONT_BOLD, k(96))
+    linhas = quebra(espalha_realce(titulo), f_tit, W - k(MARGEM) * 2)
+    tam_cha, esp_cha = (k(64), k(10)) if tarja else (k(46), k(8))
+    alt_cha = (tam_cha + k(96)) if chapeu else 0
+    alt = len(linhas) * k(124) + alt_cha + (k(116) if sub else 0)
+    y = (H - alt) // 2 + k(40)
     if chapeu:
         txt = chapeu.upper()
         f_cha = ImageFont.truetype(FONT_SEMI, tam_cha)
         larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
+        # chapéu longo num quadro estreito estoura a tarja pra fora da
+        # tela; encolhe até caber com folga
+        limite = W - k(MARGEM)
+        while larg > limite and tam_cha > k(20):
+            tam_cha -= 2
+            esp_cha = max(1, esp_cha - 1) if tam_cha % 8 == 0 else esp_cha
+            f_cha = ImageFont.truetype(FONT_SEMI, tam_cha)
+            larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
         cor_cha = TIFFANY
         if tarja:
-            pad_x, pad_y = 52, 26
+            pad_x, pad_y = k(52), k(26)
             x0 = int((W - larg) / 2) - pad_x
             ev.append(caixa(x0, y - pad_y, int(x0 + larg) + pad_x * 2,
                             y + int(tam_cha * 1.18) + pad_y, tarja, 0, 1,
@@ -138,55 +169,57 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
             cor_cha = BRANCO
         ev.append(texto(txt, W // 2, y, tam_cha, cor_cha, de, ate,
                         fonte="SemiBold", espaco=esp_cha))
-        y += tam_cha + 96
+        y += tam_cha + k(96)
     for linha in linhas:
-        ev.append(texto(realce(linha, BRANCO, hl), W // 2, y, 96, BRANCO,
+        ev.append(texto(realce(linha, BRANCO, hl), W // 2, y, k(96), BRANCO,
                         de, ate))
-        y += 124
+        y += k(124)
     if sub:
-        ev.append(texto(realce(sub, BEGE, hl), W // 2, y + 26, 52, BEGE,
+        ev.append(texto(realce(espalha_realce(sub), BEGE, hl), W // 2,
+                        y + k(26), k(52), BEGE,
                         de, ate, fonte="Medium"))
     if rodape:
         # a assinatura sai do meio e vai pro pé do cartão, senão disputa
         # atenção com a chamada
-        ev.append(texto(rodape, W // 2, H - 132, 44, TIFFANY, de, ate,
+        ev.append(texto(rodape, W // 2, H - k(132), k(44), TIFFANY, de, ate,
                         fonte="SemiBold"))
     return ev
 
 
 def eventos_faixa(txt, de, ate):
     """Tarja de rodapé com a manchete, acima da linha de legenda."""
-    f = ImageFont.truetype(FONT_BOLD, 68)
-    linhas = quebra(txt, f, W - MARGEM * 2)
-    alt = 88 * len(linhas) + 76
-    y0 = H - RODAPE_LEGENDA - alt - 40
+    f = ImageFont.truetype(FONT_BOLD, k(68))
+    linhas = quebra(txt, f, W - k(MARGEM) * 2)
+    alt = k(88) * len(linhas) + k(76)
+    y0 = H - k(RODAPE_LEGENDA) - alt - k(40)
     ev = [caixa(0, y0, W, y0 + alt, TIFFANY, 0x14, 1, de, ate)]
-    y = y0 + 38
+    y = y0 + k(38)
     for linha in linhas:
-        ev.append(texto(linha, W // 2, y, 68, BRANCO, de, ate))
-        y += 88
+        ev.append(texto(linha, W // 2, y, k(68), BRANCO, de, ate))
+        y += k(88)
     return ev
 
 
 def eventos_selo(chapeu, txt, sub, de, ate):
     """Cartão de canto — o gene ou o exame que está sendo explicado."""
-    f_txt = ImageFont.truetype(FONT_BOLD, 64)
-    f_cha = ImageFont.truetype(FONT_SEMI, 30)
-    f_sub = ImageFont.truetype(FONT_MED, 32)
-    larg = max(f_txt.getlength(txt), f_cha.getlength(chapeu.upper()) + 4 * len(chapeu),
-               f_sub.getlength(sub) if sub else 0) + 88
-    alt = 176 + (48 if sub else 0)
+    f_txt = ImageFont.truetype(FONT_BOLD, k(64))
+    f_cha = ImageFont.truetype(FONT_SEMI, k(30))
+    f_sub = ImageFont.truetype(FONT_MED, k(32))
+    larg = max(f_txt.getlength(txt), f_cha.getlength(chapeu.upper()) + k(4) * len(chapeu),
+               f_sub.getlength(sub) if sub else 0) + k(88)
+    alt = k(176) + (k(48) if sub else 0)
     # no alto o cartão cobre o rosto assim que ela se move; embaixo cai
     # sobre a mesa e o jaleco, onde nada acontece
-    x0, y0 = 96, H - RODAPE_LEGENDA - alt - 60
+    x0, y0 = k(96), H - k(RODAPE_LEGENDA) - alt - k(60)
     ev = [caixa(x0, y0, x0 + larg, y0 + alt, BRANCO, 0x0D, 1, de, ate),
-          caixa(x0, y0, x0 + 12, y0 + alt, TIFFANY, 0, 1, de, ate)]
-    ev.append(texto(chapeu.upper(), x0 + 44, y0 + 30, 30, TIFFANY, de, ate,
-                    fonte="SemiBold", alinha=7, espaco=4))
-    ev.append(texto(txt, x0 + 44, y0 + 74, 64, DARK_TEAL, de, ate, alinha=7))
+          caixa(x0, y0, x0 + k(12), y0 + alt, TIFFANY, 0, 1, de, ate)]
+    ev.append(texto(chapeu.upper(), x0 + k(44), y0 + k(30), k(30), TIFFANY,
+                    de, ate, fonte="SemiBold", alinha=7, espaco=k(4)))
+    ev.append(texto(txt, x0 + k(44), y0 + k(74), k(64), DARK_TEAL, de, ate,
+                    alinha=7))
     if sub:
-        ev.append(texto(sub, x0 + 44, y0 + 156, 32, (70, 90, 90), de, ate,
-                        fonte="Medium", alinha=7))
+        ev.append(texto(sub, x0 + k(44), y0 + k(156), k(32), (70, 90, 90),
+                        de, ate, fonte="Medium", alinha=7))
     return ev
 
 
@@ -198,44 +231,45 @@ def eventos_painel(chapeu, titulo, sub, itens, de, ate):
     embaixo.
     """
     ev = []
-    f_tit = ImageFont.truetype(FONT_BOLD, 132)
-    linhas = quebra(titulo, f_tit, W - MARGEM * 2 - 120)
-    alt = len(linhas) * 158 + (78 if chapeu else 0) + (86 if sub else 0)
-    alt += len(itens or []) * 118
+    f_tit = ImageFont.truetype(FONT_BOLD, k(132))
+    linhas = quebra(espalha_realce(titulo), f_tit, W - k(MARGEM) * 2 - k(120))
+    alt = len(linhas) * k(158) + (k(78) if chapeu else 0) + (k(86) if sub else 0)
+    alt += len(itens or []) * k(118)
     y = (H - alt) // 2
 
     # painel atrás do bloco: só escurecer o vídeo inteiro não basta, o
     # texto branco ainda briga com a parede clara e a janela do consultório
-    pad = 72
-    ev.append(caixa(MARGEM - 40, y - pad, W - MARGEM + 40, y + alt + pad,
+    pad = k(72)
+    ev.append(caixa(k(MARGEM) - k(40), y - pad, W - k(MARGEM) + k(40),
+                    y + alt + pad,
                     DARK_TEAL, 0x1A, 0, de, ate))
 
     if chapeu:
-        ev.append(texto(chapeu.upper(), W // 2, y, 42, TIFFANY, de, ate,
-                        fonte="SemiBold", espaco=9))
-        y += 78
+        ev.append(texto(chapeu.upper(), W // 2, y, k(42), TIFFANY, de, ate,
+                        fonte="SemiBold", espaco=k(9)))
+        y += k(78)
     for linha in linhas:
-        ev.append(texto(realce(linha, BRANCO), W // 2, y, 132, BRANCO,
+        ev.append(texto(realce(linha, BRANCO), W // 2, y, k(132), BRANCO,
                         de, ate))
-        y += 158
+        y += k(158)
     if sub:
-        ev.append(texto(realce(sub, BEGE), W // 2, y + 8, 54, BEGE, de, ate,
-                        fonte="Medium"))
-        y += 86
+        ev.append(texto(realce(espalha_realce(sub), BEGE), W // 2, y + k(8),
+                        k(54), BEGE, de, ate, fonte="Medium"))
+        y += k(86)
     for rotulo, valor in (itens or []):
         # rótulo e valor na mesma linha: o rótulo vira uma etiqueta curta
         # em Tiffany e o valor fica em branco, do lado
-        f_rot = ImageFont.truetype(FONT_SEMI, 36)
-        f_val = ImageFont.truetype(FONT_BOLD, 58)
-        larg = f_rot.getlength(rotulo.upper()) + 4 * len(rotulo) + 32 \
+        f_rot = ImageFont.truetype(FONT_SEMI, k(36))
+        f_val = ImageFont.truetype(FONT_BOLD, k(58))
+        larg = f_rot.getlength(rotulo.upper()) + k(4) * len(rotulo) + k(32) \
             + f_val.getlength(valor)
         x = int((W - larg) / 2)
-        ev.append(texto(rotulo.upper(), x, y + 18, 36, TIFFANY, de, ate,
-                        fonte="SemiBold", alinha=7, espaco=4))
+        ev.append(texto(rotulo.upper(), x, y + k(18), k(36), TIFFANY, de, ate,
+                        fonte="SemiBold", alinha=7, espaco=k(4)))
         ev.append(texto(valor, int(x + f_rot.getlength(rotulo.upper())
-                                   + 4 * len(rotulo) + 32), y, 58, BRANCO,
-                        de, ate, alinha=7))
-        y += 118
+                                   + k(4) * len(rotulo) + k(32)), y, k(58),
+                        BRANCO, de, ate, alinha=7))
+        y += k(118)
     return ev
 
 
@@ -316,7 +350,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: fala,Montserrat SemiBold,66,{base},&H00000000,&HC0000000,0,0,0,0,100,100,0,0,1,4,3,2,140,140,120,1
+Style: fala,Montserrat SemiBold,{k(78)},{base},&H00000000,&HC0000000,0,0,0,0,100,100,0,0,1,{k(4)},{k(3)},2,{k(140)},{k(140)},{k(120)},1
 Style: caixa,Arial,20,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: base,Montserrat Bold,54,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,8,0,0,0,1
 
@@ -324,11 +358,13 @@ Style: base,Montserrat Bold,54,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     linhas = list(manchetes)
-    for ini, fim, txt in blocos:
+    for bloco in blocos:
+        ini, fim, txt = bloco[0], bloco[1], bloco[2]
+        margem = bloco[3] if len(bloco) > 3 else 0
         t = marca(txt, destaques, hl, base)
         # camada 3: a legenda fica por cima da tarja, nunca por baixo
         linhas.append(f"Dialogue: 3,{hms(ini + deslocamento)},"
-                      f"{hms(fim + deslocamento)},fala,,0,0,0,,{t}")
+                      f"{hms(fim + deslocamento)},fala,,0,0,{margem},,{t}")
     Path(caminho).write_text(cab + "\n".join(linhas) + "\n")
 
 
@@ -360,13 +396,57 @@ def dur_video(path):
     return float(out.stdout.strip())
 
 
+def junta_clipes(clipes, tmp):
+    """Recorta cada clipe e emenda tudo num vídeo só.
+
+    Cada item aceita `trecho` e `velocidade`; a velocidade abaixo de 1
+    alonga o clipe, o que salva um trecho curto demais pro texto que
+    precisa caber nele.
+    """
+    partes = []
+    for i, c in enumerate(clipes):
+        p = tmp / f"c{i}.mp4"
+        corte = []
+        if c.get("trecho"):
+            de, ate = c["trecho"]
+            corte = ["-ss", str(de), "-t", str(ate - de)]
+        vf = [f"scale={W}:{H}:force_original_aspect_ratio=increase",
+              f"crop={W}:{H}"]
+        vel = c.get("velocidade", 1)
+        if vel != 1:
+            vf.append(f"setpts={1 / vel:.4f}*PTS")
+        vf.append(f"fps={FPS}")
+        subprocess.run([
+            "ffmpeg", "-v", "error", "-y", *corte, "-i", c["video"],
+            "-vf", ",".join(vf) + "," + FMT, "-an",
+            "-pix_fmt", "yuv420p", *COR, "-c:v", "libx264", "-crf", "18",
+            str(p)], check=True)
+        partes.append(p)
+    lista = tmp / "clipes.txt"
+    lista.write_text("".join(f"file '{p}'\n" for p in partes))
+    juntos = tmp / "juntos.mp4"
+    subprocess.run([
+        "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
+        "-i", str(lista), "-c", "copy", str(juntos)], check=True)
+    return juntos
+
+
 def main():
+    global W, H, K
     roteiro = json.loads(Path(sys.argv[1]).read_text())
+    if roteiro.get("saida"):
+        W, H = roteiro["saida"]
+        # em retrato a referência é 1080 de largura, não 1920: escalar
+        # um vertical pela régua do horizontal deixa o texto minúsculo
+        K = W / (1080 if H > W else 1920)
     saida = sys.argv[2]
     tmp = Path(tempfile.mkdtemp())
 
-    video = roteiro["video"]
-    segs = json.loads(Path(roteiro["transcricao"]).read_text())
+    tmp_c = Path(tempfile.mkdtemp())
+    video = (junta_clipes(roteiro["clipes"], tmp_c) if roteiro.get("clipes")
+             else roteiro["video"])
+    segs = (json.loads(Path(roteiro["transcricao"]).read_text())
+            if roteiro.get("transcricao") else [])
     destaques = [d.lower() for d in roteiro.get("destaques", [])]
 
     ab, fe = roteiro.get("abertura"), roteiro.get("fecho")
@@ -407,7 +487,8 @@ def main():
     blocos = [] if roteiro.get("sem_legenda") else blocos_legenda(segs)
     # legendas próprias do roteiro: no anúncio mudo o texto não vem da
     # fala, é escrito pra ser lido
-    blocos += [(l["de"], l["ate"], l["texto"])
+    blocos += [(l["de"], l["ate"], l["texto"],
+                k(l["margem"]) if l.get("margem") else 0)
                for l in roteiro.get("legendas", [])]
     blocos.sort(key=lambda b: b[0])
     faz_ass(ass, blocos, destaques, dur_ab, eventos)

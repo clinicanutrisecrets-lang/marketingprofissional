@@ -1,0 +1,117 @@
+{
+  "_": "Meu dia como nutricionista especialista em nutrigenetica. 9:16, sem audio: a Aline grava a narracao por cima.",
+  "saida": [
+    720,
+    1280
+  ],
+  "mudo": true,
+  "sem_legenda": true,
+  "escurecer": 0.28,
+  "clipes": [
+    {
+      "_": "centrifuga, so a primeira cena do clipe de tres",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/2021b55d-hf_20260815_210016_5bf105633e3448569191f16fc0ee3225.mp4",
+      "trecho": [
+        0.3,
+        9.3
+      ]
+    },
+    {
+      "_": "microscopio, cortando os 6s iniciais com o monitor atravessado",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
+      "trecho": [
+        6.0,
+        19.5
+      ]
+    },
+    {
+      "_": "cozinha com o bolo; a legenda cai entre o rosto e o bolo",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e9265d63-hf_20260815_211505_bfd85ce65c47462e92640e090af9cc0c.mp4",
+      "trecho": [
+        0.3,
+        9.5
+      ]
+    },
+    {
+      "_": "consultorio, sem os 3s do verso do monitor; em camera lenta pra caber o texto",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/0ee34dfc-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d_2.mp4",
+      "trecho": [
+        3.0,
+        6.0
+      ],
+      "velocidade": 0.55
+    }
+  ],
+  "abertura": {
+    "chapeu": "Nutricionista",
+    "tarja": [
+      214,
+      51,
+      108
+    ],
+    "titulo": "Meu dia como nutri\nde **nutrigenética**",
+    "sub": "acompanhe um pouco da minha carreira",
+    "dur": 4.0
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      214,
+      51,
+      108
+    ],
+    "titulo": "Aula gratuita e\n**mão na massa**",
+    "sub": "teoria descomplicada, para você cuidar do paciente com **precisão**",
+    "rodape": "@nutri_secrets",
+    "dur": 6.0
+  },
+  "legendas": [
+    {
+      "de": 0.5,
+      "ate": 4.6,
+      "texto": "Você que é nutri e quer seguir essa área,"
+    },
+    {
+      "de": 4.9,
+      "ate": 8.9,
+      "texto": "vem ver como é o meu dia."
+    },
+    {
+      "de": 9.6,
+      "ate": 14.4,
+      "texto": "Atuo em pesquisa científica:"
+    },
+    {
+      "de": 14.7,
+      "ate": 19.4,
+      "texto": "mestrado em Genética e 9 especializações internacionais."
+    },
+    {
+      "de": 19.7,
+      "ate": 22.6,
+      "texto": "Estudo como os compostos bioativos e os nutrientes"
+    },
+    {
+      "de": 23.4,
+      "ate": 27.6,
+      "texto": "ativam e silenciam genes.",
+      "margem": 620
+    },
+    {
+      "de": 27.9,
+      "ate": 32.0,
+      "texto": "E adoro cozinhar de forma terapêutica.",
+      "margem": 620
+    },
+    {
+      "de": 32.6,
+      "ate": 36.2,
+      "texto": "Aí traduzo tudo em conduta, na prática clínica:"
+    },
+    {
+      "de": 36.5,
+      "ate": 40.0,
+      "texto": "exames, microbiota, genética, emoções e estilo de vida."
+    }
+  ]
+}
