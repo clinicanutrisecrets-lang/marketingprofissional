@@ -1,0 +1,141 @@
+{
+  "_": "Anuncio 16:9 de 1 min, generos da ansiedade. O video da consulta entra so como fundo, sem audio: a Aline narra por cima depois.",
+  "video": "video/consulta.mp4",
+  "transcricao": "video/transcricao_ok.json",
+  "trecho": [
+    60.0,
+    110.0
+  ],
+  "mudo": true,
+  "sem_legenda": true,
+  "escurecer": 0.74,
+  "abertura": {
+    "chapeu": "Nutricionista",
+    "tarja": [
+      214,
+      51,
+      108
+    ],
+    "titulo": "A ansiedade dela não\nestá só na cabeça",
+    "sub": "está no **prato** e no **genoma**",
+    "dur": 3.5
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      214,
+      51,
+      108
+    ],
+    "titulo": "Aprenda a ler esses\ngenes na **prática**",
+    "sub": "**Aula gratuita**, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets",
+    "dur": 5.5
+  },
+  "manchetes": [
+    {
+      "de": 0.2,
+      "ate": 4.0,
+      "tipo": "painel",
+      "chapeu": "cinco genes, cinco condutas",
+      "texto": "Ansiedade tem\n**genótipo**",
+      "sub": "e cada um pede um alimento diferente"
+    },
+    {
+      "de": 4.4,
+      "ate": 13.0,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "COMT",
+      "sub": "Met/Met degrada dopamina **devagar**: sob estresse, acumula",
+      "itens": [
+        [
+          "alimento",
+          "reduzir café e chá verde em dose alta"
+        ],
+        [
+          "suplemento",
+          "magnésio glicinato, cofator da enzima"
+        ]
+      ]
+    },
+    {
+      "de": 13.4,
+      "ate": 22.0,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "ADORA2A",
+      "sub": "a variante que faz o café **virar ansiedade**",
+      "itens": [
+        [
+          "alimento",
+          "trocar o café da tarde por chá branco"
+        ],
+        [
+          "suplemento",
+          "L-teanina, que segura o pico"
+        ]
+      ]
+    },
+    {
+      "de": 22.4,
+      "ate": 31.0,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "GAD1",
+      "sub": "converte glutamato em **GABA**, o freio do cérebro",
+      "itens": [
+        [
+          "alimento",
+          "grão-de-bico, banana, semente de abóbora"
+        ],
+        [
+          "suplemento",
+          "B6 na forma P5P e zinco"
+        ]
+      ]
+    },
+    {
+      "de": 31.4,
+      "ate": 40.0,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "TPH2",
+      "sub": "a enzima que fabrica **serotonina** no cérebro",
+      "itens": [
+        [
+          "alimento",
+          "ovo, aveia e castanha pelo triptofano"
+        ],
+        [
+          "suplemento",
+          "ferro e B6 antes de pensar em triptofano"
+        ]
+      ]
+    },
+    {
+      "de": 40.4,
+      "ate": 49.0,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "BDNF",
+      "sub": "Val66Met responde **pior** ao estresse crônico",
+      "itens": [
+        [
+          "alimento",
+          "peixe gordo e cacau 70%"
+        ],
+        [
+          "suplemento",
+          "ômega-3 com EPA e DHA"
+        ]
+      ]
+    },
+    {
+      "de": 49.2,
+      "ate": 50.0,
+      "tipo": "painel",
+      "texto": "Mesma queixa.\nCondutas **diferentes**."
+    }
+  ]
+}

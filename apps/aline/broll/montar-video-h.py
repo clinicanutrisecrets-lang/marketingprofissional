@@ -190,6 +190,55 @@ def eventos_selo(chapeu, txt, sub, de, ate):
     return ev
 
 
+def eventos_painel(chapeu, titulo, sub, itens, de, ate):
+    """Painel central grande — o formato de anúncio, que roda no mudo.
+
+    O vídeo fica só como textura por trás, então aqui o texto é o
+    conteúdo: nome do gene em corpo enorme e os pares rótulo/valor
+    embaixo.
+    """
+    ev = []
+    f_tit = ImageFont.truetype(FONT_BOLD, 132)
+    linhas = quebra(titulo, f_tit, W - MARGEM * 2 - 120)
+    alt = len(linhas) * 158 + (78 if chapeu else 0) + (86 if sub else 0)
+    alt += len(itens or []) * 118
+    y = (H - alt) // 2
+
+    # painel atrás do bloco: só escurecer o vídeo inteiro não basta, o
+    # texto branco ainda briga com a parede clara e a janela do consultório
+    pad = 72
+    ev.append(caixa(MARGEM - 40, y - pad, W - MARGEM + 40, y + alt + pad,
+                    DARK_TEAL, 0x2E, 0, de, ate))
+
+    if chapeu:
+        ev.append(texto(chapeu.upper(), W // 2, y, 42, TIFFANY, de, ate,
+                        fonte="SemiBold", espaco=9))
+        y += 78
+    for linha in linhas:
+        ev.append(texto(realce(linha, BRANCO), W // 2, y, 132, BRANCO,
+                        de, ate))
+        y += 158
+    if sub:
+        ev.append(texto(realce(sub, BEGE), W // 2, y + 8, 54, BEGE, de, ate,
+                        fonte="Medium"))
+        y += 86
+    for rotulo, valor in (itens or []):
+        # rótulo e valor na mesma linha: o rótulo vira uma etiqueta curta
+        # em Tiffany e o valor fica em branco, do lado
+        f_rot = ImageFont.truetype(FONT_SEMI, 36)
+        f_val = ImageFont.truetype(FONT_BOLD, 58)
+        larg = f_rot.getlength(rotulo.upper()) + 4 * len(rotulo) + 32 \
+            + f_val.getlength(valor)
+        x = int((W - larg) / 2)
+        ev.append(texto(rotulo.upper(), x, y + 18, 36, TIFFANY, de, ate,
+                        fonte="SemiBold", alinha=7, espaco=4))
+        ev.append(texto(valor, int(x + f_rot.getlength(rotulo.upper())
+                                   + 4 * len(rotulo) + 32), y, 58, BRANCO,
+                        de, ate, alinha=7))
+        y += 118
+    return ev
+
+
 def ass_cor(rgb):
     """ASS usa BGR, não RGB."""
     r, g, b = rgb
@@ -303,6 +352,14 @@ def clipe_cartao(tmp, nome, cfg, saida):
         str(saida)], check=True)
 
 
+def dur_video(path):
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=nw=1:nk=1", str(path)],
+        capture_output=True, text=True, check=True)
+    return float(out.stdout.strip())
+
+
 def main():
     roteiro = json.loads(Path(sys.argv[1]).read_text())
     saida = sys.argv[2]
@@ -326,12 +383,29 @@ def main():
                 hl=tuple(m["hl"]) if m.get("hl") else None)
         elif m["tipo"] == "faixa":
             eventos += eventos_faixa(m["texto"], de, ate)
+        elif m["tipo"] == "painel":
+            eventos += eventos_painel(m.get("chapeu"), m["texto"],
+                                      m.get("sub"),
+                                      [tuple(i) for i in m.get("itens", [])],
+                                      de, ate)
         else:
             eventos += eventos_selo(m.get("chapeu", "gene"), m["texto"],
                                     m.get("sub"), de, ate)
 
+    trecho = roteiro.get("trecho")
+    mudo = roteiro.get("mudo", False)
+    escurecer = roteiro.get("escurecer", 0)
+    if escurecer:
+        # véu preto do começo ao fim: com o vídeo servindo de fundo, o
+        # texto só ganha contraste se a imagem descer alguns pontos
+        dur = (trecho[1] - trecho[0]) if trecho else dur_video(video)
+        alfa = int(255 * (1 - escurecer))
+        eventos.insert(0, caixa(0, 0, W, H, (0, 0, 0), alfa, 0,
+                                dur_ab, dur_ab + dur + 0.5))
+
     ass = tmp / "legenda.ass"
-    faz_ass(ass, blocos_legenda(segs), destaques, dur_ab, eventos)
+    blocos = [] if roteiro.get("sem_legenda") else blocos_legenda(segs)
+    faz_ass(ass, blocos, destaques, dur_ab, eventos)
 
     partes = []
     if ab:
@@ -343,15 +417,18 @@ def main():
     # igual à abertura pra tudo cair no lugar
     caminho = str(ass).replace(":", r"\:")
     miolo = tmp / "miolo.mp4"
+    corte = ["-ss", str(trecho[0]), "-t", str(trecho[1] - trecho[0])] \
+        if trecho else []
     subprocess.run([
-        "ffmpeg", "-v", "error", "-y", "-i", video,
+        "ffmpeg", "-v", "error", "-y", *corte, "-i", video,
         "-vf", f"setpts=PTS+{dur_ab}/TB,"
                f"subtitles='{caminho}':"
                f"fontsdir=/usr/share/fonts/truetype/montserrat,"
                f"setpts=PTS-{dur_ab}/TB," + FMT,
         "-r", str(FPS), "-pix_fmt", "yuv420p", *COR,
         "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-c:a", "aac", "-b:a", "192k", str(miolo)], check=True)
+        *(["-an"] if mudo else ["-c:a", "aac", "-b:a", "192k"]),
+        str(miolo)], check=True)
     partes.append(miolo)
 
     if fe:
