@@ -34,6 +34,7 @@ cartão de canto.
 """
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -100,7 +101,16 @@ def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
             f"\\fad(180,180)}}{txt}")
 
 
-def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None):
+def realce(txt, cor_base, cor_hl=None):
+    """Troca **palavra** por mudança de cor inline no ASS."""
+    hl = ass_cor(cor_hl or TIFFANY)
+    return re.sub(r"\*\*([^*]+)\*\*",
+                  lambda m: f"{{\\c{hl}}}{m.group(1)}{{\\c{ass_cor(cor_base)}}}",
+                  txt)
+
+
+def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
+                   rodape=None, hl=None):
     """Cartão de tela cheia — tapa um trecho ruim da imagem sem tocar no áudio.
 
     `tarja` põe o chapéu dentro de um retângulo colorido, em branco e num
@@ -130,11 +140,17 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None):
                         fonte="SemiBold", espaco=esp_cha))
         y += tam_cha + 96
     for linha in linhas:
-        ev.append(texto(linha, W // 2, y, 96, BRANCO, de, ate))
+        ev.append(texto(realce(linha, BRANCO, hl), W // 2, y, 96, BRANCO,
+                        de, ate))
         y += 124
     if sub:
-        ev.append(texto(sub, W // 2, y + 26, 52, BEGE, de, ate,
-                        fonte="Medium"))
+        ev.append(texto(realce(sub, BEGE, hl), W // 2, y + 26, 52, BEGE,
+                        de, ate, fonte="Medium"))
+    if rodape:
+        # a assinatura sai do meio e vai pro pé do cartão, senão disputa
+        # atenção com a chamada
+        ev.append(texto(rodape, W // 2, H - 132, 44, TIFFANY, de, ate,
+                        fonte="SemiBold"))
     return ev
 
 
@@ -274,7 +290,9 @@ def clipe_cartao(tmp, nome, cfg, saida):
             eventos_cartao(cfg.get("chapeu"), cfg["titulo"], cfg.get("sub"),
                            0.0, cfg["dur"],
                            tarja=tuple(cfg["tarja"]) if cfg.get("tarja")
-                           else None))
+                           else None,
+                           rodape=cfg.get("rodape"),
+                           hl=tuple(cfg["hl"]) if cfg.get("hl") else None))
     caminho = str(ass).replace(":", r"\:")
     subprocess.run([
         "ffmpeg", "-v", "error", "-y", "-f", "lavfi",
@@ -303,7 +321,9 @@ def main():
         if m["tipo"] == "cheia":
             eventos += eventos_cartao(
                 m.get("chapeu"), m["texto"], m.get("sub"), de, ate,
-                tarja=tuple(m["tarja"]) if m.get("tarja") else None)
+                tarja=tuple(m["tarja"]) if m.get("tarja") else None,
+                rodape=m.get("rodape"),
+                hl=tuple(m["hl"]) if m.get("hl") else None)
         elif m["tipo"] == "faixa":
             eventos += eventos_faixa(m["texto"], de, ate)
         else:

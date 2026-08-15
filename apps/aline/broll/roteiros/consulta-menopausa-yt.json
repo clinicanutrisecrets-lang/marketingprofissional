@@ -46,8 +46,14 @@
   },
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
-    "titulo": "Quer aprender a fazer\nessa leitura?",
-    "sub": "Aula gratuita, exclusiva para nutricionistas  ·  @nutri_secrets",
+    "tarja": [
+      214,
+      51,
+      108
+    ],
+    "titulo": "Quer aprender a fazer\nessa **leitura**?",
+    "sub": "**Aula gratuita**, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets",
     "dur": 6.0
   },
   "manchetes": [
