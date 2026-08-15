@@ -43,6 +43,7 @@ from PIL import ImageFont
 
 TIFFANY = (10, 186, 181)
 DARK_TEAL = (14, 89, 89)
+MAGENTA = (214, 51, 108)
 BEGE = (245, 230, 211)
 BRANCO = (255, 255, 255)
 
@@ -99,17 +100,35 @@ def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
             f"\\fad(180,180)}}{txt}")
 
 
-def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL):
-    """Cartão de tela cheia — tapa um trecho ruim da imagem sem tocar no áudio."""
+def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None):
+    """Cartão de tela cheia — tapa um trecho ruim da imagem sem tocar no áudio.
+
+    `tarja` põe o chapéu dentro de um retângulo colorido, em branco e num
+    corpo maior — é o tratamento de chamada de atenção, forte demais pra
+    usar em todo cartão.
+    """
     ev = [caixa(0, 0, W, H, fundo, 0, 1, de, ate)]
     f_tit = ImageFont.truetype(FONT_BOLD, 96)
     linhas = quebra(titulo, f_tit, W - MARGEM * 2)
-    alt = len(linhas) * 124 + (110 if chapeu else 0) + (116 if sub else 0)
+    tam_cha, esp_cha = (64, 10) if tarja else (46, 8)
+    alt_cha = (tam_cha + 96) if chapeu else 0
+    alt = len(linhas) * 124 + alt_cha + (116 if sub else 0)
     y = (H - alt) // 2 + 40
     if chapeu:
-        ev.append(texto(chapeu.upper(), W // 2, y, 46, TIFFANY, de, ate,
-                        fonte="SemiBold", espaco=8))
-        y += 110
+        txt = chapeu.upper()
+        f_cha = ImageFont.truetype(FONT_SEMI, tam_cha)
+        larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
+        cor_cha = TIFFANY
+        if tarja:
+            pad_x, pad_y = 52, 26
+            x0 = int((W - larg) / 2) - pad_x
+            ev.append(caixa(x0, y - pad_y, int(x0 + larg) + pad_x * 2,
+                            y + int(tam_cha * 1.18) + pad_y, tarja, 0, 1,
+                            de, ate))
+            cor_cha = BRANCO
+        ev.append(texto(txt, W // 2, y, tam_cha, cor_cha, de, ate,
+                        fonte="SemiBold", espaco=esp_cha))
+        y += tam_cha + 96
     for linha in linhas:
         ev.append(texto(linha, W // 2, y, 96, BRANCO, de, ate))
         y += 124
@@ -253,7 +272,9 @@ def clipe_cartao(tmp, nome, cfg, saida):
     ass = tmp / f"{nome}.ass"
     faz_ass(ass, [], [], 0.0,
             eventos_cartao(cfg.get("chapeu"), cfg["titulo"], cfg.get("sub"),
-                           0.0, cfg["dur"]))
+                           0.0, cfg["dur"],
+                           tarja=tuple(cfg["tarja"]) if cfg.get("tarja")
+                           else None))
     caminho = str(ass).replace(":", r"\:")
     subprocess.run([
         "ffmpeg", "-v", "error", "-y", "-f", "lavfi",
@@ -280,8 +301,9 @@ def main():
     for m in roteiro.get("manchetes", []):
         de, ate = m["de"] + dur_ab, m["ate"] + dur_ab
         if m["tipo"] == "cheia":
-            eventos += eventos_cartao(m.get("chapeu"), m["texto"],
-                                      m.get("sub"), de, ate)
+            eventos += eventos_cartao(
+                m.get("chapeu"), m["texto"], m.get("sub"), de, ate,
+                tarja=tuple(m["tarja"]) if m.get("tarja") else None)
         elif m["tipo"] == "faixa":
             eventos += eventos_faixa(m["texto"], de, ate)
         else:

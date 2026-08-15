@@ -37,7 +37,12 @@
     "chapeu": "Atenção, nutricionistas",
     "titulo": "Veja um pedaço da minha\nconsulta de precisão na MENOPAUSA",
     "sub": "nutrigenética aplicada, caso clínico ilustrativo",
-    "dur": 4.5
+    "dur": 4.5,
+    "tarja": [
+      214,
+      51,
+      108
+    ]
   },
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
