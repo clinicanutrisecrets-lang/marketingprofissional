@@ -208,7 +208,7 @@ def eventos_painel(chapeu, titulo, sub, itens, de, ate):
     # texto branco ainda briga com a parede clara e a janela do consultório
     pad = 72
     ev.append(caixa(MARGEM - 40, y - pad, W - MARGEM + 40, y + alt + pad,
-                    DARK_TEAL, 0x2E, 0, de, ate))
+                    DARK_TEAL, 0x1A, 0, de, ate))
 
     if chapeu:
         ev.append(texto(chapeu.upper(), W // 2, y, 42, TIFFANY, de, ate,
@@ -405,6 +405,11 @@ def main():
 
     ass = tmp / "legenda.ass"
     blocos = [] if roteiro.get("sem_legenda") else blocos_legenda(segs)
+    # legendas próprias do roteiro: no anúncio mudo o texto não vem da
+    # fala, é escrito pra ser lido
+    blocos += [(l["de"], l["ate"], l["texto"])
+               for l in roteiro.get("legendas", [])]
+    blocos.sort(key=lambda b: b[0])
     faz_ass(ass, blocos, destaques, dur_ab, eventos)
 
     partes = []

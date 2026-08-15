@@ -1,14 +1,14 @@
 {
-  "_": "Anuncio 16:9 de 1 min, generos da ansiedade. O video da consulta entra so como fundo, sem audio: a Aline narra por cima depois.",
+  "_": "Anuncio 16:9 dos genes da ansiedade. O video da consulta entra so como fundo, sem audio: a Aline narra por cima depois.",
   "video": "video/consulta.mp4",
   "transcricao": "video/transcricao_ok.json",
   "trecho": [
     60.0,
-    110.0
+    133.0
   ],
   "mudo": true,
   "sem_legenda": true,
-  "escurecer": 0.74,
+  "escurecer": 0.5,
   "abertura": {
     "chapeu": "Nutricionista",
     "tarja": [
@@ -16,9 +16,9 @@
       51,
       108
     ],
-    "titulo": "A ansiedade dela não\nestá só na cabeça",
-    "sub": "está no **prato** e no **genoma**",
-    "dur": 3.5
+    "titulo": "A ansiedade da sua paciente\ntambém vai além do **emocional**",
+    "sub": "pode estar na **genética** e no **estilo de vida**",
+    "dur": 4.5
   },
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
@@ -30,20 +30,42 @@
     "titulo": "Aprenda a ler esses\ngenes na **prática**",
     "sub": "**Aula gratuita**, exclusiva para nutricionistas",
     "rodape": "@nutri_secrets",
-    "dur": 5.5
+    "dur": 6.0
   },
+  "legendas": [
+    {
+      "de": 0.6,
+      "ate": 4.4,
+      "texto": "A ansiedade é multifatorial."
+    },
+    {
+      "de": 4.7,
+      "ate": 9.4,
+      "texto": "Como nutricionista, você faz parte da equipe multidisciplinar"
+    },
+    {
+      "de": 9.7,
+      "ate": 14.4,
+      "texto": "que ajuda a gerenciar a intensidade dessa condição"
+    },
+    {
+      "de": 14.7,
+      "ate": 19.0,
+      "texto": "e a cuidar do paciente de forma integrada."
+    }
+  ],
   "manchetes": [
     {
-      "de": 0.2,
-      "ate": 4.0,
+      "de": 19.6,
+      "ate": 24.4,
       "tipo": "painel",
       "chapeu": "cinco genes, cinco condutas",
       "texto": "Ansiedade tem\n**genótipo**",
       "sub": "e cada um pede um alimento diferente"
     },
     {
-      "de": 4.4,
-      "ate": 13.0,
+      "de": 24.8,
+      "ate": 33.4,
       "tipo": "painel",
       "chapeu": "gene",
       "texto": "COMT",
@@ -60,8 +82,8 @@
       ]
     },
     {
-      "de": 13.4,
-      "ate": 22.0,
+      "de": 33.8,
+      "ate": 42.4,
       "tipo": "painel",
       "chapeu": "gene",
       "texto": "ADORA2A",
@@ -78,8 +100,8 @@
       ]
     },
     {
-      "de": 22.4,
-      "ate": 31.0,
+      "de": 42.8,
+      "ate": 51.4,
       "tipo": "painel",
       "chapeu": "gene",
       "texto": "GAD1",
@@ -96,8 +118,8 @@
       ]
     },
     {
-      "de": 31.4,
-      "ate": 40.0,
+      "de": 51.8,
+      "ate": 60.4,
       "tipo": "painel",
       "chapeu": "gene",
       "texto": "TPH2",
@@ -114,8 +136,8 @@
       ]
     },
     {
-      "de": 40.4,
-      "ate": 49.0,
+      "de": 60.8,
+      "ate": 69.4,
       "tipo": "painel",
       "chapeu": "gene",
       "texto": "BDNF",
@@ -132,8 +154,8 @@
       ]
     },
     {
-      "de": 49.2,
-      "ate": 50.0,
+      "de": 69.8,
+      "ate": 73.0,
       "tipo": "painel",
       "texto": "Mesma queixa.\nCondutas **diferentes**."
     }
