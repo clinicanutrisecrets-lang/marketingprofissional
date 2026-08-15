@@ -1,0 +1,156 @@
+{
+  "video": "video/consulta.mp4",
+  "transcricao": "video/transcricao_ok.json",
+  "destaques": [
+    "estrogênio",
+    "estrogenio",
+    "ferritina",
+    "insulina",
+    "vitamina",
+    "genética",
+    "genetica",
+    "gene",
+    "genes",
+    "ppar",
+    "comt",
+    "fut2",
+    "menopausa",
+    "inflamação",
+    "inflamacao",
+    "dopamina",
+    "serotonina",
+    "bifidobactérias",
+    "psicobióticas",
+    "direção",
+    "sentença",
+    "abdômen",
+    "abdomen",
+    "memória",
+    "memoria",
+    "articulações",
+    "intestino",
+    "proteína",
+    "glicose",
+    "interruptores"
+  ],
+  "abertura": {
+    "chapeu": "Atenção, nutricionistas",
+    "titulo": "Veja um pedaço da minha\nconsulta de precisão na MENOPAUSA",
+    "sub": "nutrigenética aplicada, caso clínico ilustrativo",
+    "dur": 4.5
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "titulo": "Quer aprender a fazer\nessa leitura?",
+    "sub": "Aula gratuita, exclusiva para nutricionistas  ·  @nutri_secrets",
+    "dur": 6.0
+  },
+  "manchetes": [
+    {
+      "de": 16.5,
+      "ate": 23.0,
+      "tipo": "selo",
+      "chapeu": "a queixa",
+      "texto": "5 sintomas",
+      "sub": "peso, gordura, memória, dor, intestino"
+    },
+    {
+      "de": 28.2,
+      "ate": 34.5,
+      "tipo": "faixa",
+      "texto": "Parecem cinco problemas. É um só."
+    },
+    {
+      "de": 40.2,
+      "ate": 42.2,
+      "tipo": "cheia",
+      "chapeu": "a causa raiz",
+      "texto": "O que mudou foi o estrogênio"
+    },
+    {
+      "de": 60.5,
+      "ate": 67.2,
+      "tipo": "faixa",
+      "texto": "Existem receptores de estrogênio no corpo inteiro"
+    },
+    {
+      "de": 80.9,
+      "ate": 88.5,
+      "tipo": "selo",
+      "chapeu": "no sangue",
+      "texto": "Vitamina D baixa",
+      "sub": "osso, dor e humor"
+    },
+    {
+      "de": 89.2,
+      "ate": 101.4,
+      "tipo": "selo",
+      "chapeu": "no sangue",
+      "texto": "Ferritina no chão",
+      "sub": "referência não é o mesmo que funcional"
+    },
+    {
+      "de": 109.2,
+      "ate": 116.3,
+      "tipo": "selo",
+      "chapeu": "no sangue",
+      "texto": "Insulina de jejum alta",
+      "sub": "gordura no abdômen antes da balança"
+    },
+    {
+      "de": 116.4,
+      "ate": 122.1,
+      "tipo": "selo",
+      "chapeu": "no sangue",
+      "texto": "PCR elevada",
+      "sub": "a inflamação que dói na articulação"
+    },
+    {
+      "de": 139.4,
+      "ate": 151.5,
+      "tipo": "selo",
+      "chapeu": "gene",
+      "texto": "PPAR gama",
+      "sub": "resposta da célula de gordura à insulina"
+    },
+    {
+      "de": 158.3,
+      "ate": 171.0,
+      "tipo": "selo",
+      "chapeu": "gene",
+      "texto": "COMT",
+      "sub": "dopamina, foco e ansiedade"
+    },
+    {
+      "de": 171.7,
+      "ate": 183.0,
+      "tipo": "selo",
+      "chapeu": "gene",
+      "texto": "Receptor da vitamina D",
+      "sub": "dose diária, não semanal"
+    },
+    {
+      "de": 191.4,
+      "ate": 205.0,
+      "tipo": "selo",
+      "chapeu": "gene",
+      "texto": "FUT2",
+      "sub": "B12 e bifidobactérias psicobióticas"
+    },
+    {
+      "de": 213.5,
+      "ate": 219.0,
+      "tipo": "cheia",
+      "chapeu": "a virada",
+      "texto": "Não é sentença. É direção."
+    },
+    {
+      "de": 224.0,
+      "ate": 231.0,
+      "tipo": "faixa",
+      "texto": "Você não está quebrada. Seu corpo está diferente."
+    }
+  ],
+  "_": "Consulta de precisao na menopausa, corte para YouTube. 1920x1080.",
+  "_video": "o mp4 original fica em broll/video/, fora do Git (repo publico)"
+}
