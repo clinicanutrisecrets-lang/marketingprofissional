@@ -32,7 +32,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 # Paleta Nutri Secrets
 TIFFANY = (10, 186, 181)
@@ -45,10 +45,20 @@ FONT_BOLD = "/usr/share/fonts/truetype/montserrat/Montserrat-Bold.ttf"
 FONT_SEMI = "/usr/share/fonts/truetype/montserrat/Montserrat-SemiBold.ttf"
 FONT_MED = "/usr/share/fonts/truetype/montserrat/Montserrat-Medium.ttf"
 
-W, H = 1080, 1920         # 9:16
+W, H = 1080, 1920         # 9:16 — o roteiro pode baixar com "saida"
+K = 1.0                   # fator de escala das medidas, derivado de W
 FPS = 30
 MARGEM = 88
 FADE = 0.4                # crossfade entre slides
+
+
+def k(v):
+    """Escala a medida pro tamanho de saída escolhido.
+
+    Foto de IA costuma vir pequena; montar em 720 em vez de 1080 corta o
+    upscale pela metade e o Instagram recomprime tudo do mesmo jeito.
+    """
+    return max(1, round(v * K))
 COR = ["-color_range", "tv", "-colorspace", "bt709",
        "-color_primaries", "bt709", "-color_trc", "bt709"]
 FMT = "scale=out_range=tv:out_color_matrix=bt709,format=yuv420p"
@@ -138,10 +148,15 @@ def cobre(caminho, larg, alt):
     escala = max(larg / img.width, alt / img.height)
     nova = img.resize((round(img.width * escala), round(img.height * escala)),
                       Image.LANCZOS)
-    # corte centrado na horizontal, um pouco acima do centro na vertical:
-    # em retrato o rosto costuma ficar no terço de cima
+    if escala > 1.15:
+        # foto pequena ampliada fica leitosa; a máscara devolve a borda
+        nova = nova.filter(ImageFilter.UnsharpMask(radius=1.6, percent=95,
+                                                   threshold=3))
+    # corte centrado na horizontal e bem no alto na vertical: a foto
+    # original é paisagem, então a cabeça fica colada no topo do quadro e
+    # qualquer corte generoso em cima decapita
     x = (nova.width - larg) // 2
-    y = max(0, int((nova.height - alt) * 0.35))
+    y = max(0, int((nova.height - alt) * 0.08))
     return nova.crop((x, y, x + larg, y + alt))
 
 
@@ -150,25 +165,25 @@ def faixa_texto(draw, y0, altura, texto, tam, cor_fundo=BEGE,
     """Desenha a faixa de texto e devolve nada — escreve no draw."""
     draw.rectangle([0, y0, W, y0 + altura], fill=cor_fundo)
     fonte = ImageFont.truetype(FONT_BOLD, tam)
-    linhas = quebra_marcado(texto, fonte, W - MARGEM * 2)
+    linhas = quebra_marcado(texto, fonte, W - k(MARGEM) * 2)
     alt_linha = int(tam * 1.32)
     alt_bloco = alt_linha * len(linhas)
     y = y0 + (altura - alt_bloco) // 2
     if rodape:
-        y -= 26
+        y -= k(26)
     for linha in linhas:
         escreve_linha(draw, linha, fonte, y, cor_base, cor_destaque, W)
         y += alt_linha
     if rodape:
-        f = ImageFont.truetype(FONT_SEMI, 30)
+        f = ImageFont.truetype(FONT_SEMI, k(30))
         larg = f.getlength(rodape)
-        draw.text(((W - larg) / 2, y0 + altura - 62), rodape, font=f,
+        draw.text(((W - larg) / 2, y0 + altura - k(62)), rodape, font=f,
                   fill=TIFFANY)
 
 
 def slide_capa(fotos, chapeu, titulo, sub, rodape):
     """Foto em cima, faixa de texto no meio, foto embaixo."""
-    alt_faixa = 560
+    alt_faixa = k(560)
     alt_foto = (H - alt_faixa) // 2
     base = Image.new("RGB", (W, H), BEGE)
     base.paste(cobre(fotos[0], W, alt_foto), (0, 0))
@@ -179,40 +194,41 @@ def slide_capa(fotos, chapeu, titulo, sub, rodape):
     y0 = alt_foto
     draw.rectangle([0, y0, W, y0 + alt_faixa], fill=BEGE)
 
-    y = y0 + 62
+    y = y0 + k(62)
     if chapeu:
-        f = ImageFont.truetype(FONT_SEMI, 32)
+        f = ImageFont.truetype(FONT_SEMI, k(32))
         txt = chapeu.upper()
         larg = f.getlength(txt)
         # letter spacing manual: chapéu apertado fica pesado
-        x = (W - (larg + 5 * (len(txt) - 1))) / 2
+        esp = k(5)
+        x = (W - (larg + esp * (len(txt) - 1))) / 2
         for ch in txt:
             draw.text((x, y), ch, font=f, fill=TIFFANY)
-            x += f.getlength(ch) + 5
-        y += 62
+            x += f.getlength(ch) + esp
+        y += k(62)
 
-    fonte = ImageFont.truetype(FONT_BOLD, 74)
-    linhas = quebra_marcado(titulo, fonte, W - MARGEM * 2)
+    fonte = ImageFont.truetype(FONT_BOLD, k(74))
+    linhas = quebra_marcado(titulo, fonte, W - k(MARGEM) * 2)
     for linha in linhas:
         escreve_linha(draw, linha, fonte, y, DARK_TEAL, TIFFANY, W)
-        y += 94
+        y += k(94)
 
     if sub:
-        f = ImageFont.truetype(FONT_MED, 40)
+        f = ImageFont.truetype(FONT_MED, k(40))
         larg = f.getlength(sub)
-        draw.text(((W - larg) / 2, y + 18), sub, font=f, fill=DARK_TEAL)
+        draw.text(((W - larg) / 2, y + k(18)), sub, font=f, fill=DARK_TEAL)
 
     if rodape:
-        f = ImageFont.truetype(FONT_SEMI, 30)
+        f = ImageFont.truetype(FONT_SEMI, k(30))
         larg = f.getlength(rodape)
-        draw.text(((W - larg) / 2, y0 + alt_faixa - 54), rodape, font=f,
+        draw.text(((W - larg) / 2, y0 + alt_faixa - k(54)), rodape, font=f,
                   fill=TIFFANY)
     return base
 
 
 def slide_foto(foto, texto, pos, tam, rodape, fundo, cor_base, cor_destaque):
     """Foto grande e faixa de texto em cima ou embaixo."""
-    alt_faixa = 470
+    alt_faixa = k(470)
     alt_foto = H - alt_faixa
     base = Image.new("RGB", (W, H), fundo)
     y_foto = alt_faixa if pos == "cima" else 0
@@ -246,8 +262,12 @@ def anima(png, dur, saida, zoom=True):
 
 
 def main():
+    global W, H, K
     roteiro = json.loads(Path(sys.argv[1]).read_text())
     saida = sys.argv[2]
+    if roteiro.get("saida"):
+        W, H = roteiro["saida"]
+        K = W / 1080
     tmp = Path(tempfile.mkdtemp())
     fotos = roteiro["fotos"]
     rodape_geral = roteiro.get("rodape")
@@ -256,12 +276,12 @@ def main():
     for i, s in enumerate(roteiro["slides"]):
         png = tmp / f"s{i}.png"
         if s.get("tipo") == "capa":
-            img = slide_capa([fotos[k] for k in s["fotos"]],
+            img = slide_capa([fotos[nome] for nome in s["fotos"]],
                              s.get("chapeu"), s["titulo"], s.get("sub"),
                              s.get("rodape", rodape_geral))
         else:
             img = slide_foto(fotos[s["foto"]], s["texto"],
-                             s.get("pos", "baixo"), s.get("tam", 58),
+                             s.get("pos", "baixo"), k(s.get("tam", 58)),
                              s.get("rodape"),
                              tuple(s["fundo"]) if s.get("fundo") else BEGE,
                              tuple(s["cor"]) if s.get("cor") else DARK_TEAL,
@@ -278,12 +298,12 @@ def main():
         entradas += ["-i", str(mp4)]
     corrente = "[0:v]"
     deslocamento = partes[0][1] - FADE
-    for k in range(1, len(partes)):
-        rotulo = f"[x{k}]"
-        filtros.append(f"{corrente}[{k}:v]xfade=transition=fade:"
+    for n in range(1, len(partes)):
+        rotulo = f"[x{n}]"
+        filtros.append(f"{corrente}[{n}:v]xfade=transition=fade:"
                        f"duration={FADE}:offset={deslocamento:.2f}{rotulo}")
         corrente = rotulo
-        deslocamento += partes[k][1] - FADE
+        deslocamento += partes[n][1] - FADE
     filtros.append(f"{corrente}{FMT}[saida]")
 
     subprocess.run([

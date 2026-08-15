@@ -2,10 +2,10 @@
   "_": "Como funciona o raciocinio clinico de interpretacao de um teste nutrigenetico. [ORG] + [ADS]. 9:16, sem audio.",
   "rodape": "@nutri_secrets",
   "fotos": {
-    "computador": "FOTO_COMPUTADOR.png",
-    "papeis": "FOTO_PAPEIS.png",
-    "perfil": "FOTO_PERFIL.png",
-    "ampla": "FOTO_AMPLA.png"
+    "computador": "fotos/c3a.png",
+    "papeis": "fotos/c3b.png",
+    "perfil": "fotos/c2c.png",
+    "ampla": "fotos/ampla.png"
   },
   "slides": [
     {
@@ -69,5 +69,10 @@
       "texto": "Gene não é informação.\nÉ **direção**.",
       "rodape": "@nutri_secrets"
     }
-  ]
+  ],
+  "saida": [
+    720,
+    1280
+  ],
+  "_fotos": "ficam em broll/fotos/, fora do Git (repo publico)"
 }
