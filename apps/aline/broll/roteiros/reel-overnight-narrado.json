@@ -88,13 +88,25 @@
     }
   ],
   "abertura": {
-    "chapeu": "Nutri Secrets",
+    "chapeu": "Nutricionista",
     "dur": 5.0,
     "titulo": [
       {
         "txt": "O café da manhã que",
         "tam": 0.32,
-        "peso": "Regular"
+        "peso": "Regular",
+        "tarja": [
+          [
+            245,
+            230,
+            211
+          ],
+          [
+            14,
+            89,
+            89
+          ]
+        ]
       },
       {
         "txt": "SEGURA",
@@ -143,5 +155,11 @@
     ],
     "sub": "aula gratuita, exclusiva para nutricionistas",
     "rodape": "@nutri_secrets"
-  }
+  },
+  "ciclo_legenda": [
+    "cima",
+    "meio",
+    "baixo"
+  ],
+  "ciclo_a_cada": 3
 }

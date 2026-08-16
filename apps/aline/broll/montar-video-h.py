@@ -110,10 +110,12 @@ def caixa(x0, y0, x1, y1, cor, alfa=0, camada=1, de=0.0, ate=0.0):
 
 
 def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
-          alinha=8, espaco=0, italico=False, familia=None):
+          alinha=8, espaco=0, italico=False, familia=None, negrito=False,
+          sublinhado=False):
     """Uma linha de texto posicionada, na cor e no tamanho pedidos."""
     esp = f"\\fsp{espaco}" if espaco else ""
-    it = "\\i1" if italico else ""
+    it = ("\\i1" if italico else "") + ("\\b1" if negrito else "") \
+        + ("\\u1" if sublinhado else "")
     fam = familia or f"Montserrat {fonte}"
     return (f"Dialogue: {camada},{hms(de)},{hms(ate)},base,,0,0,0,,"
             f"{{\\an{alinha}\\pos({x},{y})\\fn{fam}"
@@ -162,13 +164,14 @@ def linhas_titulo(titulo, base):
         # sem hierarquia declarada, todas as linhas saem num corpo médio:
         # o corpo base é calibrado pra palavra-herói de capa
         return [{"txt": l, "tam": round(base * 0.55), "peso": "SemiBold",
-                 "cor": None} for l in titulo.split("\n")]
+                 "cor": None, "tarja": None} for l in titulo.split("\n")]
     saida = []
     for b in titulo:
         saida.append({"txt": b["txt"],
                       "tam": max(1, round(base * b.get("tam", 1))),
                       "peso": b.get("peso", "SemiBold"),
-                      "cor": tuple(b["cor"]) if b.get("cor") else None})
+                      "cor": tuple(b["cor"]) if b.get("cor") else None,
+                      "tarja": par_tarja(b.get("tarja"))})
     return saida
 
 
@@ -233,14 +236,27 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
         while (b["tam"] > k(24) and ImageFont.truetype(arq, b["tam"])
                .getlength(limpo) > W - k(MARGEM) * 2):
             b["tam"] -= 3
-        ev.append(texto(realce(espalha_realce(b["txt"]), b["cor"] or BRANCO, hl),
-                        W // 2, y, b["tam"], b["cor"] or BRANCO, de, ate,
+        cor_linha = b["cor"] or BRANCO
+        if b["tarja"]:
+            # a linha-gancho ganha um retângulo atrás: é o que puxa o olho
+            # antes da palavra grande
+            larg_l = ImageFont.truetype(arq, b["tam"]).getlength(limpo)
+            px, py = k(38), k(14)
+            x0 = int((W - larg_l) / 2) - px
+            ev.append(caixa(x0, y - py, int(x0 + larg_l) + px * 2,
+                            y + int(b["tam"] * 1.24) + py, b["tarja"][0], 0,
+                            1, de, ate))
+            cor_linha = b["tarja"][1]
+        ev.append(texto(realce(espalha_realce(b["txt"]), cor_linha, hl),
+                        W // 2, y, b["tam"], cor_linha, de, ate,
                         familia=familia, italico=b["peso"] == "Italic"))
         y += round(b["tam"] * 1.34)
 
     if sub:
+        # a chamada da aula sai destacada: é a linha que converte
         ev.append(texto(realce(espalha_realce(sub), BEGE, hl), W // 2,
-                        y + k(34), k(52), BEGE, de, ate, fonte="Light"))
+                        y + k(34), k(52), BEGE, de, ate, fonte="SemiBold",
+                        negrito=True, sublinhado=True))
     if rodape:
         # a assinatura sai do meio e vai pro pé do cartão, senão disputa
         # atenção com a chamada
@@ -546,6 +562,10 @@ def main():
                                 dur_ab, dur_ab + dur + 0.5))
 
     ass = tmp / "legenda.ass"
+    # com narração própria o áudio toca desde o primeiro frame, inclusive
+    # por cima do cartão de abertura; deslocar a legenda pela abertura a
+    # atrasaria em relação à fala
+    desloc = 0.0 if roteiro.get("audio") else dur_ab
     blocos = [] if roteiro.get("sem_legenda") else blocos_legenda(segs)
     # legendas próprias do roteiro: no anúncio mudo o texto não vem da
     # fala, é escrito pra ser lido
@@ -553,7 +573,21 @@ def main():
                 k(l["margem"]) if l.get("margem") else 0)
                for l in roteiro.get("legendas", [])]
     blocos.sort(key=lambda b: b[0])
-    faz_ass(ass, blocos, destaques, dur_ab, eventos)
+
+    ciclo = roteiro.get("ciclo_legenda")
+    if ciclo:
+        # a legenda troca de altura de tempos em tempos: fixa embaixo ela
+        # some no rodapé do app e ainda tapa o final do prato
+        alturas = {"baixo": k(120), "meio": round(H * 0.44), "cima": round(H * 0.74)}
+        passo = roteiro.get("ciclo_a_cada", 3)
+        blocos = [(b[0], b[1], b[2], alturas[ciclo[(i // passo) % len(ciclo)]])
+                  for i, b in enumerate(blocos)]
+    if roteiro.get("audio"):
+        # o cartão de abertura já diz o que ela fala nesses segundos;
+        # legenda por cima dele seria repetição
+        blocos = [b for b in blocos if b[1] > dur_ab]
+        blocos = [(max(b[0], dur_ab),) + tuple(b[1:]) for b in blocos]
+    faz_ass(ass, blocos, destaques, desloc, eventos)
 
     partes = []
     if ab:

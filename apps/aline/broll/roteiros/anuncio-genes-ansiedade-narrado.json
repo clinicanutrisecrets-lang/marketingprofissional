@@ -34,18 +34,6 @@
   ],
   "abertura": {
     "chapeu": "Nutricionista",
-    "tarja": [
-      [
-        245,
-        230,
-        211
-      ],
-      [
-        14,
-        89,
-        89
-      ]
-    ],
     "dur": 5.0,
     "titulo": [
       {
@@ -216,5 +204,11 @@
       "tipo": "faixa",
       "texto": "Mesma queixa. Condutas diferentes."
     }
-  ]
+  ],
+  "ciclo_legenda": [
+    "cima",
+    "meio",
+    "baixo"
+  ],
+  "ciclo_a_cada": 3
 }
