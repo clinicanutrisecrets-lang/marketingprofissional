@@ -27,6 +27,8 @@ _det = None
 FAIXAS = 90          # resolução do perfil vertical de ocupação
 ALVO = 0.55          # altura preferida do centro do texto (fração)
 PESO_POS = 0.5       # quanto o "prefira o meio" pesa contra a energia
+PESO_LUZ = 0.22      # entre duas faixas igualmente vazias, a mais escura
+                     # lê melhor com texto branco
 HISTERESE = 0.07     # o quanto a altura anterior pode ser pior e mesmo
                      # assim ser mantida, pra legenda não ficar pulando
 
@@ -40,16 +42,18 @@ def _detector(larg, alt):
 
 
 def _perfil(frame):
-    """Energia de borda por faixa horizontal do quadro.
+    """Por faixa horizontal do quadro: energia de borda e claridade.
 
     Reduzido pra 160 colunas antes do Sobel: o que interessa é onde tem
-    coisa acontecendo, não o detalhe.
+    coisa acontecendo, não o detalhe. A claridade entra porque a legenda
+    é branca — faixa clara e faixa escura podem estar igualmente vazias
+    e ainda assim ler muito diferente.
     """
     g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     g = cv2.resize(g, (160, FAIXAS), interpolation=cv2.INTER_AREA)
     gx = cv2.Sobel(g, cv2.CV_32F, 1, 0, ksize=3)
     gy = cv2.Sobel(g, cv2.CV_32F, 0, 1, ksize=3)
-    return (np.abs(gx) + np.abs(gy)).mean(axis=1)
+    return (np.abs(gx) + np.abs(gy)).mean(axis=1), g.mean(axis=1) / 255.0
 
 
 def rosto_em(video, instantes):
@@ -85,7 +89,7 @@ def _colide(t0, t1, proibidas):
     return any(t1 > p0 and t0 < p1 for p0, p1 in proibidas)
 
 
-def _escolhe(perfil, rostos, altura, alt_texto, rodape_min, bloqueios,
+def _escolhe(perfil, luz, rostos, altura, alt_texto, rodape_min, bloqueios,
              anterior=None):
     """Melhor margem inferior (medida do pé do quadro) pra esse trecho.
 
@@ -112,8 +116,9 @@ def _escolhe(perfil, rostos, altura, alt_texto, rodape_min, bloqueios,
         if i1 <= i0:
             return None
         energia = float(p[i0:i1].mean())
+        claro = float(luz[i0:i1].mean())
         centro = (topo + base) / 2 / altura
-        return energia + PESO_POS * abs(centro - ALVO)
+        return energia + PESO_LUZ * claro + PESO_POS * abs(centro - ALVO)
 
     melhor, nota = None, None
     for base in range(int(base_min), int(base_max) + 1, passo):
@@ -153,16 +158,20 @@ def margens_por_bloco(video, janelas, altura_saida, alt_texto, rodape_min,
 
     saida, anterior = [], None
     for (ini, fim), bloq in zip(janelas, bloqueios):
-        rostos, perfil = [], np.zeros(FAIXAS)
+        rostos, perfil, luz, n = [], np.zeros(FAIXAS), np.zeros(FAIXAS), 0
         fim_util = min(max(ini + 0.1, fim), max(total - 0.1, 0.1))
         for t in np.linspace(max(0, ini), fim_util, amostras):
             cap.set(cv2.CAP_PROP_POS_FRAMES, int(t * fps))
             ok, frame = cap.read()
             if not ok:
                 continue
-            # o pior quadro do trecho manda: livre num frame e coberta no
-            # seguinte é o mesmo que coberta
-            perfil = np.maximum(perfil, _perfil(frame))
+            # o pior quadro do trecho manda na ocupação: livre num frame e
+            # coberta no seguinte é o mesmo que coberta. A claridade, não —
+            # ali interessa como o trecho é em média
+            pf, pl = _perfil(frame)
+            perfil = np.maximum(perfil, pf)
+            luz += pl
+            n += 1
             _, faces = det.detect(frame)
             if faces is None:
                 continue
@@ -170,8 +179,8 @@ def margens_por_bloco(video, janelas, altura_saida, alt_texto, rodape_min,
                 _, y, _, h = f[:4]
                 rostos.append((y / alt * altura_saida,
                                (y + h) / alt * altura_saida))
-        m = _escolhe(perfil, rostos, altura_saida, alt_texto, rodape_min,
-                     bloq, anterior)
+        m = _escolhe(perfil, luz / max(n, 1), rostos, altura_saida, alt_texto,
+                     rodape_min, bloq, anterior)
         anterior = m
         saida.append(m)
     cap.release()
