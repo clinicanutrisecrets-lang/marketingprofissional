@@ -430,7 +430,9 @@ edita. O que já saiu da decisão manual:
 
 | era decidido a olho | agora |
 |---|---|
-| altura da legenda | o rosto é detectado (YuNet) e a legenda vai pro vão abaixo do queixo; sem rosto, rodapé |
+| altura da legenda | o quadro é medido: rosto por YuNet, ocupação por energia de borda. A legenda nunca entra no rosto e, havendo vão no meio, vai pro meio em vez do rodapé |
+| legenda batendo em manchete | manchete, selo e painel registram a faixa que ocupam; a legenda desvia |
+| nome de gene errado na legenda | `corrige_transcricao.py` aplica o dicionário da marca antes de virar texto |
 | onde cortar um clipe multi-cena | os cortes são detectados por `select=gt(scene,0.3)` |
 | se o texto cabe na linha | a linha encolhe sozinha até caber |
 | quanto acelerar pra bater a narração | a velocidade é calculada da razão material/alvo |
@@ -440,4 +442,27 @@ A regra geral: **se a mesma classe de erro apareceu duas vezes, a decisão
 tem que ir pro código.** Num pipeline automático isso deixa de ser
 conforto e vira requisito — escolha a olho, em escala, produz dezenas de
 vídeos com a legenda em cima do rosto.
+
+### Onde a legenda pousa
+
+A ordem é essa, e vale pra qualquer clipe novo sem ninguém configurar
+nada:
+
+1. **Rosto é intocável.** A faixa do rosto, mais 3,5% de folga, está
+   fora de discussão.
+2. **Manchete também.** Faixa, selo e painel dizem que altura ocupam e
+   em que segundo; a legenda trata como área proibida.
+3. **Entre o que sobra, ganha o mais vazio.** O quadro é lido em 90
+   faixas horizontais e cada uma recebe uma nota de energia de borda —
+   parede, bancada e mesa são lisas, rosto e comida não.
+4. **Empate resolve pro meio.** Um empurrão para 55% da altura faz a
+   legenda preferir o vão central ao rodapé. É o caso do plano em que
+   ela aparece em cima e o prato embaixo: o rodapé cai na comida, e o
+   vão entre os dois é onde a legenda tem que estar.
+5. **Só muda de altura quando compensa.** Uma histerese segura a altura
+   anterior enquanto ela continuar boa, senão a legenda pularia de lugar
+   a cada frase.
+
+Legenda em altura fixa e ciclo cego de posições (cima, meio, baixo) erram
+igual: nenhum dos dois sabe o que tem no quadro.
 

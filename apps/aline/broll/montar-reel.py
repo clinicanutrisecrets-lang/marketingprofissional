@@ -261,7 +261,8 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
         return _cartela_simples(clipe, t, dur, saida, estilo, texto, tam,
                                 pre, palavra, pos, fundo, cor, y)
     # alturas de cada bloco, pra dimensionar o painel
-    H_CHAPEU, TAM_CHAPEU = 46, 30
+    # o chapéu diz pra quem é o vídeo; fino e pequeno ele some
+    H_CHAPEU, TAM_CHAPEU = 58, 40
     TAM_TITULO, LH_TITULO = 48, 64
     TAM_CORPO, LH_CORPO = 34, 46
     PAD = 44
@@ -276,7 +277,7 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
     linhas_cor = (quebra(" ".join(corpo.split("\n")), FONT_MED, TAM_CORPO,
                          texto_w) if corpo else [])
 
-    linhas_cha = quebra(chapeu.upper(), FONT_SEMI, TAM_CHAPEU,
+    linhas_cha = quebra(chapeu.upper(), FONT_BOLD, TAM_CHAPEU,
                         texto_w) if chapeu else []
 
     alt = PAD * 2
@@ -301,7 +302,7 @@ def faz_cartela(clipe, t, dur, saida, chapeu=None, titulo=None,
 
     y = painel_y + PAD
     for linha in linhas_cha:
-        filtros.append(drawtext(linha, FONT_SEMI, TAM_CHAPEU, cor_apoio, y,
+        filtros.append(drawtext(linha, FONT_BOLD, TAM_CHAPEU, cor_apoio, y,
                                 enable=f"gte(t,{quando:.2f})", sombra=True))
         y += H_CHAPEU
     if linhas_cha:

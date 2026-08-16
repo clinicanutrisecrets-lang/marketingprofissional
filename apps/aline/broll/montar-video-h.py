@@ -48,6 +48,13 @@ MAGENTA = (214, 51, 108)
 BEGE = (245, 230, 211)
 BRANCO = (255, 255, 255)
 
+# nome de família como o fontconfig registra: só os pesos que ganharam
+# família própria é que podem ser pedidos pelo nome. Bold é estilo de
+# "Montserrat", não família, e vai com \b1
+FAMILIA_MS = {"Bold": "Montserrat", "Regular": "Montserrat",
+              "SemiBold": "Montserrat SemiBold", "Medium": "Montserrat Medium",
+              "Light": "Montserrat Light", "Black": "Montserrat Black"}
+
 FONT_BOLD = "/usr/share/fonts/truetype/montserrat/Montserrat-Bold.ttf"
 FONT_SEMI = "/usr/share/fonts/truetype/montserrat/Montserrat-SemiBold.ttf"
 FONT_MED = "/usr/share/fonts/truetype/montserrat/Montserrat-Medium.ttf"
@@ -74,6 +81,15 @@ FMT = "scale=out_range=tv:out_color_matrix=bt709,format=yuv420p"
 
 # a legenda ocupa o rodapé; manchete e selo têm que ficar acima dela
 RODAPE_LEGENDA = 210
+
+# faixas verticais que manchete, selo e painel ocupam em cada instante.
+# A legenda agora escolhe a própria altura e precisa saber o que já está
+# na tela, senão vai parar em cima de uma manchete.
+ZONAS = []
+
+
+def ocupa(de, ate, y0, y1):
+    ZONAS.append((de, ate, max(0, int(y0)), min(H, int(y1))))
 
 
 def quebra(texto, fonte, largura):
@@ -114,9 +130,13 @@ def texto(txt, x, y, tam, cor, de, ate, camada=2, fonte="Bold",
           sublinhado=False):
     """Uma linha de texto posicionada, na cor e no tamanho pedidos."""
     esp = f"\\fsp{espaco}" if espaco else ""
+    # "Montserrat Bold" não existe como família: o negrito é estilo da
+    # família "Montserrat". Pedir o nome errado fazia o libass cair numa
+    # fonte de fallback — era por isso que o chapéu saía fino
+    negrito = negrito or fonte == "Bold"
     it = ("\\i1" if italico else "") + ("\\b1" if negrito else "") \
         + ("\\u1" if sublinhado else "")
-    fam = familia or f"Montserrat {fonte}"
+    fam = familia or FAMILIA_MS.get(fonte, "Montserrat")
     return (f"Dialogue: {camada},{hms(de)},{hms(ate)},base,,0,0,0,,"
             f"{{\\an{alinha}\\pos({x},{y})\\fn{fam}"
             f"\\fs{tam}\\c{ass_cor(cor)}\\bord0\\shad0{esp}{it}"
@@ -185,10 +205,14 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
     sóbrio.
     """
     ev = [caixa(0, 0, W, H, fundo, 0, 1, de, ate)]
+    ocupa(de, ate, 0, H)
     # corpo base generoso: numa capa editorial a palavra-herói tem que
     # dominar o quadro, e o fator de cada linha parte daqui
     blocos = linhas_titulo(titulo, k(180))
-    tam_cha, esp_cha = (k(46), k(14)) if tarja else (k(40), k(16))
+    # o chapéu diz pra quem é o vídeo ("NUTRICIONISTA"). Em corpo fino e
+    # pequeno ele some, e um reel que não diz isso na cara atrai paciente
+    # em vez de nutricionista — então vai em negrito e grande
+    tam_cha, esp_cha = (k(74), k(8)) if tarja else (k(68), k(10))
 
     alt = sum(round(b["tam"] * 1.34) for b in blocos)
     alt += (tam_cha + k(110)) if chapeu else 0
@@ -197,15 +221,15 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
 
     if chapeu:
         txt = chapeu.upper()
-        f_cha = ImageFont.truetype(FONT_LIGHT, tam_cha)
+        f_cha = ImageFont.truetype(FONT_BOLD, tam_cha)
         larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
         # chapéu longo num quadro estreito estoura a tarja pra fora da
         # tela; encolhe até caber com folga
         limite = W - k(MARGEM) * 2
-        while larg > limite and tam_cha > k(18):
+        while larg > limite and tam_cha > k(30):
             tam_cha -= 2
-            esp_cha = max(k(4), esp_cha - 1)
-            f_cha = ImageFont.truetype(FONT_LIGHT, tam_cha)
+            esp_cha = max(k(3), esp_cha - 1)
+            f_cha = ImageFont.truetype(FONT_BOLD, tam_cha)
             larg = f_cha.getlength(txt) + esp_cha * (len(txt) - 1)
         cor_cha = tarja[1] if tarja else TIFFANY
         if tarja:
@@ -220,10 +244,10 @@ def eventos_cartao(chapeu, titulo, sub, de, ate, fundo=DARK_TEAL, tarja=None,
             fx = int((W - larg) / 2) - k(34)
             fw = int(larg) + k(68)
             for yy in (y - k(30), y + int(tam_cha * 1.3) + k(14)):
-                ev.append(caixa(fx, yy, fx + fw, yy + k(2), TIFFANY, 0x30,
+                ev.append(caixa(fx, yy, fx + fw, yy + k(4), TIFFANY, 0x18,
                                 1, de, ate))
         ev.append(texto(txt, W // 2, y, tam_cha, cor_cha, de, ate,
-                        fonte="Light", espaco=esp_cha))
+                        fonte="Bold", espaco=esp_cha))
         y += tam_cha + k(110)
 
     for b in blocos:
@@ -271,6 +295,7 @@ def eventos_faixa(txt, de, ate):
     linhas = quebra(txt, f, W - k(MARGEM) * 2)
     alt = k(88) * len(linhas) + k(76)
     y0 = H - k(RODAPE_LEGENDA) - alt - k(40)
+    ocupa(de, ate, y0 - k(20), y0 + alt + k(20))
     ev = [caixa(0, y0, W, y0 + alt, TIFFANY, 0x14, 1, de, ate)]
     y = y0 + k(38)
     for linha in linhas:
@@ -290,6 +315,7 @@ def eventos_selo(chapeu, txt, sub, de, ate):
     # no alto o cartão cobre o rosto assim que ela se move; embaixo cai
     # sobre a mesa e o jaleco, onde nada acontece
     x0, y0 = k(96), H - k(RODAPE_LEGENDA) - alt - k(60)
+    ocupa(de, ate, y0 - k(20), y0 + alt + k(20))
     ev = [caixa(x0, y0, x0 + larg, y0 + alt, BRANCO, 0x0D, 1, de, ate),
           caixa(x0, y0, x0 + k(12), y0 + alt, TIFFANY, 0, 1, de, ate)]
     ev.append(texto(chapeu.upper(), x0 + k(44), y0 + k(30), k(30), TIFFANY,
@@ -319,6 +345,7 @@ def eventos_painel(chapeu, titulo, sub, itens, de, ate):
     # painel atrás do bloco: só escurecer o vídeo inteiro não basta, o
     # texto branco ainda briga com a parede clara e a janela do consultório
     pad = k(72)
+    ocupa(de, ate, y - pad - k(20), y + alt + pad + k(20))
     ev.append(caixa(k(MARGEM) - k(40), y - pad, W - k(MARGEM) + k(40),
                     y + alt + pad,
                     DARK_TEAL, 0x1A, 0, de, ate))
@@ -431,7 +458,7 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: fala,Montserrat SemiBold,{k(78)},{base},&H00000000,&HC0000000,0,0,0,0,100,100,0,0,1,{k(4)},{k(3)},2,{k(140)},{k(140)},{k(120)},1
 Style: caixa,Arial,20,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
-Style: base,Montserrat Bold,54,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,8,0,0,0,1
+Style: base,Montserrat,54,{base},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,8,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -523,7 +550,11 @@ def main():
     tmp_c = Path(tempfile.mkdtemp())
     video = (junta_clipes(roteiro["clipes"], tmp_c) if roteiro.get("clipes")
              else roteiro["video"])
-    segs = (json.loads(Path(roteiro["transcricao"]).read_text())
+    # a transcrição passa pelo dicionário da marca antes de virar legenda:
+    # nome de gene errado na tela é o tipo de erro que ninguém perdoa e
+    # que não pode depender de eu lembrar de consertar à mão
+    from corrige_transcricao import carrega
+    segs = (carrega(roteiro["transcricao"])
             if roteiro.get("transcricao") else [])
     destaques = [d.lower() for d in roteiro.get("destaques", [])]
 
@@ -575,15 +606,21 @@ def main():
     blocos.sort(key=lambda b: b[0])
 
     if blocos and roteiro.get("desvia_do_rosto", True):
-        # a legenda se posiciona sozinha: onde há rosto, ela desce pra
-        # baixo do queixo; onde não há, fica no rodapé. Altura fixa cedo
-        # ou tarde tapa a cara de alguém, e um ciclo cego de alturas erra
-        # igual, porque não sabe onde a pessoa está
+        # a legenda se posiciona sozinha: nunca em cima do rosto e, se
+        # sobrar vão no meio do quadro, ela vai pro meio em vez do
+        # rodapé — num plano com ela em cima e o prato embaixo, o rodapé
+        # é justamente onde está a comida
         from detecta_rosto import margens_por_bloco
         base_t = trecho[0] if trecho else 0.0
         janelas = [(b[0] - dur_ab + base_t, b[1] - dur_ab + base_t)
                    for b in blocos]
-        margens = margens_por_bloco(video, janelas, H, k(78) * 2, k(120))
+        # manchete e legenda no mesmo lugar seria trocar um tapa-buraco
+        # por outro; cada bloco recebe as faixas já ocupadas no seu tempo
+        bloq = [[(z[2], z[3]) for z in ZONAS
+                 if z[1] > b[0] + desloc and z[0] < b[1] + desloc]
+                for b in blocos]
+        margens = margens_por_bloco(video, janelas, H, round(k(78) * 2.3),
+                                    k(120), bloqueios=bloq)
         blocos = [(b[0], b[1], b[2], m) for b, m in zip(blocos, margens)]
     if roteiro.get("audio"):
         # o cartão de abertura já diz o que ela fala nesses segundos;

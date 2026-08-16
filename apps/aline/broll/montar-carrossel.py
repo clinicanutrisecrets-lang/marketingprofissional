@@ -196,11 +196,13 @@ def slide_capa(fotos, chapeu, titulo, sub, rodape):
 
     y = y0 + k(62)
     if chapeu:
-        f = ImageFont.truetype(FONT_SEMI, k(32))
+        # o chapéu é o filtro de público: em corpo fino e pequeno ele
+        # some, e a capa passa a atrair paciente em vez de nutricionista
+        f = ImageFont.truetype(FONT_BOLD, k(42))
         txt = chapeu.upper()
         larg = f.getlength(txt)
         # letter spacing manual: chapéu apertado fica pesado
-        esp = k(5)
+        esp = k(4)
         x = (W - (larg + esp * (len(txt) - 1))) / 2
         for ch in txt:
             draw.text((x, y), ch, font=f, fill=TIFFANY)
