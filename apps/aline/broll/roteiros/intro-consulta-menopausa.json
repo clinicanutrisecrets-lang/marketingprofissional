@@ -1,0 +1,68 @@
+{
+  "_": "Intro narrada que entra antes da consulta de menopausa. 16:9.",
+  "video": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/video/consulta.mp4",
+  "trecho": [
+    150.0,
+    173.6
+  ],
+  "mudo": true,
+  "audio": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/a1.wav",
+  "transcricao": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/t1.json",
+  "escurecer": 0.55,
+  "destaques": [
+    "nutrigenética",
+    "menopausa",
+    "genética",
+    "raciocínio",
+    "queixas",
+    "peso",
+    "memória",
+    "intestino",
+    "causa"
+  ],
+  "abertura": {
+    "chapeu": "Consulta real",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 5.0,
+    "titulo": [
+      {
+        "txt": "Nutrigenética na",
+        "tam": 0.34,
+        "peso": "Regular"
+      },
+      {
+        "txt": "MENOPAUSA",
+        "tam": 0.74,
+        "peso": "Black"
+      }
+    ],
+    "sub": "caso clínico ilustrativo, paciente fictícia"
+  },
+  "manchetes": [
+    {
+      "de": 10.0,
+      "ate": 16.9,
+      "tipo": "painel",
+      "chapeu": "as queixas",
+      "texto": "Cinco sintomas",
+      "sub": "peso · gordura abdominal · memória · dor articular · intestino"
+    },
+    {
+      "de": 17.2,
+      "ate": 23.6,
+      "tipo": "faixa",
+      "texto": "Uma causa só. E a genética explica a intensidade."
+    }
+  ]
+}

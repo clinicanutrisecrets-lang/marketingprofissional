@@ -1,0 +1,220 @@
+{
+  "_": "Genes da ansiedade, com a narracao da Aline (161s). O video da consulta e so fundo.",
+  "video": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/video/consulta.mp4",
+  "trecho": [
+    55.0,
+    204.63
+  ],
+  "mudo": true,
+  "audio": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/a5.wav",
+  "transcricao": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/t5ok.json",
+  "escurecer": 0.5,
+  "destaques": [
+    "comt",
+    "adora2a",
+    "gad1",
+    "tph2",
+    "bdnf",
+    "genótipo",
+    "nutrigenômica",
+    "nutrigenética",
+    "dopamina",
+    "gaba",
+    "serotonina",
+    "triptofano",
+    "magnésio",
+    "l-teanina",
+    "zinco",
+    "ferro",
+    "cafeína",
+    "glutamato",
+    "genes",
+    "gene",
+    "ansiedade"
+  ],
+  "abertura": {
+    "chapeu": "Nutricionista",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 5.0,
+    "titulo": [
+      {
+        "txt": "A ansiedade do seu paciente",
+        "tam": 0.28,
+        "peso": "Regular"
+      },
+      {
+        "txt": "VAI ALÉM DO",
+        "tam": 0.4,
+        "peso": "SemiBold"
+      },
+      {
+        "txt": "emocional",
+        "tam": 0.78,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "pode estar na genética e no estilo de vida"
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 7.0,
+    "titulo": [
+      {
+        "txt": "Aprenda a ler",
+        "tam": 0.42,
+        "peso": "Regular"
+      },
+      {
+        "txt": "ESSES GENES",
+        "tam": 0.62,
+        "peso": "Black"
+      },
+      {
+        "txt": "na prática",
+        "tam": 0.42,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "aula gratuita, exclusiva para profissionais de saúde",
+    "rodape": "@nutri_secrets"
+  },
+  "manchetes": [
+    {
+      "de": 29.4,
+      "ate": 42.0,
+      "tipo": "painel",
+      "chapeu": "a tese",
+      "texto": "Ansiedade tem\n**genótipo**",
+      "sub": "não é a única causa, mas faz parte do pacote"
+    },
+    {
+      "de": 55.8,
+      "ate": 80.2,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "COMT",
+      "sub": "Met/Met degrada dopamina **devagar**: sob estresse, acumula",
+      "itens": [
+        [
+          "alimento",
+          "menos café e chá verde em dose alta"
+        ],
+        [
+          "suplemento",
+          "magnésio glicinato, cofator da enzima"
+        ]
+      ]
+    },
+    {
+      "de": 80.6,
+      "ate": 98.2,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "ADORA2A",
+      "sub": "a variante que faz o café **virar ansiedade**",
+      "itens": [
+        [
+          "alimento",
+          "chá branco no lugar do café da tarde"
+        ],
+        [
+          "suplemento",
+          "L-teanina, que segura o pico"
+        ]
+      ]
+    },
+    {
+      "de": 98.6,
+      "ate": 114.6,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "GAD1",
+      "sub": "converte glutamato em **GABA**, o freio do cérebro",
+      "itens": [
+        [
+          "alimento",
+          "grão-de-bico, banana, semente de abóbora"
+        ],
+        [
+          "suplemento",
+          "B6 na forma P5P e zinco"
+        ]
+      ]
+    },
+    {
+      "de": 115.0,
+      "ate": 127.8,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "TPH2",
+      "sub": "a enzima que fabrica **serotonina** no cérebro",
+      "itens": [
+        [
+          "alimento",
+          "ovo, aveia e castanha pelo triptofano"
+        ],
+        [
+          "suplemento",
+          "ferro e B6 antes do triptofano"
+        ]
+      ]
+    },
+    {
+      "de": 136.8,
+      "ate": 152.6,
+      "tipo": "painel",
+      "chapeu": "gene",
+      "texto": "BDNF",
+      "sub": "Val66Met responde **pior** ao estresse crônico",
+      "itens": [
+        [
+          "alimento",
+          "peixe gordo e cacau 70%"
+        ],
+        [
+          "suplemento",
+          "ômega-3 com EPA e DHA, e exercício"
+        ]
+      ]
+    },
+    {
+      "de": 152.9,
+      "ate": 156.6,
+      "tipo": "faixa",
+      "texto": "Mesma queixa. Condutas diferentes."
+    }
+  ]
+}

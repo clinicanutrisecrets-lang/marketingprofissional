@@ -1,0 +1,147 @@
+{
+  "_": "Overnight oats, com a narracao da Aline. As legendas saem da propria fala.",
+  "saida": [
+    720,
+    1280
+  ],
+  "audio": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/a3.wav",
+  "transcricao": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/t3.json",
+  "escurecer": 0.15,
+  "destaques": [
+    "aveia",
+    "beta-glucana",
+    "chia",
+    "triptofano",
+    "manga",
+    "nozes",
+    "bcmo1",
+    "fads1",
+    "ômega",
+    "glicose",
+    "saciedade",
+    "intestino",
+    "gene",
+    "genes",
+    "direção",
+    "vitamina",
+    "fibra",
+    "psicobiótica",
+    "bifidobactéria",
+    "energia"
+  ],
+  "clipes": [
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4",
+      "trecho": [
+        0.2,
+        7.0
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
+      "trecho": [
+        0.2,
+        6.5
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/4ceddd68-hf_20260809_002616_edc6f77d737743f38614fbd20bb3fd6e.mp4",
+      "trecho": [
+        7.2,
+        14.5
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
+      "trecho": [
+        6.8,
+        14.6
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4",
+      "trecho": [
+        0.2,
+        4.0
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4",
+      "trecho": [
+        4.2,
+        9.0
+      ],
+      "velocidade": 0.515
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e188a60e-hf_20260809_004245_d1bdd07b22f745a6ac27804d32bba929.mp4",
+      "trecho": [
+        9.2,
+        14.6
+      ],
+      "velocidade": 0.515
+    }
+  ],
+  "abertura": {
+    "chapeu": "Nutri Secrets",
+    "dur": 5.0,
+    "titulo": [
+      {
+        "txt": "O café da manhã que",
+        "tam": 0.32,
+        "peso": "Regular"
+      },
+      {
+        "txt": "SEGURA",
+        "tam": 0.9,
+        "peso": "Black"
+      },
+      {
+        "txt": "a energia até o almoço",
+        "tam": 0.36,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "e tem gene por trás"
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 7.5,
+    "titulo": [
+      {
+        "txt": "Gene não é informação",
+        "tam": 0.34,
+        "peso": "Regular"
+      },
+      {
+        "txt": "É DIREÇÃO",
+        "tam": 0.78,
+        "peso": "Black"
+      }
+    ],
+    "sub": "aula gratuita, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets"
+  }
+}

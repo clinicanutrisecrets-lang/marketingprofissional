@@ -1,0 +1,163 @@
+{
+  "_": "Mousse de abacate, com a narracao da Aline. As legendas saem da propria fala.",
+  "saida": [
+    720,
+    1280
+  ],
+  "audio": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/a2.wav",
+  "transcricao": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/t2.json",
+  "escurecer": 0.15,
+  "destaques": [
+    "tas2r38",
+    "ankk1",
+    "apoe4",
+    "tcf7l2",
+    "cyp1a2",
+    "supertaster",
+    "dopamina",
+    "amargo",
+    "abacate",
+    "canela",
+    "genótipos",
+    "sal",
+    "bioquímica",
+    "disciplina",
+    "cacau",
+    "teobromina",
+    "compulsão",
+    "planejado"
+  ],
+  "clipes": [
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        0.5,
+        3.95
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        4.2,
+        7.28
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        0.0,
+        2.3
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        7.5,
+        11.75
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        3.0,
+        7.4
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        8.0,
+        13.0
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        13.2,
+        18.8
+      ],
+      "velocidade": 0.548
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        11.95,
+        19.9
+      ],
+      "velocidade": 0.548
+    }
+  ],
+  "abertura": {
+    "chapeu": "Nutri Secrets",
+    "dur": 4.5,
+    "titulo": [
+      {
+        "txt": "Vontade de doce",
+        "tam": 0.36,
+        "peso": "Regular"
+      },
+      {
+        "txt": "NÃO É",
+        "tam": 0.92,
+        "peso": "Black"
+      },
+      {
+        "txt": "falta de disciplina",
+        "tam": 0.42,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "é bioquímica com nome e sobrenome"
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 7.0,
+    "titulo": [
+      {
+        "txt": "O mesmo doce",
+        "tam": 0.4,
+        "peso": "Regular"
+      },
+      {
+        "txt": "NÃO SERVE",
+        "tam": 0.72,
+        "peso": "Black"
+      },
+      {
+        "txt": "a dois genótipos",
+        "tam": 0.4,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "aula gratuita, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets"
+  }
+}

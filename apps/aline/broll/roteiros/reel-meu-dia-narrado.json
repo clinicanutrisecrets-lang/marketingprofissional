@@ -1,0 +1,118 @@
+{
+  "_": "Meu dia como nutri de nutrigenetica, com a narracao da Aline.",
+  "saida": [
+    720,
+    1280
+  ],
+  "audio": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/a4.wav",
+  "transcricao": "/tmp/claude-0/-home-user-marketingprofissional/712099d6-612c-55e4-9df3-e85bce81cfcb/scratchpad/audios/t4ok.json",
+  "escurecer": 0.22,
+  "destaques": [
+    "nutrigenética",
+    "genética",
+    "genes",
+    "microbiota",
+    "bioativos",
+    "nutrientes",
+    "precisão",
+    "excelência",
+    "terapêutica",
+    "mestrado",
+    "cardápio",
+    "suplementação",
+    "detetive",
+    "personalizada"
+  ],
+  "clipes": [
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/2021b55d-hf_20260815_210016_5bf105633e3448569191f16fc0ee3225.mp4",
+      "trecho": [
+        0.3,
+        9.3
+      ],
+      "velocidade": 0.62
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
+      "trecho": [
+        6.0,
+        19.5
+      ],
+      "velocidade": 0.62
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e9265d63-hf_20260815_211505_bfd85ce65c47462e92640e090af9cc0c.mp4",
+      "trecho": [
+        0.3,
+        9.5
+      ],
+      "velocidade": 0.62
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/0ee34dfc-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d_2.mp4",
+      "trecho": [
+        3.0,
+        6.0
+      ],
+      "velocidade": 0.62
+    }
+  ],
+  "abertura": {
+    "chapeu": "Nutri Secrets",
+    "dur": 4.5,
+    "titulo": [
+      {
+        "txt": "Meu dia como",
+        "tam": 0.4,
+        "peso": "Regular"
+      },
+      {
+        "txt": "NUTRI",
+        "tam": 1.3,
+        "peso": "Black"
+      },
+      {
+        "txt": "de nutrigenética",
+        "tam": 0.48,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "acompanhe um pouco da minha carreira"
+  },
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 6.5,
+    "titulo": [
+      {
+        "txt": "Aula gratuita e",
+        "tam": 0.46,
+        "peso": "Regular"
+      },
+      {
+        "txt": "MÃO NA MASSA",
+        "tam": 0.8,
+        "peso": "Black"
+      }
+    ],
+    "sub": "teoria descomplicada, para cuidar do paciente com precisão",
+    "rodape": "@nutri_secrets"
+  },
+  "legendas": []
+}

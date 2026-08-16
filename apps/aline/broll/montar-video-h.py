@@ -604,12 +604,22 @@ def main():
 
     lista = tmp / "lista.txt"
     lista.write_text("".join(f"file '{p}'\n" for p in finais))
+    alvo = (tmp / "sem_narracao.mp4") if roteiro.get("audio") else Path(saida)
     subprocess.run([
         "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
         "-i", str(lista), "-c:v", "libx264", "-preset", "medium",
         "-crf", "20", "-pix_fmt", "yuv420p", *COR,
-        "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", saida,
+        "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(alvo),
     ], check=True)
+
+    if roteiro.get("audio"):
+        # a narração substitui a trilha inteira; o vídeo já foi calibrado
+        # pra duração dela, então shortest só apara a sobra de arredondamento
+        subprocess.run([
+            "ffmpeg", "-v", "error", "-y", "-i", str(alvo),
+            "-i", roteiro["audio"], "-map", "0:v", "-map", "1:a",
+            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+            "-shortest", "-movflags", "+faststart", saida], check=True)
 
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
