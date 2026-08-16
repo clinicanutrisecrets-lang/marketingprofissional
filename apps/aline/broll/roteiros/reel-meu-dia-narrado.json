@@ -157,11 +157,5 @@
     "sub": "teoria descomplicada, para cuidar do paciente com precisão",
     "rodape": "@nutri_secrets"
   },
-  "legendas": [],
-  "ciclo_legenda": [
-    "cima",
-    "meio",
-    "baixo"
-  ],
-  "ciclo_a_cada": 3
+  "legendas": []
 }

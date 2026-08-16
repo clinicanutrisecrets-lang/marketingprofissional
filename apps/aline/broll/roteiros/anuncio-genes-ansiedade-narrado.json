@@ -204,11 +204,5 @@
       "tipo": "faixa",
       "texto": "Mesma queixa. Condutas diferentes."
     }
-  ],
-  "ciclo_legenda": [
-    "cima",
-    "meio",
-    "baixo"
-  ],
-  "ciclo_a_cada": 3
+  ]
 }

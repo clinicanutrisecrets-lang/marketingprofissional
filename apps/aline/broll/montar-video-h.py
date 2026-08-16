@@ -574,14 +574,17 @@ def main():
                for l in roteiro.get("legendas", [])]
     blocos.sort(key=lambda b: b[0])
 
-    ciclo = roteiro.get("ciclo_legenda")
-    if ciclo:
-        # a legenda troca de altura de tempos em tempos: fixa embaixo ela
-        # some no rodapé do app e ainda tapa o final do prato
-        alturas = {"baixo": k(120), "meio": round(H * 0.44), "cima": round(H * 0.74)}
-        passo = roteiro.get("ciclo_a_cada", 3)
-        blocos = [(b[0], b[1], b[2], alturas[ciclo[(i // passo) % len(ciclo)]])
-                  for i, b in enumerate(blocos)]
+    if blocos and roteiro.get("desvia_do_rosto", True):
+        # a legenda se posiciona sozinha: onde há rosto, ela desce pra
+        # baixo do queixo; onde não há, fica no rodapé. Altura fixa cedo
+        # ou tarde tapa a cara de alguém, e um ciclo cego de alturas erra
+        # igual, porque não sabe onde a pessoa está
+        from detecta_rosto import margens_por_bloco
+        base_t = trecho[0] if trecho else 0.0
+        janelas = [(b[0] - dur_ab + base_t, b[1] - dur_ab + base_t)
+                   for b in blocos]
+        margens = margens_por_bloco(video, janelas, H, k(78) * 2, k(120))
+        blocos = [(b[0], b[1], b[2], m) for b, m in zip(blocos, margens)]
     if roteiro.get("audio"):
         # o cartão de abertura já diz o que ela fala nesses segundos;
         # legenda por cima dele seria repetição

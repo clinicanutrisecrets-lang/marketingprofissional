@@ -187,11 +187,5 @@
     ],
     "sub": "aula gratuita, exclusiva para nutricionistas",
     "rodape": "@nutri_secrets"
-  },
-  "ciclo_legenda": [
-    "cima",
-    "meio",
-    "baixo"
-  ],
-  "ciclo_a_cada": 3
+  }
 }

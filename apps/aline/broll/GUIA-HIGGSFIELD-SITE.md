@@ -408,3 +408,36 @@ O `FORMAT MODE` aqui é o contrário do de sempre: em vez de
 `one continuous shot`, escrever `four separate shots with hard cuts between
 them, no dissolves`. E manter LOCATION MAP / LIGHTING / STYLE iguais nas
 quatro, senão cada cena vem com uma luz diferente e não emenda.
+
+### 18. Receita precisa de quantidade e forma do ingrediente
+`turmeric powder sifts down` fez o modelo despejar cúrcuma até encher o
+copo, e `coarse black pepper` virou grão inteiro boiando. Ingrediente
+sempre com medida de cozinha e com a forma explícita:
+`a small measured spoonful, about one level teaspoon` +
+`finely ground powder, never whole seeds or peppercorns`.
+E um lock de proporção: `the amount is modest, never a heap, never
+filling the glass`.
+
+A receita real (a do Scanner) deve ser a fonte da quantidade — estimar de
+cabeça é o que produz o copo cheio de cúrcuma.
+
+---
+
+## Como o motor de edição decide sozinho
+
+Cada correção que se repete vira regra no código, não lembrete pra quem
+edita. O que já saiu da decisão manual:
+
+| era decidido a olho | agora |
+|---|---|
+| altura da legenda | o rosto é detectado (YuNet) e a legenda vai pro vão abaixo do queixo; sem rosto, rodapé |
+| onde cortar um clipe multi-cena | os cortes são detectados por `select=gt(scene,0.3)` |
+| se o texto cabe na linha | a linha encolhe sozinha até caber |
+| quanto acelerar pra bater a narração | a velocidade é calculada da razão material/alvo |
+| que trecho evitar | `BIBLIOTECA-CLIPES.md` lista os defeitos de cada clipe |
+
+A regra geral: **se a mesma classe de erro apareceu duas vezes, a decisão
+tem que ir pro código.** Num pipeline automático isso deixa de ser
+conforto e vira requisito — escolha a olho, em escala, produz dezenas de
+vídeos com a legenda em cima do rosto.
+
