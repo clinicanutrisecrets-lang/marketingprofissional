@@ -1,5 +1,5 @@
 {
-  "_": "Mousse: a receita e, no fecho, a cozinha e o consultorio.",
+  "_": "Mousse de abacate. Os cortes seguem a narracao, nao a ordem da receita: o sal cai quando ela diz flor de sal.",
   "saida": [
     720,
     1280
@@ -31,18 +31,18 @@
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
-        0.5,
-        3.95
+        0.0,
+        4.2
       ],
-      "velocidade": 0.813
+      "velocidade": 0.866
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
         4.2,
-        7.28
+        7.4
       ],
-      "velocidade": 0.813
+      "velocidade": 0.866
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -50,76 +50,124 @@
         0.0,
         2.3
       ],
-      "velocidade": 0.813
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
-      "trecho": [
-        7.5,
-        11.75
-      ],
-      "velocidade": 0.813
+      "velocidade": 0.866
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
-        3.0,
-        7.4
+        11.5,
+        16.0
       ],
-      "velocidade": 0.813
+      "velocidade": 0.753
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        16.0,
+        19.0
+      ],
+      "velocidade": 0.753
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
         8.0,
-        13.0
+        11.5
       ],
-      "velocidade": 0.813
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
-      "trecho": [
-        13.2,
-        18.8
-      ],
-      "velocidade": 0.813
+      "velocidade": 0.753
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
-        11.95,
-        19.9
+        7.4,
+        12.2
       ],
-      "velocidade": 0.813
+      "velocidade": 0.835
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e9265d63-hf_20260815_211505_bfd85ce65c47462e92640e090af9cc0c.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
-        0.3,
+        8.8,
+        10.6
+      ],
+      "velocidade": 0.835
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        2.3,
         8.0
       ],
-      "velocidade": 0.813
+      "velocidade": 0.939
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        9.4,
+        11.4
+      ],
+      "velocidade": 0.939
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        4.2,
+        7.4
+      ],
+      "velocidade": 0.955
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        0.0,
+        2.3
+      ],
+      "velocidade": 0.955
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        12.5,
+        16.0
+      ],
+      "velocidade": 0.955
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        12.2,
+        13.7
+      ],
+      "velocidade": 0.955
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        13.7,
+        16.3
+      ],
+      "velocidade": 0.963
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        16.3,
+        20.0
+      ],
+      "velocidade": 0.961
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
       "trecho": [
         0.3,
-        6.5
+        4.0
       ],
-      "velocidade": 0.813
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
-      "trecho": [
-        11.0,
-        14.5
-      ],
-      "velocidade": 0.813
+      "velocidade": 0.961
     }
   ],
   "abertura": {
     "chapeu": "Nutricionista",
-    "dur": 4.5,
+    "dur": 6.0,
     "titulo": [
       {
         "txt": "Vontade de doce",
@@ -170,7 +218,7 @@
         89
       ]
     ],
-    "dur": 7.0,
+    "dur": 7.9,
     "titulo": [
       {
         "txt": "O mesmo doce",
