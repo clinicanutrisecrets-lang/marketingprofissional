@@ -88,6 +88,53 @@ type SugestaoIA = {
   };
 };
 
+/**
+ * Slides do carrossel a partir do que o agente devolveu.
+ *
+ * Caminho feliz: ele manda `slides` (capa + internos + CTA) e a gente só
+ * converte. Rede de segurança: sem `slides`, monta o carrossel a partir da
+ * LEGENDA, que sempre vem e já está no tom certo — capa com o título, um slide
+ * por parágrafo (no máximo 4) e um último de CTA. Carrossel com texto pronto e
+ * arte derivada é infinitamente melhor que carrossel sem arte nenhuma, que é o
+ * que a nutri via: um card marcado CARROSSEL sem nada pra postar.
+ */
+function slidesDoCarrossel(s: SugestaoIA): ConteudoPeca[] {
+  const limpo = (v?: string) => (v ?? "").trim();
+
+  const doAgente = (s.slides ?? [])
+    .map((sl) => ({
+      headline: limpo(sl.headline),
+      corpo: limpo(sl.corpo) || undefined,
+      subtitle: limpo(sl.subtitle) || undefined,
+      cta: limpo(sl.cta) || undefined,
+      eyebrow: limpo(s.eyebrow) || undefined,
+    }))
+    .filter((sl) => sl.headline || sl.corpo);
+  if (doAgente.length) return doAgente;
+
+  const capa = conteudoDoCard(s);
+  if (!capa) return [];
+
+  const paragrafos = limpo(s.copy_legenda)
+    .split(/\n{1,}/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 25 && !p.startsWith("#"))
+    .slice(0, 4);
+  if (!paragrafos.length) return [];
+
+  const eyebrow = limpo(s.eyebrow) || undefined;
+  return [
+    { ...capa, eyebrow },
+    ...paragrafos.map((p) => ({ headline: "", corpo: p, eyebrow })),
+    {
+      headline: limpo(s.cta_card) || "Quer investigar isso com precisão?",
+      corpo: "Me chama no direct.",
+      eyebrow,
+    },
+  ];
+}
+
+
 const SYSTEM = `
 Você é diretor de conteúdo de uma agência premium especializada em PROFISSIONAIS DE SAÚDE INTEGRATIVA de alto ticket (nutricionistas, médicos, biomédicos, farmacêuticos — tratamentos de R$ 3.000 a R$ 7.500 com testes nutrigenéticos e de microbiota).
 
@@ -129,7 +176,14 @@ CARDS (arte tipográfica premium — sem foto):
 - headline: frase de impacto, 6 a 12 palavras — é o texto GIGANTE da arte
 - subtitle: complemento de 1-2 frases (opcional)
 - cta_card: frase manuscrita curta tipo "salva esse post" (opcional)
-- CARROSSEL: 4 a 6 slides; slide 1 = capa (headline forte); slides internos = headline curta + corpo de 2-3 parágrafos curtos; último slide = CTA
+- CARROSSEL: toda sugestão de tipo "feed_carrossel" DEVE trazer o campo "slides" — sem ele não existe arte pra postar, e o post não serve pra nada. Formato EXATO, 4 a 6 posições:
+  "slides": [
+    {"headline": "Capa: a frase forte que para o dedo"},
+    {"headline": "Título curto do slide", "corpo": "2-3 parágrafos curtos, um por linha."},
+    {"headline": "Título curto do slide", "corpo": "..."},
+    {"headline": "Fecho", "cta": "Convite de investigação"}
+  ]
+  Slide 1 = capa (só headline). Slides internos = headline curta + corpo. Último = CTA.
 - Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
 PEDIDOS DA NUTRI (quando o input trouxer "pedidos_da_nutri"):
@@ -366,24 +420,40 @@ export async function gerarSugestoesSemana(params: {
           });
           artes.push({ url: r.url, path: r.path, slide: 1 });
         }
-      } else if (s.tipo === "feed_carrossel" && s.slides?.length) {
-        const slides: ConteudoPeca[] = s.slides.map((sl) => ({
-          headline: sl.headline,
-          corpo: sl.corpo,
-          subtitle: sl.subtitle,
-          cta: sl.cta,
-          eyebrow: s.eyebrow,
-        }));
-        const r = await gerarCarrosselEUpload({
-          franqueadaId: params.franqueadaId,
-          brand,
-          slides,
-        });
-        r.urls.forEach((url, i) => artes.push({ url, slide: i + 1 }));
+      } else if (s.tipo === "feed_carrossel") {
+        // 🔴 Antes: `&& s.slides?.length`. Quando o agente devolvia um carrossel
+        // SEM o array `slides`, a condição era falsa, o bloco inteiro era
+        // pulado em silêncio e a sugestão entrava no banco marcada CARROSSEL e
+        // com zero arte — foi o que a Juliana recebeu em 15/08 (os 3 carrosséis
+        // dela gravados em menos de 1 segundo, sem nenhum render). O contrato
+        // do JSON não declarava o formato de `slides`, então o modelo às vezes
+        // mandava e às vezes não; o prompt agora declara, e aqui existe rede:
+        // sem slides, a legenda vira o carrossel.
+        const slides: ConteudoPeca[] = slidesDoCarrossel(s);
+        if (!slides.length) {
+          console.error(
+            "[gerador-sugestoes] carrossel sem slides e sem legenda aproveitável — arte não gerada",
+            { franqueadaId: params.franqueadaId, tema: s.tema },
+          );
+        }
+        if (slides.length) {
+          const r = await gerarCarrosselEUpload({
+            franqueadaId: params.franqueadaId,
+            brand,
+            slides,
+          });
+          r.urls.forEach((url, i) => artes.push({ url, slide: i + 1 }));
+        }
       }
       // reel: sem arte — o produto é o roteiro/teleprompter
-    } catch {
-      // arte falhou → sugestão ainda vale (copy + roteiro); artes fica vazio
+    } catch (err) {
+      // Arte falhou → a sugestão ainda vale (copy + roteiro), mas o motivo NÃO
+      // pode sumir: era um catch mudo, e por isso "carrossel sem imagem" ficou
+      // sem explicação por dias.
+      console.error("[gerador-sugestoes] render da arte falhou", {
+        franqueadaId: params.franqueadaId, tipo: s.tipo, tema: s.tema,
+        erro: err instanceof Error ? err.message : String(err),
+      });
     }
 
     const teleprompter =
