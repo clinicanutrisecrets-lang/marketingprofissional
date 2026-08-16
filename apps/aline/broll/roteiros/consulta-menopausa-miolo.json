@@ -36,14 +36,32 @@
   "fecho": {
     "chapeu": "Imersivo de Nutrigenética",
     "tarja": [
-      214,
-      51,
-      108
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
     ],
-    "titulo": "Quer aprender a fazer\nessa **leitura**?",
-    "sub": "**Aula gratuita**, exclusiva para nutricionistas",
-    "rodape": "@nutri_secrets",
-    "dur": 6.0
+    "dur": 6.5,
+    "titulo": [
+      {
+        "txt": "Quer aprender a fazer",
+        "tam": 0.42,
+        "peso": "Regular"
+      },
+      {
+        "txt": "ESSA LEITURA",
+        "tam": 0.8,
+        "peso": "Black"
+      }
+    ],
+    "sub": "aula gratuita, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets"
   },
   "manchetes": [
     {
