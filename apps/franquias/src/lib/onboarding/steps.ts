@@ -182,6 +182,30 @@ export const NICHOS_OPCOES = [
   { value: "outro", label: "Outro" },
 ];
 
+/**
+ * Estilo da CAPA dos carrosséis. Só a capa muda — miolo e fecho seguem iguais,
+ * e é o contraste entre capa e fecho que dá o arco visual da peça.
+ * Os valores batem com `EstiloCapa` de @scanner/ai-image e com o CHECK da
+ * coluna franqueadas.estilo_capa.
+ */
+export const ESTILOS_CAPA = [
+  {
+    value: "grotesca_clara",
+    label: "Moderno claro",
+    descricao: "Fundo creme, título grande e pesado, destaque na sua cor. (padrão)",
+  },
+  {
+    value: "grotesca_escura",
+    label: "Moderno forte",
+    descricao: "Fundo na sua cor, título branco em caixa alta. Lê de longe no feed.",
+  },
+  {
+    value: "editorial",
+    label: "Editorial clássico",
+    descricao: "Serifada centralizada sobre a sua cor. Discreto e elegante.",
+  },
+];
+
 export const ESTILOS_VISUAIS = [
   { value: "clean_moderno", label: "Clean moderno", descricao: "Branco, linhas finas, sans-serif" },
   { value: "calido_natural", label: "Cálido e natural", descricao: "Tons terrosos, orgânico" },

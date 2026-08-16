@@ -15,7 +15,15 @@ import { svgIlustracao, type IlustracaoId } from "./lineArt";
  * Zero chamadas de IA → zero custo, zero surpresa, zero revisão.
  */
 
-export type CardLayout = "hero" | "foto" | "conteudo" | "citacao" | "lista" | "editorial";
+export type CardLayout =
+  | "hero"
+  | "foto"
+  | "conteudo"
+  | "citacao"
+  | "lista"
+  | "editorial"
+  | "capa_clara"
+  | "capa_escura";
 
 export type CardInput = {
   layout: CardLayout;
@@ -163,7 +171,7 @@ type Bloco = { pedacos: PedacoTexto[]; largura: number; altura: number };
 
 function blocoDeTexto(
   texto: string,
-  familia: "serif" | "sans" | "manuscrita",
+  familia: "serif" | "sans" | "sans-black" | "manuscrita",
   cor: string,
   fontSize: number,
   maxWidth: number,
@@ -317,6 +325,14 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
   if (layout === "lista") {
     return renderLista({ W, H, scheme, conteudo, handle });
+  }
+  if (layout === "capa_clara" || layout === "capa_escura") {
+    return renderCapa({
+      W, H, conteudo, handle,
+      escura: layout === "capa_escura",
+      corMarca: brand.corPrimariaHex || "#2F5D50",
+      logoComposite: await prepararLogo(input, brand, W, H),
+    });
   }
   if (layout === "editorial") {
     return renderEditorial({
@@ -781,6 +797,166 @@ async function renderLista(params: {
 // ————— Layout editorial (headline em dois tons + ramos + ilustração) —————
 
 const DOURADO = "#A9803F";
+
+/**
+ * Capa de carrossel em tipografia GROTESCA PESADA — os dois estilos que a
+ * Aline escolheu (16/08), alternativos ao editorial em Playfair.
+ *
+ *  - `capa_clara`  (padrão): fundo creme, faixa e destaque na cor da marca.
+ *    Conversa com os slides internos, que já são creme — o carrossel vira uma
+ *    peça só.
+ *  - `capa_escura`: fundo na cor da marca, título em caixa alta branco. Mais
+ *    peso, lê de mais longe no feed.
+ *
+ * O título vai em Montserrat 900 de VERDADE (família "sans-black", instância
+ * estática) — engrossar por contorno daria um traço sujo neste tamanho. A
+ * linha de apoio fica em Playfair, que é o contraponto serifado da marca.
+ */
+async function renderCapa(params: {
+  W: number;
+  H: number;
+  conteudo: ConteudoPeca;
+  handle: string;
+  escura: boolean;
+  corMarca: string;
+  logoComposite: { buf: Buffer; w: number; h: number } | null;
+}): Promise<Buffer> {
+  const { W, H, conteudo, handle, escura, corMarca, logoComposite } = params;
+  const prim = /^#[0-9a-fA-F]{6}$/.test(corMarca) ? corMarca : "#2F5D50";
+
+  const bg = escura ? prim : CREME;
+  const tintaBase = escura ? "#FFFFFF" : shade(prim, 0.22);
+  const tintaDestaque = escura ? "#FFFFFF" : prim;
+  const tintaApoio = escura ? "#FFFFFF" : shade(prim, 0.62);
+  const tintaHandle = escura ? "#FFFFFF" : shade(prim, 0.5);
+
+  const composites: sharp.OverlayOptions[] = [];
+  if (logoComposite) {
+    composites.push({
+      input: logoComposite.buf,
+      top: Math.round(H * 0.06),
+      left: Math.round((W - logoComposite.w) / 2),
+    });
+  }
+
+  const margem = Math.round(W * 0.085);
+  const larguraTexto = Math.round(W * 0.83);
+  const headlineBruto = (conteudo.headline ?? "").trim();
+  const headline = escura ? headlineBruto.toUpperCase() : headlineBruto;
+  const apoio = (conteudo.subtitle ?? "").trim();
+  const eyebrow = (conteudo.eyebrow ?? "").trim();
+
+  // Quebra própria: a capa alterna a cor entre a primeira linha e as demais,
+  // então cada linha é um bloco separado.
+  const quebrar = (tam: number): string[] => {
+    const palavras = headline.split(/\s+/).filter(Boolean);
+    const linhas: string[] = [];
+    let atual = "";
+    for (const p of palavras) {
+      const teste = atual ? `${atual} ${p}` : p;
+      if (atual && medirTexto(teste, "sans-black", tam) > larguraTexto) {
+        linhas.push(atual);
+        atual = p;
+      } else {
+        atual = teste;
+      }
+    }
+    if (atual) linhas.push(atual);
+    return linhas;
+  };
+
+  let fs = Math.round(W * 0.108);
+  let linhas = quebrar(fs);
+  // Cabe em no máximo 4 linhas e em 42% da altura — títulos longos encolhem.
+  while ((linhas.length > 4 || linhas.length * fs * 1.0 > H * 0.42) && fs > Math.round(W * 0.05)) {
+    fs = Math.floor(fs * 0.93);
+    linhas = quebrar(fs);
+  }
+
+  // Monta os blocos ANTES de posicionar: a altura real de cada linha vem do
+  // compositor (acentos e descendentes mudam tudo). Estimar por `fs` deixava o
+  // conjunto fora do centro, com sobra visível embaixo.
+  // A cor de destaque vai na ÚLTIMA linha — a ênfase cai no fim da frase, e
+  // isso continua funcionando com 2 ou com 4 linhas.
+  const blocosTitulo = linhas.map((linha, i) =>
+    blocoDeTexto(linha, "sans-black", i === linhas.length - 1 ? tintaDestaque : tintaBase, fs, larguraTexto + 40, {
+      align: "left",
+      lineHeight: 1.0,
+      letterSpacing: -Math.round(fs * 0.022),
+    }),
+  );
+  const avancoLinha = Math.round(fs * 1.02);
+  const alturaTitulo =
+    avancoLinha * (blocosTitulo.length - 1) + (blocosTitulo[blocosTitulo.length - 1]?.altura ?? fs);
+  const fsApoio = Math.round(fs * 0.62);
+  const blocoApoio = apoio
+    ? blocoDeTexto(apoio, "serif", tintaApoio, fsApoio, larguraTexto, { align: "left", lineHeight: 1.18 })
+    : null;
+  const fsEyebrow = Math.round(W * 0.026);
+  const blocoEyebrow =
+    escura && eyebrow
+      ? blocoDeTexto(eyebrow.toUpperCase(), "sans", tintaApoio, fsEyebrow, larguraTexto, {
+          letterSpacing: Math.round(fsEyebrow * 0.34),
+          opacidade: 0.78,
+        })
+      : null;
+
+  const faixaAlt = escura ? 0 : Math.round(H * 0.008);
+  const faixaLarg = Math.round(W * 0.13);
+  const gapFaixa = escura ? 0 : Math.round(H * 0.032);
+  const gapEyebrow = blocoEyebrow ? blocoEyebrow.altura + Math.round(H * 0.026) : 0;
+  // Respiro maior antes do apoio: com 0.026 a serifada encostava no
+  // descendente do título ("gestação" + "o que muda no corpo").
+  const respiroApoio = Math.round(H * 0.045);
+  const gapApoio = blocoApoio ? respiroApoio + blocoApoio.altura : 0;
+
+  const alturaTotal = faixaAlt + gapFaixa + gapEyebrow + alturaTitulo + gapApoio;
+  let y = Math.round((H - alturaTotal) / 2);
+
+  if (!escura) {
+    composites.push({
+      input: Buffer.from(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${faixaLarg}" height="${faixaAlt}"><rect width="${faixaLarg}" height="${faixaAlt}" fill="${prim}"/></svg>`,
+      ),
+      left: margem,
+      top: y,
+    });
+    y += faixaAlt + gapFaixa;
+  }
+
+  if (blocoEyebrow) {
+    composites.push(...posicionar(blocoEyebrow, margem, y));
+    y += gapEyebrow;
+  }
+
+  blocosTitulo.forEach((bloco, i) => {
+    composites.push(...posicionar(bloco, margem, y));
+    if (i < blocosTitulo.length - 1) y += avancoLinha;
+    else y += bloco.altura;
+  });
+
+  if (blocoApoio) {
+    y += respiroApoio;
+    composites.push(...posicionar(blocoApoio, margem, y));
+  }
+
+  if (handle) {
+    const fsH = Math.round(W * 0.021);
+    const hBloco = blocoDeTexto(handle.toUpperCase(), "sans", tintaHandle, fsH, W, {
+      letterSpacing: Math.round(fsH * 0.22),
+      opacidade: 0.62,
+    });
+    composites.push(
+      ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.05) - hBloco.altura),
+    );
+  }
+
+  const [r, g, b] = hexToRgb(bg);
+  return sharp({ create: { width: W, height: H, channels: 3, background: { r, g, b } } })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
 
 async function renderEditorial(params: {
   W: number;

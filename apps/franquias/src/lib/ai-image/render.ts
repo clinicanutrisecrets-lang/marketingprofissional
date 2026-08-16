@@ -8,6 +8,7 @@ import {
   type TipoPeca,
   type BrandGuidelines,
   type ConteudoPeca,
+  type EstiloCapa,
 } from "@scanner/ai-image";
 import { createAdminClient } from "@/lib/supabase/server";
 
@@ -91,6 +92,8 @@ export async function gerarCarrosselEUpload(input: {
   franqueadaId: string;
   brand: BrandGuidelines;
   slides: ConteudoPeca[];
+  /** Estilo da capa escolhido pela profissional (Meu perfil). */
+  capaEstilo?: EstiloCapa;
   provider?: Provider;
 }): Promise<{
   urls: string[];
@@ -104,6 +107,7 @@ export async function gerarCarrosselEUpload(input: {
     apiKey,
     brand: input.brand,
     slides: input.slides,
+    capaEstilo: input.capaEstilo,
   });
 
   const admin = createAdminClient();

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CardPicker, Field, FormWrapper } from "@/components/ui/Field";
 import { FileUpload } from "@/components/ui/FileUpload";
-import { ESTILOS_VISUAIS } from "@/lib/onboarding/steps";
+import { ESTILOS_CAPA, ESTILOS_VISUAIS } from "@/lib/onboarding/steps";
 import { listarArquivos } from "@/lib/arquivos/actions";
 import type { StepFormProps } from "../Wizard";
 
@@ -61,6 +61,15 @@ export function Step5Visual({ dados, atualizar }: StepFormProps) {
         onChange={(v) => atualizar({ estilo_visual: v })}
         options={ESTILOS_VISUAIS}
         required
+      />
+
+      {/* Só a CAPA do carrossel muda com essa escolha — os slides internos e o
+          fecho continuam iguais pra todo mundo. */}
+      <CardPicker
+        label="Estilo das capas dos carrosséis"
+        value={(dados.estilo_capa as string) || "grotesca_clara"}
+        onChange={(v) => atualizar({ estilo_capa: v })}
+        options={ESTILOS_CAPA}
       />
 
       <FileUpload

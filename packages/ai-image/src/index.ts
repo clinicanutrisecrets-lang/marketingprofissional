@@ -4,7 +4,7 @@ import { gerarImagemGemini } from "./providers/gemini";
 import { aplicarOverlayTexto } from "./overlay";
 import { renderCard } from "./cardDesigner";
 import { sugerirIlustracao } from "./lineArt";
-import { DIMENSOES_POR_TIPO } from "./types";
+import { DIMENSOES_POR_TIPO, ESTILO_CAPA_PADRAO, type EstiloCapa } from "./types";
 import type { RenderRequest, RenderResult } from "./types";
 
 export * from "./types";
@@ -135,6 +135,14 @@ export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> 
   };
 }
 
+/** Estilo escolhido → layout do cardDesigner. Valor desconhecido cai no padrão. */
+function layoutDaCapa(estilo?: EstiloCapa): "hero" | "capa_clara" | "capa_escura" {
+  const e = estilo ?? ESTILO_CAPA_PADRAO;
+  if (e === "editorial") return "hero";
+  if (e === "grotesca_escura") return "capa_escura";
+  return "capa_clara";
+}
+
 export async function renderCarrossel(params: {
   provider: RenderRequest["provider"];
   apiKey: string;
@@ -142,6 +150,8 @@ export async function renderCarrossel(params: {
   slides: RenderRequest["conteudo"][];
   modoTexto?: RenderRequest["modoTexto"];
   estilo?: RenderRequest["estilo"];
+  /** Estilo da CAPA (slide 1). O fecho continua sempre editorial. */
+  capaEstilo?: EstiloCapa;
   timeoutMs?: number;
 }): Promise<RenderResult[]> {
   const estilo = params.estilo ?? "design";
@@ -157,7 +167,14 @@ export async function renderCarrossel(params: {
       const conteudo = params.slides[i]!;
       const ehCapa = i === 0;
       const ehUltimo = i === total - 1 && total > 1;
-      const layout = ehCapa || ehUltimo ? "hero" : "conteudo";
+      // A capa pode ter estilo próprio (escolha da profissional em Meu perfil);
+      // o ÚLTIMO slide segue sempre no editorial, que é o fecho da peça — e é o
+      // contraste com a capa que dá arco visual ao carrossel.
+      const layout = ehCapa
+        ? layoutDaCapa(params.capaEstilo)
+        : ehUltimo
+          ? "hero"
+          : "conteudo";
       const schemeIndex = ehCapa || ehUltimo ? 0 : 1;
 
       const buffer = await renderCard({

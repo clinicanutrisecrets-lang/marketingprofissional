@@ -87,3 +87,14 @@ export function getSafeZone(dim: Dimensoes): SafeZone {
   }
   return { x: 0, y: Math.round(h * 0.35), width: w, height: Math.round(h * 0.4) };
 }
+
+/**
+ * Estilo da capa do carrossel — escolha da profissional em Meu perfil.
+ *
+ *  editorial       Playfair centralizado sobre a cor da marca (o original).
+ *  grotesca_clara  Fundo creme, título em Montserrat 900, destaque na marca.
+ *  grotesca_escura Fundo na cor da marca, título branco em caixa alta.
+ */
+export type EstiloCapa = "editorial" | "grotesca_clara" | "grotesca_escura";
+
+export const ESTILO_CAPA_PADRAO: EstiloCapa = "grotesca_clara";

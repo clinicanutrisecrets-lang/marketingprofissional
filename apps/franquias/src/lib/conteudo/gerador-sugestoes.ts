@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import { buscarPautasQuentes } from "./trends";
 import { renderCard, renderReceita, type IlustracaoId } from "@scanner/ai-image";
-import type { BrandGuidelines, ConteudoPeca } from "@scanner/ai-image";
+import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 
 const MODEL = "claude-sonnet-4-5";
 
@@ -244,7 +244,7 @@ export async function gerarSugestoesSemana(params: {
   const { data: fData, error: fErr } = await admin
     .from("franqueadas")
     .select(
-      "id, nome_comercial, nome_completo, instagram_handle, nicho_principal, nicho_secundario, publico_alvo_descricao, tom_comunicacao, palavras_evitar, palavras_chave_usar, hashtags_favoritas, cor_primaria_hex, valor_consulta_inicial, diferenciais",
+      "id, nome_comercial, nome_completo, instagram_handle, nicho_principal, nicho_secundario, publico_alvo_descricao, tom_comunicacao, palavras_evitar, palavras_chave_usar, hashtags_favoritas, cor_primaria_hex, valor_consulta_inicial, diferenciais, estilo_capa",
     )
     .eq("id", params.franqueadaId)
     .single();
@@ -464,6 +464,8 @@ export async function gerarSugestoesSemana(params: {
             franqueadaId: params.franqueadaId,
             brand,
             slides,
+            // Escolha da profissional em Meu perfil → estilo da capa.
+            capaEstilo: ((f as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ?? undefined,
           });
           r.urls.forEach((url, i) => artes.push({ url, slide: i + 1 }));
         }

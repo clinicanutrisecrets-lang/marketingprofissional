@@ -7,6 +7,7 @@ const opentype = ((opentypeNS as { default?: typeof opentypeNS }).default ??
   opentypeNS) as typeof opentypeNS;
 import { PLAYFAIR_DISPLAY_B64 } from "./fonts/playfair";
 import { MONTSERRAT_B64 } from "./fonts/montserrat";
+import { MONTSERRAT_BLACK_B64 } from "./fonts/montserratBlack";
 import { CAVEAT_B64 } from "./fonts/caveat";
 
 /**
@@ -26,6 +27,7 @@ import { CAVEAT_B64 } from "./fonts/caveat";
 let _playfair: opentypeNS.Font | null = null;
 let _montserrat: opentypeNS.Font | null = null;
 let _caveat: opentypeNS.Font | null = null;
+let _montserratBlack: opentypeNS.Font | null = null;
 
 function b64ToArrayBuffer(b64: string): ArrayBuffer {
   const buf = Buffer.from(b64, "base64");
@@ -41,11 +43,18 @@ function getFont(familia: FamiliaFonte): opentypeNS.Font {
     if (!_caveat) _caveat = opentype.parse(b64ToArrayBuffer(CAVEAT_B64));
     return _caveat;
   }
+  if (familia === "sans-black") {
+    // Instância estática de peso 900. Necessária porque o opentype.js desenha
+    // apenas a instância PADRÃO de uma fonte variável — pedir 900 no arquivo
+    // variável do Montserrat sairia com o traço normal.
+    if (!_montserratBlack) _montserratBlack = opentype.parse(b64ToArrayBuffer(MONTSERRAT_BLACK_B64));
+    return _montserratBlack;
+  }
   if (!_montserrat) _montserrat = opentype.parse(b64ToArrayBuffer(MONTSERRAT_B64));
   return _montserrat;
 }
 
-export type FamiliaFonte = "serif" | "sans" | "manuscrita";
+export type FamiliaFonte = "serif" | "sans" | "sans-black" | "manuscrita";
 
 export type ComposeOpts = {
   texto: string;
