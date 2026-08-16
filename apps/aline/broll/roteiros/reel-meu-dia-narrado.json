@@ -1,5 +1,5 @@
 {
-  "_": "Meu dia como nutri de nutrigenetica, com a narracao da Aline.",
+  "_": "Meu dia, montado com a biblioteca inteira: lab, cozinha, receitas e consultorio.",
   "saida": [
     720,
     1280
@@ -28,33 +28,64 @@
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/2021b55d-hf_20260815_210016_5bf105633e3448569191f16fc0ee3225.mp4",
       "trecho": [
         0.3,
-        9.3
-      ],
-      "velocidade": 0.62
+        6.8
+      ]
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
       "trecho": [
         6.0,
-        19.5
-      ],
-      "velocidade": 0.62
+        15.2
+      ]
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+      "trecho": [
+        0.2,
+        6.8
+      ]
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e9265d63-hf_20260815_211505_bfd85ce65c47462e92640e090af9cc0c.mp4",
       "trecho": [
         0.3,
-        9.5
-      ],
-      "velocidade": 0.62
+        6.2
+      ]
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/0ee34dfc-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d_2.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
-        3.0,
-        6.0
-      ],
-      "velocidade": 0.62
+        2.0,
+        7.8
+      ]
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/27349e43-hf_20260809_003716_ca2ef4061ff94dff8f4661dad6116a3e.mp4",
+      "trecho": [
+        2.0,
+        7.9
+      ]
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
+      "trecho": [
+        0.3,
+        7.9
+      ]
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
+      "trecho": [
+        0.2,
+        5.8
+      ]
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+      "trecho": [
+        11.0,
+        13.9
+      ]
     }
   ],
   "abertura": {
