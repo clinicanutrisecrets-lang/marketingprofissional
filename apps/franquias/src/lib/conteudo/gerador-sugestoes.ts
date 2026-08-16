@@ -75,6 +75,8 @@ type SugestaoIA = {
   cta_card?: string;
   slides?: Array<{ headline: string; corpo?: string; subtitle?: string; cta?: string }>;
   ilustracao?: string;
+  /** Tema EXATO do pedido da nutri que esta sugestão atende (quando atende). */
+  atende_pedido?: string;
   receita_slug?: string;
   condicao?: string;
   copy_legenda: string;
@@ -203,6 +205,7 @@ CARDS (arte tipográfica premium — sem foto):
 PEDIDOS DA NUTRI (quando o input trouxer "pedidos_da_nutri"):
 - São temas que a própria pessoa dona do perfil pediu — TÊM PRIORIDADE MÁXIMA sobre as manchetes.
 - Use cada pedido como base de uma sugestão (respeitando o formato preferido quando indicado).
+- Na sugestão que nasceu de um pedido, devolva o campo "atende_pedido" com o TEMA EXATO do pedido, copiado sem alterar uma letra. É por esse campo que o sistema sabe qual pedido já foi entregue — pedido sem sugestão correspondente volta pra fila da próxima semana em vez de sumir.
 
 RECEITAS TERAPÊUTICAS (quando o input trouxer "receitas_disponiveis"):
 - Escolha UMA receita que converse com o nicho e as pautas da semana e crie uma sugestão EXTRA de tipo feed_imagem com:
@@ -490,11 +493,41 @@ export async function gerarSugestoesSemana(params: {
     if (!insErr) criadas++;
   }
 
+  // 🔴 Marca como "usado" SÓ o pedido que virou sugestão de fato.
+  // Antes, bastava `criadas > 0` pra carimbar TODOS: se o agente aproveitasse
+  // 3 dos 5 temas pedidos, os outros 2 sumiam da fila sem nunca virar post — e
+  // a nutri via "Usado" num tema que não recebeu. Agora o pedido não atendido
+  // continua pendente e entra no pacote da semana seguinte.
+  // Também grava `semana_alvo`: a coluna existia e nunca era preenchida, então
+  // a tela dizia "Usado em 15/08" sem contar EM QUE PACOTE o tema saiu — foi
+  // exatamente a dúvida da Juliana ("será que é porque ainda não tá pronto?").
   if (criadas > 0 && pedidos.length) {
-    await admin
-      .from("briefings_franqueada")
-      .update({ status: "usado", usado_em: new Date().toISOString() } as never)
-      .in("id", pedidos.map((p) => p.id));
+    const atendidos = new Set(
+      sugestoes
+        .map((s) => (s.atende_pedido ?? "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    const idsAtendidos = atendidos.size
+      ? pedidos.filter((p) => atendidos.has((p.tema ?? "").trim().toLowerCase())).map((p) => p.id)
+      : // Sem nenhuma atribuição (modelo ignorou o campo): mantém o
+        // comportamento antigo pra não deixar pedido preso na fila pra sempre.
+        pedidos.map((p) => p.id);
+    if (!atendidos.size) {
+      console.error(
+        "[gerador-sugestoes] agente não devolveu `atende_pedido` — marcando todos os pedidos como usados",
+        { franqueadaId: params.franqueadaId, pedidos: pedidos.length },
+      );
+    }
+    if (idsAtendidos.length) {
+      await admin
+        .from("briefings_franqueada")
+        .update({
+          status: "usado",
+          usado_em: new Date().toISOString(),
+          semana_alvo: params.semanaRef,
+        } as never)
+        .in("id", idsAtendidos);
+    }
   }
 
   return { criadas };

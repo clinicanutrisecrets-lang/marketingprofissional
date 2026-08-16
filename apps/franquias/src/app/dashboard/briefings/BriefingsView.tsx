@@ -201,8 +201,9 @@ export default function BriefingsView({
           </h2>
           {pendentes.length === 0 ? (
             <div className="rounded-2xl bg-white p-6 text-center text-sm text-brand-text/50 shadow-sm">
-              Sem pedidos pendentes. Adicione temas acima — quando o cron rodar
-              domingo, eles entram no pacote.
+              Nenhum tema esperando. Os que você já pediu e viraram post estão
+              logo abaixo, no histórico — com o link pra vê-los no Estúdio.
+              Adicione temas acima e eles entram no pacote do próximo domingo.
             </div>
           ) : (
             <div className="space-y-3">
@@ -233,12 +234,29 @@ export default function BriefingsView({
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="text-brand-text">{b.tema}</div>
+                      {/* "Usado em 15/08" não dizia ONDE o tema saiu, e a nutri
+                          ficava esperando um post que já estava pronto no
+                          Estúdio ("será que é porque ainda não tá pronto?").
+                          Agora diz o pacote e leva até ele. */}
                       <div className="mt-1 text-xs text-brand-text/50">
-                        {b.status === "usado"
-                          ? `Usado em ${formatarData(b.usado_em)}`
-                          : b.status === "cancelado"
-                            ? `Cancelado em ${formatarData(b.cancelado_em)}`
-                            : `Expirou — não entrou em nenhuma semana`}
+                        {b.status === "usado" ? (
+                          <>
+                            {b.semana_alvo
+                              ? `Virou post no pacote da semana de ${formatarSemana(b.semana_alvo)}`
+                              : `Virou post em ${formatarData(b.usado_em)}`}{" "}
+                            ·{" "}
+                            <Link
+                              href="/dashboard/conteudo"
+                              className="text-brand-primary underline"
+                            >
+                              ver no Estúdio
+                            </Link>
+                          </>
+                        ) : b.status === "cancelado" ? (
+                          `Cancelado em ${formatarData(b.cancelado_em)}`
+                        ) : (
+                          `Expirou — não entrou em nenhuma semana`
+                        )}
                       </div>
                     </div>
                     <StatusBadge status={b.status} />
@@ -324,6 +342,20 @@ function formatarData(iso: string | null): string {
   return new Date(iso).toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
+  });
+}
+
+/**
+ * "2026-08-17" -> "17 de agosto". Data pura (sem hora): parseia como local,
+ * senão o new Date() de "YYYY-MM-DD" vira UTC meia-noite e volta um dia no
+ * Brasil — a semana de 17 apareceria como 16.
+ */
+function formatarSemana(data: string): string {
+  const [ano, mes, dia] = data.split("-").map(Number);
+  if (!ano || !mes || !dia) return data;
+  return new Date(ano, mes - 1, dia).toLocaleDateString("pt-BR", {
+    day: "numeric",
+    month: "long",
   });
 }
 
