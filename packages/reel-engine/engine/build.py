@@ -264,25 +264,45 @@ def c_virada(S, c, fi, n):
     sig(d, PAPER, 150)
     return flatten(sh, base)
 
+def _acao_f(d, txt, x):
+    """Fonte da etiqueta de ação, encolhida até caber entre o ícone e a margem."""
+    for s in range(40, 23, -2):
+        f = body_f(s, "Bold")
+        if tw(d, txt, f)/SS <= (SAFE_R - x):
+            return f
+    return body_f(24, "Bold")
+
+
 def c_cta(S, c, fi, n):
     sec=fi/FPS
     base=vgrad(ROSE,(150,44,78)); sh,d=new_sharp()
     helix(d, 830, 1180, 860, 120, sec*ROT, PAPER, PAPER, alpha=34)
     eyebrow(d, "leva com você", PAPER)
+    # 🔴 Esta cena desenhava as quatro frases FIXAS no código e ignorava o que o
+    # agente escrevia — o convite de investigação da linha editorial ("Quer
+    # investigar sua saúde com precisão? Me chama no direct") nunca chegava ao
+    # vídeo. Agora o SPEC manda: l1/l2 são as perguntas, acao1/acao2 as
+    # etiquetas ao lado dos ícones. Os ícones seguem fixos (avião = enviar/
+    # direct, marcador = salvar), então a etiqueta deve combinar com o gesto.
+    # Sem os campos, cai no texto de sempre — reel antigo não muda de cara.
+    l1 = (c.get("l1") or "").strip() or "Conhece alguém que precisa saber disso?"
+    l2 = (c.get("l2") or "").strip() or "Vai querer consultar depois?"
+    acao1 = ((c.get("acao1") or "").strip() or "COMPARTILHE").upper()
+    acao2 = ((c.get("acao2") or "").strip() or "SALVE").upper()
     a1=int(255*fx(sec,0))
-    headline(d, "Conhece alguém que precisa saber disso?", 300, 56, PAPER+(a1,), maxw=720)
+    headline(d, l1, 300, 56, PAPER+(a1,), maxw=720)
     ap=fx(sec,0.55,0.55)
     if ap>0:
         aa=int(255*ap); icx=118+(1-ap)*-90+math.sin(sec*2.4)*7
         badge(d, icx, 620, 52, PAPER, aa); plane(d, icx+3, 620, 52, ROSE, aa)
-        d.text(((icx+80)*SS, 594*SS), "COMPARTILHE", font=body_f(40,"Bold"), fill=PAPER+(aa,))
+        d.text(((icx+80)*SS, 594*SS), acao1, font=_acao_f(d, acao1, icx+80), fill=PAPER+(aa,))
     a2=int(255*fx(sec,1.25))
-    headline(d, "Vai querer consultar depois?", 830, 56, PAPER+(a2,), maxw=720)
+    headline(d, l2, 830, 56, PAPER+(a2,), maxw=720)
     bp=fx(sec,1.85,0.55)
     if bp>0:
         ba=int(255*bp); icy=1090+(1-bp)*-70+math.sin(sec*2.4+1.2)*5
         badge(d, 118, icy, 52, PAPER, ba); bookmark(d, 118, icy, 50, ROSE, ba)
-        d.text((198*SS,(icy-26)*SS), "SALVE", font=body_f(40,"Bold"), fill=PAPER+(ba,))
+        d.text((198*SS,(icy-26)*SS), acao2, font=_acao_f(d, acao2, 198), fill=PAPER+(ba,))
     a3=int(255*fx(sec,2.5,0.5)); f3=body_f(25,"Regular")
     d.text((SAFE_L*SS,1380*SS), S["assinatura"], font=f3, fill=PAPER+(int(a3*.72),))
     d.text((SAFE_L*SS,1418*SS), "Conteúdo educativo · avaliação individualizada",

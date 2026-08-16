@@ -37,7 +37,7 @@ FORMATO EXATO (siga à risca — o renderizador é rígido):
   {"tipo":"nota","dur":6.6,"cor":"TIFFANY","glifos":["espinafre","cacau","ovo"],"texto":"Por que a combinação funciona, em 2 frases."},
   {"tipo":"marcadores","dur":7.0,"cor":"ROXO","eyebrow":"exame de sangue","titulo":"O que investigar","itens":[{"nome":"Ferritina","faixa":"ideal 70-150"},{"nome":"Vitamina D","faixa":"ideal 40-60"},{"nome":"TSH","faixa":"ideal < 2,5"}]},
   {"tipo":"virada","dur":5.0,"l1":"Primeira linha grande.","l2":"Segunda linha grande — o reenquadramento.","texto":"1-2 frases curtas que sustentam a virada."},
-  {"tipo":"cta","dur":5.0,"l1":"Compartilhe com quem precisa.","l2":"Salve para consultar depois."}
+  {"tipo":"cta","dur":5.0,"l1":"Pergunta que convida a investigar.","acao1":"ME CHAMA NO DIRECT","l2":"Segunda pergunta, pra quem não vai agir agora.","acao2":"SALVE ESTE REEL"}
  ]
 }
 
@@ -46,7 +46,7 @@ REGRAS DURAS:
 - alvo: uma de: head, eyes, neck, chest, belly, hips.
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
-- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção — l1 e l2 são as DUAS linhas grandes (ex.: l1 "Não é força de vontade." / l2 "É informação que você ainda não investigou.") e "texto" é o parágrafo de apoio. A cena "cta" é a última: hoje ela desenha um convite fixo de compartilhar/salvar, então l1 e l2 dela não aparecem no vídeo — escreva mesmo assim (curtos, no tom de investigação), pois é o que a legenda do post reaproveita.
+- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção — l1 e l2 são as DUAS linhas grandes (ex.: l1 "Não é força de vontade." / l2 "É informação que você ainda não investigou.") e "texto" é o parágrafo de apoio. A cena "cta" é a última e convida pra investigação: l1 é a pergunta principal (ex.: "Quer investigar sua saúde com precisão?") e acao1 a etiqueta em CAIXA ALTA ao lado do ícone de AVIÃO/enviar (ex.: "ME CHAMA NO DIRECT"); l2 é a segunda pergunta, pra quem ainda não vai agir agora (ex.: "Vai querer consultar isso depois?") e acao2 a etiqueta ao lado do ícone de MARCADOR/salvar (ex.: "SALVE ESTE REEL"). Cada etiqueta tem no máximo 18 caracteres e precisa combinar com o gesto do seu ícone. Varie as palavras a cada reel.
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
 `.trim();
 
