@@ -69,6 +69,33 @@ export default async function DashboardPage() {
         </p>
       </header>
 
+      {/* Guia do Estúdio — logo abaixo da saudação, antes do CTA. A Aline pediu
+          que ele chame atenção e fique SEMPRE à mão (16/08): a profissional que
+          não entende como o conteúdo é criado não confia no que recebe.
+          O PDF é servido pelo Scanner, que é onde ele vive versionado. */}
+      <a
+        href="https://scannerdasaude.com/guia-estudio-conteudo.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mb-4 flex items-center gap-4 rounded-2xl border-2 border-dashed border-brand-primary/40 bg-white p-4 transition hover:border-brand-primary hover:bg-brand-primary/5"
+      >
+        <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/10 text-xl">
+          📘
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold text-brand-text">
+            Primeira vez aqui? Comece pelo guia
+          </span>
+          <span className="mt-0.5 block text-[13px] leading-snug text-brand-text/60">
+            Como o seu conteúdo é criado toda semana, o que muda em cada formato
+            e o que fazer com o pacote. 7 páginas.
+          </span>
+        </span>
+        <span className="flex-shrink-0 rounded-lg bg-brand-primary/10 px-3 py-2 text-[13px] font-semibold text-brand-primary">
+          Abrir guia →
+        </span>
+      </a>
+
       {/* CTA principal */}
       <Link
         href="/dashboard/conteudo"
