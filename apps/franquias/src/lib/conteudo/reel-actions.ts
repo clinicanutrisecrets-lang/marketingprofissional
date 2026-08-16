@@ -36,7 +36,7 @@ FORMATO EXATO (siga à risca — o renderizador é rígido):
   {"tipo":"sinergia","dur":10.6,"cor":"TIFFANY","titulo":"Título da sinergia","itens":[{"glifo":"espinafre","nome":"Espinafre cozido","qtd":"1 xícara","freq":"todos os dias"},{"glifo":"cacau","nome":"Cacau 70%","qtd":"20 g","freq":"todos os dias"},{"glifo":"ovo","nome":"Ovos","qtd":"2 unidades","freq":"5x por semana"}]},
   {"tipo":"nota","dur":6.6,"cor":"TIFFANY","glifos":["espinafre","cacau","ovo"],"texto":"Por que a combinação funciona, em 2 frases."},
   {"tipo":"marcadores","dur":7.0,"cor":"ROXO","eyebrow":"exame de sangue","titulo":"O que investigar","itens":[{"nome":"Ferritina","faixa":"ideal 70-150"},{"nome":"Vitamina D","faixa":"ideal 40-60"},{"nome":"TSH","faixa":"ideal < 2,5"}]},
-  {"tipo":"virada","dur":5.0,"texto":"A frase que reenquadra tudo em 1-2 linhas."},
+  {"tipo":"virada","dur":5.0,"l1":"Primeira linha grande.","l2":"Segunda linha grande — o reenquadramento.","texto":"1-2 frases curtas que sustentam a virada."},
   {"tipo":"cta","dur":5.0,"l1":"Compartilhe com quem precisa.","l2":"Salve para consultar depois."}
  ]
 }
@@ -46,7 +46,7 @@ REGRAS DURAS:
 - alvo: uma de: head, eyes, neck, chest, belly, hips.
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
-- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção (ex.: "Não é força de vontade. É informação que você ainda não investigou."). A cena "cta" convida pra investigação: l1 tipo "Quer investigar sua saúde com precisão?", l2 tipo "Me chama no direct ou toca no link da bio." (varie as palavras).
+- LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção — l1 e l2 são as DUAS linhas grandes (ex.: l1 "Não é força de vontade." / l2 "É informação que você ainda não investigou.") e "texto" é o parágrafo de apoio. A cena "cta" é a última: hoje ela desenha um convite fixo de compartilhar/salvar, então l1 e l2 dela não aparecem no vídeo — escreva mesmo assim (curtos, no tom de investigação), pois é o que a legenda do post reaproveita.
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
 `.trim();
 

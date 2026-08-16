@@ -24,3 +24,7 @@ next-env.d.ts
 coverage
 *.tsbuildinfo
 .claude/
+
+# artefatos do Python (motor de reels)
+__pycache__/
+*.pyc

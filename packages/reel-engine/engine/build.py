@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Motor genérico de reels Nutri Secrets, dirigido por SPEC declarativo."""
-import math, os, sys, shutil, subprocess, time
+import math, os, re, sys, shutil, subprocess, tempfile, time
 from PIL import Image, ImageDraw, ImageFilter
 from core import *
 from ui import *
@@ -221,15 +221,46 @@ def c_marcadores(S, c, fi, n):
     sig(d)
     return flatten(sh, base)
 
+def _virada_linhas(c):
+    """Devolve (l1, l2, corpo) da cena de virada a partir do que o agente mandou.
+
+    Aceita as duas formas: {l1, l2, texto} (o desenho original) e {texto}
+    sozinho (o que o prompt vinha gerando). No segundo caso, quebra a frase na
+    fronteira de sentença mais próxima do meio — a virada é sempre 1-2 frases,
+    então isso cai naturalmente em duas linhas grandes.
+    """
+    l1 = (c.get("l1") or "").strip()
+    l2 = (c.get("l2") or "").strip()
+    corpo = (c.get("texto") or "").strip()
+    if l1:
+        return l1, l2, corpo
+    if not corpo:
+        return "", "", ""
+    partes = [p.strip() for p in re.split(r'(?<=[.!?])\s+', corpo) if p.strip()]
+    if len(partes) >= 2:
+        meio = len(partes) // 2
+        return " ".join(partes[:meio]), " ".join(partes[meio:]), ""
+    return corpo, "", ""
+
+
 def c_virada(S, c, fi, n):
     sec=fi/FPS
     base=bg_ink(); sh,d=new_sharp()
     helix(d, 800, 1080, 900, 130, sec*ROT, MUSTARD, TIFFANY, alpha=70)
     a=int(255*fx(sec,0)); a2=int(255*fx(sec,1.05)); a3=int(210*fx(sec,2.0,0.5))
-    headline(d, c["l1"], 470, 62, PAPER+(a,), maxw=760)
-    headline(d, c["l2"], 626, 62, MUSTARD+(a2,), maxw=760)
+    # 🔴 Esta cena exigia l1 + l2 + texto, mas o prompt do agente só mandava
+    # "texto" — resultado: KeyError('l1') e o reel INTEIRO morria, em toda
+    # geração (a virada está nos dois formatos, 30s e 60s). O prompt foi
+    # corrigido, e aqui a cena passou a se virar com o que chegar: sem l1/l2,
+    # ela parte o texto em duas linhas grandes. Cena de vídeo não pode derrubar
+    # 10 minutos de render por um campo que o modelo esqueceu.
+    l1, l2, corpo = _virada_linhas(c)
+    headline(d, l1, 470, 62, PAPER+(a,), maxw=760)
+    if l2:
+        headline(d, l2, 626, 62, MUSTARD+(a2,), maxw=760)
     f=body_f(31,"Regular")
-    para(d, SAFE_L, 830, c["texto"], f, PAPER+(a3,), 700)
+    if corpo:
+        para(d, SAFE_L, 830, corpo, f, PAPER+(a3,), 700)
     sig(d, PAPER, 150)
     return flatten(sh, base)
 
@@ -299,8 +330,16 @@ def c_cta_anuncio(S, c, fi, n):
 TIPOS = {"hook":c_hook, "cta_anuncio":c_cta_anuncio, "sintoma":c_sintoma, "gene":c_gene, "sinergia":c_sinergia, "nota":c_nota,
          "marcadores":c_marcadores, "virada":c_virada, "cta":c_cta}
 
-def render(SPEC, out_mp4, workdir="/home/claude/_reel_build"):
-    shutil.rmtree(workdir, ignore_errors=True); os.makedirs(workdir)
+def render(SPEC, out_mp4, workdir=None):
+    # 🔴 O default era "/home/claude/_reel_build" — caminho da máquina onde o
+    # motor foi escrito, que NÃO existe no runner do GitHub. Todo render morria
+    # em 35s com PermissionError: [Errno 13] Permission denied: '/home/claude'
+    # (o passo que marca 'erro' no banco roda depois, então a nutri via
+    # "erro — tente de novo" pra sempre, sem pista do motivo). Agora o padrão é
+    # uma pasta temporária do próprio sistema, que funciona em qualquer lugar.
+    if workdir is None:
+        workdir = os.path.join(tempfile.gettempdir(), "_reel_build")
+    shutil.rmtree(workdir, ignore_errors=True); os.makedirs(workdir, exist_ok=True)
     idx=0; t0=time.time()
     for ci,c in enumerate(SPEC["cenas"]):
         fn=TIPOS[c["tipo"]]; N=int(round(c["dur"]*FPS))
