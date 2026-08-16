@@ -509,6 +509,7 @@ def junta_clipes(clipes, tmp):
     precisa caber nele.
     """
     partes = []
+    avisa_repeticao(clipes)
     for i, c in enumerate(clipes):
         p = tmp / f"c{i}.mp4"
         corte = []
@@ -534,6 +535,24 @@ def junta_clipes(clipes, tmp):
         "ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
         "-i", str(lista), "-c", "copy", str(juntos)], check=True)
     return juntos
+
+
+def avisa_repeticao(clipes):
+    """Grita quando dois cortes pegam o mesmo pedaço do mesmo clipe.
+
+    Esticar o roteiro repetindo plano é a saída fácil quando falta
+    material, e na tela vira o vídeo "indo e voltando na mesma cena".
+    Quem monta não percebe olhando o JSON — daí o aviso vir do código.
+    """
+    vistos = {}
+    for i, c in enumerate(clipes):
+        de, ate = c["trecho"] if c.get("trecho") else (0, dur_video(c["video"]))
+        for j, (d2, a2) in vistos.get(c["video"], []):
+            if ate > d2 and de < a2:
+                print(f"aviso: o corte {i} repete o {j} — "
+                      f"{Path(c['video']).name} {de}-{ate} já entrou como "
+                      f"{d2}-{a2}", file=sys.stderr)
+        vistos.setdefault(c["video"], []).append((i, (de, ate)))
 
 
 def main():

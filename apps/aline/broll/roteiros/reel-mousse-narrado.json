@@ -1,5 +1,5 @@
 {
-  "_": "Mousse de abacate. Os cortes seguem a narracao, nao a ordem da receita: o sal cai quando ela diz flor de sal.",
+  "_": "Mousse de abacate. Cada cena entra uma vez: repetir plano dentro do mesmo video aparece como bug. Os cortes seguem a narracao.",
   "saida": [
     720,
     1280
@@ -34,7 +34,7 @@
         0.0,
         4.2
       ],
-      "velocidade": 0.866
+      "velocidade": 0.822
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -42,15 +42,23 @@
         4.2,
         7.4
       ],
-      "velocidade": 0.866
+      "velocidade": 0.822
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
       "trecho": [
-        0.0,
-        2.3
+        6.5,
+        11.5
       ],
-      "velocidade": 0.866
+      "velocidade": 0.93
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/2021b55d-hf_20260815_210016_5bf105633e3448569191f16fc0ee3225.mp4",
+      "trecho": [
+        0.3,
+        5.0
+      ],
+      "velocidade": 0.93
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -58,7 +66,7 @@
         11.5,
         16.0
       ],
-      "velocidade": 0.753
+      "velocidade": 0.93
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -66,15 +74,7 @@
         16.0,
         19.0
       ],
-      "velocidade": 0.753
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
-      "trecho": [
-        8.0,
-        11.5
-      ],
-      "velocidade": 0.753
+      "velocidade": 0.93
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -82,15 +82,7 @@
         7.4,
         12.2
       ],
-      "velocidade": 0.835
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
-      "trecho": [
-        8.8,
-        10.6
-      ],
-      "velocidade": 0.835
+      "velocidade": 0.889
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -98,23 +90,7 @@
         2.3,
         8.0
       ],
-      "velocidade": 0.939
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
-      "trecho": [
-        9.4,
-        11.4
-      ],
-      "velocidade": 0.939
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
-      "trecho": [
-        4.2,
-        7.4
-      ],
-      "velocidade": 0.955
+      "velocidade": 0.851
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -122,15 +98,23 @@
         0.0,
         2.3
       ],
-      "velocidade": 0.955
+      "velocidade": 0.947
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
-        12.5,
-        16.0
+        8.0,
+        11.5
       ],
-      "velocidade": 0.955
+      "velocidade": 0.947
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+      "trecho": [
+        0.2,
+        5.5
+      ],
+      "velocidade": 0.947
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -138,7 +122,7 @@
         12.2,
         13.7
       ],
-      "velocidade": 0.955
+      "velocidade": 0.947
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -154,7 +138,7 @@
         16.3,
         20.0
       ],
-      "velocidade": 0.961
+      "velocidade": 0.962
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
@@ -162,7 +146,7 @@
         0.3,
         4.0
       ],
-      "velocidade": 0.961
+      "velocidade": 0.962
     }
   ],
   "abertura": {
