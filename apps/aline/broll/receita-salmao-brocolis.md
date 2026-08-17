@@ -35,6 +35,9 @@ o desfecho, não.
 
 ## Texto para gravar (~85s)
 
+Sem travessão e sem ponto e vírgula: o texto é pra ser lido em voz
+alta, e os dois travam a leitura tanto quanto travam na tela.
+
 Escrito pra ser lido em voz alta, na cadência dos outros. Adapta o que
 quiser — o motor sincroniza a legenda pelo áudio que você mandar.
 
@@ -49,9 +52,9 @@ O brócolis ainda traz folato. Se a sua paciente tem MTHFR, esse folato entra na
 
 Agora o salmão. O FADS1 diz quem converte bem o ômega três vegetal e quem não converte. Quem não converte precisa da fonte pronta, e é exatamente isso que o salmão é. EPA e DHA direto, sem depender de conversão.
 
-O salmão também é vitamina D. E o VDR muda o quanto essa vitamina D rende. Só que o VDR não trabalha sozinho: ele faz par com o receptor de retinoide. Sem vitamina A adequada, esse par não fecha e o sinal não acontece. Então vitamina D e vitamina A andam juntas.
+O salmão também é vitamina D. E o VDR muda o quanto essa vitamina D rende. Só que o VDR não trabalha sozinho. Ele faz par com o receptor de retinoide. Sem vitamina A adequada, esse par não fecha e o sinal não acontece. Então vitamina D e vitamina A andam juntas.
 
-E a dose importa tanto quanto o valor. Dose menor e mais frequente sustenta melhor do que dose alta uma vez por semana. O bolus sobe e desce; o que o receptor quer é constância.
+E a dose importa tanto quanto o valor. Dose menor e mais frequente sustenta melhor do que dose alta uma vez por semana. O bolus sobe e desce. O que o receptor quer é constância.
 
 E tem o selênio, que é cofator da glutationa peroxidase. Quem tem variante no GPX1 depende mais do selênio que vem da dieta.
 

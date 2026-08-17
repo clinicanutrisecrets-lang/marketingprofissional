@@ -443,6 +443,13 @@ tem que ir pro código.** Num pipeline automático isso deixa de ser
 conforto e vira requisito — escolha a olho, em escala, produz dezenas de
 vídeos com a legenda em cima do rosto.
 
+### Nada de travessão
+
+Nem na legenda nem no texto de gravação. Na tela o travessão come largura
+e quebra a linha num lugar ruim; na leitura em voz alta ele pede uma pausa
+que ela não faz. Duas frases curtas com ponto resolvem melhor os dois
+casos. Ponto e vírgula, idem.
+
 ### Onde a legenda pousa
 
 A ordem é essa, e vale pra qualquer clipe novo sem ninguém configurar
