@@ -196,7 +196,7 @@
         3.0,
         8.5
       ],
-      "velocidade": 0.925
+      "velocidade": 0.95
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
@@ -204,7 +204,7 @@
         8.6,
         11.85
       ],
-      "velocidade": 0.925
+      "velocidade": 0.95
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
@@ -212,15 +212,15 @@
         11.95,
         15.0
       ],
-      "velocidade": 0.925
+      "velocidade": 0.95
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/0ee34dfc-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d_2.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
       "trecho": [
-        3.0,
-        6.0
+        8.5,
+        11.9
       ],
-      "velocidade": 0.925
+      "velocidade": 0.95
     }
   ],
   "abertura": {

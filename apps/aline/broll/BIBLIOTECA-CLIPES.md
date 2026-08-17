@@ -63,7 +63,11 @@ ffmpeg -i clipe.mp4 -filter_complex "select='gt(scene,0.3)',metadata=print" -an 
 ## Trechos a evitar
 
 - `micro` 0-6s: o monitor atravessa o quadro
-- `consult3` 0-3s: verso do monitor
+- `consult3` inteiro: perfil fechado, o rosto ocupa um terço do quadro e a
+  pele aparece com detalhe demais. Os 3 primeiros segundos ainda pegam o
+  verso do monitor
+- `consult2` 3-6s: o mesmo perfil fechado da `consult3` (é a segunda cena
+  do clipe — cortar em 2,9)
 - `centrifuga` 10-16s: micro em zoom exagerado
 - `centrifuga` 17-19s: enquadramento da cozinha que ela não gostou
 - `consulta.mp4` (16:9) 40,5-44s: o sorriso que a IA deformou
@@ -72,6 +76,17 @@ ffmpeg -i clipe.mp4 -filter_complex "select='gt(scene,0.3)',metadata=print" -an 
 - `bolo`: é torta de chocolate. Serve de dia a dia, nunca de
   ilustração de outra receita — apareceu no reel da mousse e no da
   aveia e as duas vezes foi a primeira coisa que ela viu
+
+## Plano dela em quadro
+
+Quando o vídeo precisa mostrar a Aline, o plano é o **frontal médio da
+`consult1`**: ela de frente na mesa, o rosto ocupando pouco do quadro.
+Perfil fechado não entra — a câmera chega perto demais da pele e é a
+primeira coisa que ela vê no vídeo pronto.
+
+Os planos dela que servem: `consult1` inteira (frontal), `consult2` 0-2,9
+(aberto, no computador), `lab` (jaleco, bancada), `centrifuga` 0-9,8,
+`micro` 6-20. Todos com o rosto pequeno no quadro ou de longe.
 
 ## O que falta gerar
 
