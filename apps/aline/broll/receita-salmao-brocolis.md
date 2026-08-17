@@ -16,8 +16,9 @@ todo mundo faz (o salmão).
 | **mirosinase** (não é gene, é a enzima do próprio brócolis) | a glucorafanina só vira sulforafano quando a mirosinase age, e ela desnatura no calor alto | vapor curto, 3 a 5 minutos; fervido em água perde o composto que interessa |
 | **NRF2** (via) | o sulforafano é o indutor alimentar mais estudado dessa via de defesa antioxidante | é o mecanismo, não uma variante a testar |
 | **GSTM1** | a deleção (genótipo nulo) muda a velocidade de conjugação e excreção do sulforafano — a exposição não é a mesma em duas pessoas | quem é nulo mantém o composto por mais tempo na circulação; a frequência do brócolis na semana muda com isso |
+| **vitamina C** (não é gene, é o cofator da via) | o GST conjuga a glutationa **reduzida**; a vitamina C é o que sustenta o par reduzido/oxidado a favor da forma que a enzima usa | o limão do prato deixa de ser enfeite: brócolis e limão juntos são a via inteira, não combinação de sabor |
 | **FADS1** | dessaturase que converte ALA em EPA e DHA; quem carrega a variante converte pouco | fonte pronta, e é exatamente o que o salmão é — não depende de conversão |
-| **VDR** | receptor da vitamina D: a mesma dose rende diferente | o salmão é fonte alimentar, e a refeição com gordura melhora a absorção |
+| **VDR** | o receptor não age sozinho: ele forma par com o RXR, o receptor de retinoide. Sem vitamina A adequada o par não fecha e o sinal não acontece | vitamina A junto, e **dose menor e mais frequente** em vez de dose alta uma vez por semana — o bolus sobe e desce, a dose fracionada sustenta |
 | **GPX1** | glutationa peroxidase, selênio-dependente | o selênio do salmão é cofator; variante depende mais do aporte alimentar |
 | **MTHFR** | o brócolis também é fonte de folato alimentar | entra na conta junto com a forma ativa prescrita |
 
@@ -48,9 +49,13 @@ O brócolis ainda traz folato. Se a sua paciente tem MTHFR, esse folato entra na
 
 Agora o salmão. O FADS1 diz quem converte bem o ômega três vegetal e quem não converte. Quem não converte precisa da fonte pronta, e é exatamente isso que o salmão é. EPA e DHA direto, sem depender de conversão.
 
-O salmão também é vitamina D. E o VDR muda o quanto essa vitamina D rende. A mesma dose não faz o mesmo efeito em duas pessoas. E como ela é lipossolúvel, a gordura do próprio peixe já ajuda na absorção.
+O salmão também é vitamina D. E o VDR muda o quanto essa vitamina D rende. Só que o VDR não trabalha sozinho: ele faz par com o receptor de retinoide. Sem vitamina A adequada, esse par não fecha e o sinal não acontece. Então vitamina D e vitamina A andam juntas.
+
+E a dose importa tanto quanto o valor. Dose menor e mais frequente sustenta melhor do que dose alta uma vez por semana. O bolus sobe e desce; o que o receptor quer é constância.
 
 E tem o selênio, que é cofator da glutationa peroxidase. Quem tem variante no GPX1 depende mais do selênio que vem da dieta.
+
+Agora repara no limão. Ele não é enfeite. A vitamina C mantém a glutationa na forma reduzida, que é justamente o substrato que o GST usa pra conjugar. Brócolis e limão no mesmo prato não é combinação de sabor. É a via inteira.
 
 Repara: nada disso é o alimento sozinho. É o alimento, o gene e o modo de preparo. Trocar a fervura pelo vapor não é detalhe de cozinha. É conduta.
 
@@ -64,6 +69,7 @@ Quer aprender a fazer essa leitura na sua consulta? Vem para o imersivo de nutri
 - **FADS1** → "fads-um"
 - **NRF2** → "êne-erre-efe-dois"
 - **VDR** → dá pra dizer "receptor da vitamina D", que soa melhor em consulta
+- **RXR** → "receptor de retinoide" evita soletrar mais uma sigla na mesma frase
 
 O `corrige_transcricao.py` já conhece esses nomes, então mesmo que o
 reconhecimento erre na hora de virar legenda, a tela sai certa.

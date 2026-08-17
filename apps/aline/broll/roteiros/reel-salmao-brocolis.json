@@ -21,7 +21,12 @@
     "mthfr",
     "vapor",
     "gene",
-    "via"
+    "via",
+    "vitamina",
+    "glutationa",
+    "gst",
+    "reduzida",
+    "dose"
   ],
   "abertura": {
     "chapeu": "Nutricionista",
@@ -99,9 +104,9 @@
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
       "trecho": [
         0.2,
-        4.2
+        4.15
       ],
-      "velocidade": 0.9
+      "velocidade": 0.773
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e36c0de8-hf_20260816_153241_6ff17c283a2e4e83a163c5ca54d72ae9.mp4",
@@ -109,13 +114,13 @@
         15.15,
         20.05
       ],
-      "velocidade": 0.8
+      "velocidade": 0.72
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
       "trecho": [
         5.0,
-        8.5
+        11.0
       ],
       "velocidade": 0.9
     }
@@ -138,11 +143,11 @@
     },
     {
       "de": 12.2,
-      "ate": 15.0,
+      "ate": 15.2,
       "texto": "O GSTM1 muda a velocidade\ncom que você elimina o sulforafano."
     },
     {
-      "de": 15.2,
+      "de": 15.4,
       "ate": 17.4,
       "texto": "Mesmo prato, exposição diferente."
     },
@@ -157,24 +162,29 @@
       "texto": "É exatamente o que o salmão é."
     },
     {
-      "de": 24.3,
-      "ate": 28.3,
+      "de": 24.4,
+      "ate": 28.9,
       "texto": "O selênio do salmão\né cofator da GPX1."
     },
     {
-      "de": 28.9,
-      "ate": 32.5,
-      "texto": "E o VDR muda o quanto\na vitamina D dele rende."
+      "de": 29.6,
+      "ate": 32.3,
+      "texto": "O limão não é enfeite: a vitamina C\nmantém a glutationa reduzida,"
     },
     {
-      "de": 32.7,
-      "ate": 34.5,
-      "texto": "Vitamina D pede gordura\nna mesma refeição."
+      "de": 32.5,
+      "ate": 35.8,
+      "texto": "que é o substrato que o GST usa."
     },
     {
-      "de": 34.9,
-      "ate": 38.4,
-      "texto": "Não é o alimento sozinho.\nÉ o alimento, o gene e o preparo."
+      "de": 36.4,
+      "ate": 39.4,
+      "texto": "E o VDR pede vitamina A junto:\nsozinho ele não fecha."
+    },
+    {
+      "de": 39.6,
+      "ate": 42.4,
+      "texto": "Vitamina D em dose menor e mais\nfrequente, não em dose alta semanal."
     }
   ],
   "fecho": {
