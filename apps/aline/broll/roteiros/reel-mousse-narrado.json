@@ -32,17 +32,25 @@
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
         0.0,
-        4.2
+        4.05
       ],
-      "velocidade": 0.822
+      "velocidade": 0.88
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
+      "trecho": [
+        0.3,
+        2.5
+      ],
+      "velocidade": 0.88
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
       "trecho": [
-        4.2,
-        7.4
+        4.1,
+        7.35
       ],
-      "velocidade": 0.822
+      "velocidade": 0.812
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
@@ -50,7 +58,7 @@
         6.5,
         11.5
       ],
-      "velocidade": 0.93
+      "velocidade": 0.844
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/2021b55d-hf_20260815_210016_5bf105633e3448569191f16fc0ee3225.mp4",
@@ -58,39 +66,15 @@
         0.3,
         5.0
       ],
-      "velocidade": 0.93
+      "velocidade": 0.844
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/3f0c9d57-hf_20260812_202957_26ed3f01ad4541e4851ff3ecd53ae28d.mp4",
       "trecho": [
-        11.5,
-        16.0
+        0.2,
+        2.9
       ],
-      "velocidade": 0.93
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
-      "trecho": [
-        16.0,
-        19.0
-      ],
-      "velocidade": 0.93
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
-      "trecho": [
-        7.4,
-        12.2
-      ],
-      "velocidade": 0.889
-    },
-    {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
-      "trecho": [
-        2.3,
-        8.0
-      ],
-      "velocidade": 0.851
+      "velocidade": 0.844
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
@@ -98,31 +82,55 @@
         0.0,
         2.3
       ],
-      "velocidade": 0.947
+      "velocidade": 0.848
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "trecho": [
+        7.4,
+        11.8
+      ],
+      "velocidade": 0.848
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        2.3,
+        8.0
+      ],
+      "velocidade": 0.878
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
         8.0,
+        9.5
+      ],
+      "velocidade": 0.878
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
+      "trecho": [
+        9.5,
         11.5
       ],
-      "velocidade": 0.947
+      "velocidade": 0.783
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
-        0.2,
-        5.5
+        11.5,
+        16.0
       ],
-      "velocidade": 0.947
+      "velocidade": 0.783
     },
     {
-      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c59b4266-hf_20260813_001340_596d1cbab1c04dc79b8a1d79fa72dfbe.mp4",
       "trecho": [
-        12.2,
-        13.7
+        16.0,
+        19.0
       ],
-      "velocidade": 0.947
+      "velocidade": 0.968
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -130,7 +138,7 @@
         13.7,
         16.3
       ],
-      "velocidade": 0.963
+      "velocidade": 0.897
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/b1e0be50-hf_20260814_024718_2d8148774fb64668a1f81b2fbe9be810.mp4",
@@ -138,15 +146,15 @@
         16.3,
         20.0
       ],
-      "velocidade": 0.962
+      "velocidade": 0.944
     },
     {
       "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
       "trecho": [
-        0.3,
-        4.0
+        2.5,
+        5.5
       ],
-      "velocidade": 0.962
+      "velocidade": 0.944
     }
   ],
   "abertura": {

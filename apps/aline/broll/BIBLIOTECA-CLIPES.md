@@ -34,6 +34,32 @@ duração da narração — o microscópio ficava parado tempo demais e a comida
 não batia com a fala da receita. Cruzando o acervo, o "Meu dia" saiu a
 **velocidade natural**, e as receitas caíram de 0,51× para ~0,80×.
 
+## Clipes multi-cena
+
+Metade do banco não é um plano só. `video/cenas.json` guarda os cortes
+internos detectados, e o motor avisa quando um `trecho` atravessa um
+deles — foi assim que o mesmo café entrou duas vezes no reel da aveia.
+
+| clipe | cortes em | cenas |
+|---|---|---|
+| `lab` | 4,21 · 8,58 · 11,88 | laboratório · **café na janela** · balança · cozinha |
+| `mousseB` | 4,08 · 7,38 · 11,83 | ingredientes · cacau e nibs · abacate com mel · mousse pronta, sal e colher |
+| `aveia2` | 4,25 · 11,71 | geladeira · pote aberto até a colher entrar · colher levantando |
+| `centrifuga` | 9,83 · 17,04 | centrífuga · micro em zoom (evitar) · cozinha (evitar) |
+| `consult2` | 2,96 | dois enquadramentos |
+| `consult3` | 2,96 | verso do monitor (evitar) · ela de frente |
+
+Os demais (`micro`, `bolo`, `mousseA`, `aveia1`, `aveia3`, `consult1`)
+são tomada única: dentro deles a montagem só pode andar pra frente, e
+voltar a um ponto já mostrado quebra a continuidade — a mousse não
+volta a ser verde.
+
+Regenerar `cenas.json` quando entrar clipe novo:
+
+```bash
+ffmpeg -i clipe.mp4 -filter_complex "select='gt(scene,0.3)',metadata=print" -an -f null -
+```
+
 ## Trechos a evitar
 
 - `micro` 0-6s: o monitor atravessa o quadro

@@ -537,22 +537,67 @@ def junta_clipes(clipes, tmp):
     return juntos
 
 
-def avisa_repeticao(clipes):
-    """Grita quando dois cortes pegam o mesmo pedaço do mesmo clipe.
+def cenas_de(video):
+    """Onde estão os cortes internos de um clipe, em segundos.
 
-    Esticar o roteiro repetindo plano é a saída fácil quando falta
-    material, e na tela vira o vídeo "indo e voltando na mesma cena".
-    Quem monta não percebe olhando o JSON — daí o aviso vir do código.
+    Vários clipes do banco são multi-cena: `lab` tem laboratório, café,
+    balança e cozinha em 15 segundos. Tratar isso como um clipe só é o
+    que fez o mesmo café aparecer duas vezes no reel da aveia.
     """
-    vistos = {}
+    mapa = Path(__file__).with_name("video") / "cenas.json"
+    if not mapa.exists():
+        return []
+    tabela = json.loads(mapa.read_text())
+    nome = Path(video).name
+    for chave, cortes in tabela.items():
+        if chave == nome or chave in str(video) or nome in str(chave):
+            return cortes
+    banco = Path(__file__).with_name("video") / "biblioteca.json"
+    if banco.exists():
+        for apelido, caminho in json.loads(banco.read_text()).items():
+            if Path(caminho).name == nome:
+                return tabela.get(apelido, [])
+    return []
+
+
+def _cena(cortes, t):
+    """Índice da cena em que o instante cai."""
+    return sum(1 for c in cortes if t >= c)
+
+
+def avisa_repeticao(clipes):
+    """Grita quando dois cortes voltam pro mesmo pedaço do mesmo clipe.
+
+    Duas regras, e as duas nasceram de defeito que foi pro ar:
+
+    - **Voltar atrás dentro da mesma cena.** Avançar numa tomada é
+      montagem normal; voltar pra um ponto já passado dela é o vídeo
+      "indo e voltando". Pega o trecho repetido e a continuidade
+      invertida (o pote sem cobertura depois do pote coberto). Entre
+      cenas diferentes a ordem é livre: são tomadas independentes que só
+      por acaso moram no mesmo arquivo.
+    - **Atravessar uma virada de cena.** Metade do banco é multi-cena:
+      `lab` tem laboratório, café, balança e cozinha em 15 segundos. Um
+      trecho que cruza o corte traz um pedaço da cena vizinha de brinde —
+      foi assim que o mesmo café entrou duas vezes no reel da aveia.
+    """
+    fim_anterior = {}
     for i, c in enumerate(clipes):
         de, ate = c["trecho"] if c.get("trecho") else (0, dur_video(c["video"]))
-        for j, (d2, a2) in vistos.get(c["video"], []):
-            if ate > d2 and de < a2:
-                print(f"aviso: o corte {i} repete o {j} — "
-                      f"{Path(c['video']).name} {de}-{ate} já entrou como "
-                      f"{d2}-{a2}", file=sys.stderr)
-        vistos.setdefault(c["video"], []).append((i, (de, ate)))
+        nome = Path(c["video"]).name
+        cortes = cenas_de(c["video"])
+        dentro = [x for x in cortes if de < x < ate]
+        if dentro:
+            print(f"aviso: o corte {i} atravessa uma virada de cena — "
+                  f"{nome} {de}-{ate} passa por {dentro}", file=sys.stderr)
+        chave = (c["video"], _cena(cortes, (de + ate) / 2))
+        j, ate_j = fim_anterior.get(chave, (None, None))
+        if j is not None and de < ate_j:
+            print(f"aviso: o corte {i} volta atrás em {nome} — começa em "
+                  f"{de}, e o corte {j} já tinha ido até {ate_j}",
+                  file=sys.stderr)
+        if ate_j is None or ate > ate_j:
+            fim_anterior[chave] = (i, ate)
 
 
 def main():
