@@ -676,7 +676,11 @@ def main():
         # é justamente onde está a comida
         from detecta_rosto import margens_por_bloco
         base_t = trecho[0] if trecho else 0.0
-        janelas = [(b[0] - dur_ab + base_t, b[1] - dur_ab + base_t)
+        # com narração os tempos já são do vídeo final e o cartão de
+        # abertura precisa ser descontado; sem narração eles são do vídeo
+        # de origem e o desconto seria erro de sinal
+        off = dur_ab - desloc
+        janelas = [(b[0] - off + base_t, b[1] - off + base_t)
                    for b in blocos]
         # manchete e legenda no mesmo lugar seria trocar um tapa-buraco
         # por outro; cada bloco recebe as faixas já ocupadas no seu tempo

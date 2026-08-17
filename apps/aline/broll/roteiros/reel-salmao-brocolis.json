@@ -1,0 +1,210 @@
+{
+  "_": "Salmao com brocolis: sulforafano, GSTM1, FADS1, VDR e GPX1. Versao curta, sem audio - a narrada entra quando ela gravar.",
+  "saida": [
+    720,
+    1280
+  ],
+  "sem_legenda": true,
+  "escurecer": 0.12,
+  "destaques": [
+    "mirosinase",
+    "sulforafano",
+    "nrf2",
+    "gstm1",
+    "fads1",
+    "epa",
+    "dha",
+    "vdr",
+    "gpx1",
+    "selênio",
+    "folato",
+    "mthfr",
+    "vapor",
+    "gene",
+    "via"
+  ],
+  "abertura": {
+    "chapeu": "Nutricionista",
+    "dur": 4.5,
+    "titulo": [
+      {
+        "txt": "Esse prato tem",
+        "tam": 0.34,
+        "peso": "Regular",
+        "tarja": [
+          [
+            245,
+            230,
+            211
+          ],
+          [
+            14,
+            89,
+            89
+          ]
+        ]
+      },
+      {
+        "txt": "5 GENES",
+        "tam": 1.05,
+        "peso": "Black"
+      },
+      {
+        "txt": "por trás",
+        "tam": 0.44,
+        "peso": "Italic",
+        "cor": [
+          10,
+          186,
+          181
+        ]
+      }
+    ],
+    "sub": "e o modo de preparo muda todos eles"
+  },
+  "clipes": [
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e36c0de8-hf_20260816_153241_6ff17c283a2e4e83a163c5ca54d72ae9.mp4",
+      "trecho": [
+        0.0,
+        5.0
+      ],
+      "velocidade": 0.8
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e36c0de8-hf_20260816_153241_6ff17c283a2e4e83a163c5ca54d72ae9.mp4",
+      "trecho": [
+        5.1,
+        9.7
+      ],
+      "velocidade": 0.8
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/c17f0869-hf_20260815_210944_d03421c46eac452c9f0d279157eacaba.mp4",
+      "trecho": [
+        6.5,
+        11.5
+      ],
+      "velocidade": 0.9
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e36c0de8-hf_20260816_153241_6ff17c283a2e4e83a163c5ca54d72ae9.mp4",
+      "trecho": [
+        9.8,
+        15.05
+      ],
+      "velocidade": 0.8
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6bb801d9-hf_20260812_201657_a1ca2a81d3fd4e13a1ece729c5d92b9c.mp4",
+      "trecho": [
+        0.2,
+        4.2
+      ],
+      "velocidade": 0.9
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/e36c0de8-hf_20260816_153241_6ff17c283a2e4e83a163c5ca54d72ae9.mp4",
+      "trecho": [
+        15.15,
+        20.05
+      ],
+      "velocidade": 0.8
+    },
+    {
+      "video": "/root/.claude/uploads/712099d6-612c-55e4-9df3-e85bce81cfcb/6eb9380e-hf_20260812_210409_754d2cf0afee40b0bd79711bc0ff20cb.mp4",
+      "trecho": [
+        5.0,
+        8.5
+      ],
+      "velocidade": 0.9
+    }
+  ],
+  "legendas": [
+    {
+      "de": 0.3,
+      "ate": 3.0,
+      "texto": "Brócolis no vapor,\n3 a 5 minutos."
+    },
+    {
+      "de": 3.2,
+      "ate": 6.1,
+      "texto": "Fervido, a mirosinase morre —\nsem ela não existe sulforafano."
+    },
+    {
+      "de": 6.5,
+      "ate": 11.8,
+      "texto": "O sulforafano acende a via NRF2,\na defesa antioxidante da célula."
+    },
+    {
+      "de": 12.2,
+      "ate": 15.0,
+      "texto": "O GSTM1 muda a velocidade\ncom que você elimina o sulforafano."
+    },
+    {
+      "de": 15.2,
+      "ate": 17.4,
+      "texto": "Mesmo prato, exposição diferente."
+    },
+    {
+      "de": 17.8,
+      "ate": 21.5,
+      "texto": "FADS1: quem converte mal\nprecisa de EPA e DHA prontos."
+    },
+    {
+      "de": 21.7,
+      "ate": 23.9,
+      "texto": "É exatamente o que o salmão é."
+    },
+    {
+      "de": 24.3,
+      "ate": 28.3,
+      "texto": "O selênio do salmão\né cofator da GPX1."
+    },
+    {
+      "de": 28.9,
+      "ate": 32.5,
+      "texto": "E o VDR muda o quanto\na vitamina D dele rende."
+    },
+    {
+      "de": 32.7,
+      "ate": 34.5,
+      "texto": "Vitamina D pede gordura\nna mesma refeição."
+    },
+    {
+      "de": 34.9,
+      "ate": 38.4,
+      "texto": "Não é o alimento sozinho.\nÉ o alimento, o gene e o preparo."
+    }
+  ],
+  "fecho": {
+    "chapeu": "Imersivo de Nutrigenética",
+    "tarja": [
+      [
+        245,
+        230,
+        211
+      ],
+      [
+        14,
+        89,
+        89
+      ]
+    ],
+    "dur": 6.5,
+    "titulo": [
+      {
+        "txt": "Não é o alimento",
+        "tam": 0.4,
+        "peso": "Regular"
+      },
+      {
+        "txt": "É A VIA",
+        "tam": 0.92,
+        "peso": "Black"
+      }
+    ],
+    "sub": "aula gratuita, exclusiva para nutricionistas",
+    "rodape": "@nutri_secrets"
+  }
+}
