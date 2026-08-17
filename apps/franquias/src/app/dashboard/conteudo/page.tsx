@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { semanaAlvo, formatarSemana } from "@/lib/conteudo/semana";
 import { GerarSugestoesButton } from "./GerarSugestoesButton";
 import { SugestaoCard, type Sugestao } from "./SugestaoCard";
 import { ReelAnimadoSection, type ReelAnimado } from "./ReelAnimadoSection";
@@ -40,6 +41,11 @@ export default async function ConteudoPage() {
     .order("criado_em", { ascending: false })
     .limit(10);
   const reels = (reelsData ?? []) as ReelAnimado[];
+
+  // A semana que o botão gera/regera é a MESMA que o painel conta — e o botão
+  // precisa saber, de saída, se ela já tem pacote (senão o Regerar não aparece).
+  const alvo = semanaAlvo();
+  const jaTemPacote = sugestoes.some((s) => s.semana_ref === alvo);
 
   // Agrupa por semana
   const porSemana = new Map<string, Sugestao[]>();
@@ -81,7 +87,10 @@ export default async function ConteudoPage() {
             >
               📚 Posts prontos
             </Link>
-            <GerarSugestoesButton />
+            <GerarSugestoesButton
+              jaTemPacote={jaTemPacote}
+              rotuloSemana={formatarSemana(alvo)}
+            />
           </div>
         </header>
 
@@ -98,7 +107,7 @@ export default async function ConteudoPage() {
           Array.from(porSemana.entries()).map(([semana, lista]) => (
             <section key={semana} className="mb-10">
               <h2 className="mb-4 text-lg font-semibold text-brand-text">
-                Semana de {formatSemana(semana)}
+                Semana de {formatarSemana(semana)}
               </h2>
               <div className="grid gap-5 md:grid-cols-2">
                 {lista.map((s) => (
@@ -111,13 +120,4 @@ export default async function ConteudoPage() {
       </div>
     </main>
   );
-}
-
-function formatSemana(semanaRef: string): string {
-  const d = new Date(`${semanaRef}T00:00:00Z`);
-  return d.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    timeZone: "UTC",
-  });
 }

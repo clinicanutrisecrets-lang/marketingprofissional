@@ -57,14 +57,37 @@ Filtre RIGOROSAMENTE. É melhor retornar 5 temas ótimos do que 20 fracos.
 Descarte qualquer coisa que seja emagrecimento mirabolante, Ozempic, dieta da moda, ou celebridade.
 Só retorne itens com relevancia_icp >= 6.`;
 
+/**
+ * 🔴 O NICHO manda no descarte. Sem esta instrução, uma manchete de saúde
+ * genérica (o RSS do G1 cobre tudo) virava tema "em alta no seu nicho" pra
+ * qualquer profissional — foi assim que oncologia apareceu num perfil de saúde
+ * hormonal feminina. Manchete que não conversa com o nicho é descartada, não
+ * adaptada à força.
+ */
+function regraDeNicho(nicho: string): string {
+  return `
+NICHO DA PROFISSIONAL QUE VAI RECEBER ESTES TEMAS: "${nicho.replace(/_/g, " ")}"
+
+REGRA DE DESCARTE POR NICHO (vale mais que a relevância geral):
+- Se a manchete não conversa com esse nicho, DESCARTE. Não force adaptação, não
+  "puxe" o assunto pro nicho, não use como gancho distante.
+- Especialidade alheia é descarte, não oportunidade: assunto de oncologia num
+  nicho de saúde feminina, pediatria num nicho esportivo, e assim por diante.
+- Na dúvida entre descartar e incluir, DESCARTE. Tema de fora do nicho custa a
+  confiança da profissional no que ela recebe.`;
+}
+
 export async function classificarSinais(
   sinais: SinalBruto[],
+  nicho = "saude_integrativa",
 ): Promise<TendenciaClassificada[]> {
   if (sinais.length === 0) return [];
 
   const claude = createClaude();
 
-  const userPrompt = `Aqui estão ${sinais.length} sinais externos coletados hoje. Classifique:
+  const userPrompt = `${regraDeNicho(nicho)}
+
+Aqui estão ${sinais.length} sinais externos coletados hoje. Classifique:
 
 ${sinais
   .map(

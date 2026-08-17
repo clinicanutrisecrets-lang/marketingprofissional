@@ -129,7 +129,10 @@ export async function gerarPostsDaSemana(
   const nicho = (franqueada.nicho_principal as string) ?? "saude_integrativa";
   const [datasRaw, tendencias] = await Promise.all([
     buscarDatasProximas(14, new Date(semanaRef)),
-    listarTendenciasDoDia("saude_integrativa", 5),
+    // O nicho da franqueada, não um fixo: era o segundo lugar (junto do
+    // TendenciasCard) onde "saude_integrativa" estava escrito na mão e o
+    // radar de outra especialidade entrava no prompt dos posts dela.
+    listarTendenciasDoDia(nicho, 5),
   ]);
   const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
 

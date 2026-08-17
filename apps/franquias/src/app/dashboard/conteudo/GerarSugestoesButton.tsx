@@ -3,11 +3,25 @@
 import { useState, useTransition } from "react";
 import { gerarSugestoesAction } from "@/lib/conteudo/actions";
 
-export function GerarSugestoesButton() {
+/**
+ * `jaTemPacote` vem da página (a semana alvo já tem sugestões no banco).
+ *
+ * 🔴 Antes o Regerar só aparecia DEPOIS de a action responder "semana já tem
+ * sugestões" — e como a action mirava a semana seguinte, essa resposta nunca
+ * vinha e o botão nunca existia. Quem recebeu um pacote com defeito não tinha
+ * como refazer. Agora a página diz de saída se a semana já está preenchida.
+ */
+export function GerarSugestoesButton({
+  jaTemPacote = false,
+  rotuloSemana,
+}: {
+  jaTemPacote?: boolean;
+  rotuloSemana?: string;
+}) {
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
 
-  const jaExiste = msg?.includes("já tem sugestões");
+  const mostrarRegerar = jaTemPacote || !!msg?.includes("já tem sugestões");
 
   return (
     <div className="flex flex-col items-end gap-2">
@@ -25,11 +39,16 @@ export function GerarSugestoesButton() {
         >
           {pending ? "Gerando (30s a 1min)..." : "✨ Gerar sugestões da semana"}
         </button>
-        {jaExiste && (
+        {mostrarRegerar && (
           <button
             disabled={pending}
             onClick={() => {
-              if (!confirm("Apagar as sugestões desta semana e gerar novas?")) return;
+              if (
+                !confirm(
+                  `Apagar as sugestões da semana de ${rotuloSemana ?? "referência"} e gerar novas?`,
+                )
+              )
+                return;
               startTransition(async () => {
                 setMsg(null);
                 const r = await gerarSugestoesAction(true);
@@ -42,7 +61,14 @@ export function GerarSugestoesButton() {
           </button>
         )}
       </div>
-      {msg && <p className="text-xs text-brand-text/60">{msg}</p>}
+      <p className="max-w-[19rem] text-right text-xs text-brand-text/60">
+        {msg ??
+          (rotuloSemana
+            ? jaTemPacote
+              ? `Semana de ${rotuloSemana} já montada. "Regerar" refaz do zero.`
+              : `Vai montar o pacote da semana de ${rotuloSemana}.`
+            : null)}
+      </p>
     </div>
   );
 }

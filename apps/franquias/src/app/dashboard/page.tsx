@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { semanaAlvo, formatarSemana } from "@/lib/conteudo/semana";
 import TendenciasCard from "@/components/TendenciasCard";
 import { TutorialTour } from "@/components/TutorialTour";
 
@@ -32,8 +33,12 @@ export default async function DashboardPage() {
     "Olá";
   const corPrimaria = (f.cor_primaria_hex as string) || "#0BB8A8";
 
-  // Números reais do que funciona hoje
-  const segunda = proximaSegunda();
+  // Números reais do que funciona hoje.
+  // 🔴 A semana vem de lib/conteudo/semana.ts — a MESMA que o Estúdio lista e
+  // que o botão gera. Este arquivo tinha o seu próprio `proximaSegunda()`, que
+  // numa segunda-feira aponta pra semana SEGUINTE: o painel dizia "0 Sugestões
+  // da semana" com o pacote da semana pronto no Estúdio (Juliana, 17/08).
+  const segunda = semanaAlvo();
   const [{ count: sugestoesSemana }, { count: artesSalvas }, { count: pedidosPendentes }] =
     await Promise.all([
       supabase
@@ -121,7 +126,11 @@ export default async function DashboardPage() {
 
       {/* Números */}
       <section className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icone="🗓️" valor={String(sugestoesSemana ?? 0)} label="Sugestões da semana" />
+        <StatCard
+          icone="🗓️"
+          valor={String(sugestoesSemana ?? 0)}
+          label={`Sugestões da semana de ${formatarSemana(segunda)}`}
+        />
         <StatCard icone="🗂️" valor={String(artesSalvas ?? 0)} label="Artes na galeria" />
         <StatCard icone="📝" valor={String(pedidosPendentes ?? 0)} label="Pedidos na fila" />
         <StatCard icone="🛡️" valor="Ativo" label="Compliance CFN" />
@@ -140,13 +149,6 @@ export default async function DashboardPage() {
       </footer>
     </main>
   );
-}
-
-function proximaSegunda(): string {
-  const agora = new Date(Date.now() - 3 * 3600 * 1000);
-  const dow = agora.getUTCDay();
-  const dias = ((8 - dow) % 7) || 7;
-  return new Date(agora.getTime() + dias * 86400 * 1000).toISOString().slice(0, 10);
 }
 
 function StatCard({ icone, valor, label }: { icone: string; valor: string; label: string }) {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
+import { listarTendenciasRecentes } from "@/lib/tendencias/orquestrar";
 import { buscarDatasProximas, filtrarPorNicho } from "@/lib/tendencias/datas-comemorativas";
 
 type Props = {
@@ -8,12 +8,18 @@ type Props = {
 };
 
 export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
-  const [tendencias, datasRaw] = await Promise.all([
-    listarTendenciasDoDia("saude_integrativa", 5),
+  const nichoEfetivo = nicho?.trim() || "saude_integrativa";
+
+  // 🔴 O nicho VEM DA PROFISSIONAL. Estava escrito "saude_integrativa" fixo
+  // aqui, ignorando a prop que o painel já passava: quem é de saúde feminina
+  // ou materno-infantil recebia o radar de outra pessoa, sob o título
+  // "no seu nicho".
+  const [{ itens: tendencias, dataRef }, datasRaw] = await Promise.all([
+    listarTendenciasRecentes(nichoEfetivo, 5),
     buscarDatasProximas(7),
   ]);
 
-  const datas = filtrarPorNicho(datasRaw, nicho ?? "saude_integrativa").slice(0, 3);
+  const datas = filtrarPorNicho(datasRaw, nichoEfetivo).slice(0, 3);
   const cor = corPrimaria ?? "#0BB8A8";
 
   if (tendencias.length === 0 && datas.length === 0) {
@@ -24,9 +30,15 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-text/60">
-          📰 Em alta hoje no seu nicho
+          📰 Em alta no seu nicho
         </h2>
-        <span className="text-xs text-brand-text/40">atualizado diariamente</span>
+        {/* Dizia "atualizado diariamente" mesmo quando o dado tinha meses.
+            Ou mostra a data do que está na tela, ou não promete nada. */}
+        {dataRef && (
+          <span className="text-xs text-brand-text/40">
+            radar de {formatarDia(dataRef)}
+          </span>
+        )}
       </div>
 
       {datas.length > 0 && (
@@ -116,6 +128,14 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
       </p>
     </div>
   );
+}
+
+function formatarDia(dataRef: string): string {
+  return new Date(`${dataRef}T00:00:00Z`).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "UTC",
+  });
 }
 
 function mesCurto(m: number): string {
