@@ -44,25 +44,35 @@ type Ilustracao = {
 };
 
 const LIB: Record<IlustracaoId, Ilustracao> = {
-  // Mulher de costas, coque, traço contínuo minimalista
+  // Mulher: ROSTO DE PERFIL com cabelo longo (busto editorial).
+  //
+  // 🔴 O desenho anterior era uma figura de costas: coque oval SOLTO acima de
+  // uma cabeça arredondada, com dois traços longos e paralelos descendo. A
+  // Aline apontou (18/08) que a silhueta ficava fálica no card — a mesma
+  // objeção que já tinha derrubado o tubo de ensaio do `exame`, a cápsula do
+  // `microbiota` e a vagem fechada das `leguminosas`.
+  //
+  // Regra que fica pra esta biblioteca: **nada de forma alongada vertical com
+  // topo arredondado** — nem silhueta humana de costas, nem oval solto sobre
+  // corpo estreito. Rosto de perfil tem testa, nariz e queixo, então não
+  // admite segunda leitura; é o que se usa em ilustração editorial de saúde
+  // da mulher. Renderizado e conferido a 420 px e a 150 px (tamanho real no
+  // card) antes de entrar.
   mulher: {
     viewBox: "0 0 200 200",
-    strokeWidth: 2.2,
+    strokeWidth: 2.4,
     paths: [
-      // coque
-      "M103 22 C96 14 84 16 82 25 C80 33 88 39 96 36 C104 33 107 27 103 22 Z",
-      // cabeça e pescoço
-      "M96 36 C86 40 80 50 82 60 C83 68 88 74 94 77 C95 82 94 87 91 91",
-      "M103 38 C111 44 114 54 111 64 C109 71 105 76 101 79 C101 83 102 87 105 90",
-      // ombros e braços
-      "M91 91 C76 96 64 104 58 118 C53 130 52 145 54 160",
-      "M105 90 C122 95 134 105 139 120 C143 132 143 147 141 162",
-      // linha das costas
-      "M85 100 C82 118 82 136 86 154 C88 163 91 171 95 178",
-      // curva do quadril
-      "M111 102 C116 120 116 140 110 158 C107 166 104 172 100 178",
-      // detalhe do braço esquerdo
-      "M58 118 C60 132 63 144 70 154",
+      // perfil: testa → nariz → queixo → mandíbula
+      "M94 30 C124 32 140 54 138 78 C137 86 134 90 132 94 C144 100 144 108 130 110 C136 118 132 128 118 132 C112 134 105 134 100 132",
+      // cabelo: topo da cabeça → nuca → comprimento nas costas
+      "M94 30 C66 33 51 57 50 88 C49 117 57 144 68 160",
+      // mecha junto à testa
+      "M94 30 C80 37 71 49 68 63",
+      // pescoço
+      "M100 132 L103 154",
+      // ombros
+      "M68 160 C52 165 40 173 33 185",
+      "M103 154 C135 159 157 170 165 185",
     ],
   },
   // Ramo de folhas (canto decorativo)
@@ -264,9 +274,12 @@ const LIB: Record<IlustracaoId, Ilustracao> = {
       "M86 34 L86 80 L44 146 C40 153 45 162 53 162 L147 162 C155 162 160 153 156 146 L114 80 L114 34",
       // linha do líquido
       "M63 124 L137 124",
-      // bolhas
-      "M80 140 C82 136 86 136 88 140",
-      "M108 146 C110 142 114 142 116 146",
+      // Bolhas: círculos pequenos e assimétricos. Eram dois arcos simétricos
+      // acima da linha do líquido — no card liam como dois olhos e uma boca,
+      // e o frasco virava uma carinha (Aline, 18/08).
+      "M78 138 C81 138 83 140 83 143 C83 146 81 148 78 148 C75 148 73 146 73 143 C73 140 75 138 78 138 Z",
+      "M96 148 C98 148 100 150 100 152 C100 154 98 156 96 156 C94 156 92 154 92 152 C92 150 94 148 96 148 Z",
+      "M112 134 C114 134 116 136 116 138 C116 140 114 142 112 142 C110 142 108 140 108 138 C108 136 110 134 112 134 Z",
     ],
   },
   // Estetoscópio
