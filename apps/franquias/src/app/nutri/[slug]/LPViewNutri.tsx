@@ -4,6 +4,8 @@ type Props = {
   franqueada: Record<string, unknown>;
   logoUrl: string | null;
   fotoUrl: string | null;
+  /** Prints reais de depoimento subidos no onboarding. Vazio = seção não aparece. */
+  depoimentoUrls?: string[];
   sofiaSlug?: string | null;
   sofiaBaseUrl?: string;
 };
@@ -34,6 +36,7 @@ export function LPViewNutri({
   franqueada,
   logoUrl,
   fotoUrl,
+  depoimentoUrls = [],
   sofiaSlug,
   sofiaBaseUrl = "https://scannerdasaude.com/sofia",
 }: Props) {
@@ -55,7 +58,37 @@ export function LPViewNutri({
     "Eu escuto primeiro. Antes de qualquer plano, antes de qualquer exame, eu quero entender a sua história. Porque nutrição que funciona é a que cabe na sua vida, não a que cabe no livro.";
   const instaHandle = (franqueada.instagram_handle as string) ?? "";
   const email = (franqueada.email_publico as string) ?? (franqueada.email as string) ?? "";
-  const endereco = (franqueada.endereco_consultorio as string) ?? cidadeUF;
+
+  // Modalidade REAL do atendimento (onboarding): 'online' | 'presencial' | 'hibrido'.
+  // A LP dizia "presencial e online" pra todo mundo — pra quem só atende online
+  // isso é informação errada na página (caso da Julliana, 22/08).
+  const modalidade = ((franqueada.modalidade_atendimento as string) ?? "hibrido").toLowerCase();
+  const soOnline = modalidade === "online";
+  const soPresencial = modalidade === "presencial";
+  const fraseAtendimento = soOnline
+    ? "Atendimento 100% online"
+    : soPresencial
+      ? cidadeUF
+        ? `Atendimento presencial em ${cidadeUF}`
+        : "Atendimento presencial"
+      : "Atendimento presencial e online";
+  const faqAtendimento = soOnline
+    ? {
+        q: "O atendimento é online?",
+        a: "Sim — o atendimento é 100% online, para pacientes de todo o Brasil (e brasileiros no exterior). Consulta por vídeo, com a mesma profundidade da presencial. No primeiro contato no WhatsApp combinamos tudo.",
+      }
+    : soPresencial
+      ? {
+          q: "Onde é o atendimento?",
+          a: `O atendimento é presencial${cidadeUF ? `, em ${cidadeUF}` : ""}. No primeiro contato no WhatsApp você recebe o endereço e as orientações pra primeira consulta.`,
+        }
+      : {
+          q: "Atende presencial ou online?",
+          a: `Os dois. ${cidadeUF ? `O consultório fica em ${cidadeUF};` : "O consultório fica na minha cidade;"} também atendo online para pacientes de todo o Brasil. No primeiro contato no WhatsApp você escolhe o formato.`,
+        };
+
+  // Endereço no rodapé só faz sentido quando existe atendimento presencial.
+  const endereco = soOnline ? "" : ((franqueada.endereco_consultorio as string) ?? cidadeUF);
 
   // CTA primário: Sofia URL (se sofia_slug configurado), fallback WhatsApp direto
   const sofiaLink = sofiaSlug
@@ -100,9 +133,9 @@ export function LPViewNutri({
               <div style={{ fontFamily: SERIF }} className="text-[15px] font-semibold leading-tight">
                 {primeiroNome}
               </div>
-              {cidadeUF && (
+              {(cidadeUF || soOnline) && (
                 <div className="text-[11px] tracking-wider" style={{ color: MUTED }}>
-                  Nutrição de Precisão · {cidadeUF}
+                  Nutrição de Precisão · {cidadeUF || "Atendimento online"}
                 </div>
               )}
             </div>
@@ -155,7 +188,7 @@ export function LPViewNutri({
                 <WhatsappIcon size={18} /> Agendar consulta pelo WhatsApp
               </WhatsAppLink>
               <div className="text-sm" style={{ color: MUTED }}>
-                Atendimento presencial e online
+                {fraseAtendimento}
               </div>
             </div>
           </div>
@@ -352,7 +385,7 @@ export function LPViewNutri({
               {
                 marco: "Mês 3-5",
                 titulo: "Silenciamento Genético",
-                desc: "3 consultas mensais de tratamento nutrigenético: silenciar predisposições, ativar genes protetivos.",
+                desc: "Uma consulta por mês, durante 3 meses de tratamento nutrigenético: silenciar predisposições, ativar genes protetivos.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
                     <path d="M4 20c4 0 6-16 16-16" />
@@ -650,72 +683,51 @@ export function LPViewNutri({
         </div>
       </section>
 
-      {/* PROVA SOCIAL */}
-      <section className="py-24 sm:py-[128px]">
-        <div className="mx-auto max-w-[1180px] px-6">
-          <div className="mx-auto mb-16 max-w-[620px] text-center">
-            <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
-              Histórias que contam
-            </div>
-            <h2
-              style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.08, color: INK }}
-              className="text-[30px] font-normal sm:text-[38px]"
-            >
-              Mulheres que entenderam o próprio corpo pela primeira vez.
-            </h2>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {[
-              {
-                t: (
-                  <>
-                    A primeira consulta já foi diferente de tudo que vivi. Pela primeira
-                    vez entendi <strong>por que meu corpo reage</strong> do jeito que reage.
-                  </>
-                ),
-                a: "Marina, 42",
-              },
-              {
-                t: (
-                  <>
-                    Antes eu testava tudo. Hoje eu <strong style={{ color: "#2F5D50" }}>entendo meu metabolismo</strong>.
-                    Só faço o que faz sentido pra ele. Outro patamar.
-                  </>
-                ),
-                a: "Patrícia, 51",
-              },
-              {
-                t: (
-                  <>
-                    O <strong style={{ color: "#2F5D50" }}>teste nutrigenético</strong> foi um divisor. Virou um antes
-                    e depois de autoconhecimento. Não de dieta.
-                  </>
-                ),
-                a: "Juliana, 38",
-              },
-            ].map((d, i) => (
-              <blockquote
-                key={i}
-                className="border-t pt-6"
-                style={{ borderColor: `${INK}14` }}
+      {/* PROVA SOCIAL — só depoimentos REAIS (prints subidos pela nutri).
+          Sem print, a seção não existe: depoimento inventado é proibido. */}
+      {depoimentoUrls.length > 0 && (
+        <section className="py-24 sm:py-[128px]">
+          <div className="mx-auto max-w-[1180px] px-6">
+            <div className="mx-auto mb-16 max-w-[620px] text-center">
+              <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#2F5D50" }}>
+                Histórias que contam
+              </div>
+              <h2
+                style={{ fontFamily: SERIF, letterSpacing: "-0.015em", lineHeight: 1.08, color: INK }}
+                className="text-[30px] font-normal sm:text-[38px]"
               >
-                <div
-                  style={{ fontFamily: SERIF, color: "#2F5D50", lineHeight: 1 }}
-                  className="mb-4 text-[42px]"
+                Depoimentos reais de quem já vive essa jornada.
+              </h2>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+              {depoimentoUrls.map((url, i) => (
+                <a
+                  key={i}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block overflow-hidden rounded-2xl transition hover:opacity-95"
+                  style={{
+                    background: "#fff",
+                    border: `1px solid ${INK}14`,
+                    boxShadow: "0 20px 40px -18px rgba(31,29,26,0.18)",
+                  }}
+                  title="Abrir depoimento"
                 >
-                  &ldquo;
-                </div>
-                <p className="mb-5 leading-[1.65]" style={{ color: GRAPHITE }}>
-                  {d.t}
-                </p>
-                <footer className="text-[13px]" style={{ color: MUTED }}>
-                  {d.a}
-                </footer>
-              </blockquote>
-            ))}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={`Depoimento de paciente ${i + 1}`}
+                    loading="lazy"
+                    className="max-h-[420px] w-full object-contain"
+                    style={{ background: "#fff" }}
+                  />
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* FAQ */}
       <section
@@ -739,10 +751,7 @@ export function LPViewNutri({
             style={{ borderColor: `${INK}14` }}
           >
             {[
-              {
-                q: "Atende presencial ou online?",
-                a: `Os dois. ${cidadeUF ? `O consultório fica em ${cidadeUF};` : "O consultório fica na minha cidade;"} também atendo online para pacientes de todo o Brasil. No primeiro contato no WhatsApp você escolhe o formato.`,
-              },
+              faqAtendimento,
               {
                 q: "Como funciona o acompanhamento depois da primeira consulta?",
                 a: "Depois da avaliação inicial, você recebe um plano escrito e retornamos em 30 dias pra ajustar. O ritmo depende do seu caso: alguns precisam de revisão quinzenal, outros mensal.",
@@ -751,10 +760,15 @@ export function LPViewNutri({
                 q: "O que é o teste nutrigenético?",
                 a: "É uma análise única do seu DNA que mostra como seu corpo responde a nutrientes, padrões metabólicos e predisposições. Não é pra todos. Usamos quando, na consulta, vejo que vai agregar. Os detalhes, inclusive valores, conversamos juntas no atendimento.",
               },
-              {
-                q: "Atende plano de saúde?",
-                a: "O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista. Emito recibo com código próprio pra você solicitar.",
-              },
+              franqueada.aceita_plano_saude === true
+                ? {
+                    q: "Atende plano de saúde?",
+                    a: "Sim, atendo por plano de saúde — confirme no WhatsApp se o seu está entre os aceitos. Também atendo particular, com recibo pra pedir reembolso.",
+                  }
+                : {
+                    q: "Atende plano de saúde?",
+                    a: "O atendimento é particular. Muitos planos oferecem reembolso parcial de consulta com nutricionista. Emito recibo com código próprio pra você solicitar.",
+                  },
             ].map((f, i, arr) => (
               <details
                 key={i}
