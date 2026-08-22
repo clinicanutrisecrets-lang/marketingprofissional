@@ -977,24 +977,11 @@ async function renderEditorial(params: {
 
   const composites: sharp.OverlayOptions[] = [];
 
-  // Ramos decorativos nos cantos (traço fino, discretos)
-  const ramoTam = Math.round(W * 0.26);
-  const ramoTR = svgIlustracao("folhas", ramoTam, verde, 0.5);
-  if (ramoTR) {
-    composites.push({
-      input: await sharp(ramoTR).rotate(180, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer(),
-      top: -Math.round(ramoTam * 0.22),
-      left: W - ramoTam + Math.round(ramoTam * 0.18),
-    });
-  }
-  const ramoBL = svgIlustracao("ramo", ramoTam, verde, 0.5);
-  if (ramoBL) {
-    composites.push({
-      input: await sharp(ramoBL).png().toBuffer(),
-      top: H - ramoTam + Math.round(ramoTam * 0.15),
-      left: -Math.round(ramoTam * 0.18),
-    });
-  }
+  // Os ramos decorativos dos cantos são montados DEPOIS do texto ser medido
+  // (bloco no fim desta função): eles precisam DESVIAR do texto. Com posição
+  // fixa, um título de 6 linhas + subtítulo longo descia até o canto e o ramo
+  // ficava em cima da frase (Juliana, 22/08/2026 — "os galhinhos ficaram em
+  // cima da frase", card "A saúde do bebê começa antes da concepção").
 
   const headline = (conteudo.headline ?? "").trim().toUpperCase();
   const subtitle = (conteudo.subtitle ?? "").trim();
@@ -1030,6 +1017,8 @@ async function renderEditorial(params: {
 
   // Bloco de texto: começa no terço superior, alinhado à esquerda
   let y = Math.round(H * (temIlustracao ? 0.16 : 0.18));
+  const yIniTexto = y;
+  let larguraRealTexto = 0;
   const lineGap = Math.round(fs * 1.22);
   linhas.forEach((linha, i) => {
     const dourada = i % 3 === 2; // a cada 3 linhas, uma dourada (ritmo das referências)
@@ -1038,6 +1027,7 @@ async function renderEditorial(params: {
       lineHeight: 1.05,
     });
     composites.push(...posicionar(bloco, margem, y));
+    larguraRealTexto = Math.max(larguraRealTexto, bloco.largura);
     y += lineGap;
   });
 
@@ -1058,6 +1048,55 @@ async function renderEditorial(params: {
       peso: 0.5,
     });
     composites.push(...posicionar(sub, margem, y));
+    larguraRealTexto = Math.max(larguraRealTexto, sub.largura);
+    y += sub.altura;
+  }
+  const yFimTexto = y;
+
+  // Ramos decorativos nos cantos — DESVIANDO do texto (Juliana 22/08/2026:
+  // "os galhinhos ficaram em cima da frase"). Cada ramo tenta o tamanho
+  // padrão; se o retângulo dele encosta no retângulo do texto, encolhe; se
+  // nem pequeno cabe, NÃO é desenhado — enfeite nunca vale uma frase ilegível.
+  // Entram no INÍCIO da pilha (unshift) pra continuarem atrás de tudo.
+  {
+    const FOLGA = 18;
+    const x1Texto = margem - FOLGA;
+    const x2Texto = margem + larguraRealTexto + FOLGA;
+    const y1Texto = yIniTexto - FOLGA;
+    const y2Texto = yFimTexto + FOLGA;
+    const colideComTexto = (x1: number, y1: number, x2: number, y2: number) =>
+      !(x2 <= x1Texto || x1 >= x2Texto || y2 <= y1Texto || y1 >= y2Texto);
+
+    const ramoTamBase = Math.round(W * 0.26);
+    const ramoTamMin = Math.round(W * 0.12);
+
+    // Topo-direita (folhas, giradas)
+    for (let tam = ramoTamBase; tam >= ramoTamMin; tam = Math.floor(tam * 0.8)) {
+      const left = W - tam + Math.round(tam * 0.18);
+      const top = -Math.round(tam * 0.22);
+      if (colideComTexto(left, top, left + tam, top + tam)) continue;
+      const ramoTR = svgIlustracao("folhas", tam, verde, 0.5);
+      if (ramoTR) {
+        composites.unshift({
+          input: await sharp(ramoTR).rotate(180, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer(),
+          top,
+          left,
+        });
+      }
+      break;
+    }
+
+    // Base-esquerda (ramo)
+    for (let tam = ramoTamBase; tam >= ramoTamMin; tam = Math.floor(tam * 0.8)) {
+      const left = -Math.round(tam * 0.18);
+      const top = H - tam + Math.round(tam * 0.15);
+      if (colideComTexto(left, top, left + tam, top + tam)) continue;
+      const ramoBL = svgIlustracao("ramo", tam, verde, 0.5);
+      if (ramoBL) {
+        composites.unshift({ input: await sharp(ramoBL).png().toBuffer(), top, left });
+      }
+      break;
+    }
   }
 
   // Ilustração à direita (grande, na cor verde)
