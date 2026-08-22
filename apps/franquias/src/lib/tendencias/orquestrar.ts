@@ -35,11 +35,14 @@ export async function orquestrarTendencias(
   const admin = createAdminClient();
 
   try {
-    // 1. Coletar sinais — manchetes do NICHO + saúde geral como complemento
-    const [manchetesNicho, noticias] = await Promise.all([
-      buscarPautasQuentes({ nichoPrincipal: nicho }),
-      buscarNoticiasSaude(),
-    ]);
+    // 1. Coletar sinais — manchetes do NICHO. A saúde geral só COMPLEMENTA
+    // quando o nicho rendeu pouco (Aline 2026-08-21): somar o noticiário
+    // nacional pra todo nicho fazia GLP-1/menopausa/câncer dominarem o radar
+    // de TODAS as profissionais, com nichos diferentes recebendo os mesmos
+    // assuntos — o classificador "adaptava" a manchete quente em vez de
+    // descartar, porque ela era a maior parte do material.
+    const manchetesNicho = await buscarPautasQuentes({ nichoPrincipal: nicho });
+    const noticias = manchetesNicho.length < 5 ? await buscarNoticiasSaude() : [];
 
     const sinais: SinalBruto[] = [
       ...manchetesNicho.map((m) => ({

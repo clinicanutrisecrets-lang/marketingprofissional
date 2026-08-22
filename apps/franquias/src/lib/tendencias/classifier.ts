@@ -73,6 +73,12 @@ REGRA DE DESCARTE POR NICHO (vale mais que a relevância geral):
   "puxe" o assunto pro nicho, não use como gancho distante.
 - Especialidade alheia é descarte, não oportunidade: assunto de oncologia num
   nicho de saúde feminina, pediatria num nicho esportivo, e assim por diante.
+- MANCHETE NACIONAL DO MOMENTO (GLP-1/Ozempic, emagrecimento de famoso, câncer
+  em celebridade, "assunto da semana" da grande mídia) NÃO pode ser reformulada
+  pra "parecer" do nicho — reformular é o mesmo que forçar a ponte. Se a mesma
+  manchete serviria pra qualquer nutricionista do país, ela não é "em alta NO
+  SEU NICHO" — descarte. Profissionais de nichos diferentes recebendo os mesmos
+  temas é o defeito nº 1 que este filtro existe pra impedir.
 - Na dúvida entre descartar e incluir, DESCARTE. Tema de fora do nicho custa a
   confiança da profissional no que ela recebe.`;
 }

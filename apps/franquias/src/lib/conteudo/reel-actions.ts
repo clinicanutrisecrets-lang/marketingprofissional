@@ -43,7 +43,7 @@ FORMATO EXATO (siga à risca — o renderizador é rígido):
 
 REGRAS DURAS:
 - glifo/glifos: APENAS destes: ${GLIFOS_VALIDOS.join(", ")}. NUNCA invente outro.
-- alvo: uma de: head, eyes, neck, chest, belly, hips.
+- alvo: uma de: face, eyes, neck, chest, spine. São os pontos REAIS da figura no renderizador (spine = tronco/abdômen; use spine pra sintomas de barriga/quadril). NUNCA invente outro — "belly" já derrubou um render inteiro (18/08/2026).
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
 - 🔴 A CENA "hook" PRECISA FUNCIONAR SEM CONTEXTO: escreva l1/l2 pensando em quem NUNCA VIU este perfil. Sem depender de post anterior, de série, de bordão ou de saber quem está falando; sem "como eu sempre digo" / "quem me acompanha sabe"; com promessa ESPECÍFICA e OBSERVÁVEL, que a pessoa confere na própria vida. Específico: "Seu exame veio normal e você continua cansada." Sensacionalista (NÃO usar): "o segredo que ninguém te conta". Nada de promessa de resultado.
