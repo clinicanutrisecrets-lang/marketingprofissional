@@ -117,7 +117,14 @@ def c_sintoma(S, c, fi, n):
     cy = c.get("card_y", 946)
     card(d, CARD_X, cy, CARD_W, c["titulo"], c["texto"], ac,
          eyebrow=c.get("card_eb","o que você sente"), alpha=ap)
-    tgt = A[c["alvo"]]
+    # O roteiro é gerado por modelo e já chegou com alvo fora do mapa da figura
+    # ("belly", 18/08/2026 — matou o render inteiro com KeyError e o reel da
+    # Viviane ficou em "erro"). Alias pros nomes que o gerador usa + fallback
+    # no tronco: alvo desconhecido aponta a seta pro corpo, nunca derruba o job.
+    ALVO_ALIAS = {"head": "face", "belly": "spine", "hips": "spine",
+                  "cabeca": "face", "barriga": "spine", "quadril": "spine"}
+    alvo = str(c.get("alvo", "chest"))
+    tgt = A.get(alvo) or A.get(ALVO_ALIAS.get(alvo, ""), A["chest"])
     off = c.get("alvo_off", (-30, 18))
     arrow(d, (CARD_X+CARD_W, cy), (tgt[0]+off[0], tgt[1]+off[1]), ac,
           prog=(sec-0.75)/0.85, alpha=ap, mode="v")
