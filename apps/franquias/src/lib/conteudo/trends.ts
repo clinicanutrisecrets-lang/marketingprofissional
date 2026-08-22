@@ -42,8 +42,21 @@ const QUERIES_POR_NICHO: Record<string, string[]> = {
   materno_infantil: ["alimentação infantil estudo", "nutrição gestante"],
   longevidade: ["longevidade alimentação estudo", "envelhecimento saudável pesquisa"],
   saude_feminina: ["saúde da mulher hormônios estudo", "endometriose SOP alimentação", "fertilidade nutrição pesquisa"],
+  // Pedido da Juliana (22/08/2026): "saude_feminina" cobre a mulher inteira e o
+  // noticiário do momento é dominado por menopausa/perimenopausa — quem atende
+  // fertilidade/SOP/endo e gestação via o radar falar de outra fase da vida.
+  // Nicho próprio = buscas próprias; menopausa fica no saude_feminina.
+  fertilidade_gestacao: [
+    "fertilidade nutrição estudo",
+    "engravidar saúde alimentação",
+    "gestante nutrição pesquisa",
+    "SOP endometriose fertilidade",
+  ],
   autoimune_intestino: ["doença autoimune alimentação", "microbioma intestino estudo"],
-  // Chaves legadas — contas antigas gravaram esses valores.
+  // Chaves legadas — contas antigas gravaram esses valores. "fertilidade" e
+  // "gestante" também servem ao match por texto livre (nicho "Outro").
+  fertilidade: ["fertilidade nutrição estudo", "engravidar saúde alimentação"],
+  gestante: ["gestante nutrição pesquisa", "nutrição gestação estudo"],
   esportiva: ["nutrição esportiva desempenho", "suplemento atleta estudo"],
   infantil: ["alimentação infantil estudo", "seletividade alimentar criança"],
   hormonal: ["menopausa saúde estudo", "hormônios alimentação"],
