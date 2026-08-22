@@ -178,6 +178,10 @@ export const NICHOS_OPCOES = [
   { value: "materno_infantil", label: "Materno-infantil" },
   { value: "longevidade", label: "Longevidade" },
   { value: "saude_feminina", label: "Saúde feminina" },
+  // Pedido da Juliana (22/08/2026): "Saúde feminina" no noticiário é dominada
+  // por menopausa/perimenopausa; quem atende fertilidade/SOP/endo e gestação
+  // precisava de um nicho próprio pro radar não puxar pauta de outra fase.
+  { value: "fertilidade_gestacao", label: "Fertilidade / Gestação" },
   { value: "autoimune_intestino", label: "Autoimune / Intestino" },
   { value: "outro", label: "Outro" },
 ];
