@@ -110,7 +110,13 @@ export async function buscarPautasQuentes(params: {
   nichoPrincipal?: string | null;
   nichoSecundario?: string | null;
 }): Promise<Manchete[]> {
-  const queries = new Set<string>(QUERIES_BASE.slice(0, 2));
+  // 🔴 Genérico é FALLBACK, nunca tempero (Aline 2026-08-21): as duas buscas
+  // genéricas entravam pra TODO nicho, e é delas que saem as manchetes
+  // nacionais do momento (GLP-1, menopausa, câncer, lipedema…). Resultado:
+  // Aline (funcional), Vivi e Aju (nichos diferentes) recebendo os MESMOS
+  // assuntos. Nicho com busca própria agora usa SÓ as buscas do nicho; o
+  // genérico só entra quando o nicho não resolve nada.
+  const queries = new Set<string>();
   for (const nicho of [params.nichoPrincipal, params.nichoSecundario]) {
     if (!nicho) continue;
     const chaves = nichoParaChaves(nicho);
@@ -125,7 +131,7 @@ export async function buscarPautasQuentes(params: {
     }
     for (const q of chaves) queries.add(q);
   }
-  if (queries.size <= 2) for (const q of QUERIES_BASE) queries.add(q);
+  if (queries.size === 0) for (const q of QUERIES_BASE) queries.add(q);
 
   const resultados = await Promise.allSettled(
     Array.from(queries).slice(0, 5).map(buscarRss),
