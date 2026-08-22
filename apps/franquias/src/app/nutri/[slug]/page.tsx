@@ -31,6 +31,22 @@ async function buscarArquivoUrl(franqueadaId: string, tipo: string) {
   return (data as { url_storage?: string } | null)?.url_storage ?? null;
 }
 
+// Depoimentos REAIS da nutri (prints subidos no onboarding). A LP nunca
+// exibe depoimento inventado: sem print, a seção de prova social não aparece.
+async function buscarDepoimentoUrls(franqueadaId: string, limite = 6) {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("arquivos_franqueada")
+    .select("url_storage")
+    .eq("franqueada_id", franqueadaId)
+    .eq("tipo", "depoimento_print")
+    .order("criado_em", { ascending: false })
+    .limit(limite);
+  return ((data as Array<{ url_storage?: string }> | null) ?? [])
+    .map((a) => a.url_storage)
+    .filter((u): u is string => Boolean(u));
+}
+
 export default async function NutriLPPage({ params }: PageProps) {
   const { slug } = await params;
   const franqueada = await buscarFranqueadaPorSlug(slug);
@@ -39,6 +55,7 @@ export default async function NutriLPPage({ params }: PageProps) {
   const franqueadaId = franqueada.id as string;
   const logoUrl = await buscarArquivoUrl(franqueadaId, "logo_principal");
   const fotoUrl = await buscarArquivoUrl(franqueadaId, "foto_profissional");
+  const depoimentoUrls = await buscarDepoimentoUrls(franqueadaId);
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
   const sofiaSlug = (franqueada.sofia_slug as string | null) ?? null;
   const sofiaBaseUrl = process.env.NEXT_PUBLIC_SOFIA_BASE_URL ?? "https://scannerdasaude.com/sofia";
@@ -56,6 +73,7 @@ export default async function NutriLPPage({ params }: PageProps) {
         franqueada={franqueada}
         logoUrl={logoUrl}
         fotoUrl={fotoUrl}
+        depoimentoUrls={depoimentoUrls}
         sofiaSlug={sofiaSlug}
         sofiaBaseUrl={sofiaBaseUrl}
       />
