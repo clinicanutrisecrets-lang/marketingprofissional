@@ -66,7 +66,7 @@ function conteudoDoCard(s: {
  */
 
 type SugestaoIA = {
-  tipo: "feed_imagem" | "feed_carrossel" | "reel";
+  tipo: "feed_imagem" | "feed_carrossel" | "reel" | "story";
   tema: string;
   gatilho_pauta: string;
   eyebrow: string;
@@ -220,9 +220,15 @@ RECEITAS TERAPÊUTICAS (quando o input trouxer "receitas_disponiveis"):
   - "copy_legenda": explique POR QUE a receita ajuda naquela condição, citando 1-2 genes relevantes, o papel da microbiota e os sintomas que ela apoia — didático, lúdico e CFN-compliant (nada de "cura" ou prescrição). Feche com o CTA investigativo padrão (direct/link na bio pra investigar a saúde com precisão).
   - headline = título da receita (não invente outro)
 
+STORY (sequência de telas do dia — Juliana pediu em 22/08/2026, o pacote não trazia stories):
+- 1 sugestão de tipo "story" por semana: NÃO é legenda de feed. É um ROTEIRO DE TELAS (3 a 5), cada tela com 1-2 frases curtas (máx ~140 caracteres por tela), escritas pra caixa de texto do story.
+- "copy_legenda" do story = as telas separadas por linha em branco, cada uma prefixada "Tela N:". A última tela é o convite de interação com sticker (enquete, caixa de pergunta ou link) — sem promessa de resultado.
+- Preencha também "roteiro": hook = texto da Tela 1; blocos = telas intermediárias; cta = convite da última tela; dicas = 1-2 dicas de sticker/figurinha.
+- Story não tem arte renderizada: o produto é o texto pronto pra digitar tela a tela.
+
 Saída: APENAS JSON válido:
 {"sugestoes": [SugestaoIA, ...]}
-com exatamente: 2 feed_imagem, 1 feed_carrossel, 2 reel — e +1 feed_imagem de receita quando houver receitas disponíveis.
+com exatamente: 2 feed_imagem, 1 feed_carrossel, 2 reel, 1 story — e +1 feed_imagem de receita quando houver receitas disponíveis.
 `.trim();
 
 export async function gerarSugestoesSemana(params: {

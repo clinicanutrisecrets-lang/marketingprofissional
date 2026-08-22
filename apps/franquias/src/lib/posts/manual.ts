@@ -49,13 +49,33 @@ export async function gerarLegendaManual(
   try {
     const claude = createClaude();
     const systemText = buildSystemPrompt(contexto);
+
+    // Stories NÃO recebe legenda de feed: a Juliana escolheu "stories" e o
+    // gerador devolveu um parágrafo de legenda genérico (22/08). Story é
+    // roteiro de TELAS — texto curto que cabe na tela, uma ideia por tela.
+    const instrucaoFormato =
+      tipo === "stories"
+        ? `Stories NÃO leva legenda de feed. Gere um ROTEIRO DE TELAS (3 a 5 telas):
+- Cada tela: 1-2 frases curtas (máx ~140 caracteres) — texto que cabe NA tela do story.
+- "copy_legenda" = as telas separadas por linha em branco, cada uma prefixada "Tela N: ".
+- Tela 1 = gancho que segura o dedo. Telas do meio = desenvolvimento, uma ideia por tela.
+- Última tela = convite de interação com sticker (enquete, caixa de pergunta ou link) — é esse convite que vai em "copy_cta".
+- Stories quase não usa hashtag: devolva no máximo 1-2 em "hashtags".`
+        : tipo === "reels"
+          ? `Reels: a legenda complementa o vídeo (não repete o que ele fala). 150-400 chars em "copy_legenda", gancho na primeira linha.`
+          : `Gere a legenda completa do post (150-400 chars) em "copy_legenda".`;
+
     const userPrompt = `A nutri vai postar um ${tipo} e escreveu esse briefing curto do que quer comunicar:
 
 "${briefing}"
 
-Gere a legenda, CTA e hashtags pra esse post. Responda APENAS JSON:
+${instrucaoFormato}
+
+IMPORTANTE — nada de texto genérico que serviria pra qualquer perfil de nutrição: escreva ESPECÍFICO pro nicho e pro público descritos no contexto do perfil (dor concreta, situação do dia a dia dessa pessoa, vocabulário dela). Se o briefing citar um tema, aprofunde NESSE tema em vez de generalizar.
+
+Responda APENAS JSON:
 {
-  "copy_legenda": "legenda completa (150-400 chars)",
+  "copy_legenda": "...",
   "copy_cta": "CTA curto",
   "hashtags": ["h1", "h2", ...]
 }`;
