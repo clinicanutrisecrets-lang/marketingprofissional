@@ -8,7 +8,7 @@ export type Sugestao = {
   id: string;
   semana_ref: string;
   ordem: number;
-  tipo: "feed_imagem" | "feed_carrossel" | "reel";
+  tipo: "feed_imagem" | "feed_carrossel" | "reel" | "story";
   tema: string;
   gatilho_pauta: string | null;
   copy_legenda: string;
@@ -29,6 +29,7 @@ const LABEL_TIPO: Record<Sugestao["tipo"], { label: string; cor: string }> = {
   feed_imagem: { label: "POST", cor: "bg-emerald-600" },
   feed_carrossel: { label: "CARROSSEL", cor: "bg-indigo-600" },
   reel: { label: "REEL", cor: "bg-rose-600" },
+  story: { label: "STORIES", cor: "bg-amber-500" },
 };
 
 /**
@@ -144,6 +145,15 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
               />
             </a>
           ))}
+        </div>
+      )}
+
+      {s.tipo === "story" && (
+        <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+          <p className="font-semibold">📱 Roteiro de telas — grave/poste uma tela por vez</p>
+          <p className="mt-1 text-amber-900/70">
+            A última tela é o convite de interação (enquete, caixa de pergunta ou link).
+          </p>
         </div>
       )}
 
