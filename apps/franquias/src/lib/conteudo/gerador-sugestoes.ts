@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import { buscarPautasQuentes } from "./trends";
+import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { renderCard, renderReceita, type IlustracaoId } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 
@@ -200,12 +202,16 @@ CARDS (arte tipográfica premium — sem foto):
 - CARROSSEL: toda sugestão de tipo "feed_carrossel" DEVE trazer o campo "slides" — sem ele não existe arte pra postar, e o post não serve pra nada. Formato EXATO, 4 a 6 posições:
   "slides": [
     {"headline": "Capa: a frase forte que para o dedo"},
-    {"headline": "Título curto do slide", "corpo": "2-3 parágrafos curtos, um por linha."},
+    {"headline": "Título curto do slide", "corpo": "No máximo 2 frases curtas, UMA ideia só, continuando o raciocínio do slide anterior."},
     {"headline": "Título curto do slide", "corpo": "..."},
     {"headline": "Fecho", "cta": "Convite de investigação"}
   ]
   Slide 1 = capa (só headline). Slides internos = headline curta + corpo. Último = CTA.
   Os slides seguem o IHC: capa = IDENTIFICAÇÃO (o "sim, sou eu"); slides 2 e 3 = HISTÓRIA de consultório, sem nome; slides seguintes = CONTEÚDO amarrado à história; último = convite de investigação.
+  🔴 CLAREZA DO TEXTO DO SLIDE (a leitora é LEIGA e lê em 3 segundos):
+  - UMA ideia por slide, em NO MÁXIMO 2 frases curtas. Se as frases do slide não falam da MESMA ideia, corte: slide com 3 fatos empilhados confunde e a pessoa desliza embora.
+  - O carrossel é UMA história contínua: cada corpo retoma o slide anterior e prepara o próximo. Lido em sequência, o texto forma um parágrafo único que faz sentido. NUNCA lista de fatos soltos.
+  - Termo técnico (exame, gene, citocina, marcador): NO MÁXIMO 1 por slide, SEMPRE traduzido na mesma frase em linguagem simples, ex.: "PCR ultrassensível (o exame que mostra inflamação escondida)". PROIBIDO empilhar siglas sem explicar (ex.: citar TNF-alfa, IL-6 e homocisteína no mesmo slide).
 - Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
 
 PEDIDOS DA NUTRI (quando o input trouxer "pedidos_da_nutri"):
@@ -225,6 +231,8 @@ STORY (sequência de telas do dia — Juliana pediu em 22/08/2026, o pacote não
 - "copy_legenda" do story = as telas separadas por linha em branco, cada uma prefixada "Tela N:". A última tela é o convite de interação com sticker (enquete, caixa de pergunta ou link) — sem promessa de resultado.
 - Preencha também "roteiro": hook = texto da Tela 1; blocos = telas intermediárias; cta = convite da última tela; dicas = 1-2 dicas de sticker/figurinha.
 - Story não tem arte renderizada: o produto é o texto pronto pra digitar tela a tela.
+
+${REGRA_SEM_TRAVESSAO}
 
 Saída: APENAS JSON válido:
 {"sugestoes": [SugestaoIA, ...]}
@@ -346,7 +354,10 @@ export async function gerarSugestoesSemana(params: {
 
   let sugestoes: SugestaoIA[];
   try {
-    sugestoes = (JSON.parse(jsonMatch[0]) as { sugestoes: SugestaoIA[] }).sugestoes ?? [];
+    // Trava do travessão: vale mesmo quando o modelo ignora a regra do prompt.
+    sugestoes = semTravessoesFundo(
+      (JSON.parse(jsonMatch[0]) as { sugestoes: SugestaoIA[] }).sugestoes ?? [],
+    );
   } catch {
     return { criadas: 0, erro: "JSON inválido do agente" };
   }

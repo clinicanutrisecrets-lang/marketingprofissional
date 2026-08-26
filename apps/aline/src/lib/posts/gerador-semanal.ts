@@ -3,6 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createAlineClient } from "@/lib/supabase/server";
 import { CLAUDE_MODEL } from "@/lib/claude/scripts";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import {
   FRAMEWORK_EUGENE_SCHWARTZ,
@@ -503,7 +504,10 @@ REGRAS DE ARTE (campos arte_*):
 - arte_subtitle (opcional): frase de apoio que complementa, MAXIMO 80 caracteres.
 - arte_eyebrow (opcional): pequena tag/categoria em cima do headline, MAXIMO 30 caracteres. Ex: "DICA RAPIDA", "MITO OU VERDADE", "ATENCAO".
 - O conjunto headline+subtitle precisa fazer sentido SOZINHO (quem ve a imagem sem ler legenda entende).
-- Banir emoji nos campos arte_*.`;
+- Banir emoji nos campos arte_*.
+
+PONTUACAO — REGRA ABSOLUTA:
+- NUNCA use travessao ("—") nem meia-risca ("–") em nenhum texto. Use virgula, ponto, dois-pontos ou parenteses curtos. Hifen de palavra composta ("anti-inflamatorio") e permitido.`;
 }
 
 function montarUserPrompt(
@@ -575,7 +579,9 @@ function parsePostsJson(texto: string): PostGerado[] {
     const match = limpo.match(/\{[\s\S]*\}/);
     if (!match) return [];
     const parsed = JSON.parse(match[0]) as { posts?: PostGerado[] };
-    return parsed.posts ?? [];
+    // Trava do travessão (pedido da Aline, 26/08/2026): nenhum post sai
+    // com "—"/"–", mesmo que o modelo ignore a regra do prompt.
+    return semTravessoesFundo(parsed.posts ?? []);
   } catch {
     return [];
   }

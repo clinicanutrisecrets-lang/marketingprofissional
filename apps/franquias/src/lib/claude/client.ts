@@ -55,3 +55,16 @@ REGRAS DE COMPLIANCE OBRIGATÓRIAS (CFN — Brasil) — NÃO PODEM SER VIOLADAS:
 
 Qualquer violação = post rejeitado automaticamente.
 `.trim();
+
+/**
+ * Regra de escrita da Aline (26/08/2026): travessão é proibido em TODO
+ * conteúdo gerado. Entra em todo system prompt de geração de copy, e o
+ * sanitizador determinístico (lib/texto/sem-travessoes) garante na saída
+ * o que o prompt só pede.
+ */
+export const REGRA_SEM_TRAVESSAO = `
+PONTUAÇÃO — REGRA ABSOLUTA:
+- NUNCA use travessão ("—") nem meia-risca ("–") em NENHUM texto: legenda, slide, headline, roteiro, CTA, e-mail, LP.
+- No lugar, use vírgula, ponto, dois-pontos ou parênteses curtos. Prefira duas frases curtas a uma frase longa partida por travessão.
+- Hífen comum de palavra composta ("anti-inflamatório", "low-carb") e de faixa numérica ("70-150") continua permitido.
+`.trim();

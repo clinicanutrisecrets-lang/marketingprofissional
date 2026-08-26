@@ -19,6 +19,12 @@ CARD_X, CARD_W = 62, 452
 COR = {"AMBER":AMBER,"CORAL":CORAL,"MUSTARD":MUSTARD,"TIFFANY":TIFFANY,
        "ROXO":ROXO,"ROSE":ROSE,"INK":INK}
 
+def cor(nome, fb=MUSTARD):
+    """Cor por nome, com fallback. O SPEC vem de modelo: nome de cor inventado
+    não pode derrubar 10 minutos de render (mesma classe do KeyError 'belly'
+    de 18/08/2026 e do KeyError 'alto' de 24/08/2026)."""
+    return COR.get(str(nome or ""), fb)
+
 def bg_warm(k): return vgrad(lerp(PAPER,(252,230,212),k), lerp((233,222,205),(244,204,180),k))
 def bg_cool():  return vgrad(PAPER, (231,224,210))
 def bg_ink():   return vgrad((17,30,35), (11,20,24))
@@ -78,7 +84,7 @@ def c_hook(S, c, fi, n):
                  flush=.12+.05*math.sin(sec*1.8), eye="open", fade=(1400,BODY_BOTTOM))
     base=Image.alpha_composite(base, lay.reduce(SS))
     sh,d=new_sharp()
-    ac = COR[S.get("cor_tema","ROSE")]
+    ac = cor(S.get("cor_tema"), ROSE)
     a=int(255*fx(sec,0,0.40))
     ft, ts = fit_title(d, S["tema"], SAFE_R-SAFE_L)
     d.text((SAFE_L*SS, 236*SS), S["tema"], font=ft, fill=INK+(a,))
@@ -95,7 +101,7 @@ def c_hook(S, c, fi, n):
     return flatten(sh, base)
 
 def c_sintoma(S, c, fi, n):
-    sec=fi/FPS; ac=COR[c["cor"]]
+    sec=fi/FPS; ac=cor(c.get("cor"), AMBER)
     calor = c.get("calor", False)
     inten=(math.sin(sec*2*math.pi/2.6-math.pi/2)+1)/2 if calor else 0
     base = bg_warm(.35+.55*inten) if calor else bg_cool()
@@ -115,7 +121,7 @@ def c_sintoma(S, c, fi, n):
     eyebrow(d, c.get("eyebrow","sintoma"), ac)
     ap=int(255*fx(sec,0))
     cy = c.get("card_y", 946)
-    card(d, CARD_X, cy, CARD_W, c["titulo"], c["texto"], ac,
+    card(d, CARD_X, cy, CARD_W, c.get("titulo",""), c.get("texto",""), ac,
          eyebrow=c.get("card_eb","o que você sente"), alpha=ap)
     # O roteiro é gerado por modelo e já chegou com alvo fora do mapa da figura
     # ("belly", 18/08/2026 — matou o render inteiro com KeyError e o reel da
@@ -132,25 +138,25 @@ def c_sintoma(S, c, fi, n):
     return flatten(sh, base)
 
 def c_gene(S, c, fi, n):
-    sec=fi/FPS; ac=COR.get(c.get("cor","MUSTARD"))
+    sec=fi/FPS; ac=cor(c.get("cor"), MUSTARD)
     base=bg_cool(); sh,d=new_sharp()
     eyebrow(d, c.get("eyebrow","por que acontece"), ac)
-    helix(d, 838, 940, 900, 108, (sec*ROT)*c.get("giro",1), ac, COR[c.get("cor2","TIFFANY")])
+    helix(d, 838, 940, 900, 108, (sec*ROT)*c.get("giro",1), ac, cor(c.get("cor2"), TIFFANY))
     ap=int(255*fx(sec,0))
-    card(d, CARD_X, 380, CARD_W+30, c["gene"], c["texto"], ac,
-         eyebrow="gene", rs=c["rs"], alpha=ap, fs=40)
+    card(d, CARD_X, 380, CARD_W+30, c.get("gene",""), c.get("texto",""), ac,
+         eyebrow="gene", rs=c.get("rs",""), alpha=ap, fs=40)
     sig(d)
     return flatten(sh, base)
 
 def c_sinergia(S, c, fi, n):
     """Revelação sequencial: ilustração -> nome -> quantidade -> frequência."""
-    sec=fi/FPS; ac=COR[c["cor"]]
+    sec=fi/FPS; ac=cor(c.get("cor"), TIFFANY)
     base=bg_cool(); sh,d=new_sharp()
     eyebrow(d, "sinergia no prato", ac)
     a0=int(255*fx(sec,0,0.40))
-    headline(d, c["titulo"], 248, 60, INK+(a0,), maxw=820)
+    headline(d, c.get("titulo",""), 248, 60, INK+(a0,), maxw=820)
 
-    itens = c["itens"]; passo = c.get("passo", 3.0); t0 = 0.75
+    itens = c.get("itens") or []; passo = c.get("passo", 3.0); t0 = 0.75
     for i,it in enumerate(itens):
         ini = t0 + i*passo
         ent = fx(sec, ini, 0.45)
@@ -161,17 +167,20 @@ def c_sinergia(S, c, fi, n):
         yb = 640 + (1-ent)*40
         # prato
         d.ellipse([(540-215)*SS,(yb-215)*SS,(540+215)*SS,(yb+215)*SS], fill=ac+(int(34*vis),))
-        GLIFOS[it["glifo"]](d, 540, yb + math.sin(sec*1.9+i)*7, 360*(0.90+0.10*ent), av)
+        # Glifo inventado pelo modelo NÃO derruba o render: fica o prato sem
+        # ilustração, com nome/quantidade/frequência intactos.
+        _gl = GLIFOS.get(it.get("glifo",""))
+        if _gl: _gl(d, 540, yb + math.sin(sec*1.9+i)*7, 360*(0.90+0.10*ent), av)
         # nome
-        fn_=body_f(54,"Bold"); nm=it["nome"]
+        fn_=body_f(54,"Bold"); nm=it.get("nome","")
         d.text(((W-tw(d,nm,fn_)/SS)/2*SS, 920*SS), nm, font=fn_, fill=INK+(av,))
         # quantidade
         aq=int(255*vis*fx(sec, ini+0.55, 0.35))
-        fq=title_f(82); q=it["qtd"]
+        fq=title_f(82); q=it.get("qtd","")
         d.text(((W-tw(d,q,fq)/SS)/2*SS, 1000*SS), q, font=fq, fill=ac+(aq,))
         # frequência
         af=int(255*vis*fx(sec, ini+1.05, 0.35))
-        ff=body_f(38,"SemiBold"); fr=it["freq"]
+        ff=body_f(38,"SemiBold"); fr=it.get("freq","")
         fw=tw(d,fr,ff)/SS
         d.rounded_rectangle([((W-fw)/2-30)*SS, 1136*SS, ((W+fw)/2+30)*SS, 1204*SS],
                             radius=34*SS, outline=ac+(int(af*0.75),), width=int(2.5*SS))
@@ -182,7 +191,7 @@ def c_sinergia(S, c, fi, n):
 
 def c_nota(S, c, fi, n):
     """Cena só de texto: o porquê da combinação, em corpo grande."""
-    sec=fi/FPS; ac=COR[c["cor"]]
+    sec=fi/FPS; ac=cor(c.get("cor"), TIFFANY)
     base=bg_cool(); sh,d=new_sharp()
     eyebrow(d, c.get("eyebrow","por que essa combinação"), ac)
 
@@ -195,7 +204,8 @@ def c_nota(S, c, fi, n):
             gx, gy = x0+i*passo_x, 400 + (1-gp)*24
             d.ellipse([(gx-104)*SS,(gy-104)*SS,(gx+104)*SS,(gy+104)*SS],
                       fill=ac+(int(30*gp),))
-            GLIFOS[g](d, gx, gy, 176*(0.9+0.1*gp), int(255*gp))
+            _gl = GLIFOS.get(g)
+            if _gl: _gl(d, gx, gy, 176*(0.9+0.1*gp), int(255*gp))
         ty = 600
     else:
         ty = 380
@@ -210,19 +220,29 @@ def c_nota(S, c, fi, n):
     return flatten(sh, base)
 
 def c_marcadores(S, c, fi, n):
-    sec=fi/FPS; ac=COR[c["cor"]]
+    sec=fi/FPS; ac=cor(c.get("cor"), ROXO)
     base=bg_cool(); sh,d=new_sharp()
-    eyebrow(d, c["eyebrow"], ac)
+    eyebrow(d, c.get("eyebrow","exame de sangue"), ac)
     a=int(255*fx(sec,0,0.40))
-    y=headline(d, c["titulo"], 250, 60, INK+(a,), maxw=820)
+    y=headline(d, c.get("titulo",""), 250, 60, INK+(a,), maxw=820)
     y += 40
-    for i,it in enumerate(c["itens"]):
+    itens = c.get("itens") or []
+    for i,it in enumerate(itens):
         ap=int(255*fx(sec, 0.45+i*0.42, 0.5))
         if ap<=2: continue
-        y = marker_row(d, SAFE_L, y, SAFE_R-SAFE_L, it["alto"], it["nome"],
-                       it["ludico"], it["alavanca"], ac, alpha=ap)
+        # 🔴 O prompt do agente gerava itens {"nome","faixa"} enquanto esta
+        # cena exigia {"alto","nome","ludico","alavanca"} — KeyError('alto')
+        # matou o render de 24/08/2026 no frame 9/12 (reel da endometriose da
+        # Juliana). A cena agora aceita as duas formas: sem "ludico" a linha
+        # descritiva some, e a "faixa" antiga vira a alavanca (↳ faixa ideal).
+        alto = bool(it.get("alto", True))
+        nome = it.get("nome", "")
+        ludico = it.get("ludico") or ""
+        alavanca = it.get("alavanca") or it.get("faixa") or ""
+        y = marker_row(d, SAFE_L, y, SAFE_R-SAFE_L, alto, nome,
+                       ludico, alavanca, ac, alpha=ap)
     if c.get("nota"):
-        na=int(255*fx(sec, 0.55+len(c["itens"])*0.42+0.6, 0.55))
+        na=int(255*fx(sec, 0.55+len(itens)*0.42+0.6, 0.55))
         if na>2:
             callout(d, SAFE_L, min(y+28, 1276), SAFE_R-SAFE_L, c["nota"], ac, alpha=na)
     sig(d)
@@ -369,7 +389,16 @@ def render(SPEC, out_mp4, workdir=None):
     shutil.rmtree(workdir, ignore_errors=True); os.makedirs(workdir, exist_ok=True)
     idx=0; t0=time.time()
     for ci,c in enumerate(SPEC["cenas"]):
-        fn=TIPOS[c["tipo"]]; N=int(round(c["dur"]*FPS))
+        # Cena de tipo desconhecido ou sem duração usável não derruba o job:
+        # pula com aviso (o vídeo sai sem ela, que é infinitamente melhor que
+        # "erro — tente de novo" depois de 10 minutos).
+        fn=TIPOS.get(c.get("tipo"))
+        if fn is None:
+            print(f"  !! cena {ci+1} de tipo desconhecido ({c.get('tipo')!r}) — pulada", flush=True)
+            continue
+        try: dur=float(c.get("dur", 5.0))
+        except (TypeError, ValueError): dur=5.0
+        N=int(round(max(1.0, dur)*FPS))
         for i in range(N):
             fn(SPEC, c, i, N).convert("RGB").save(f"{workdir}/f_{idx:05d}.jpg", quality=92)
             idx+=1

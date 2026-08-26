@@ -5,6 +5,7 @@ import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { buildSystemPrompt } from "@/lib/claude/prompts";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { traduzirErroClaude } from "@/lib/claude/erros";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { revalidatePath } from "next/cache";
 
 type ContextoFranqueada = Parameters<typeof buildSystemPrompt>[0];
@@ -98,11 +99,13 @@ Responda APENAS JSON:
       .replace(/\n?```$/i, "")
       .trim();
 
-    const parsed = JSON.parse(cleaned) as {
-      copy_legenda: string;
-      copy_cta: string;
-      hashtags: string[];
-    };
+    const parsed = semTravessoesFundo(
+      JSON.parse(cleaned) as {
+        copy_legenda: string;
+        copy_cta: string;
+        hashtags: string[];
+      },
+    );
 
     return {
       ok: true,

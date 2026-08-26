@@ -3,7 +3,7 @@
  * A parte estática vai com cache_control pra reduzir custo em ~90%.
  */
 
-import { COMPLIANCE_CFN_BR } from "./client";
+import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
 
 /**
  * Produto real da nutri no Scanner Tratamentos (cache produtos_scanner,
@@ -77,7 +77,9 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "",
     "CARROSSEIS (tipo feed_carrossel):",
     "- Slide 1: hook IMPACTANTE e ÉTICO — é a capa, tem que parar o scroll. Nunca comece com título explicativo.",
-    "- Slides 2-7: 1 ideia por slide. Frases curtas e impactantes. Dados que surpreendem.",
+    "- Slides 2-7: UMA ideia por slide, em NO MÁXIMO 2 frases curtas. Se duas frases do slide não falam da MESMA ideia, corte uma: slide com 3 fatos empilhados confunde e a pessoa desliza embora.",
+    "- O carrossel conta UMA história contínua: cada slide retoma o raciocínio do anterior e prepara o próximo. Lido em sequência, o texto dos slides forma um parágrafo único que faz sentido. Nada de lista de fatos soltos.",
+    "- Termo técnico (nome de exame, gene, citocina, marcador): NO MÁXIMO 1 por slide, e SEMPRE traduzido na mesma frase em linguagem simples, ex.: 'PCR ultrassensível (o exame que mostra inflamação escondida)'. NUNCA empilhar siglas sem explicar.",
     "- Penúltimo slide: momento de quebra de padrão ou resumo brutal.",
     "- Último slide: fechamento forte + CTA coerente com o tema.",
     "- Tudo precisa ser compartilhável — a pessoa salva porque quer lembrar ou manda pra alguém.",
@@ -133,6 +135,8 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     ...(ctx.produtos?.length ? blocoProdutos(ctx.produtos) : []),
     "",
     COMPLIANCE_CFN_BR,
+    "",
+    REGRA_SEM_TRAVESSAO,
     "",
     "FORMATO DE RESPOSTA:",
     "Retorne APENAS JSON válido seguindo o schema pedido na mensagem do usuário.",
@@ -212,10 +216,10 @@ export function buildPromptPost(params: {
     ? `
 INSTRUÇÕES CARROSSEL:
 - Slide 1 = CAPA: hook impactante que para o scroll (mas sempre ético e profissional). NÃO é título explicativo.
-- Slides 2 a 7: 1 ideia por slide, frases curtas, dados que surpreendem, ritmo crescente.
+- Slides 2 a 7: UMA ideia por slide, no máximo 2 frases curtas. Cada slide continua o raciocínio do anterior: lido em sequência, o carrossel é UMA história, não uma lista de fatos soltos.
+- Termo técnico: no máximo 1 por slide, sempre traduzido na mesma frase em linguagem simples ("homocisteína (um marcador de inflamação que aparece no exame de sangue)"). Nunca empilhar siglas sem explicar.
 - Penúltimo slide: quebra de padrão ou resumo brutal.
 - Último slide: fechamento forte + CTA.
-- Cada slide precisa ser compartilhável/salvável isoladamente.
 - No campo "slides", retorne array com texto de cada slide.`
     : isReels
       ? `

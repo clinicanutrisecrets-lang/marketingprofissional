@@ -240,7 +240,11 @@ def dir_chip(d, cx, cy, r, up, accent, alpha=255):
                     fill=PAPER+(alpha,))
 
 def marker_row(d, x, y, w, up, nome, ludico, alavanca, accent, alpha=255):
-    """Linha de parâmetro de exame ou bactéria."""
+    """Linha de parâmetro de exame ou bactéria.
+
+    ludico e alavanca podem vir vazios (SPEC gerado por modelo): a linha
+    correspondente simplesmente não é desenhada — nunca um "↳ " solto.
+    """
     r = 32
     dir_chip(d, x+r, y+r+6, r, up, accent, alpha)
     tx = x + r*2 + 28
@@ -248,10 +252,13 @@ def marker_row(d, x, y, w, up, nome, ludico, alavanca, accent, alpha=255):
     f_n = body_f(43, "Bold"); f_l = body_f(35, "Regular"); f_a = body_f(32, "SemiBold")
     d.text((tx*SS, y*SS), nome, font=f_n, fill=INK+(alpha,))
     cy = y + 56
-    cy = para(d, tx, cy, ludico, f_l, lerp(INK,(92,106,110),0.35), iw)
-    cy += 6
-    d.text((tx*SS, cy*SS), "↳ " + alavanca, font=f_a, fill=accent+(alpha,))
-    return cy + 58
+    if ludico:
+        cy = para(d, tx, cy, ludico, f_l, lerp(INK,(92,106,110),0.35), iw)
+        cy += 6
+    if alavanca:
+        d.text((tx*SS, cy*SS), "↳ " + alavanca, font=f_a, fill=accent+(alpha,))
+        cy += 44
+    return cy + 14
 
 def para_reveal(d, x, y, txt, f, fill, maxw, sec, t0=0.0, passo=0.42, lh=1.50):
     """Parágrafo com revelação linha a linha (ritmo de leitura)."""

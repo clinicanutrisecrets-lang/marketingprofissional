@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 export const CLAUDE_MODEL = "claude-sonnet-4-5";
 
@@ -88,6 +89,9 @@ VOCABULÁRIO COMERCIAL PROIBIDO:
 - "dieta padrão", "dieta pronta", "cardápio pronto" — mesma razão
 - Use "sinergias", "mapa metabólico", "plano feito pra você", "investigação"
 
+PONTUAÇÃO — REGRA ABSOLUTA:
+- NUNCA use travessão ("—") nem meia-risca ("–") em nenhum texto. Use vírgula, ponto, dois-pontos ou parênteses curtos. Hífen de palavra composta ("anti-inflamatório") é permitido.
+
 Retorne APENAS JSON válido, sem markdown:
 {
   "titulo": "título curto pro post (max 60 chars)",
@@ -119,5 +123,7 @@ Retorne APENAS JSON válido, sem markdown:
     .replace(/\n?```$/i, "")
     .trim();
 
-  return JSON.parse(cleaned);
+  // Trava do travessão (pedido da Aline, 26/08/2026): vale mesmo quando o
+  // modelo ignora a regra do prompt.
+  return semTravessoesFundo(JSON.parse(cleaned));
 }
