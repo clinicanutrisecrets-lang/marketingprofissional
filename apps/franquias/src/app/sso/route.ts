@@ -35,6 +35,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) {
+    console.error("[sso] chegou em /sso sem token na URL");
     return NextResponse.redirect(new URL("/login?erro=sso_token_ausente", req.url));
   }
 
@@ -44,16 +45,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/login?erro=sso_config", req.url));
   }
 
-  const payload = verificarJwtHs256(token, secret);
-  if (!payload) {
+  const verificacao = verificarJwtHs256(token, secret);
+  if (!verificacao.ok) {
+    // `assinatura` aqui significa MARKETING_SSO_SECRET diferente entre os dois
+    // Vercels — a causa mais provável de "parou do nada" e a que menos aparece.
+    console.error(`[sso] jwt recusado: ${verificacao.falha}`);
     return NextResponse.redirect(new URL("/login?erro=sso_invalido", req.url));
   }
+  const payload = verificacao.payload;
 
   const scannerUserId = typeof payload.sub === "string" ? payload.sub : "";
   const emailToken =
     typeof payload.email === "string" ? payload.email.toLowerCase().trim() : "";
   const nomeToken = typeof payload.nome === "string" ? payload.nome.trim() : "";
   if (!scannerUserId || !emailToken) {
+    console.error("[sso] token válido mas sem sub/email — contrato quebrado do emissor");
     return NextResponse.redirect(new URL("/login?erro=sso_invalido", req.url));
   }
 
@@ -236,22 +242,45 @@ async function vincularOnboarding(
 }
 
 /**
- * Verifica JWT HS256 na mão (sem lib): assinatura + exp + iss + aud.
- * Retorna o payload ou null.
+ * Por que a verificação do JWT falhou. Todas estas viravam um `null` só, e o
+ * `null` virava `/login?erro=sso_invalido` SEM LOG NENHUM.
+ *
+ * 🔴 Caso Viviane (26/08/2026): ela relatou que o Marketing "parou do nada" e
+ * não havia como saber se era segredo divergente entre os dois Vercels, token
+ * vencido no caminho, ou outra coisa — os seis motivos abaixo são
+ * indistinguíveis pelo lado de fora, e nenhum deixava rastro. Agora cada um
+ * tem nome e vai pro log.
+ *
+ * `assinatura` é o que aponta MARKETING_SSO_SECRET diferente nos dois lados —
+ * a hipótese que mais custa tempo quando não se tem essa informação.
  */
-function verificarJwtHs256(
-  token: string,
-  secret: string,
-): Record<string, unknown> | null {
+type FalhaJwt =
+  | "formato"
+  | "algoritmo"
+  | "assinatura"
+  | "expirado"
+  | "emissor"
+  | "audiencia"
+  | "payload_ilegivel";
+
+type ResultadoJwt =
+  | { ok: true; payload: Record<string, unknown> }
+  | { ok: false; falha: FalhaJwt };
+
+/**
+ * Verifica JWT HS256 na mão (sem lib): assinatura + exp + iss + aud.
+ * Devolve o payload ou o motivo exato da recusa.
+ */
+function verificarJwtHs256(token: string, secret: string): ResultadoJwt {
   const partes = token.split(".");
-  if (partes.length !== 3) return null;
+  if (partes.length !== 3) return { ok: false, falha: "formato" };
   const [h, p, s] = partes;
 
   try {
     const header = JSON.parse(Buffer.from(h, "base64url").toString("utf8")) as {
       alg?: string;
     };
-    if (header.alg !== "HS256") return null;
+    if (header.alg !== "HS256") return { ok: false, falha: "algoritmo" };
 
     const esperada = createHmac("sha256", secret).update(`${h}.${p}`).digest();
     const recebida = Buffer.from(s, "base64url");
@@ -259,7 +288,7 @@ function verificarJwtHs256(
       esperada.length !== recebida.length ||
       !timingSafeEqual(esperada, recebida)
     ) {
-      return null;
+      return { ok: false, falha: "assinatura" };
     }
 
     const payload = JSON.parse(
@@ -267,12 +296,16 @@ function verificarJwtHs256(
     ) as Record<string, unknown>;
 
     const agora = Math.floor(Date.now() / 1000);
-    if (typeof payload.exp !== "number" || payload.exp < agora) return null;
-    if (payload.iss !== "scannerdasaude.com") return null;
-    if (payload.aud !== "marketing.scannerdasaude.com") return null;
+    if (typeof payload.exp !== "number" || payload.exp < agora) {
+      return { ok: false, falha: "expirado" };
+    }
+    if (payload.iss !== "scannerdasaude.com") return { ok: false, falha: "emissor" };
+    if (payload.aud !== "marketing.scannerdasaude.com") {
+      return { ok: false, falha: "audiencia" };
+    }
 
-    return payload;
+    return { ok: true, payload };
   } catch {
-    return null;
+    return { ok: false, falha: "payload_ilegivel" };
   }
 }
