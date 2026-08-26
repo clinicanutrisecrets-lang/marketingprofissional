@@ -1,4 +1,5 @@
 import { createClaude, CLAUDE_MODEL } from "./client";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import {
   buildSystemPrompt,
   buildPromptPost,
@@ -163,7 +164,9 @@ function parseJSON<T>(raw: string): T {
     .replace(/\n?```$/i, "")
     .trim();
   try {
-    return JSON.parse(cleaned) as T;
+    // Travessão nunca sai daqui, mesmo que o modelo ignore a regra do prompt
+    // (pedido da Aline, 26/08/2026).
+    return semTravessoesFundo(JSON.parse(cleaned)) as T;
   } catch (e) {
     throw new Error(`JSON inválido do Claude: ${(e as Error).message}\nRaw: ${raw.slice(0, 300)}`);
   }

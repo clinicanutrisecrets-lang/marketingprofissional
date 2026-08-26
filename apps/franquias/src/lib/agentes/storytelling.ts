@@ -2,6 +2,8 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { FRAMEWORK_DONALD_MILLER_SB7, FRAMEWORKS_MATRIZ_USO, COMPLIANCE_CFN_2026_RESUMO } from "./_frameworks";
+import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 const MODEL = "claude-sonnet-4-5";
 
@@ -26,6 +28,8 @@ VOCABULÁRIO COMERCIAL PROIBIDO (além das regras CFN):
 - NUNCA "protocolo" / "protocolos" — contradiz personalização da marca
 - NUNCA "dieta padrão", "dieta pronta", "cardápio pronto"
 - Use: "sinergias", "mapa metabólico", "plano personalizado", "investigação"
+
+${REGRA_SEM_TRAVESSAO}
 
 Saída: APENAS JSON válido.
 `.trim();
@@ -144,7 +148,7 @@ export async function executarStorytelling(
       .replace(/^```\s*/, "")
       .replace(/```\s*$/, "")
       .trim();
-    parsed = JSON.parse(jsonLimpo);
+    parsed = semTravessoesFundo(JSON.parse(jsonLimpo) as Record<string, unknown>);
   } catch {
     return { ok: false, erro: `JSON inválido: ${responseText.slice(0, 300)}` };
   }

@@ -3,6 +3,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 const MODEL = "claude-sonnet-4-5";
 const REPO = "clinicanutrisecrets-lang/marketingprofissional";
@@ -35,7 +37,7 @@ FORMATO EXATO (siga à risca — o renderizador é rígido):
   {"tipo":"gene","dur":6.2,"cor":"MUSTARD","cor2":"AMBER","gene":"COMT","rs":"rs4680","texto":"Metáfora lúdica explicando o gene em 2 frases."},
   {"tipo":"sinergia","dur":10.6,"cor":"TIFFANY","titulo":"Título da sinergia","itens":[{"glifo":"espinafre","nome":"Espinafre cozido","qtd":"1 xícara","freq":"todos os dias"},{"glifo":"cacau","nome":"Cacau 70%","qtd":"20 g","freq":"todos os dias"},{"glifo":"ovo","nome":"Ovos","qtd":"2 unidades","freq":"5x por semana"}]},
   {"tipo":"nota","dur":6.6,"cor":"TIFFANY","glifos":["espinafre","cacau","ovo"],"texto":"Por que a combinação funciona, em 2 frases."},
-  {"tipo":"marcadores","dur":7.0,"cor":"ROXO","eyebrow":"exame de sangue","titulo":"O que investigar","itens":[{"nome":"Ferritina","faixa":"ideal 70-150"},{"nome":"Vitamina D","faixa":"ideal 40-60"},{"nome":"TSH","faixa":"ideal < 2,5"}]},
+  {"tipo":"marcadores","dur":7.0,"cor":"ROXO","eyebrow":"exame de sangue","titulo":"O que investigar","itens":[{"alto":false,"nome":"Ferritina","ludico":"O estoque de ferro do corpo, a bateria da sua energia.","alavanca":"faixa ideal 70-150"},{"alto":false,"nome":"Vitamina D","ludico":"O hormônio do sol que regula imunidade e disposição.","alavanca":"faixa ideal 40-60"},{"alto":true,"nome":"TSH","ludico":"O termostato da tireoide: quando sobe, o metabolismo desacelera.","alavanca":"ideal abaixo de 2,5"}]},
   {"tipo":"virada","dur":5.0,"l1":"Primeira linha grande.","l2":"Segunda linha grande — o reenquadramento.","texto":"1-2 frases curtas que sustentam a virada."},
   {"tipo":"cta","dur":5.0,"l1":"Pergunta que convida a investigar.","acao1":"ME CHAMA NO DIRECT","l2":"Segunda pergunta, pra quem não vai agir agora.","acao2":"SALVE ESTE REEL"}
  ]
@@ -45,11 +47,60 @@ REGRAS DURAS:
 - glifo/glifos: APENAS destes: ${GLIFOS_VALIDOS.join(", ")}. NUNCA invente outro.
 - alvo: uma de: face, eyes, neck, chest, spine. São os pontos REAIS da figura no renderizador (spine = tronco/abdômen; use spine pra sintomas de barriga/quadril). NUNCA invente outro — "belly" já derrubou um render inteiro (18/08/2026).
 - Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
+- Cena marcadores: cada item tem EXATAMENTE as chaves alto, nome, ludico, alavanca — o renderizador exige as quatro (faltar "alto" derrubou o render de 24/08/2026). "alto": true quando o sinal de atenção é o marcador ALTO, false quando é ele BAIXO. "ludico": tradução do marcador em 1 frase simples de leiga. "alavanca": a faixa ideal ou a próxima ação, curtinha (ex.: "faixa ideal 70-150").
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
 - 🔴 A CENA "hook" PRECISA FUNCIONAR SEM CONTEXTO: escreva l1/l2 pensando em quem NUNCA VIU este perfil. Sem depender de post anterior, de série, de bordão ou de saber quem está falando; sem "como eu sempre digo" / "quem me acompanha sabe"; com promessa ESPECÍFICA e OBSERVÁVEL, que a pessoa confere na própria vida. Específico: "Seu exame veio normal e você continua cansada." Sensacionalista (NÃO usar): "o segredo que ninguém te conta". Nada de promessa de resultado.
 - LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção — l1 e l2 são as DUAS linhas grandes (ex.: l1 "Não é força de vontade." / l2 "É informação que você ainda não investigou.") e "texto" é o parágrafo de apoio. A cena "cta" é a última e convida pra investigação: l1 é a pergunta principal (ex.: "Quer investigar sua saúde com precisão?") e acao1 a etiqueta em CAIXA ALTA ao lado do ícone de AVIÃO/enviar (ex.: "ME CHAMA NO DIRECT"); l2 é a segunda pergunta, pra quem ainda não vai agir agora (ex.: "Vai querer consultar isso depois?") e acao2 a etiqueta ao lado do ícone de MARCADOR/salvar (ex.: "SALVE ESTE REEL"). Cada etiqueta tem no máximo 18 caracteres e precisa combinar com o gesto do seu ícone. Varie as palavras a cada reel.
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
+
+${REGRA_SEM_TRAVESSAO}
 `.trim();
+
+/**
+ * Rede de segurança do SPEC gerado: o render roda ~10 min no worker do
+ * GitHub e um campo fora do contrato mata o job INTEIRO (KeyError 'belly'
+ * em 18/08/2026, KeyError 'alto' em 24/08/2026 — a nutri só via "erro,
+ * tente de novo"). O renderizador também ficou tolerante, mas corrigir
+ * aqui é grátis; descobrir lá custa um render de 10 minutos.
+ */
+const ALVOS_VALIDOS = new Set(["face", "eyes", "neck", "chest", "spine"]);
+const ALVO_ALIAS: Record<string, string> = {
+  head: "face", cabeca: "face", belly: "spine", barriga: "spine",
+  hips: "spine", quadril: "spine", stomach: "spine",
+};
+const TIPOS_CENA = new Set([
+  "hook", "sintoma", "gene", "sinergia", "nota", "marcadores", "virada", "cta", "cta_anuncio",
+]);
+
+function normalizarSpecReel(spec: Record<string, unknown>): Record<string, unknown> {
+  // Travessão fora de TODO texto do vídeo (pedido da Aline, 26/08/2026)
+  const s = semTravessoesFundo(spec);
+  const cenas = Array.isArray(s.cenas) ? (s.cenas as Record<string, unknown>[]) : [];
+  s.cenas = cenas
+    .filter((c) => TIPOS_CENA.has(String(c.tipo)))
+    .map((c) => {
+      if (c.tipo === "sintoma") {
+        const alvo = String(c.alvo ?? "chest");
+        c.alvo = ALVOS_VALIDOS.has(alvo) ? alvo : (ALVO_ALIAS[alvo] ?? "chest");
+      }
+      if (c.tipo === "nota" && Array.isArray(c.glifos)) {
+        // glifo inventado é só decoração: sai da lista em vez de derrubar o job
+        c.glifos = (c.glifos as unknown[]).filter((g) => GLIFOS_VALIDOS.includes(String(g)));
+      }
+      if (c.tipo === "marcadores" && Array.isArray(c.itens)) {
+        // Completa o contrato do renderizador {alto, nome, ludico, alavanca},
+        // aceitando o formato {nome, faixa} que o prompt antigo ensinava.
+        c.itens = (c.itens as Record<string, unknown>[]).map((it) => ({
+          alto: typeof it.alto === "boolean" ? it.alto : true,
+          nome: String(it.nome ?? ""),
+          ludico: String(it.ludico ?? ""),
+          alavanca: String(it.alavanca ?? it.faixa ?? ""),
+        }));
+      }
+      return c;
+    });
+  return s;
+}
 
 export async function gerarReelAnimadoAction(
   tema: string,
@@ -121,6 +172,7 @@ export async function gerarReelAnimadoAction(
   } catch {
     return { ok: false, msg: "roteiro inválido — tente de novo" };
   }
+  spec = normalizarSpecReel(spec);
   spec.assinatura = assinatura;
 
   // 2. Registra e dispara o worker

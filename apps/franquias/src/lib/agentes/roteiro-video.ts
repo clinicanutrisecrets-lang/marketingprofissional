@@ -1,5 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
+import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 export type RoteiroVideoInput = {
   franqueada: {
@@ -66,6 +68,8 @@ DICAS DE GRAVAÇÃO OBRIGATÓRIAS:
 - Mencione energia/postura (falar com energia, olhar na câmera)
 - Mencione roupas profissionais mas acessíveis
 
+${REGRA_SEM_TRAVESSAO}
+
 Saída: APENAS JSON válido conforme o schema pedido.
 `.trim();
 
@@ -91,7 +95,7 @@ Retorne JSON com este schema:
 {
   "duracao_segundos": 30,
   "formato": "reels_30s",
-  "hook": "texto do hook — primeiros 3 segundos que param o scroll",
+  "hook": "texto do hook (primeiros 3 segundos que param o scroll)",
   "desenvolvimento": ["ponto 1", "ponto 2", "ponto 3"],
   "cta_final": "texto do call to action final",
   "dicas_gravacao": ["dica 1", "dica 2", "dica 3", "dica 4"],
@@ -116,7 +120,7 @@ Retorne JSON com este schema:
       .replace(/```\s*$/, "")
       .trim();
 
-    const roteiro = JSON.parse(jsonLimpo) as RoteiroVideo;
+    const roteiro = semTravessoesFundo(JSON.parse(jsonLimpo) as RoteiroVideo);
     return { ok: true, roteiro };
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : String(e) };
