@@ -1,0 +1,47 @@
+{
+  "_": "Lótus por dentro — as telas da área da aluna. Mudo, 9:16, para a Aline gravar a voz por cima. Os cortes de B-roll dela entram nos pontos marcados em SLOTS-BROLL.md.",
+  "saida": [1080, 1920],
+  "escurecer": 0.34,
+  "desvia_do_rosto": false,
+  "destaques": ["genética", "fases", "cardápio", "receitas", "Lótus"],
+  "clipes": [
+    { "video": "/tmp/lotus-clipes/trilha.mp4" },
+    { "video": "/tmp/lotus-clipes/fase1.mp4" },
+    { "video": "/tmp/lotus-clipes/cardapios.mp4" },
+    { "video": "/tmp/lotus-clipes/receitas.mp4" },
+    { "video": "/tmp/lotus-clipes/genetica.mp4" },
+    { "video": "/tmp/lotus-clipes/guia.mp4" }
+  ],
+  "abertura": {
+    "chapeu": "Curso Lótus",
+    "dur": 3.6,
+    "titulo": [
+      { "txt": "Por dentro do", "tam": 0.42, "peso": "Regular" },
+      { "txt": "LÓTUS", "tam": 1.35, "peso": "Black" },
+      { "txt": "a área de quem entra", "tam": 0.44, "peso": "Italic", "cor": [10, 186, 181] }
+    ],
+    "sub": "cinco fases, uma de cada vez"
+  },
+  "fecho": {
+    "chapeu": "Nutri Secrets",
+    "tarja": [[245, 230, 211], [14, 89, 89]],
+    "dur": 5.5,
+    "titulo": [
+      { "txt": "Comece pela", "tam": 0.46, "peso": "Regular" },
+      { "txt": "ORDEM CERTA", "tam": 0.86, "peso": "Black" }
+    ],
+    "sub": "o Lótus é um ciclo de dietas terapêuticas, para um momento específico da sua vida",
+    "rodape": "@nutri_secrets"
+  },
+  "legendas": [
+    { "de": 0.4, "ate": 3.0, "texto": "Cinco fases,\numa de cada vez" },
+    { "de": 3.2, "ate": 5.8, "texto": "A ordem é o que\nfaz funcionar" },
+    { "de": 6.3, "ate": 9.0, "texto": "O cardápio montado\ndia a dia" },
+    { "de": 9.2, "ate": 11.8, "texto": "com o preparo que\nativa cada composto" },
+    { "de": 12.3, "ate": 16.7, "texto": "73 dias prontos" },
+    { "de": 17.3, "ate": 21.7, "texto": "272 receitas,\nligadas ao dia" },
+    { "de": 22.3, "ate": 25.0, "texto": "Antes da comida,\na genética" },
+    { "de": 25.2, "ate": 27.8, "texto": "por que a mesma dieta\nnão serve para todo mundo" },
+    { "de": 28.3, "ate": 33.6, "texto": "E quando o curso acaba,\no guia diz o que vem depois" }
+  ]
+}

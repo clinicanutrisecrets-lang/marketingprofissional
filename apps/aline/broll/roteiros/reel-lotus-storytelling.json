@@ -1,0 +1,178 @@
+{
+ "_": "Lótus v2 — gancho, storytelling e as telas. As cartelas 'AQUI ENTRA O SEU VÍDEO' são marcação: entram os clipes dela (consult1, lab, micro) quando a pasta do Drive existir.",
+ "saida": [
+  1080,
+  1920
+ ],
+ "escurecer": 0.34,
+ "desvia_do_rosto": false,
+ "destaques": [
+  "genética",
+  "terapêutica",
+  "emocional",
+  "Lótus",
+  "fases"
+ ],
+ "clipes": [
+  {
+   "video": "/tmp/lotus-clipes/c-gancho.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-sintomas.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-apresentacao.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-balanca.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-emocional.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-terapeutica.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/fase1.mp4",
+   "trecho": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "video": "/tmp/lotus-clipes/c-lab.mp4"
+  },
+  {
+   "video": "/tmp/lotus-clipes/genetica.mp4",
+   "trecho": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "video": "/tmp/lotus-clipes/trilha.mp4",
+   "trecho": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "video": "/tmp/lotus-clipes/cardapios.mp4",
+   "trecho": [
+    0,
+    4.0
+   ]
+  },
+  {
+   "video": "/tmp/lotus-clipes/receitas.mp4",
+   "trecho": [
+    0,
+    4.0
+   ]
+  },
+  {
+   "video": "/tmp/lotus-clipes/guia.mp4",
+   "trecho": [
+    0,
+    5.0
+   ]
+  }
+ ],
+ "fecho": {
+  "chapeu": "Curso Lótus · Nutri Secrets",
+  "tarja": [
+   [
+    245,
+    230,
+    211
+   ],
+   [
+    14,
+    89,
+    89
+   ]
+  ],
+  "dur": 5.5,
+  "titulo": [
+   {
+    "txt": "Comece pela",
+    "tam": 0.46,
+    "peso": "Regular"
+   },
+   {
+    "txt": "ORDEM CERTA",
+    "tam": 0.86,
+    "peso": "Black"
+   }
+  ],
+  "sub": "um ciclo de dietas terapêuticas, para um momento específico da sua vida",
+  "rodape": "@nutri_secrets"
+ },
+ "legendas": [
+  {
+   "de": 0.4,
+   "ate": 3.6,
+   "texto": "Você já come saudável\ne ainda assim se sente mal?"
+  },
+  {
+   "de": 4.3,
+   "ate": 8.8,
+   "texto": "Reconhece alguma\ndestas?"
+  },
+  {
+   "de": 9.4,
+   "ate": 13.2,
+   "texto": "Aline Quissak\nnutricionista e pesquisadora"
+  },
+  {
+   "de": 13.8,
+   "ate": 17.3,
+   "texto": "Nutrição é muito mais\nque a balança"
+  },
+  {
+   "de": 17.8,
+   "ate": 21.3,
+   "texto": "O corpo não separa o que você\nsente do que você digere"
+  },
+  {
+   "de": 21.8,
+   "ate": 24.8,
+   "texto": "A comida como\nterapêutica"
+  },
+  {
+   "de": 25.4,
+   "ate": 29.6,
+   "texto": "e ela vem montada\ndia a dia"
+  },
+  {
+   "de": 30.3,
+   "ate": 33.3,
+   "texto": "E a genética explica\no porquê"
+  },
+  {
+   "de": 33.9,
+   "ate": 38.1,
+   "texto": "por que a mesma dieta\nnão serve para todo mundo"
+  },
+  {
+   "de": 38.9,
+   "ate": 43.1,
+   "texto": "Cinco fases,\numa de cada vez"
+  },
+  {
+   "de": 43.8,
+   "ate": 47.2,
+   "texto": "73 dias prontos"
+  },
+  {
+   "de": 47.8,
+   "ate": 51.2,
+   "texto": "272 receitas"
+  },
+  {
+   "de": 51.9,
+   "ate": 56.1,
+   "texto": "e quando acaba, o guia\ndiz o que vem depois"
+  }
+ ]
+}
