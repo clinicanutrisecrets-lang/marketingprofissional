@@ -1,10 +1,10 @@
 {
- "_": "Lótus v2 — gancho, storytelling e as telas. As cartelas 'AQUI ENTRA O SEU VÍDEO' são marcação: entram os clipes dela (consult1, lab, micro) quando a pasta do Drive existir.",
+ "_": "Lótus v3 — gancho, sintomas PALAVRA POR PALAVRA (acelerando) e as telas. As cartelas 'AQUI ENTRA O SEU VÍDEO' são marcação para os clipes dela (consult1, lab, micro).",
  "saida": [
   1080,
   1920
  ],
- "escurecer": 0.34,
+ "escurecer": 0.22,
  "desvia_do_rosto": false,
  "destaques": [
   "genética",
@@ -110,68 +110,63 @@
  },
  "legendas": [
   {
-   "de": 0.4,
-   "ate": 3.6,
+   "de": 0.3,
+   "ate": 3.1,
    "texto": "Você já come saudável\ne ainda assim se sente mal?"
   },
   {
-   "de": 4.3,
-   "ate": 8.8,
-   "texto": "Reconhece alguma\ndestas?"
-  },
-  {
-   "de": 9.4,
-   "ate": 13.2,
+   "de": 8.94,
+   "ate": 12.14,
    "texto": "Aline Quissak\nnutricionista e pesquisadora"
   },
   {
-   "de": 13.8,
-   "ate": 17.3,
+   "de": 12.74,
+   "ate": 16.24,
    "texto": "Nutrição é muito mais\nque a balança"
   },
   {
-   "de": 17.8,
-   "ate": 21.3,
+   "de": 16.74,
+   "ate": 20.24,
    "texto": "O corpo não separa o que você\nsente do que você digere"
   },
   {
-   "de": 21.8,
-   "ate": 24.8,
+   "de": 20.74,
+   "ate": 23.74,
    "texto": "A comida como\nterapêutica"
   },
   {
-   "de": 25.4,
-   "ate": 29.6,
+   "de": 24.34,
+   "ate": 28.54,
    "texto": "e ela vem montada\ndia a dia"
   },
   {
-   "de": 30.3,
-   "ate": 33.3,
+   "de": 29.24,
+   "ate": 32.24,
    "texto": "E a genética explica\no porquê"
   },
   {
-   "de": 33.9,
-   "ate": 38.1,
+   "de": 32.84,
+   "ate": 37.04,
    "texto": "por que a mesma dieta\nnão serve para todo mundo"
   },
   {
-   "de": 38.9,
-   "ate": 43.1,
+   "de": 37.84,
+   "ate": 42.04,
    "texto": "Cinco fases,\numa de cada vez"
   },
   {
-   "de": 43.8,
-   "ate": 47.2,
+   "de": 42.74,
+   "ate": 46.14,
    "texto": "73 dias prontos"
   },
   {
-   "de": 47.8,
-   "ate": 51.2,
+   "de": 46.74,
+   "ate": 50.14,
    "texto": "272 receitas"
   },
   {
-   "de": 51.9,
-   "ate": 56.1,
+   "de": 50.84,
+   "ate": 55.04,
    "texto": "e quando acaba, o guia\ndiz o que vem depois"
   }
  ]
