@@ -1,0 +1,18 @@
+# 🔴 O REPOSITÓRIO É PÚBLICO. Clipe, foto e áudio NUNCA entram no Git.
+#
+# O que vive aqui é texto: roteiro, prompt, documentação e os montadores.
+# A mídia é da sessão (ou do Drive da Aline) e fica de fora — foi por isso
+# que o guia da pasta abre dizendo que "o que não viaja são os clipes".
+saida/
+video/
+fotos/
+fotos-treino/
+audios/
+overlays/*.png
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.jpg
+*.jpeg
+*.png
