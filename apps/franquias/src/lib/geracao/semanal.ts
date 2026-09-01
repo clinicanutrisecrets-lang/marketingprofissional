@@ -1,12 +1,8 @@
 "use server";
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { gerarPost, planejarSemana } from "@/lib/claude/generate";
-import type {
-  ContextoFranqueada,
-  TipoPost,
-  AnguloPost,
-} from "@/lib/claude/prompts";
+import { gerarPost, planejarSemana, type SlotSemana } from "@/lib/claude/generate";
+import type { ContextoFranqueada } from "@/lib/claude/prompts";
 import {
   generateImage,
   buildModifications,
@@ -109,17 +105,21 @@ export async function gerarPostsDaSemana(
 
   const aprovacaoId = (aprov as { id: string }).id;
 
-  // 4. Planeja a semana
-  const plano = planejarSemana({
-    diasPostSemana: (franqueada.dias_post_semana as number[]) ?? [1, 3, 5],
-    frequenciaReels: (franqueada.frequencia_reels as string) ?? "semanal",
-    frequenciaStories: (franqueada.frequencia_stories as string) ?? "diario",
-  });
-
   const contexto = toContexto(franqueada);
   // Produtos reais do Scanner Tratamentos entram no system prompt — copy
   // pode citar produto/preço/link verdadeiros (nunca inventados)
   contexto.produtos = await carregarProdutosContexto(admin, franqueadaId);
+
+  // 4. Planeja a semana
+  // O catálogo é carregado ANTES de propósito: sem produto ativo o plano
+  // pula o ângulo de divulgação (senão o modelo inventaria a oferta).
+  const plano = planejarSemana({
+    diasPostSemana: (franqueada.dias_post_semana as number[]) ?? [1, 3, 5],
+    frequenciaReels: (franqueada.frequencia_reels as string) ?? "semanal",
+    frequenciaStories: (franqueada.frequencia_stories as string) ?? "diario",
+    semanaRef,
+    temProdutos: (contexto.produtos?.length ?? 0) > 0,
+  });
 
   // Busca arquivos pra usar nos criativos (logo + foto)
   const logoUrl = await buscarArquivoUrl(admin, franqueadaId, "logo_principal");
@@ -164,6 +164,7 @@ export async function gerarPostsDaSemana(
         item.angulo,
         semanaRef,
         contextoComBriefing,
+        item.consciencia,
       );
       const latenciaMs = Date.now() - tInicio;
 
@@ -178,7 +179,11 @@ export async function gerarPostsDaSemana(
           briefingId: item.briefing?.id ?? null,
           aprovacaoId: aprovacaoId,
           latenciaMs,
-          metadata: { tipo: item.tipo, angulo: item.angulo },
+          metadata: {
+            tipo: item.tipo,
+            angulo: item.angulo,
+            consciencia: item.consciencia ?? null,
+          },
         });
       }
 
@@ -368,6 +373,9 @@ export async function gerarPostsDaSemana(
           copy_cta: post.copy_cta,
           hashtags: post.hashtags,
           angulo_copy: post.angulo_copy,
+          // Nível de consciência de quem esse post mira. Vem do plano, não
+          // do que o modelo devolveu: é decisão de estratégia, não de copy.
+          nivel_consciencia: item.consciencia ?? null,
           copy_legenda_ia_original: post.copy_legenda,
           copy_cta_ia_original: post.copy_cta,
           hashtags_ia_original: post.hashtags,
@@ -582,25 +590,17 @@ function montarBlocoContextoExtra(
  * matching de tipo. Os demais slots seguem com o tema automático.
  */
 function casarBriefingsComPlano(
-  plano: Array<{ dia: number; tipo: TipoPost; angulo: AnguloPost }>,
+  plano: SlotSemana[],
   briefings: Briefing[],
-): Array<{
-  dia: number;
-  tipo: TipoPost;
-  angulo: AnguloPost;
-  briefing?: Briefing;
-}> {
+): Array<SlotSemana & { briefing?: Briefing }> {
   if (briefings.length === 0) {
     return plano.map((p) => ({ ...p }));
   }
 
   const restantes = [...briefings];
-  const resultado: Array<{
-    dia: number;
-    tipo: TipoPost;
-    angulo: AnguloPost;
-    briefing?: Briefing;
-  }> = plano.map((p) => ({ ...p }));
+  const resultado: Array<SlotSemana & { briefing?: Briefing }> = plano.map((p) => ({
+    ...p,
+  }));
 
   // 1. Casa briefings com formato preferido específico
   for (const b of [...restantes]) {

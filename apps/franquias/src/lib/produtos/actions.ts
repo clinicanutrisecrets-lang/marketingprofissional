@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { gerarPostVenda, type PostVendaGerado } from "@/lib/claude/generate";
 import type { ContextoFranqueada, TipoPost } from "@/lib/claude/prompts";
+import { normalizarNivelConsciencia } from "@/lib/claude/consciencia";
 import { sincronizarProdutosScanner } from "./sync";
 import { carregarProdutosContexto, formatarPrecoBR } from "./contexto";
 import { traduzirErroClaude } from "@/lib/claude/erros";
@@ -121,6 +122,13 @@ export async function gerarPostVendaAction(params: {
   produtoId: string;
   tipo: TipoPost;
   incluirPreco: boolean;
+  /**
+   * Nível de consciência de quem vai ler (Eugene Schwartz). É o que muda o
+   * que se fala do MESMO produto: pra quem nem sabe que tem o problema, a
+   * copy fala do sintoma; pra quem já decidiu, fala de preço e de como
+   * começa. Opcional: sem ele o post sai como sempre saiu.
+   */
+  consciencia?: string;
 }): Promise<{ ok: true; post: PostVendaGerado } | { ok: false; erro: string }> {
   const supabase = createClient();
   const {
@@ -179,6 +187,9 @@ export async function gerarPostVendaAction(params: {
       },
       params.tipo,
       params.incluirPreco,
+      // Valor vindo do cliente: normaliza (nível desconhecido vira undefined
+      // e o prompt fica sem o bloco, em vez de injetar lixo).
+      normalizarNivelConsciencia(params.consciencia),
     );
     return { ok: true, post };
   } catch (e) {

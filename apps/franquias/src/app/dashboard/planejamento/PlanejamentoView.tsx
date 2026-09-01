@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  NIVEIS_CONSCIENCIA,
+  ROTULO_CONSCIENCIA,
+  type NivelConsciencia,
+} from "@/lib/claude/consciencia";
 
 type Tipo = "skill_2_mecanismo_unico" | "skill_3_posicionamento_oferta" | "skill_5_funil_organico";
 
@@ -49,7 +54,11 @@ export function PlanejamentoView({
 
   // Skill 5
   const [s5Ticket, setS5Ticket] = useState(String(franqueada.valor_consulta_inicial ?? "650"));
-  const [s5Consciencia, setS5Consciencia] = useState("pouco_consciente");
+  // Os 5 níveis do Schwartz, com os MESMOS valores que o gerador de posts
+  // usa (lib/claude/consciencia.ts). Antes eram 4, com nomes só daqui
+  // ("pouco_consciente"), que não casavam com nada do resto do sistema.
+  const [s5Consciencia, setS5Consciencia] =
+    useState<NivelConsciencia>("consciente_problema");
   const [s5Conteudo, setS5Conteudo] = useState("");
   const [s5Tempo, setS5Tempo] = useState("3h");
   const [s5Canal, setS5Canal] = useState("Instagram");
@@ -168,11 +177,16 @@ export function PlanejamentoView({
             <Campo label="Ticket médio" value={s5Ticket} onChange={setS5Ticket} />
             <div>
               <label className="text-xs font-medium uppercase tracking-wider text-brand-text/60">Consciência do público</label>
-              <select value={s5Consciencia} onChange={(e) => setS5Consciencia(e.target.value)} className="mt-1 w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm">
-                <option value="inconsciente">Inconsciente do problema</option>
-                <option value="pouco_consciente">Pouco consciente — sabe que tem dor</option>
-                <option value="consciente_solucao">Consciente da solução</option>
-                <option value="consciente_produto">Consciente do produto</option>
+              <select
+                value={s5Consciencia}
+                onChange={(e) => setS5Consciencia(e.target.value as NivelConsciencia)}
+                className="mt-1 w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
+              >
+                {NIVEIS_CONSCIENCIA.map((n) => (
+                  <option key={n} value={n}>
+                    {ROTULO_CONSCIENCIA[n]}
+                  </option>
+                ))}
               </select>
             </div>
             <Campo label="Tipo de conteúdo que já faz" value={s5Conteudo} onChange={setS5Conteudo} textarea />

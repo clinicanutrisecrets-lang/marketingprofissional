@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
 import { buildSystemPrompt } from "@/lib/claude/prompts";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
+import { normalizarNivelConsciencia } from "@/lib/claude/consciencia";
 import { traduzirErroClaude } from "@/lib/claude/erros";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { revalidatePath } from "next/cache";
@@ -140,6 +141,13 @@ export async function criarPostManual(params: {
   url_imagem?: string;
   url_video?: string;
   legenda_gerada_ia?: boolean;
+  /** Ângulo da copy (AnguloPost). Opcional: post manual pode não ter. */
+  angulo_copy?: string;
+  /**
+   * Nível de consciência do público (Eugene Schwartz), quando a tela deixa a
+   * nutri escolher. Valores válidos em lib/claude/consciencia.ts.
+   */
+  nivel_consciencia?: string;
 }): Promise<{ ok: boolean; postId?: string; erro?: string; redistribuidos?: number }> {
   const supabase = createClient();
   const {
@@ -203,6 +211,10 @@ export async function criarPostManual(params: {
       copy_legenda: params.copy_legenda,
       copy_cta: params.copy_cta,
       hashtags: params.hashtags,
+      angulo_copy: params.angulo_copy ?? null,
+      // Nível inválido vira NULL em vez de estourar o CHECK da coluna: o post
+      // da nutri nunca deixa de ser salvo por causa de um rótulo.
+      nivel_consciencia: normalizarNivelConsciencia(params.nivel_consciencia) ?? null,
       briefing_nutri: params.briefing_nutri,
       legenda_gerada_ia: params.legenda_gerada_ia ?? false,
       data_hora_agendada: params.data_hora_agendada ?? null,
