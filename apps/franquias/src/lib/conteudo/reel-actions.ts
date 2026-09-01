@@ -46,11 +46,15 @@ FORMATO EXATO (siga à risca — o renderizador é rígido):
 REGRAS DURAS:
 - glifo/glifos: APENAS destes: ${GLIFOS_VALIDOS.join(", ")}. NUNCA invente outro.
 - alvo: uma de: face, eyes, neck, chest, spine. São os pontos REAIS da figura no renderizador (spine = tronco/abdômen; use spine pra sintomas de barriga/quadril). NUNCA invente outro — "belly" já derrubou um render inteiro (18/08/2026).
-- Duração 30s = 1 bloco sintoma→gene→sinergia→nota. 60s = 2 blocos. Sempre com hook no início e virada+cta no fim. Cena marcadores só na versão 60s (exatamente 3 itens).
+- 🔴 TETO DE 90 SEGUNDOS (1min30): a soma dos "dur" de TODAS as cenas não pode passar de 90, e nenhuma cena sozinha passa de 20. Some os "dur" antes de responder. O renderizador corta as cenas EXCEDENTES DO FIM, então quem cai primeiro é o cta e o reel fica sem chamada.
+- A duração pedida é a soma aproximada dos "dur". 30s = hook + 1 bloco sintoma→gene→sinergia→nota + virada + cta, com cenas curtas. 60s = hook + 2 blocos + virada + cta. 90s = hook + 2 blocos + marcadores + virada + cta. Cena marcadores só nas versões 60s e 90s (exatamente 3 itens).
+- Orçamento por cena: hook 3.5-5 · sintoma 4.5-6 · gene 5-6.5 · nota 5-7 · marcadores 7-12 · virada 4-5.5 · cta 4-7. A sinergia revela um item por vez, 3 s cada mais 1.5 s de fecho: com 3 itens ela precisa de 10.5, e encurtar corta a quantidade e a frequência antes de aparecerem.
 - Cena marcadores: cada item tem EXATAMENTE as chaves alto, nome, ludico, alavanca — o renderizador exige as quatro (faltar "alto" derrubou o render de 24/08/2026). "alto": true quando o sinal de atenção é o marcador ALTO, false quando é ele BAIXO. "ludico": tradução do marcador em 1 frase simples de leiga. "alavanca": a faixa ideal ou a próxima ação, curtinha (ex.: "faixa ideal 70-150").
 - Genes reais com rsID correto. Sem promessa de cura (CFN): linguagem de investigação, não de tratamento.
 - 🔴 A CENA "hook" PRECISA FUNCIONAR SEM CONTEXTO: escreva l1/l2 pensando em quem NUNCA VIU este perfil. Sem depender de post anterior, de série, de bordão ou de saber quem está falando; sem "como eu sempre digo" / "quem me acompanha sabe"; com promessa ESPECÍFICA e OBSERVÁVEL, que a pessoa confere na própria vida. Específico: "Seu exame veio normal e você continua cansada." Sensacionalista (NÃO usar): "o segredo que ninguém te conta". Nada de promessa de resultado.
 - LINHA EDITORIAL: o pano de fundo é despertar consciência sobre NUTRIGENÉTICA e microbiota — quem assina o perfil é "detetive da saúde" e investiga com testes. A cena "virada" deve reenquadrar nessa direção — l1 e l2 são as DUAS linhas grandes (ex.: l1 "Não é força de vontade." / l2 "É informação que você ainda não investigou.") e "texto" é o parágrafo de apoio. A cena "cta" é a última e convida pra investigação: l1 é a pergunta principal (ex.: "Quer investigar sua saúde com precisão?") e acao1 a etiqueta em CAIXA ALTA ao lado do ícone de AVIÃO/enviar (ex.: "ME CHAMA NO DIRECT"); l2 é a segunda pergunta, pra quem ainda não vai agir agora (ex.: "Vai querer consultar isso depois?") e acao2 a etiqueta ao lado do ícone de MARCADOR/salvar (ex.: "SALVE ESTE REEL"). Cada etiqueta tem no máximo 18 caracteres e precisa combinar com o gesto do seu ícone. Varie as palavras a cada reel.
+- 🔴 UMA IDEIA POR CENA, e o bloco inteiro fecha UM raciocínio só: o sintoma que a cena mostra é o mesmo que o gene explica, os alimentos da sinergia são os que destravam AQUELE gene, e a nota diz por que aquela combinação age nele. Nunca troque de assunto no meio do bloco, nunca cite um segundo gene ou um segundo sintoma na mesma cena.
+- Tetos de texto (medidos no card real, 374 px úteis): "titulo" do sintoma até 4 palavras (cabem ~2.9 por linha, então 4 já são 2 linhas) · "texto" do sintoma até 16 palavras (~3.8 por linha, 4 linhas) · "texto" do gene até 24 palavras · "texto" da nota até 24 palavras · "ludico" dos marcadores até 14 palavras. Passar disso empurra o card pra fora da tela e ninguém termina de ler antes do corte.
 - Cores das cenas: varie entre AMBER, MUSTARD, TIFFANY, ROXO, ROSE, CORAL.
 
 ${REGRA_SEM_TRAVESSAO}
@@ -71,6 +75,37 @@ const ALVO_ALIAS: Record<string, string> = {
 const TIPOS_CENA = new Set([
   "hook", "sintoma", "gene", "sinergia", "nota", "marcadores", "virada", "cta", "cta_anuncio",
 ]);
+
+/**
+ * Teto de duração do reel (Juliana, 01/09/2026: "manter até 1 minuto e meio").
+ * Os mesmos números vivem em packages/reel-engine/engine/build.py
+ * (DUR_MAX_TOTAL / DUR_MAX_CENA) — o motor é a trava que vale, esta aqui evita
+ * que o SPEC saia grande do agente e o corte só apareça 10 minutos depois.
+ */
+const DUR_MAX_TOTAL_S = 90;
+const DUR_MAX_CENA_S = 20;
+
+/**
+ * Aplica o teto de 90 s: cena a cena, com as EXCEDENTES DO FIM descartadas
+ * inteiras. Encolher todas na proporção estragaria o ritmo da narração e o
+ * tempo de leitura dos cards — perder a última cena é um corte limpo.
+ */
+function limitarDuracoes(cenas: Record<string, unknown>[]): Record<string, unknown>[] {
+  const dentro: Record<string, unknown>[] = [];
+  let total = 0;
+  for (const c of cenas) {
+    const bruto = Number(c.dur);
+    const dur = Math.min(
+      Number.isFinite(bruto) && bruto > 0 ? bruto : 5,
+      DUR_MAX_CENA_S,
+    );
+    if (total + dur > DUR_MAX_TOTAL_S + 1e-6) break;
+    c.dur = dur;
+    dentro.push(c);
+    total += dur;
+  }
+  return dentro;
+}
 
 function normalizarSpecReel(spec: Record<string, unknown>): Record<string, unknown> {
   // Travessão fora de TODO texto do vídeo (pedido da Aline, 26/08/2026)
@@ -99,12 +134,15 @@ function normalizarSpecReel(spec: Record<string, unknown>): Record<string, unkno
       }
       return c;
     });
+  s.cenas = limitarDuracoes(s.cenas as Record<string, unknown>[]);
   return s;
 }
 
+export type DuracaoReel = "30s" | "60s" | "90s";
+
 export async function gerarReelAnimadoAction(
   tema: string,
-  duracao: "30s" | "60s",
+  duracao: DuracaoReel,
 ): Promise<{ ok: boolean; msg: string }> {
   const supabase = createClient();
   const {

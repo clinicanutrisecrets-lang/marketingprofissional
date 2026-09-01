@@ -4,6 +4,7 @@
  */
 
 import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
+import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
 
 /**
  * Produto real da nutri no Scanner Tratamentos (cache produtos_scanner,
@@ -177,7 +178,9 @@ export type AnguloPost =
   | "mito_vs_verdade"
   | "caso_anonimizado"
   | "prova_social"
-  | "chamada_direta";
+  | "chamada_direta"
+  | "autoridade"
+  | "divulgacao_produto";
 
 export type TipoPost = "feed_imagem" | "feed_carrossel" | "reels" | "stories";
 
@@ -196,7 +199,65 @@ export const DESCRICAO_ANGULOS: Record<AnguloPost, string> = {
     "Credibilidade pura: números reais (X pacientes atendidos, Y% melhoraram Z), depoimento (citação direta anônima), ou resultado laboratorial (sem identificar). Tom: confiante, não presunçoso.",
   chamada_direta:
     "Post comercial SEM parecer comercial. Conecta uma dor/desejo real com a solução (consulta). O CTA precisa parecer o próximo passo NATURAL, não uma venda forçada. Usar no máximo 1 a cada 5 posts.",
+  autoridade:
+    "A nutri como REFERÊNCIA TÉCNICA. Mostra COMO ela pensa, não o que ela vende: o raciocínio clínico por trás de uma decisão, o que ela olha primeiro num exame e por quê, uma leitura da literatura aplicada no consultório, um bastidor do método. Formação e titulação entram no máximo como uma linha de contexto, nunca como o assunto. Nada de depoimento, promessa de resultado individual ou número inventado: padrão observado só no agregado e sem prazo. O objetivo é a pessoa pensar 'essa profissional enxerga de um jeito que ninguém me mostrou'.",
+  divulgacao_produto:
+    "Divulgação de um produto REAL do catálogo da nutri (a lista está no contexto do sistema). Escolhe UM produto e fala dele pela dor ou pelo desejo que ele resolve, nunca pelo formato. Nome, preço, condição e link só existem se estiverem listados: nada de inventar, arredondar, criar desconto ou prometer bônus. Sem lista de produtos no contexto, este ângulo não deve ser usado. Sem promessa de cura, de prazo ou de resultado garantido.",
 };
+
+/**
+ * Guarda-corpo do CFN, escrito uma vez só.
+ *
+ * A descrição do produto vem do catálogo INTERNO da nutri e pode trazer nome
+ * de doença; o post é conteúdo público, lido por paciente. Nasceu no post de
+ * venda (buildPromptPostVenda) e vale igual pro ângulo divulgacao_produto —
+ * duas versões do mesmo guarda-corpo divergiriam em silêncio.
+ *
+ * @param sujeito de onde vem o texto que pode conter diagnóstico, já
+ *                terminando em "e" pra emendar em "PODE conter nome de doença".
+ */
+function regraProcessoFuncional(sujeito: string): string {
+  return `⚠️ ${sujeito} PODE conter nome de doença
+(ex.: "SOP", "endometriose", "TEA"). O post é conteúdo público, visto por
+paciente: NUNCA reproduza nome de diagnóstico. Traduza para PROCESSO FUNCIONAL
+— "modulação hormonal feminina", "cuidado intestinal", "cuidado
+neuroendócrino", "melhora hepática", "fase reprodutiva feminina" etc. Nutri não
+diagnostica (CFN); descrever o processo é o que a lei permite.`;
+}
+
+/**
+ * Instruções extras dos ângulos que precisam de guarda-corpo próprio.
+ * Ângulo antigo devolve "" e o prompt sai idêntico ao de antes.
+ */
+function instrucoesDoAngulo(angulo: AnguloPost): string {
+  if (angulo === "autoridade") {
+    return `
+
+INSTRUÇÕES AUTORIDADE:
+- Mostre o RACIOCÍNIO, não o currículo: o que você olha primeiro, o que quase todo mundo deixa passar, por que você pediu aquele exame antes do outro.
+- Formação, título e anos de estrada entram no máximo em UMA linha, como contexto. Se o post virar sobre o diploma, refaça.
+- Proibido: depoimento (inventado ou não), print de conversa, antes/depois, número de paciente que você não tem, "método exclusivo", "único no Brasil".
+- Padrão observado só no agregado e sem prazo ("o que costuma aparecer no exame de quem chega com esse cansaço"), NUNCA resultado individual com número.
+- Ao citar a tecnologia por trás da leitura dos exames, escreva "algoritmo Scanner" ou "Scanner da Saúde". Nunca "IA" nem "inteligência artificial" (regra de marca do Scanner). Isso não substitui o aviso de conteúdo produzido com auxílio de IA que a CFN 856 exige na arte/legenda quando for o caso.
+- CTA de autoridade não vende: convida a salvar, a comentar a dúvida, a acompanhar.`;
+  }
+
+  if (angulo === "divulgacao_produto") {
+    return `
+
+INSTRUÇÕES DIVULGAÇÃO DE PRODUTO:
+- Escolha UM produto da lista "PRODUTOS REAIS DA NUTRI" que está no contexto do sistema e fale só dele.
+- Se essa lista NÃO estiver no contexto, não invente oferta: escreva sobre o cuidado que ela oferece, sem nome de produto, sem preço e sem link.
+- Nome do produto VERBATIM. Preço, condição de pagamento e link só se estiverem listados, exatamente como estão. Proibido inventar desconto, bônus, vaga limitada ou prazo.
+- Comece pela dor ou pelo desejo que o produto resolve. O produto entra como próximo passo natural, nunca como anúncio de vitrine.
+- Em legenda de Instagram, chame pro "link na bio"; o link por extenso vai no campo copy_cta.
+- Ao citar a tecnologia por trás da análise, escreva "algoritmo Scanner" ou "Scanner da Saúde". Nunca "IA" nem "inteligência artificial" (regra de marca do Scanner).
+
+${regraProcessoFuncional("A lista de produtos no contexto do sistema é interna (catálogo da nutri) e")}`;
+  }
+
+  return "";
+}
 
 /**
  * Prompt para gerar 1 post. Compacto — a nutri já está no system (cached).
@@ -207,6 +268,11 @@ export function buildPromptPost(params: {
   semana: string;
   contexto_extra?: string;
   historico_performance?: string;
+  /**
+   * Nível de consciência do público deste post (Eugene Schwartz). Opcional
+   * de propósito: sem ele o prompt sai IDÊNTICO ao que já roda hoje.
+   */
+  consciencia?: NivelConsciencia;
 }): string {
   const isCarrossel = params.tipo === "feed_carrossel";
   const isReels = params.tipo === "reels";
@@ -254,7 +320,13 @@ INSTRUÇÕES FEED IMAGEM:
   return `Gere 1 post de Instagram do tipo "${params.tipo}" com ângulo "${params.angulo}".
 
 Ângulo: ${DESCRICAO_ANGULOS[params.angulo]}
-${instrucoesTipo}
+${instrucoesTipo}${instrucoesDoAngulo(params.angulo)}${
+    params.consciencia
+      ? `\n${blocoConsciencia(params.consciencia, {
+          esteira: params.angulo === "divulgacao_produto",
+        })}`
+      : ""
+  }
 
 Semana de referência: ${params.semana}
 ${params.contexto_extra ? `\nContexto extra:\n${params.contexto_extra}` : ""}
@@ -282,6 +354,12 @@ export function buildPromptPostVenda(params: {
   produto: ProdutoContexto & { descricao?: string };
   tipo: TipoPost;
   incluir_preco: boolean;
+  /**
+   * Nível de consciência de quem vai ler. É o que muda o que se fala do
+   * MESMO produto (a esteira). Opcional: sem ele o prompt sai idêntico ao
+   * que já roda hoje.
+   */
+  consciencia?: NivelConsciencia;
 }): string {
   const { produto, tipo, incluir_preco } = params;
 
@@ -300,12 +378,7 @@ ${produto.descricao ? `- Descrição da nutri: ${produto.descricao}` : ""}
 ${incluir_preco && produto.preco_texto ? `- Preço: ${produto.preco_texto}` : "- Preço: NÃO citar preço neste post"}
 - Link de compra (checkout real): ${produto.checkout_url}
 
-⚠️ A descrição acima é interna (catálogo da nutri) e PODE conter nome de doença
-(ex.: "SOP", "endometriose", "TEA"). O post é conteúdo público, visto por
-paciente: NUNCA reproduza nome de diagnóstico. Traduza para PROCESSO FUNCIONAL
-— "modulação hormonal feminina", "cuidado intestinal", "cuidado
-neuroendócrino", "melhora hepática", "fase reprodutiva feminina" etc. Nutri não
-diagnostica (CFN); descrever o processo é o que a lei permite.
+${regraProcessoFuncional("A descrição acima é interna (catálogo da nutri) e")}
 
 COMO VENDER SEM PARECER PANFLETO:
 - Comece pela DOR ou DESEJO que esse produto resolve — nunca pelo produto.
@@ -315,7 +388,8 @@ COMO VENDER SEM PARECER PANFLETO:
 - CTA: chame pro "link na bio" na legenda; no campo copy_cta, use o link real por extenso.
 - Máximo 1 post de venda a cada 5 posts — este é o post de venda, então capriche na conexão, não no volume de oferta.
 - Compliance CFN integral: nada de promessa de resultado, prazo ou cura.
-
+- Ao citar a tecnologia por trás da análise, escreva "algoritmo Scanner" ou "Scanner da Saúde". Nunca "IA" nem "inteligência artificial" (regra de marca do Scanner).
+${params.consciencia ? `${blocoConsciencia(params.consciencia, { esteira: true })}\n` : ""}
 Responda APENAS com JSON válido neste schema:
 {
   "headline": "texto curto que vai no criativo (máx 40 chars, impacto máximo)",
@@ -323,7 +397,7 @@ Responda APENAS com JSON válido neste schema:
   "copy_legenda": "legenda completa (200-600 chars, hook forte na 1a linha, produto como próximo passo natural, CTA pro link na bio)",
   "copy_cta": "CTA com o link real: ${produto.checkout_url}",
   "hashtags": ["hashtag1", "hashtag2"],
-  "angulo_copy": "venda_produto"${schemaExtra}
+  "angulo_copy": "divulgacao_produto"${schemaExtra}
 }`;
 }
 

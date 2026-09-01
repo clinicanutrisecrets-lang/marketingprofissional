@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# ⚠️ Este exemplo soma 128 s e é ANTERIOR ao teto de 1min30 (01/09/2026):
+# renderizado como está, o motor avisa no stdout e descarta as 5 últimas cenas
+# (o reel sai sem o cta). Ele continua aqui como referência de FORMATO das
+# cenas; pra um reel publicável, a soma dos "dur" tem que caber em 90 s.
 SPEC = {
  "tema": "Menopausa",
  "cor_tema": "ROSE",

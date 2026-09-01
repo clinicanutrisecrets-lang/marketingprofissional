@@ -13,8 +13,69 @@ MODO_ANUNCIO = False
 CARIMBO = ("IMERSÃO EM NUTRIGENÉTICA", "AULA GRATUITA PARA NUTRICIONISTAS")
 # Handle exibido na assinatura — parametrizável por marca/franqueada
 HANDLE = "@nutri_secrets"
-CX_FIG, HEAD_TOP, BODY_BOTTOM = 762, 566, 1560
+HEAD_TOP, BODY_BOTTOM = 566, 1560
 CARD_X, CARD_W = 62, 452
+FADE_Y0 = 1330  # altura em que a figura começa a dissolver no fundo
+
+# ------------------------------------------------- enquadramento da figura
+# 🔴 A posição horizontal da figura era número mágico repetido cena a cena
+# (762 no sintoma, 556 no gancho, 742 no close). A personagem PULAVA de lugar
+# a cada corte, e foi isso que a Aline viu como "o vídeo não ficou
+# centralizado" (01/09/2026). Agora ela é CALCULADA a partir do layout da
+# cena: cena com card e cena sem card têm, cada uma, UM lugar só.
+FOLGA_CARD = 60  # respiro entre o card de texto e a faixa livre da figura
+                 # (a mesma margem lateral da zona segura, SAFE_L = 60)
+
+
+def cx_figura(com_card):
+    """Centro horizontal da figura, derivado do layout da cena.
+
+    - cena SEM card (gancho): centro do canvas, W/2 = 540.
+    - cena COM card: centro da faixa livre à direita do card, que vai de
+      CARD_X + CARD_W + FOLGA_CARD = 62 + 452 + 60 = 574 até SAFE_R = 950,
+      logo (574 + 950)/2 = 762 — exatamente o valor que estava escrito à mão.
+      A conta fecha porque a faixa foi desenhada pro tamanho dela: a figura
+      padrão (escala 0.92) tem meia-largura de 196*0.92 = 180 px nos ombros
+      (core.draw_woman: shw = 196*s), então 762 + 180 = 942, 8 px dentro de
+      SAFE_R, e 762 - 180 = 582, 8 px à direita do início da faixa.
+    """
+    if not com_card:
+        return W/2
+    return (CARD_X + CARD_W + FOLGA_CARD + SAFE_R)/2
+
+
+CX_FIG = cx_figura(True)  # 762 — default de figure(), mantido por compatibilidade
+
+# --- close-up (cena de sintoma com close=True) ---
+# 🔴 Era scale=1.44 + head_top=392 + cx=742: a figura ficava 57% maior que a
+# padrão, os ombros (meia-largura 196*1.44 = 282 px) INVADIAM o card de texto
+# pela esquerda (742-282 = 460, e o card termina em 514) e estouravam 74 px
+# além de SAFE_R pela direita (742+282 = 1024). Era o "zoom estranho" que a
+# Aline relatou.
+#
+# A escala nova é DERIVADA, não chutada: é o maior close que ainda não encosta
+# no card, com o centro vindo de cx_figura(True) = 762.
+#   762 - 196*escala >= (CARD_X + CARD_W) + 16 de respiro = 530
+#   196*escala <= 232  ->  escala <= 1.183
+CLOSE_SCALE = 1.18   # meia-largura 196*1.18 = 231 -> borda esquerda em 531
+# ⚠️ Pela direita os ombros ainda passam de SAFE_R (762+231 = 993, +43 px).
+# Com o centro em 762 isso é inevitável em QUALQUER close (só escala <= 0.96
+# caberia inteira, o que não é close nenhum). São 43 px de blusa chapada
+# embaixo da coluna de botões do Reels: nenhum rosto, texto ou card se perde.
+# Antes eram 74 px, e o card ainda ficava por cima do corpo.
+#
+# Topo do cabelo = head_top - 0.22*hr, com hr = 100*escala = 118 px:
+#   470 - 26 = 444, ou seja 274 px abaixo de SAFE_T (170) e da linha do
+#   eyebrow (186). Antes: 392 - 32 = 360.
+CLOSE_HEAD_TOP = 470
+# Com a figura maior, dissolver a partir de 1330 comia o busto bem na altura
+# do card. O fade começa 70 px mais abaixo e termina no mesmo BODY_BOTTOM
+# (1560), 30 px acima de SAFE_B.
+CLOSE_FADE_Y0 = 1400
+
+# --- teto de duração (pedido da Juliana, 01/09/2026: reel até 1min30) ---
+DUR_MAX_TOTAL = 90.0  # soma das cenas
+DUR_MAX_CENA = 20.0   # nenhuma cena sozinha passa disso
 
 COR = {"AMBER":AMBER,"CORAL":CORAL,"MUSTARD":MUSTARD,"TIFFANY":TIFFANY,
        "ROXO":ROXO,"ROSE":ROSE,"INK":INK}
@@ -29,7 +90,7 @@ def bg_warm(k): return vgrad(lerp(PAPER,(252,230,212),k), lerp((233,222,205),(24
 def bg_cool():  return vgrad(PAPER, (231,224,210))
 def bg_ink():   return vgrad((17,30,35), (11,20,24))
 
-def figure(cx=CX_FIG, head_top=HEAD_TOP, scale=0.92, fade=(1330,BODY_BOTTOM), **kw):
+def figure(cx=CX_FIG, head_top=HEAD_TOP, scale=0.92, fade=(FADE_Y0,BODY_BOTTOM), **kw):
     lay = Image.new("RGBA", (W*SS, H*SS), (0,0,0,0)); d = ImageDraw.Draw(lay)
     A = draw_woman(d, cx*SS, head_top, scale=scale, body_bottom=BODY_BOTTOM, **kw)
     fade_bottom(lay, *fade)
@@ -80,7 +141,10 @@ def fit_title(d, txt, maxw, smax=148, smin=84):
 def c_hook(S, c, fi, n):
     sec=fi/FPS
     base=bg_cool()
-    lay,A=figure(cx=556, head_top=c.get("head_top",756), scale=0.94,
+    # O gancho não desenha card: o texto ocupa o topo inteiro e a figura fica
+    # embaixo. Logo, centro do canvas (540) — e não 556, que deixava a
+    # personagem 16 px fora do eixo, o "quase centralizado" que salta aos olhos.
+    lay,A=figure(cx=cx_figura(False), head_top=c.get("head_top",756), scale=0.94,
                  flush=.12+.05*math.sin(sec*1.8), eye="open", fade=(1400,BODY_BOTTOM))
     base=Image.alpha_composite(base, lay.reduce(SS))
     sh,d=new_sharp()
@@ -109,9 +173,14 @@ def c_sintoma(S, c, fi, n):
     if calor: fkw["flush"]=.35+.6*inten
     if fkw.pop("olheira_anim", False): fkw["undereye"]=.55+.35*min(1,sec/2.2)
     close = c.get("close", False)
-    lay,A = figure(cx=742 if close else CX_FIG,
-                   head_top=392 if close else HEAD_TOP,
-                   scale=1.44 if close else 0.92, **fkw)
+    # Cena com card: o close e o plano aberto compartilham o MESMO centro
+    # (cx_figura(True) = 762). Só muda o tamanho e a altura da cabeça, então a
+    # personagem não escorrega de lado no corte.
+    lay,A = figure(cx=cx_figura(True),
+                   head_top=CLOSE_HEAD_TOP if close else HEAD_TOP,
+                   scale=CLOSE_SCALE if close else 0.92,
+                   fade=((CLOSE_FADE_Y0 if close else FADE_Y0), BODY_BOTTOM),
+                   **fkw)
     if calor:
         base=Image.alpha_composite(base, heat((A["neck"][0],A["neck"][1]+30),(sec/2.4)%1.0,inten).convert("RGBA"))
     base=Image.alpha_composite(base, lay.reduce(SS))
@@ -377,6 +446,36 @@ def c_cta_anuncio(S, c, fi, n):
 TIPOS = {"hook":c_hook, "cta_anuncio":c_cta_anuncio, "sintoma":c_sintoma, "gene":c_gene, "sinergia":c_sinergia, "nota":c_nota,
          "marcadores":c_marcadores, "virada":c_virada, "cta":c_cta}
 
+def limitar_duracoes(cenas):
+    """Aplica o teto de 1min30 do reel e devolve [(cena, dur), ...].
+
+    Regra (pedido da Juliana, 01/09/2026): reel até 90 s. Quando o roteiro
+    passa disso, as cenas EXCEDENTES DO FIM são descartadas inteiras — nunca
+    encolhidas na proporção. Encurtar todas estraga o ritmo da narração e o
+    tempo de leitura dos cards; perder a última cena é um corte limpo.
+    Cena individual também não passa de DUR_MAX_CENA.
+    """
+    duracoes = []
+    for c in cenas:
+        try: dur = float(c.get("dur", 5.0))
+        except (TypeError, ValueError): dur = 5.0
+        duracoes.append(max(1.0, min(dur, DUR_MAX_CENA)))
+    pedido = sum(duracoes)
+
+    plano, total = [], 0.0
+    for c, dur in zip(cenas, duracoes):
+        if total + dur > DUR_MAX_TOTAL + 1e-6:
+            break
+        plano.append((c, dur)); total += dur
+
+    descartadas = len(cenas) - len(plano)
+    if descartadas:
+        print(f"  !! teto de {DUR_MAX_TOTAL:.0f}s: {descartadas} cena(s) do fim "
+              f"descartada(s) — o roteiro pedia {pedido:.1f}s, o vídeo sai com "
+              f"{total:.1f}s", flush=True)
+    return plano
+
+
 def render(SPEC, out_mp4, workdir=None):
     # 🔴 O default era "/home/claude/_reel_build" — caminho da máquina onde o
     # motor foi escrito, que NÃO existe no runner do GitHub. Todo render morria
@@ -388,21 +487,24 @@ def render(SPEC, out_mp4, workdir=None):
         workdir = os.path.join(tempfile.gettempdir(), "_reel_build")
     shutil.rmtree(workdir, ignore_errors=True); os.makedirs(workdir, exist_ok=True)
     idx=0; t0=time.time()
+    # Cena de tipo desconhecido não derruba o job: sai com aviso (o vídeo sem
+    # ela é infinitamente melhor que "erro — tente de novo" depois de 10 min).
+    # Ela é descartada ANTES do teto de duração, senão gastaria orçamento de
+    # segundos que nunca vão virar frame e derrubaria uma cena boa do fim.
+    conhecidas = []
     for ci,c in enumerate(SPEC["cenas"]):
-        # Cena de tipo desconhecido ou sem duração usável não derruba o job:
-        # pula com aviso (o vídeo sai sem ela, que é infinitamente melhor que
-        # "erro — tente de novo" depois de 10 minutos).
-        fn=TIPOS.get(c.get("tipo"))
-        if fn is None:
+        if TIPOS.get(c.get("tipo")) is None:
             print(f"  !! cena {ci+1} de tipo desconhecido ({c.get('tipo')!r}) — pulada", flush=True)
-            continue
-        try: dur=float(c.get("dur", 5.0))
-        except (TypeError, ValueError): dur=5.0
-        N=int(round(max(1.0, dur)*FPS))
+        else:
+            conhecidas.append(c)
+    plano = limitar_duracoes(conhecidas)
+    for ci,(c,dur) in enumerate(plano):
+        fn=TIPOS[c["tipo"]]
+        N=int(round(dur*FPS))
         for i in range(N):
             fn(SPEC, c, i, N).convert("RGB").save(f"{workdir}/f_{idx:05d}.jpg", quality=92)
             idx+=1
-        print(f"  {ci+1:2d}/{len(SPEC['cenas'])} {c['tipo']:11s} {N:3d}f  [{time.time()-t0:5.1f}s]", flush=True)
+        print(f"  {ci+1:2d}/{len(plano)} {c['tipo']:11s} {N:3d}f  [{time.time()-t0:5.1f}s]", flush=True)
     subprocess.run(["ffmpeg","-y","-framerate",str(FPS),"-i",f"{workdir}/f_%05d.jpg",
         "-c:v","libx264","-preset","slow","-crf","20","-pix_fmt","yuv420p",
         "-r","30","-movflags","+faststart", out_mp4],

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { gerarReelAnimadoAction } from "@/lib/conteudo/reel-actions";
+import { gerarReelAnimadoAction, type DuracaoReel } from "@/lib/conteudo/reel-actions";
 
 export type ReelAnimado = {
   id: string;
@@ -22,7 +22,7 @@ function travou(r: ReelAnimado): boolean {
 
 export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
   const [tema, setTema] = useState("");
-  const [duracao, setDuracao] = useState<"30s" | "60s">("60s");
+  const [duracao, setDuracao] = useState<DuracaoReel>("60s");
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -44,11 +44,14 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
         />
         <select
           value={duracao}
-          onChange={(e) => setDuracao(e.target.value as "30s" | "60s")}
+          onChange={(e) => setDuracao(e.target.value as DuracaoReel)}
           className="rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
         >
+          {/* Teto de 1min30 (Juliana, 01/09/2026): o motor corta as cenas
+              excedentes do fim, então não existe opção acima de 90s. */}
           <option value="30s">~30 segundos</option>
           <option value="60s">~60 segundos</option>
+          <option value="90s">~90 segundos (máximo)</option>
         </select>
         <button
           disabled={pending}

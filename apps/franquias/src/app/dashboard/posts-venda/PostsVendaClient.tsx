@@ -3,6 +3,11 @@
 import { useState, useTransition } from "react";
 import type { TipoPost } from "@/lib/claude/prompts";
 import {
+  NIVEIS_CONSCIENCIA,
+  ROTULO_CONSCIENCIA,
+  type NivelConsciencia,
+} from "@/lib/claude/consciencia";
+import {
   atualizarProdutosScanner,
   gerarPostVendaAction,
   type ProdutoScannerLista,
@@ -35,6 +40,10 @@ export function PostsVendaClient(props: {
   const [produtoAtivo, setProdutoAtivo] = useState<ProdutoScannerLista | null>(null);
   const [tipo, setTipo] = useState<TipoPost>("feed_imagem");
   const [incluirPreco, setIncluirPreco] = useState(true);
+  // O MESMO produto muda de copy conforme quem lê. "Consciente do produto" é
+  // o padrão porque é onde o post de venda costuma nascer: quem já conhece o
+  // trabalho dela e está pesando.
+  const [consciencia, setConsciencia] = useState<NivelConsciencia>("consciente_produto");
   const [gerando, setGerando] = useState(false);
   const [post, setPost] = useState<PostGerado | null>(null);
 
@@ -72,6 +81,7 @@ export function PostsVendaClient(props: {
       produtoId: produtoAtivo.id,
       tipo,
       incluirPreco,
+      consciencia,
     });
     if (r.ok) {
       setPost(r.post);
@@ -97,6 +107,8 @@ export function PostsVendaClient(props: {
         briefing_nutri: `Post de venda: ${produtoAtivo?.nome ?? ""}`,
         url_imagem: imagem || undefined,
         legenda_gerada_ia: true,
+        angulo_copy: "divulgacao_produto",
+        nivel_consciencia: consciencia,
       });
       if (r.ok) {
         setAgendado(true);
@@ -221,6 +233,20 @@ export function PostsVendaClient(props: {
                 disabled={!produtoAtivo.preco_texto}
               />
               Citar o preço {produtoAtivo.preco_texto ? `(${produtoAtivo.preco_texto})` : "(sem preço cadastrado)"}
+            </label>
+            <label className="flex items-center gap-2 text-xs text-brand-text/70">
+              <span className="whitespace-nowrap">Quem vai ler</span>
+              <select
+                value={consciencia}
+                onChange={(e) => setConsciencia(e.target.value as NivelConsciencia)}
+                className="rounded-full border border-brand-text/15 bg-white px-3 py-1.5 text-xs"
+              >
+                {NIVEIS_CONSCIENCIA.map((n) => (
+                  <option key={n} value={n}>
+                    {ROTULO_CONSCIENCIA[n]}
+                  </option>
+                ))}
+              </select>
             </label>
             <button
               onClick={gerar}

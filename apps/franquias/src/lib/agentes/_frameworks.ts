@@ -105,25 +105,102 @@ REGRA DE 3 (decisao):
 // COPY
 // ============================================================
 
+/**
+ * Os 5 níveis de awareness do Schwartz como DADO, não como texto solto.
+ *
+ * Fonte única: o bloco FRAMEWORK_EUGENE_SCHWARTZ logo abaixo é MONTADO a
+ * partir desta lista, e o gerador de posts (lib/claude/consciencia.ts) lê a
+ * MESMA lista pra montar a diretriz de copy por nível. Duas cópias do
+ * framework divergiriam em silêncio: alguém corrige o texto num lugar, o
+ * outro segue com a versão velha e ninguém percebe.
+ *
+ * O texto dos campos é o original do framework (sem acento, estilo de
+ * anotação de curso) porque ele já está em produção nos prompts dos agentes
+ * de ads/storytelling. Adaptação pra copy de Instagram em pt-BR fica em
+ * lib/claude/consciencia.ts, que ADICIONA sem reescrever o que está aqui.
+ */
+export type NivelAwarenessSchwartz = {
+  /** Posição no framework (1 = unaware ... 5 = most aware). É a chave de junção. */
+  ordem: 1 | 2 | 3 | 4 | 5;
+  /** Rótulo original em inglês, como o mercado de copy usa. */
+  nome: string;
+  /**
+   * Fatia do mercado nesse nível, exatamente como o framework escreve dentro
+   * dos parênteses (o original só escreve "do mercado" no nível 1).
+   */
+  fatia_mercado: string;
+  /** Em que ponto a pessoa está. */
+  estado: string;
+  /** O que a copy tem que fazer nesse nível (as linhas com "→" do framework). */
+  diretrizes: string[];
+};
+
+export const NIVEIS_AWARENESS_SCHWARTZ: NivelAwarenessSchwartz[] = [
+  {
+    ordem: 1,
+    nome: "UNAWARE",
+    fatia_mercado: "60% do mercado",
+    estado: "nao sabe que tem o problema",
+    diretrizes: [
+      "Headline emocional/identidade/historia. NAO mencione produto cedo.",
+    ],
+  },
+  {
+    ordem: 2,
+    nome: "PROBLEM AWARE",
+    fatia_mercado: "20%",
+    estado: "sente a dor, nao conhece solucoes",
+    diretrizes: [
+      "Lidere com empatia da dor, agite, depois revele solucao",
+      'Ex: "Se voce sofre com X, leia isso"',
+    ],
+  },
+  {
+    ordem: 3,
+    nome: "SOLUTION AWARE",
+    fatia_mercado: "10%",
+    estado: "conhece solucoes, nao seu produto",
+    diretrizes: [
+      "Lidere com resultado desejado, depois conecte ao produto",
+      'Ex: "Como [resultado] sem [dor]"',
+    ],
+  },
+  {
+    ordem: 4,
+    nome: "PRODUCT AWARE",
+    fatia_mercado: "7%",
+    estado: "conhece seu produto, nao convencido",
+    diretrizes: ["Diferenciacao, prova, depoimentos"],
+  },
+  {
+    ordem: 5,
+    nome: "MOST AWARE",
+    fatia_mercado: "3%",
+    estado: "quer comprar, so precisa da oferta",
+    diretrizes: ["Nome do produto + preco/oferta direto"],
+  },
+];
+
+/** A regra que amarra os 5 níveis. Linha a linha, sem indentação. */
+export const REGRA_NUCLEAR_SCHWARTZ: string[] = [
+  "Quanto MENOS aware o prospect, MAIS LONGA e INDIRETA a copy.",
+  "Quanto MAIS aware, mais CURTA e DIRETA.",
+];
+
+const BLOCO_NIVEIS_SCHWARTZ = NIVEIS_AWARENESS_SCHWARTZ.map((n) =>
+  [
+    `  ${n.ordem}. ${n.nome} (${n.fatia_mercado}): ${n.estado}`,
+    ...n.diretrizes.map((d) => `     → ${d}`),
+  ].join("\n"),
+).join("\n");
+
 export const FRAMEWORK_EUGENE_SCHWARTZ = `
 === EUGENE SCHWARTZ — Awareness Levels & Sofisticacao ===
 5 NIVEIS DE AWARENESS (define abordagem do headline/copy):
-  1. UNAWARE (60% do mercado): nao sabe que tem o problema
-     → Headline emocional/identidade/historia. NAO mencione produto cedo.
-  2. PROBLEM AWARE (20%): sente a dor, nao conhece solucoes
-     → Lidere com empatia da dor, agite, depois revele solucao
-     → Ex: "Se voce sofre com X, leia isso"
-  3. SOLUTION AWARE (10%): conhece solucoes, nao seu produto
-     → Lidere com resultado desejado, depois conecte ao produto
-     → Ex: "Como [resultado] sem [dor]"
-  4. PRODUCT AWARE (7%): conhece seu produto, nao convencido
-     → Diferenciacao, prova, depoimentos
-  5. MOST AWARE (3%): quer comprar, so precisa da oferta
-     → Nome do produto + preco/oferta direto
+${BLOCO_NIVEIS_SCHWARTZ}
 
 REGRA NUCLEAR:
-  Quanto MENOS aware o prospect, MAIS LONGA e INDIRETA a copy.
-  Quanto MAIS aware, mais CURTA e DIRETA.
+${REGRA_NUCLEAR_SCHWARTZ.map((l) => `  ${l}`).join("\n")}
 
 SOFISTICACAO DE MERCADO (saturacao):
   - Stage 1: 1o no mercado → declaracao direta
