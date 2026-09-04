@@ -25,6 +25,8 @@
 --  * slug        — chave natural, pra este seed ser idempotente (rodar de
 --                  novo atualiza, não duplica).
 --
+-- ✅ APLICADA EM PRODUÇÃO em 03/09/2026 (antes do deploy, como manda a ordem).
+--
 -- ⚠️ ORDEM: esta migração vem ANTES do deploy do app — a tela nova
 -- seleciona as colunas novas, e SELECT com coluna inexistente falha
 -- INTEIRO no PostgREST (a biblioteca ficaria em "erro ao carregar" pra
