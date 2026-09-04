@@ -1,6 +1,9 @@
 -- ============================================================
 -- MIGRATION 026: os 5 stories do teste genético na biblioteca
 -- ============================================================
+-- ✅ APLICADA EM PRODUÇÃO em 04/09/2026, depois do deploy READY do commit
+-- af9116c e de conferir que as 5 artes respondem 200 em app.scannerdasaude.com.
+--
 -- 🔴 APLICAR SOMENTE DEPOIS DO DEPLOY do app (PR da coleção nutrigenética).
 --
 -- Motivo: quem filtra por produto é a TELA. O app que está no ar hoje lê a
