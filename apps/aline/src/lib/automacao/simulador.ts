@@ -7,7 +7,7 @@
 
 import { createAlineClient } from "@/lib/supabase/server";
 import { carregarPerfilPorSlug } from "@/lib/instagram/credenciais";
-import { lerConfig } from "./config";
+import { blocoOrientacoesDaDona, lerConfig } from "./config";
 import { gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import { pareceClinico, pareceSpam, preencherTexto, selecionarRegra, type Gatilho, type Regra } from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
@@ -29,6 +29,7 @@ export async function simularEvento(params: {
   if (!perfil) return { regra: null, acoes: [], avisos: ["Perfil não encontrado"] };
   const aline = createAlineClient();
   const config = lerConfig(perfil.automacao_config);
+  const orientacoes = blocoOrientacoesDaDona(config);
   const vars = { nome: params.nome ?? "Maria Teste", username: "maria.teste" };
   const acoes: string[] = [];
   const avisos: string[] = [];
@@ -75,7 +76,7 @@ export async function simularEvento(params: {
     if (pareceClinico(params.texto)) {
       return { regra: null, acoes: [`Responde no comentário (pergunta clínica → direct): "${preencherTexto(config.texto_convite_direct, vars)}"`], avisos };
     }
-    const texto = await gerarAgradecimentoComentario({ perfil, comentario: params.texto, username: vars.username });
+    const texto = await gerarAgradecimentoComentario({ perfil, comentario: params.texto, username: vars.username, orientacoes });
     return texto
       ? { regra: null, acoes: [`Responde no comentário (agradecimento gerado): "${texto}"`], avisos }
       : { regra: null, acoes: [], avisos: ["A geração do agradecimento falhou. Veja o log da Vercel."] };
@@ -88,7 +89,7 @@ export async function simularEvento(params: {
     else avisos.push(`Base do Scanner: ${contexto.totalRegistros} registro(s) encontrados pra esta pergunta.`);
     const resp = await responderDmComScanner({
       perfil, historico: [], pergunta: params.texto, nomeContato: vars.nome,
-      contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano,
+      contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
     });
     if (!resp) return { regra: null, acoes: [], avisos: [...avisos, "A geração da resposta falhou. Veja o log da Vercel."] };
     acoes.push(`Manda no direct: "${resp.texto}"`);

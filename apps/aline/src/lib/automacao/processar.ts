@@ -20,7 +20,7 @@ import {
   credenciaisDoPerfil,
   type PerfilInstagram,
 } from "@/lib/instagram/credenciais";
-import { lerConfig } from "./config";
+import { blocoOrientacoesDaDona, lerConfig, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
 import { gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import {
@@ -109,6 +109,11 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
       const vars = { nome: contato.nome, username: contato.username ?? ev.username };
       const config = lerConfig(perfil.automacao_config);
+      const orientacoes = blocoOrientacoesDaDona(config);
+
+      // Família, equipe, amigas: o robô não responde (regra nem chave geral).
+      const usernameContato = normalizarUsername(contato.username ?? ev.username ?? "");
+      if (usernameContato && config.nao_responder_usernames.includes(usernameContato)) { resumo.ignorados++; continue; }
 
       if (regra) {
         await executarRegra({ perfil, cred, contato, ev, regra, vars });
@@ -127,7 +132,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           origem = "convite_direct";
         } else {
           texto = await gerarAgradecimentoComentario({
-            perfil, comentario: ev.texto, username: ev.username, legendaDoPost: await legendaDoPost(perfil.id, ev.mediaId),
+            perfil, comentario: ev.texto, username: ev.username, legendaDoPost: await legendaDoPost(perfil.id, ev.mediaId), orientacoes,
           });
           origem = "ia_agradecimento";
         }
@@ -145,7 +150,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         const [historico, contexto] = await Promise.all([historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa)]);
         const resp = await responderDmComScanner({
           perfil, historico, pergunta: textoPessoa, nomeContato: contato.nome,
-          contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano,
+          contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
         if (!resp || !resp.texto) { resumo.erros++; continue; }
         await enviarDm(cred, ev.igsid, resp.texto);

@@ -157,6 +157,20 @@ Um robô, N contas: cada linha de `aline.perfis` tem o seu app da Meta.
   Meta; fechou, o resto é cancelado sozinho (`ig_fila.erro = janela_24h`).
 - **Contatos**: tags, "esperando uma pessoa", desligar o robô pra um contato.
 
+## As orientações da dona (chaves gerais, 05/09 à tarde)
+
+- **Quem o robô nunca responde** (`nao_responder_usernames`): família, equipe,
+  amigas — vale pra comentário e direct, antes de qualquer regra.
+- **Como eu falo** (`voz`): botão "Mapear minha voz" lê legendas + respostas
+  que ELA deu em comentários (`mapear-voz.ts`) e escreve o retrato no campo;
+  ela edita. DM antiga a Meta não entrega pela API.
+- **Quando pedirem orientação/prescrição** (`instrucoes_etica`): texto dela
+  por cima da trava do CFN que já está no prompt.
+- **Direcionamentos de conversão** (`direcionamentos`): "quando X -> fazer Y",
+  uma linha por caso; entra no prompt da DM pra conduzir a conversa.
+Tudo vai pro system prompt via `blocoOrientacoesDaDona(config)`, nos DOIS
+caminhos (comentário e DM) e no simulador. `tests/automacao-config.test.ts`.
+
 ## Travas que não devem cair
 
 - Evento da PRÓPRIA conta (eco, comentário nosso) nunca dispara regra.

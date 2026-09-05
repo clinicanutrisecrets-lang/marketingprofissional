@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
-import { lerConfig } from "@/lib/automacao/config";
+import { direcionamentosParaTexto, lerConfig } from "@/lib/automacao/config";
 import {
   alternarRegra,
   alternarSilenciarContato,
@@ -13,6 +13,7 @@ import {
   salvarSequencia,
 } from "@/lib/automacao/actions";
 import { SimuladorRobo } from "./SimuladorRobo";
+import { MapearVoz } from "./MapearVoz";
 
 export const dynamic = "force-dynamic";
 
@@ -136,6 +137,32 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
               </span>
             </label>
             <textarea name="texto_encaminhar_humano" defaultValue={config.texto_encaminhar_humano} rows={2} className={campo} placeholder="Texto quando o robô passa pra uma pessoa" />
+
+            <div className="border-t border-aline-text/5 pt-4">
+              <label className="mb-1 block text-sm font-medium">Quem o robô nunca responde</label>
+              <p className="mb-2 text-xs text-aline-text/60">Nomes de usuário, separados por vírgula: família, equipe, amigas. Vale pra comentário e direct.</p>
+              <input name="nao_responder_usernames" defaultValue={config.nao_responder_usernames.join(", ")} placeholder="ex.: pai.da.aline, julimendesnutri" className={campo} />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">Como eu falo</label>
+              <p className="mb-2 text-xs text-aline-text/60">O retrato do seu jeito de escrever. O robô imita isto em todo comentário e DM gerados.</p>
+              <textarea name="voz" defaultValue={config.voz} rows={8} className={campo} placeholder="Use o botão abaixo pra mapear a partir do seu Instagram, ou escreva você mesma." />
+              <div className="mt-2"><MapearVoz slug={slug} cor={cor} /></div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">Quando pedirem orientação ou prescrição</label>
+              <p className="mb-2 text-xs text-aline-text/60">A regra do CFN já vale por baixo (nunca diagnóstico, nunca dose individual). Aqui você escreve, nas suas palavras, o que o robô deve dizer e pra onde levar a pessoa.</p>
+              <textarea name="instrucoes_etica" defaultValue={config.instrucoes_etica} rows={4} className={campo} placeholder='ex.: "Explico que orientação individual só em consulta, porque depende de exames e história. Ofereço a Avaliação de Saúde como primeiro passo e mando o link."' />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">Direcionamentos de conversão</label>
+              <p className="mb-2 text-xs text-aline-text/60">Uma linha por caso: <code>quando a pessoa quer X -&gt; o que fazer / link</code>. O robô usa isto pra conduzir a DM quando a pessoa puxa assunto.</p>
+              <textarea name="direcionamentos" defaultValue={direcionamentosParaTexto(config.direcionamentos)} rows={6} className={`${campo} font-mono text-xs`} placeholder={"quer consulta ou pergunta preço -> explicar que a primeira etapa é a Avaliação de Saúde e mandar https://...\nquer emagrecer / fala de inchaço, ansiedade -> apresentar o Lótus e mandar https://...\npergunta sobre teste genético -> explicar em 2 frases e mandar https://..."} />
+            </div>
+
             <button className={BOTAO} style={{ background: cor }}>Salvar chaves</button>
           </form>
         </section>

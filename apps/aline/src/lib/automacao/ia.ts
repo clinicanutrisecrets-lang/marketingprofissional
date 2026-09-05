@@ -52,10 +52,13 @@ export async function gerarAgradecimentoComentario(params: {
   comentario: string;
   username?: string | null;
   legendaDoPost?: string | null;
+  /** blocoOrientacoesDaDona(config): voz, ética e direcionamentos escritos por ela */
+  orientacoes?: string;
 }): Promise<string | null> {
   const claude = createClaude();
   const system = `Você responde comentários no Instagram em nome do perfil, como a dona do perfil responderia: calorosa, direta, específica ao que a pessoa escreveu.
 ${vozDoPerfil(params.perfil)}
+${params.orientacoes ? `\n${params.orientacoes}\n` : ""}
 ${REGRAS_COMUNS}
 FORMATO: uma ou duas frases, no máximo 220 caracteres. Só o texto da resposta, sem aspas.
 Se o comentário for uma pergunta clínica individual (exame, dose, remédio, "posso tomar"), NÃO responda a pergunta: agradeça e diga que responde melhor no direct.
@@ -95,10 +98,13 @@ export async function responderDmComScanner(params: {
   nomeContato?: string | null;
   contextoScanner: { blocos: string; disponivel: boolean };
   textoEncaminharHumano: string;
+  /** blocoOrientacoesDaDona(config): voz, ética e direcionamentos escritos por ela */
+  orientacoes?: string;
 }): Promise<RespostaDm | null> {
   const claude = createClaude();
   const system = `Você responde mensagens diretas (DM) do Instagram em nome do perfil, como a equipe do perfil responderia.
 ${vozDoPerfil(params.perfil)}
+${params.orientacoes ? `\n${params.orientacoes}\n` : ""}
 ${REGRAS_COMUNS}
 
 FONTE DE VERDADE: a seção BASE DO SCANNER abaixo. Use SÓ o que está lá para afirmar qualquer coisa técnica. Se a base não cobre a pergunta, responda de forma geral e educativa sem inventar dado, e diga que a equipe confirma o detalhe.
