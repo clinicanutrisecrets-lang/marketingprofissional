@@ -6,10 +6,11 @@ import { GerarReelButton } from "@/components/GerarReelButton";
 
 export const dynamic = "force-dynamic";
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = { params: Promise<{ slug: string }>; searchParams?: Promise<Record<string, string | undefined>> };
 
-export default async function PerfilPage({ params }: PageProps) {
+export default async function PerfilPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const sp = (await searchParams) ?? {};
 
   const supabase = createClient();
   const {
@@ -103,6 +104,16 @@ export default async function PerfilPage({ params }: PageProps) {
             </div>
           </div>
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>
+          {sp.ig_error && (
+            <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+              <strong>A conexão do Instagram falhou:</strong> {sp.ig_error}
+            </p>
+          )}
+          {sp.ig_conectado && (
+            <p className="mt-3 rounded-lg bg-green-50 p-3 text-sm text-green-800">
+              Instagram conectado.{sp.webhook === "falhou" ? " A assinatura do webhook falhou; confira o passo 2 no painel da Meta." : ""}
+            </p>
+          )}
         </header>
 
         <section className="mb-6 flex flex-wrap gap-3">
