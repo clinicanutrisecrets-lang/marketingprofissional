@@ -93,9 +93,18 @@ export default async function DashboardPage() {
                       @{p.instagram_handle as string}
                     </h3>
                     {p.instagram_conta_id ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                        conectado
-                      </span>
+                      <>
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          conectado
+                        </span>
+                        <a
+                          href={`/api/auth/instagram/connect?slug=${p.slug as string}`}
+                          className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700 hover:bg-gray-200"
+                          title="Refaz o login pra o token pegar permissões novas do app (ex.: insights, comentários)"
+                        >
+                          reconectar
+                        </a>
+                      </>
                     ) : (
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
                         conectar
