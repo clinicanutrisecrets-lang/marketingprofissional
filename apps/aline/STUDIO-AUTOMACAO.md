@@ -171,6 +171,25 @@ Um robô, N contas: cada linha de `aline.perfis` tem o seu app da Meta.
 Tudo vai pro system prompt via `blocoOrientacoesDaDona(config)`, nos DOIS
 caminhos (comentário e DM) e no simulador. `tests/automacao-config.test.ts`.
 
+## Botões e áudio (05/09, pra migrar o fluxo GLP1 do ManyChat)
+
+- **Botões** (`ig_regras.opcoes`, migração aline/010, aplicada): até 3 por
+  regra, rótulo ≤ 20 caracteres (limite da resposta rápida do Instagram),
+  cada um com resposta própria, tags e sequência. Vão junto da resposta
+  privada; se a Meta recusar os botões (ex.: em resposta privada de
+  comentário), o robô manda a lista numerada e aceita "2" ou o rótulo
+  digitado (`casarOpcao`, memória em `ig_contatos.ultimas_opcoes`). O toque
+  chega como DM com `quick_reply.payload = opc:<regra>:<índice>`.
+- **Follow-up em 23h** = sequência com `1380 | texto`: o toque no botão é
+  mensagem da pessoa e abre a janela de 24h; quem só comentou e não tocou
+  não recebe (a fila cancela sozinha, como a Meta exige).
+- **Áudio no direct**: `transcrever-audio.ts` (AssemblyAI, `ASSEMBLYAI_API_KEY`
+  na Vercel do studio-aline). Sem chave, o áudio fica registrado e não é
+  respondido no automático.
+- **Posts antigos**: o seletor de post da regra lista os 40 posts mais
+  recentes direto do Instagram (`listarMidias`), com data e legenda — a
+  regra prende ao ID, e o webhook avisa comentário em post de qualquer data.
+
 ## Travas que não devem cair
 
 - Evento da PRÓPRIA conta (eco, comentário nosso) nunca dispara regra.

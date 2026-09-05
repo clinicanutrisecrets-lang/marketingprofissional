@@ -83,10 +83,26 @@ export async function renovarTokenLongo(token: string): Promise<{ access_token: 
 
 /* ── Mensagens ────────────────────────────────────────────────────────── */
 
-export async function enviarDm(cred: Credenciais, igsid: string, texto: string): Promise<{ message_id?: string }> {
+export type BotaoRapido = { title: string; payload: string };
+
+function mensagemComBotoes(texto: string, botoes?: BotaoRapido[]) {
+  const quick = (botoes ?? []).slice(0, 13).map((b) => ({
+    content_type: "text",
+    title: b.title.slice(0, 20),
+    payload: b.payload.slice(0, 1000),
+  }));
+  return quick.length > 0 ? { text: texto, quick_replies: quick } : { text: texto };
+}
+
+export async function enviarDm(
+  cred: Credenciais,
+  igsid: string,
+  texto: string,
+  botoes?: BotaoRapido[],
+): Promise<{ message_id?: string }> {
   return chamar(cred, `${cred.pathId}/messages`, {
     method: "POST",
-    body: { recipient: { id: igsid }, message: { text: texto } },
+    body: { recipient: { id: igsid }, message: mensagemComBotoes(texto, botoes) },
   });
 }
 
@@ -95,10 +111,11 @@ export async function respostaPrivadaComentario(
   cred: Credenciais,
   commentId: string,
   texto: string,
+  botoes?: BotaoRapido[],
 ): Promise<{ message_id?: string }> {
   return chamar(cred, `${cred.pathId}/messages`, {
     method: "POST",
-    body: { recipient: { comment_id: commentId }, message: { text: texto } },
+    body: { recipient: { comment_id: commentId }, message: mensagemComBotoes(texto, botoes) },
   });
 }
 

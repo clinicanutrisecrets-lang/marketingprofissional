@@ -8,6 +8,13 @@
 
 export type Gatilho = "comentario" | "dm" | "story_reply" | "story_mention";
 
+export type Opcao = {
+  rotulo: string; // ≤ 20 caracteres (limite da resposta rápida do Instagram)
+  resposta: string;
+  tags: string[];
+  sequencia_id: string | null;
+};
+
 export type Regra = {
   id: string;
   nome: string;
@@ -21,7 +28,10 @@ export type Regra = {
   tags_adicionar: string[];
   uma_vez_por_contato: boolean;
   prioridade: number;
+  opcoes?: Opcao[];
 };
+
+export type Anexo = { tipo: string; url?: string };
 
 export type EventoInstagram = {
   /** entry.id — conta profissional que recebeu o evento */
@@ -35,6 +45,9 @@ export type EventoInstagram = {
   mediaId?: string;
   commentId?: string;
   parentCommentId?: string;
+  /** quick_reply.payload quando a pessoa tocou num botão */
+  payload?: string;
+  anexos?: Anexo[];
   timestamp?: number;
   bruto: unknown;
 };
@@ -203,8 +216,13 @@ export function extrairEventos(payload: unknown): EventoInstagram[] {
         const payload = (mention.payload ?? {}) as Json;
         eventos.push({ ...base, tipo: "story_mention", texto: str(msg.text) ?? "", mediaId: str(payload.url) });
       } else {
-        const texto = str(msg.text) ?? (attachments.length > 0 ? `[${attachments.map((a) => a.type).join(", ")}]` : "");
-        eventos.push({ ...base, tipo: "dm", texto });
+        const anexos: Anexo[] = attachments.map((a) => ({
+          tipo: str(a.type) ?? "desconhecido",
+          url: str(((a.payload ?? {}) as Json).url),
+        }));
+        const quick = msg.quick_reply as Json | undefined;
+        const texto = str(msg.text) ?? (anexos.length > 0 ? `[${anexos.map((a) => a.tipo).join(", ")}]` : "");
+        eventos.push({ ...base, tipo: "dm", texto, payload: str(quick?.payload), anexos: anexos.length ? anexos : undefined });
       }
     }
   }
@@ -237,4 +255,49 @@ export function pareceSpam(texto: string): boolean {
   if (!semMencoes) return true;
   if (/https?:\/\//.test(t) && /(seguidores|ganhe|renda|crypto|bitcoin|promocao)/.test(t)) return true;
   return false;
+}
+
+/* ── Botões (respostas rápidas) ────────────────────────────────────────── */
+
+export const PREFIXO_PAYLOAD_OPCAO = "opc:";
+export const MAX_OPCOES = 3;
+export const MAX_ROTULO = 20;
+
+export function payloadDaOpcao(regraId: string, indice: number): string {
+  return `${PREFIXO_PAYLOAD_OPCAO}${regraId}:${indice}`;
+}
+
+/** regra_id é o id da regra OU "passo:<id do passo de sequência>". */
+export type UltimasOpcoes = { regra_id: string; rotulos: string[] };
+export const PREFIXO_PASSO = "passo:";
+
+/**
+ * Descobre qual botão a pessoa escolheu. Ordem: payload do toque →
+ * número digitado ("2") → texto igual ao rótulo (sem acento/caixa).
+ * Devolve {regraId, indice} ou null.
+ */
+export function casarOpcao(
+  ev: { texto: string; payload?: string },
+  ultimas: UltimasOpcoes | null | undefined,
+): { regraId: string; indice: number } | null {
+  if (ev.payload && ev.payload.startsWith(PREFIXO_PAYLOAD_OPCAO)) {
+    const [regraId, idx] = ev.payload.slice(PREFIXO_PAYLOAD_OPCAO.length).split(":");
+    const indice = Number(idx);
+    if (regraId && Number.isInteger(indice) && indice >= 0) return { regraId, indice };
+  }
+  if (!ultimas || ultimas.rotulos.length === 0) return null;
+  const t = normalizarTexto(ev.texto);
+  if (!t) return null;
+  const numero = t.match(/^(\d{1,2})[.)]?$/);
+  if (numero) {
+    const indice = Number(numero[1]) - 1;
+    if (indice >= 0 && indice < ultimas.rotulos.length) return { regraId: ultimas.regra_id, indice };
+  }
+  const indice = ultimas.rotulos.findIndex((r) => normalizarTexto(r) === t);
+  return indice >= 0 ? { regraId: ultimas.regra_id, indice } : null;
+}
+
+/** Texto de reserva quando os botões não podem ser mostrados: lista numerada. */
+export function opcoesComoTexto(texto: string, rotulos: string[]): string {
+  return `${texto}\n\n${rotulos.map((r, i) => `${i + 1}. ${r}`).join("\n")}\n\nResponda com o número.`;
 }

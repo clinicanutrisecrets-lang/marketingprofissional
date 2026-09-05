@@ -4,11 +4,11 @@
  */
 
 import { createAlineClient } from "@/lib/supabase/server";
-import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenLongo } from "@/lib/instagram/api";
+import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenLongo, type BotaoRapido } from "@/lib/instagram/api";
 import { carregarPerfilPorId, credenciaisDoPerfil, salvarTokenRenovado } from "@/lib/instagram/credenciais";
-import { janela24hAberta, preencherTexto } from "./regras";
+import { janela24hAberta, opcoesComoTexto, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
 
-type Passo = { ordem: number; atraso_minutos: number; texto: string };
+type Passo = { id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null };
 
 export async function enfileirarSequencia(params: {
   perfilId: string;
@@ -28,7 +28,7 @@ export async function enfileirarSequencia(params: {
 
   const { data: passosData, error } = await aline
     .from("ig_sequencia_passos")
-    .select("ordem, atraso_minutos, texto")
+    .select("id, ordem, atraso_minutos, texto, opcoes")
     .eq("sequencia_id", params.sequenciaId)
     .order("ordem", { ascending: true });
   if (error) throw new Error(`passos: ${error.message}`);
@@ -56,6 +56,8 @@ export async function enfileirarSequencia(params: {
       enviar_em: new Date(Date.now() + acumuladoMin * 60_000).toISOString(),
       sequencia_id: params.sequenciaId,
       passo_ordem: p.ordem,
+      passo_id: p.id,
+      opcoes: (p.opcoes ?? []).filter((o) => o.rotulo && o.resposta).map((o) => ({ ...o, resposta: preencherTexto(o.resposta, params.vars) })),
       regra_id: params.regraId ?? null,
     };
   });
@@ -73,13 +75,15 @@ type ItemFila = {
   texto: string;
   sequencia_id: string | null;
   regra_id: string | null;
+  passo_id: string | null;
+  opcoes: Opcao[] | null;
 };
 
 export async function processarFila(limite = 40): Promise<{ enviados: number; cancelados: number; falhas: number }> {
   const aline = createAlineClient();
   const { data, error } = await aline
     .from("ig_fila")
-    .select("id, perfil_id, contato_id, tipo, destino, texto, sequencia_id, regra_id")
+    .select("id, perfil_id, contato_id, tipo, destino, texto, sequencia_id, regra_id, passo_id, opcoes")
     .eq("status", "pendente")
     .lte("enviar_em", new Date().toISOString())
     .order("enviar_em", { ascending: true })
@@ -124,7 +128,21 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         continue;
       }
 
-      if (item.tipo === "dm") await enviarDm(acesso.cred, item.destino, item.texto);
+      let textoEnviado = item.texto;
+      const opcoes = (item.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
+      if (item.tipo === "dm" && opcoes.length > 0 && item.passo_id) {
+        const ref = `${PREFIXO_PASSO}${item.passo_id}`;
+        const botoes: BotaoRapido[] = opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(ref, i) }));
+        try {
+          await enviarDm(acesso.cred, item.destino, item.texto, botoes);
+        } catch (e) {
+          console.warn("[automacao/fila] botões recusados, lista numerada:", (e as Error).message.slice(0, 200));
+          textoEnviado = opcoesComoTexto(item.texto, opcoes.map((o) => o.rotulo));
+          await enviarDm(acesso.cred, item.destino, textoEnviado);
+        }
+        const ultimas: UltimasOpcoes = { regra_id: ref, rotulos: opcoes.map((o) => o.rotulo) };
+        await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", item.contato_id);
+      } else if (item.tipo === "dm") await enviarDm(acesso.cred, item.destino, item.texto);
       else if (item.tipo === "private_reply") await respostaPrivadaComentario(acesso.cred, item.destino, item.texto);
       else await responderComentario(acesso.cred, item.destino, item.texto);
 
@@ -134,7 +152,7 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         contato_id: item.contato_id,
         canal: item.tipo === "comment_reply" ? "comentario" : "dm",
         direcao: "saida",
-        texto: item.texto,
+        texto: textoEnviado,
         origem: item.sequencia_id ? "sequencia" : "regra",
         regra_id: item.regra_id,
       });

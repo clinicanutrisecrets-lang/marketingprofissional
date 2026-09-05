@@ -36,7 +36,7 @@ export async function simularEvento(params: {
 
   const { data } = await aline
     .from("ig_regras")
-    .select("id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade")
+    .select("id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade, opcoes")
     .eq("perfil_id", perfil.id)
     .eq("ativa", true);
   const regras = (data ?? []) as Regra[];
@@ -48,6 +48,13 @@ export async function simularEvento(params: {
     }
     if (regra.resposta_privada) {
       acoes.push(`Manda no direct: "${preencherTexto(regra.resposta_privada, vars)}"`);
+    }
+    for (const o of regra.opcoes ?? []) {
+      acoes.push(
+        `Botão "${o.rotulo}" → ao tocar: "${preencherTexto(o.resposta, vars)}"` +
+          (o.tags.length ? ` (tags: ${o.tags.join(", ")})` : "") +
+          (o.sequencia_id ? " + entra na sequência" : ""),
+      );
     }
     if (regra.sequencia_id) {
       const { data: passos } = await aline

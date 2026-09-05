@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { direcionamentosParaTexto, lerConfig } from "@/lib/automacao/config";
+import { credenciaisDoPerfil } from "@/lib/instagram/credenciais";
+import { listarMidias } from "@/lib/instagram/api";
 import {
   alternarRegra,
   alternarSilenciarContato,
@@ -54,7 +56,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
   const [regrasRes, seqRes, passosRes, postsRes, contatosRes, mensagensRes, filaRes, humanoRes] = await Promise.all([
     aline.from("ig_regras").select("*").eq("perfil_id", perfil.id).order("prioridade").order("criado_em"),
     aline.from("ig_sequencias").select("id, nome, ativa").eq("perfil_id", perfil.id).order("criado_em"),
-    aline.from("ig_sequencia_passos").select("sequencia_id, ordem, atraso_minutos, texto").order("ordem"),
+    aline.from("ig_sequencia_passos").select("sequencia_id, ordem, atraso_minutos, texto, opcoes").order("ordem"),
     aline.from("posts").select("instagram_post_id, copy_legenda, data_hora_postada").eq("perfil_id", perfil.id).not("instagram_post_id", "is", null).order("data_hora_postada", { ascending: false }).limit(30),
     aline.from("ig_contatos").select("id, username, nome, tags, ultima_interacao_em, precisa_humano, precisa_humano_motivo, silenciado").eq("perfil_id", perfil.id).order("ultima_interacao_em", { ascending: false }).limit(25),
     aline.from("ig_mensagens").select("id, canal, direcao, texto, origem, criado_em, contato_id").eq("perfil_id", perfil.id).order("criado_em", { ascending: false }).limit(40),
@@ -62,15 +64,37 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
     aline.from("ig_contatos").select("id", { count: "exact", head: true }).eq("perfil_id", perfil.id).eq("precisa_humano", true),
   ]);
 
+  type Opcao = { rotulo: string; resposta: string; tags: string[]; sequencia_id: string | null };
   type Regra = {
     id: string; nome: string; ativa: boolean; gatilho: string; palavras_chave: string[]; media_ids: string[];
     resposta_publica: string | null; resposta_privada: string | null; sequencia_id: string | null; tags_adicionar: string[];
-    uma_vez_por_contato: boolean; prioridade: number;
+    uma_vez_por_contato: boolean; prioridade: number; opcoes: Opcao[] | null;
   };
   const regras = (regrasRes.data ?? []) as Regra[];
   const sequencias = (seqRes.data ?? []) as Array<{ id: string; nome: string; ativa: boolean }>;
-  const passos = (passosRes.data ?? []) as Array<{ sequencia_id: string; ordem: number; atraso_minutos: number; texto: string }>;
-  const posts = (postsRes.data ?? []) as Array<{ instagram_post_id: string; copy_legenda: string | null; data_hora_postada: string | null }>;
+  const passos = (passosRes.data ?? []) as Array<{ sequencia_id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null }>;
+  const passoParaLinha = (p: { atraso_minutos: number; texto: string; opcoes: Opcao[] | null }) =>
+    `${p.atraso_minutos} | ${p.texto}` + ((p.opcoes?.length ?? 0) > 0 ? ` || ${p.opcoes!.map((o) => `${o.rotulo} -> ${o.resposta}`).join(" ;; ")}` : "");
+  const postsDoEstudio = (postsRes.data ?? []) as Array<{ instagram_post_id: string; copy_legenda: string | null; data_hora_postada: string | null }>;
+
+  // Posts REAIS da conta (novos e antigos), direto do Instagram, pra prender
+  // regra a um post pela legenda em vez de digitar ID.
+  let postsDoInstagram: Array<{ instagram_post_id: string; copy_legenda: string | null; data_hora_postada: string | null }> = [];
+  let avisoPosts = "";
+  try {
+    const acesso = await credenciaisDoPerfil({
+      id: perfil.id, instagram_conta_id: perfil.instagram_conta_id,
+      instagram_login_tipo: perfil.instagram_login_tipo as "facebook" | "instagram", instagram_token_expiry: perfil.instagram_token_expiry,
+    });
+    if (acesso.cred) {
+      const midias = await listarMidias(acesso.cred, 40);
+      postsDoInstagram = midias.map((m) => ({ instagram_post_id: m.id, copy_legenda: m.caption ?? null, data_hora_postada: m.timestamp ?? null }));
+    }
+  } catch (e) {
+    avisoPosts = (e as Error).message;
+  }
+  const vistos = new Set<string>();
+  const posts = [...postsDoInstagram, ...postsDoEstudio].filter((p) => (vistos.has(p.instagram_post_id) ? false : (vistos.add(p.instagram_post_id), true)));
   const contatos = (contatosRes.data ?? []) as Array<{
     id: string; username: string | null; nome: string | null; tags: string[]; ultima_interacao_em: string;
     precisa_humano: boolean; precisa_humano_motivo: string | null; silenciado: boolean;
@@ -173,7 +197,9 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
         <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-aline-text/60">Regras</h2>
           <p className="mb-4 text-xs text-aline-text/60">
-            Gatilho + palavra-chave → resposta pública, resposta no direct, sequência e tag. Use {"{primeiro_nome}"} e {"{username}"} no texto.
+            Gatilho + palavra-chave → resposta pública, resposta no direct, botões, sequência e tag. Use {"{primeiro_nome}"} e {"{username}"} no texto.
+            {posts.length > 0 && <> No campo de post, comece a digitar a legenda: a lista mostra seus {posts.length} posts mais recentes, novos e antigos.</>}
+            {avisoPosts && <> (Não consegui listar seus posts agora: {avisoPosts})</>}
           </p>
           {regras.length === 0 ? (
             <p className="mb-4 text-sm text-aline-text/60">Nenhuma regra ainda.</p>
@@ -187,6 +213,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
                     <span className="text-aline-text/60">· {GATILHOS[r.gatilho] ?? r.gatilho}</span>
                     {r.palavras_chave.length > 0 && <span className="text-aline-text/60">· {r.palavras_chave.join(", ")}</span>}
                     {r.media_ids.length > 0 && <span className="text-aline-text/60">· {r.media_ids.length} post(s)</span>}
+                    {(r.opcoes?.length ?? 0) > 0 && <span className="text-aline-text/60">· {r.opcoes!.length} botão(ões)</span>}
                   </summary>
                   <FormRegra regra={r} posts={posts} sequencias={sequencias} action={salvarRegraAction} cor={cor} />
                   <div className="mt-2 flex gap-3 text-xs">
@@ -207,7 +234,8 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
         <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-aline-text/60">Sequências</h2>
           <p className="mb-4 text-xs text-aline-text/60">
-            Uma linha por mensagem: <code>minutos | texto</code>. O atraso conta a partir da mensagem anterior (1440 = 1 dia).
+            Uma linha por mensagem: <code>minutos | texto</code>. O atraso conta a partir da mensagem anterior (1380 = 23 horas, 1440 = 1 dia).
+            Botões no passo: acrescente <code>|| Rótulo -&gt; resposta ;; Rótulo -&gt; resposta</code> no fim da linha.
             Só sai dentro da janela de 24h da Meta: se a pessoa não respondeu mais, o resto é cancelado sozinho.
           </p>
           {sequencias.map((s) => {
@@ -218,7 +246,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
                 <form action={salvarSeqAction} className="mt-3 space-y-2">
                   <input type="hidden" name="id" value={s.id} />
                   <input name="nome" defaultValue={s.nome} className={campo} />
-                  <textarea name="passos" rows={Math.max(3, ps.length + 1)} className={`${campo} font-mono text-xs`} defaultValue={ps.map((p) => `${p.atraso_minutos} | ${p.texto}`).join("\n")} />
+                  <textarea name="passos" rows={Math.max(3, ps.length + 1)} className={`${campo} font-mono text-xs`} defaultValue={ps.map(passoParaLinha).join("\n")} />
                   <div className="flex items-center gap-3">
                     <button className={BOTAO} style={{ background: cor }}>Salvar sequência</button>
                   </div>
@@ -308,7 +336,7 @@ function quando(iso: string): string {
 function FormRegra({
   regra, posts, sequencias, action, cor,
 }: {
-  regra?: { id: string; nome: string; gatilho: string; palavras_chave: string[]; media_ids: string[]; resposta_publica: string | null; resposta_privada: string | null; sequencia_id: string | null; tags_adicionar: string[]; uma_vez_por_contato: boolean; prioridade: number };
+  regra?: { id: string; nome: string; gatilho: string; palavras_chave: string[]; media_ids: string[]; resposta_publica: string | null; resposta_privada: string | null; sequencia_id: string | null; tags_adicionar: string[]; uma_vez_por_contato: boolean; prioridade: number; opcoes: Array<{ rotulo: string; resposta: string; tags: string[]; sequencia_id: string | null }> | null };
   posts: Array<{ instagram_post_id: string; copy_legenda: string | null; data_hora_postada: string | null }>;
   sequencias: Array<{ id: string; nome: string }>;
   action: (form: FormData) => Promise<void>;
@@ -324,10 +352,23 @@ function FormRegra({
       <input name="palavras_chave" defaultValue={regra?.palavras_chave.join(", ")} placeholder="Palavras-chave (vírgula). Vazio = qualquer texto" className={campo} />
       <input name="media_ids" defaultValue={regra?.media_ids.join(", ")} placeholder="IDs de post (só comentário). Vazio = todos" className={campo} list={`posts-${regra?.id ?? "novo"}`} />
       <datalist id={`posts-${regra?.id ?? "novo"}`}>
-        {posts.map((p) => <option key={p.instagram_post_id} value={p.instagram_post_id}>{(p.copy_legenda ?? "").slice(0, 60)}</option>)}
+        {posts.map((p) => (
+          <option key={p.instagram_post_id} value={p.instagram_post_id}>
+            {`${p.data_hora_postada ? p.data_hora_postada.slice(0, 10) + " · " : ""}${(p.copy_legenda ?? "(sem legenda)").replace(/\s+/g, " ").slice(0, 70)}`}
+          </option>
+        ))}
       </datalist>
       <textarea name="resposta_publica" defaultValue={regra?.resposta_publica ?? ""} rows={2} placeholder="Resposta pública no comentário (só gatilho comentário)" className={`${campo} md:col-span-2`} />
-      <textarea name="resposta_privada" defaultValue={regra?.resposta_privada ?? ""} rows={3} placeholder="Resposta no direct (link do material, cupom, etc.)" className={`${campo} md:col-span-2`} />
+      <textarea name="resposta_privada" defaultValue={regra?.resposta_privada ?? ""} rows={3} placeholder="Resposta no direct (link do material, cupom, ou a pergunta que vem com os botões)" className={`${campo} md:col-span-2`} />
+      <div className="md:col-span-2">
+        <textarea
+          name="opcoes"
+          defaultValue={(regra?.opcoes ?? []).map((o) => `${o.rotulo} | ${o.resposta} | ${o.tags.join(", ")} | ${sequencias.find((s) => s.id === o.sequencia_id)?.nome ?? ""}`.replace(/(\s\|\s*)+$/, "")).join("\n")}
+          rows={3}
+          placeholder={"Botões (até 3), um por linha: Rótulo (até 20 letras) | resposta ao tocar | tags | nome da sequência\nSim, sou nutri | Ahh que legal! Segue o material: https://... | nutri | Follow-up GLP1\nNão, sou paciente | Esse material é técnico, mas aqui vai o que serve pra você: https://... | paciente"}
+          className={`${campo} font-mono text-xs`}
+        />
+      </div>
       <select name="sequencia_id" defaultValue={regra?.sequencia_id ?? ""} className={campo}>
         <option value="">Sem sequência</option>
         {sequencias.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}

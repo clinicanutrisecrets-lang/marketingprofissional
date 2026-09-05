@@ -172,3 +172,35 @@ function extrairJson(texto: string): Record<string, unknown> | null {
     return null;
   }
 }
+
+/* ── Qual botão a pessoa quis dizer, quando digitou em vez de tocar ────── */
+
+/**
+ * "sou farmacêutico" → "Outro profissional"; "sim, sou nutri há 10 anos" →
+ * "Sim, sou nutri". Devolve o índice do botão ou null quando a frase não é
+ * resposta à pergunta (aí o robô segue o caminho normal).
+ */
+export async function classificarOpcaoPorTexto(texto: string, rotulos: string[]): Promise<number | null> {
+  if (!texto.trim() || rotulos.length === 0) return null;
+  const claude = createClaude();
+  try {
+    const msg = await claude.messages.create({
+      model: CLAUDE_MODEL_RAPIDO,
+      max_tokens: 10,
+      temperature: 0,
+      system: `A pessoa recebeu uma pergunta com estas opções numeradas e respondeu digitando. Diga QUAL opção a resposta dela equivale.
+Responda SÓ o número da opção (1 a ${rotulos.length}). Se a resposta não corresponde a nenhuma opção, ou é outra pergunta, responda 0.`,
+      messages: [
+        {
+          role: "user",
+          content: `Opções:\n${rotulos.map((r, i) => `${i + 1}. ${r}`).join("\n")}\n\nResposta digitada: "${texto.slice(0, 300)}"`,
+        },
+      ],
+    });
+    const n = Number(textoDaResposta(msg).match(/\d+/)?.[0] ?? "0");
+    return n >= 1 && n <= rotulos.length ? n - 1 : null;
+  } catch (e) {
+    console.error("[automacao/ia] classificar opção falhou:", (e as Error).message);
+    return null;
+  }
+}
