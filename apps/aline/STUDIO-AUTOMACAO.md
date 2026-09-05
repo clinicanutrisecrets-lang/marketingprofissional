@@ -190,6 +190,18 @@ caminhos (comentário e DM) e no simulador. `tests/automacao-config.test.ts`.
   recentes direto do Instagram (`listarMidias`), com data e legenda — a
   regra prende ao ID, e o webhook avisa comentário em post de qualquer data.
 
+## Raio-X do público (05/09, pedido da Aline)
+
+`/perfis/<slug>/publico` → "Gerar raio-x agora" (`raio-x-publico.ts`): lê até
+60 posts com curtidas/comentários e, com `instagram_business_manage_insights`
+(precisa estar em Permissões e recursos + **Reconectar**), alcance,
+salvamentos, compartilhamentos e visualizações por post; comentários dos 15
+mais comentados classificados em temas; conversas recentes do direct (o que
+`/me/conversations?platform=instagram` devolver — parcial). Relatório com
+quem é o público, o que engaja por formato/tema, necessidades e 10 ideias de
+posts, sempre citando só números lidos. Guarda em `aline.ig_analises`
+(migração 012, aplicada).
+
 ## Travas que não devem cair
 
 - Evento da PRÓPRIA conta (eco, comentário nosso) nunca dispara regra.

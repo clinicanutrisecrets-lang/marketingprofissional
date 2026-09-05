@@ -101,6 +101,17 @@ export default async function PerfilPage({ params, searchParams }: PageProps) {
               >
                 🤖 Robô do Instagram
               </Link>
+              <Link
+                href={`/perfis/${perfil.slug as string}/publico`}
+                className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-200"
+              >
+                🔎 Raio-X do público
+              </Link>
+              {perfil.instagram_conta_id && perfil.instagram_login_tipo === "instagram" ? (
+                <a href={`/api/auth/instagram/connect?slug=${perfil.slug as string}`} className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200" title="Refaz o login pra pegar permissões novas (ex.: insights)">
+                  Reconectar
+                </a>
+              ) : null}
             </div>
           </div>
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>
