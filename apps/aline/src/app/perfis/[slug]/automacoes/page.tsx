@@ -187,6 +187,16 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
               <textarea name="direcionamentos" defaultValue={direcionamentosParaTexto(config.direcionamentos)} rows={6} className={`${campo} font-mono text-xs`} placeholder={"quer consulta ou pergunta preço -> explicar que a primeira etapa é a Avaliação de Saúde e mandar https://...\nquer emagrecer / fala de inchaço, ansiedade -> apresentar o Lótus e mandar https://...\npergunta sobre teste genético -> explicar em 2 frases e mandar https://..."} />
             </div>
 
+            <div className="border-t border-aline-text/5 pt-4">
+              <label className="flex items-start gap-3">
+                <input type="checkbox" name="publicar_posts" defaultChecked={config.publicar_posts} className="mt-1" />
+                <span className="text-sm">
+                  <strong>Publicar posts aprovados no Instagram</strong> (o cron de 15 em 15 min). Desligado, nenhum post do Estúdio
+                  sobe, mesmo aprovado. Ligue só depois de limpar os posts antigos.
+                </span>
+              </label>
+            </div>
+
             <button className={BOTAO} style={{ background: cor }}>Salvar chaves</button>
           </form>
         </section>
