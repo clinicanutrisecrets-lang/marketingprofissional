@@ -195,6 +195,12 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
                   sobe, mesmo aprovado. Ligue só depois de limpar os posts antigos.
                 </span>
               </label>
+              <label className="mt-3 flex items-start gap-3">
+                <input type="checkbox" name="gerar_posts_semanal" defaultChecked={config.gerar_posts_semanal} className="mt-1" />
+                <span className="text-sm">
+                  <strong>Gerar o pack semanal de posts</strong> (cron de quinta). Desligado enquanto a estratégia está em revisão.
+                </span>
+              </label>
             </div>
 
             <button className={BOTAO} style={{ background: cor }}>Salvar chaves</button>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAlineClient } from "@/lib/supabase/server";
 import { gerarPackSemanal } from "@/lib/posts/gerador-semanal";
+import { lerConfig } from "@/lib/automacao/config";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -17,13 +18,18 @@ export async function GET(request: Request) {
   }
 
   const aline = createAlineClient();
-  const { data: perfis } = await aline
+  // Chave-geral por perfil (automacao_config.gerar_posts_semanal), DESLIGADA
+  // por padrão desde 05/09: a Aline pausou a geração pra repensar a estratégia.
+  const { data: perfisBrutos } = await aline
     .from("perfis")
-    .select("slug, nome")
+    .select("slug, nome, automacao_config")
     .eq("ativo", true);
+  const perfis = ((perfisBrutos ?? []) as Array<{ slug: string; nome: string; automacao_config: unknown }>).filter(
+    (p) => lerConfig(p.automacao_config).gerar_posts_semanal,
+  );
 
-  if (!perfis || perfis.length === 0) {
-    return NextResponse.json({ ok: true, geradosPara: 0 });
+  if (perfis.length === 0) {
+    return NextResponse.json({ ok: true, geradosPara: 0, motivo: "geração semanal desligada em todos os perfis" });
   }
 
   const resultados: Array<{
