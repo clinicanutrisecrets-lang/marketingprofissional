@@ -12,6 +12,7 @@ import {
   salvarRegra,
   salvarSequencia,
 } from "@/lib/automacao/actions";
+import { SimuladorRobo } from "./SimuladorRobo";
 
 export const dynamic = "force-dynamic";
 
@@ -138,6 +139,8 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
             <button className={BOTAO} style={{ background: cor }}>Salvar chaves</button>
           </form>
         </section>
+
+        <SimuladorRobo slug={slug} cor={cor} />
 
         {/* Regras */}
         <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
