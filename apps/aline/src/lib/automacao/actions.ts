@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAlineClient, createClient } from "@/lib/supabase/server";
-import { CONFIG_PADRAO, lerConfig, type AutomacaoConfig } from "./config";
+import { CONFIG_PADRAO, lerConfig, lerDirecionamentos, normalizarUsername, type AutomacaoConfig } from "./config";
 
 async function exigirSessao() {
   const supabase = createClient();
@@ -35,13 +35,18 @@ function texto(v: FormDataEntryValue | null): string | null {
 export async function salvarConfigAutomacao(slug: string, form: FormData): Promise<void> {
   await exigirSessao();
   const aline = createAlineClient();
-  const atual = lerConfig(null);
+  const { data: atualRow } = await aline.from("perfis").select("automacao_config").eq("slug", slug).maybeSingle();
+  const atual = lerConfig((atualRow as { automacao_config?: unknown } | null)?.automacao_config);
   const config: AutomacaoConfig = {
     ...atual,
     agradecer_comentarios: form.get("agradecer_comentarios") === "on",
     responder_dm_scanner: form.get("responder_dm_scanner") === "on",
     texto_convite_direct: texto(form.get("texto_convite_direct")) ?? CONFIG_PADRAO.texto_convite_direct,
     texto_encaminhar_humano: texto(form.get("texto_encaminhar_humano")) ?? CONFIG_PADRAO.texto_encaminhar_humano,
+    nao_responder_usernames: lista(form.get("nao_responder_usernames")).map(normalizarUsername).filter(Boolean),
+    voz: texto(form.get("voz")) ?? "",
+    instrucoes_etica: texto(form.get("instrucoes_etica")) ?? "",
+    direcionamentos: lerDirecionamentos(String(form.get("direcionamentos") ?? "")),
   };
   const { error } = await aline.from("perfis").update({ automacao_config: config }).eq("slug", slug);
   if (error) throw new Error(error.message);
@@ -171,6 +176,20 @@ export async function simularRobo(slug: string, _prev: EstadoSimulacao, form: Fo
       mediaId: texto(form.get("media_id")),
     });
     return { resultado };
+  } catch (e) {
+    return { erro: (e as Error).message };
+  }
+}
+
+export type EstadoVoz = { voz?: string; legendas?: number; respostas?: number; erro?: string } | null;
+
+export async function mapearVozAction(slug: string, _prev: EstadoVoz, _form: FormData): Promise<EstadoVoz> {
+  await exigirSessao();
+  try {
+    const { mapearVoz } = await import("./mapear-voz");
+    const r = await mapearVoz(slug);
+    revalidatePath(`/perfis/${slug}/automacoes`);
+    return r;
   } catch (e) {
     return { erro: (e as Error).message };
   }

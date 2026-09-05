@@ -120,3 +120,28 @@ export async function obterPerfilUsuario(cred: Credenciais, igsid: string): Prom
     return {};
   }
 }
+
+/* ── Leitura do próprio conteúdo (pra mapear a voz da dona) ───────────── */
+
+export type MidiaResumo = { id: string; caption?: string; timestamp?: string; media_type?: string };
+
+export async function listarMidias(cred: Credenciais, limite = 20): Promise<MidiaResumo[]> {
+  const r = await chamar<{ data?: MidiaResumo[] }>(cred, `${cred.pathId}/media`, {
+    query: { fields: "id,caption,timestamp,media_type", limit: String(limite) },
+  });
+  return r.data ?? [];
+}
+
+export type ComentarioComRespostas = {
+  id: string;
+  text?: string;
+  username?: string;
+  replies?: { data?: Array<{ id: string; text?: string; username?: string }> };
+};
+
+export async function listarComentarios(cred: Credenciais, mediaId: string, limite = 30): Promise<ComentarioComRespostas[]> {
+  const r = await chamar<{ data?: ComentarioComRespostas[] }>(cred, `${mediaId}/comments`, {
+    query: { fields: "id,text,username,replies{id,text,username}", limit: String(limite) },
+  });
+  return r.data ?? [];
+}
