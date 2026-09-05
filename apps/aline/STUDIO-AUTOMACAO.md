@@ -84,3 +84,84 @@ Ou criar um botao no dashboard que chama esse endpoint.
 -- Rodar no SQL Editor:
 -- supabase/migrations/aline/006_publicacao_helpers.sql
 ```
+
+---
+
+# Robô do Instagram (o "ManyChat próprio") — 2026-09-05
+
+Pedido da Aline: substituir o ManyChat pra `@nutri_secrets` (e depois
+`@scannerdasaude`) por automação própria — comentários, stories e direct —
+sem ela precisar colar texto e clicar botão em ferramenta de terceiro.
+Um robô, N contas: cada linha de `aline.perfis` tem o seu app da Meta.
+
+## Onde mora
+
+| Peça | Arquivo |
+|---|---|
+| Login direto do Instagram (sem Página do Facebook) | `src/lib/instagram/oauth-instagram.ts`, `api/auth/instagram/connect` + `callback` |
+| Token cifrado NO APP (AES-256-GCM, `ENCRYPTION_KEY`) | `src/lib/security/encrypt.ts`, `src/lib/instagram/credenciais.ts` |
+| Cliente da API (DM, resposta privada, resposta pública, webhooks) | `src/lib/instagram/api.ts` |
+| Webhook da Meta (GET verificação / POST eventos) | `api/webhooks/instagram` |
+| Leitura do webhook + escolha da regra (PURO, testado) | `src/lib/automacao/regras.ts`, `tests/automacao-regras.test.ts` |
+| Execução (regra → respostas, tags, sequência; chaves gerais) | `src/lib/automacao/processar.ts` |
+| Agradecimento de comentário e resposta de DM geradas | `src/lib/automacao/ia.ts` |
+| Conhecimento técnico (vem do SCANNER por API) | `src/lib/automacao/scanner-conhecimento.ts` → `scannerdasaude.com/api/integrations/marketing/conhecimento` |
+| Fila (sequências, janela de 24h) + renovação de token | `src/lib/automacao/fila.ts`, cron `api/cron/instagram-fila` (5 em 5 min) |
+| Tela | `/perfis/<slug>/automacoes` (chaves gerais, regras, sequências, contatos, últimas interações) |
+| Banco | `supabase/migrations/aline/009_instagram_automacao.sql` (só schema `aline`, aditiva) |
+
+## Env vars (Vercel do projeto `studio-aline`)
+
+| Var | O que é |
+|---|---|
+| `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` | **ID e chave do PRODUTO Instagram** dentro do app "Automacao NS" (tela "Configuração da API com login do Instagram"), não o id do app geral |
+| `INSTAGRAM_REDIRECT_URI` | opcional; padrão `https://studio.scannerdasaude.com/api/auth/instagram/callback` |
+| `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | string qualquer; o MESMO valor vai no campo "Verificar token" do painel da Meta |
+| `ENCRYPTION_KEY` | cifra o token no banco (`openssl rand -base64 32`). Sem ela o "Conectar" falha em voz alta |
+| `STUDIO_CONHECIMENTO_SECRET` | bearer pra ler o conhecimento do Scanner; o MESMO valor vai na Vercel do `scanner-saude-b1jf`. Sem ele o direct responde sem a base do Scanner |
+| `SCANNER_API_URL` | opcional; padrão `https://scannerdasaude.com` |
+| `CRON_SECRET` | já existia; o cron novo usa o mesmo |
+| `ANTHROPIC_API_KEY` | já existia; agradecimento usa Haiku 4.5, DM usa o `CLAUDE_MODEL` do Estúdio |
+
+## Passos no painel da Meta (app "Automacao NS", BM da Nutri Secrets)
+
+1. Caso de uso "Gerenciar mensagens e conteúdo no Instagram" (feito 05/09).
+2. Permissões: `instagram_business_basic`, `instagram_business_content_publish`,
+   `instagram_business_manage_comments`, `instagram_business_manage_messages`.
+3. Funções → Testadores do Instagram → `nutri_secrets` → aceitar o convite no
+   app do Instagram → "Gerar tokens de acesso → Adicionar conta".
+4. Login comercial: URIs de redirecionamento = callback acima;
+   desautorização = `/api/auth/instagram/desautorizar`;
+   exclusão de dados = `/api/auth/instagram/excluir-dados`.
+5. Webhooks: URL `https://studio.scannerdasaude.com/api/webhooks/instagram`,
+   token = `INSTAGRAM_WEBHOOK_VERIFY_TOKEN`, campos `comments` e `messages`.
+   **A Meta só entrega webhook com o app PUBLICADO** (política de privacidade,
+   ícone, categoria). Publicar ≠ revisão.
+6. Revisão da Meta (Advanced Access) — necessária só pra falar com quem NÃO
+   tem papel no app (as seguidoras). Publicar na própria conta e testar com
+   contas testadoras funciona sem revisão.
+
+## O que a tela faz
+
+- **Chaves gerais**: agradecer todo comentário (texto gerado na voz do perfil;
+  pergunta clínica em comentário recebe convite pro direct, nunca resposta
+  clínica pública) e responder DM com a base do Scanner (caso individual,
+  compra, reclamação ou "quero falar com alguém" → encaminha pra pessoa e
+  marca o contato).
+- **Regras** (têm prioridade sobre as chaves): gatilho (comentário / DM /
+  resposta a story / menção em story) + palavras-chave (palavra inteira, sem
+  acento) + post específico → resposta pública, resposta no direct
+  (privada no comentário: 1 por comentário, até 7 dias), sequência, tags.
+  `{primeiro_nome}`, `{nome}`, `{username}` no texto.
+- **Sequências**: `minutos | texto` por linha. DM só sai na janela de 24h da
+  Meta; fechou, o resto é cancelado sozinho (`ig_fila.erro = janela_24h`).
+- **Contatos**: tags, "esperando uma pessoa", desligar o robô pra um contato.
+
+## Travas que não devem cair
+
+- Evento da PRÓPRIA conta (eco, comentário nosso) nunca dispara regra.
+- Dedup por id da Meta (`ig_mensagens` unique) — a Meta reenvia webhook.
+- Throttle de 20 s por contato entre saídas geradas.
+- Só comentário de 1º nível recebe agradecimento (resposta de resposta não).
+- Falha de envio não derruba o lote; volta 200 e fica no log.
+- Erro de leitura na tela mostra "Erro ao carregar", não lista vazia.

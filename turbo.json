@@ -19,7 +19,15 @@
         "RESEND_API_KEY",
         "RESEND_FROM_EMAIL",
         "HEYGEN_API_KEY",
-        "ENCRYPTION_KEY"
+        "ENCRYPTION_KEY",
+        "INSTAGRAM_APP_ID",
+        "INSTAGRAM_APP_SECRET",
+        "INSTAGRAM_REDIRECT_URI",
+        "INSTAGRAM_WEBHOOK_VERIFY_TOKEN",
+        "SCANNER_API_URL",
+        "MARKETING_WEBHOOK_SECRET",
+        "STUDIO_CONHECIMENTO_SECRET",
+        "CRON_SECRET"
       ]
     },
     "dev": {
