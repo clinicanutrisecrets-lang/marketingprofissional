@@ -13,6 +13,7 @@ import {
   obterPerfilUsuario,
   responderComentario,
   respostaPrivadaComentario,
+  type BotaoRapido,
   type Credenciais,
 } from "@/lib/instagram/api";
 import {
@@ -22,38 +23,56 @@ import {
 } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
-import { gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import { classificarOpcaoPorTexto, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import {
+  casarOpcao,
   ehDaPropriaConta,
   extrairEventos,
+  opcoesComoTexto,
   pareceClinico,
   pareceSpam,
+  payloadDaOpcao,
   preencherTexto,
+  PREFIXO_PASSO,
   selecionarRegra,
   type EventoInstagram,
   type Gatilho,
+  type Opcao,
   type Regra,
+  type UltimasOpcoes,
 } from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
+import { transcreverAudio } from "./transcrever-audio";
 
 export type ResumoProcessamento = {
   eventos: number;
   ignorados: number;
   duplicados: number;
   regras: number;
+  opcoes: number;
   agradecimentos: number;
   respostasDm: number;
   encaminhados: number;
   erros: number;
 };
 
-type Contato = { id: string; username: string | null; nome: string | null; tags: string[]; silenciado: boolean };
+type Contato = {
+  id: string;
+  username: string | null;
+  nome: string | null;
+  tags: string[];
+  silenciado: boolean;
+  ultimas_opcoes: UltimasOpcoes | null;
+};
 
+const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes";
+const COLS_REGRA =
+  "id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade, opcoes";
 const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
+    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
@@ -99,21 +118,53 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       await aline.from("ig_mensagens").update({ contato_id: contato.id }).eq("id", entrada);
       if (contato.silenciado) { resumo.ignorados++; continue; }
 
+      const config = lerConfig(perfil.automacao_config);
+      const orientacoes = blocoOrientacoesDaDona(config);
+      const gatilho = ev.tipo as Gatilho;
+
+      // Família, equipe, amigas: o robô não responde (regra nem chave geral).
+      const usernameContato = normalizarUsername(contato.username ?? ev.username ?? "");
+      if (usernameContato && config.nao_responder_usernames.includes(usernameContato)) { resumo.ignorados++; continue; }
+
+      // Áudio no direct → texto (AssemblyAI). Sem transcrição, segue como "[audio]".
+      if (gatilho === "dm" && (!ev.texto || ev.texto.startsWith("["))) {
+        const audio = ev.anexos?.find((a) => a.tipo === "audio" && a.url);
+        if (audio?.url) {
+          const transcrito = await transcreverAudio(audio.url);
+          if (transcrito) {
+            ev.texto = transcrito;
+            await aline.from("ig_mensagens").update({ texto: `[áudio] ${transcrito}` }).eq("id", entrada);
+          }
+        }
+      }
+
       let regras = regrasPorPerfil.get(perfil.id);
       if (!regras) {
         regras = await carregarRegras(perfil.id);
         regrasPorPerfil.set(perfil.id, regras);
       }
-      const jaAplicadas = await regrasJaAplicadas(contato.id);
-      const gatilho = ev.tipo as Gatilho;
-      const regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
       const vars = { nome: contato.nome, username: contato.username ?? ev.username };
-      const config = lerConfig(perfil.automacao_config);
-      const orientacoes = blocoOrientacoesDaDona(config);
 
-      // Família, equipe, amigas: o robô não responde (regra nem chave geral).
-      const usernameContato = normalizarUsername(contato.username ?? ev.username ?? "");
-      if (usernameContato && config.nao_responder_usernames.includes(usernameContato)) { resumo.ignorados++; continue; }
+      // ── Toque num botão, ou "2", ou o rótulo digitado, ou a frase que quer
+      //    dizer um dos botões ("sou farmacêutico" → Outro profissional) ──
+      if (gatilho === "dm") {
+        let escolha = casarOpcao(ev, contato.ultimas_opcoes);
+        if (!escolha && contato.ultimas_opcoes && ev.texto.trim() && !ev.texto.startsWith("[")) {
+          const idx = await classificarOpcaoPorTexto(ev.texto, contato.ultimas_opcoes.rotulos);
+          if (idx != null) escolha = { regraId: contato.ultimas_opcoes.regra_id, indice: idx };
+        }
+        if (escolha) {
+          const origem = await opcaoDeOrigem(escolha.regraId, escolha.indice, regras);
+          if (origem) {
+            await executarOpcao({ perfil, cred, contato, ev, regraId: origem.regraId, opcao: origem.opcao, vars });
+            resumo.opcoes++;
+            continue;
+          }
+        }
+      }
+
+      const jaAplicadas = await regrasJaAplicadas(contato.id);
+      const regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
 
       if (regra) {
         await executarRegra({ perfil, cred, contato, ev, regra, vars });
@@ -201,7 +252,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     const ehDm = ev.tipo !== "comentario";
     const { data: existente } = await aline
       .from("ig_contatos")
-      .select("id, username, nome, tags, silenciado")
+      .select(COLS_CONTATO)
       .eq("perfil_id", perfilId)
       .eq("igsid", ev.igsid)
       .maybeSingle();
@@ -233,20 +284,33 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         perfil_id: perfilId, igsid: ev.igsid, username, nome,
         ultima_interacao_em: agora, ultima_msg_recebida_em: ehDm ? agora : null,
       })
-      .select("id, username, nome, tags, silenciado")
+      .select(COLS_CONTATO)
       .single();
     if (error) throw new Error(`ig_contatos: ${error.message}`);
     return data as Contato;
   }
 
   async function carregarRegras(perfilId: string): Promise<Regra[]> {
-    const { data, error } = await aline
-      .from("ig_regras")
-      .select("id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade")
-      .eq("perfil_id", perfilId)
-      .eq("ativa", true);
+    const { data, error } = await aline.from("ig_regras").select(COLS_REGRA).eq("perfil_id", perfilId).eq("ativa", true);
     if (error) throw new Error(`ig_regras: ${error.message}`);
     return (data ?? []) as Regra[];
+  }
+
+  async function carregarRegraPorId(id: string): Promise<Regra | null> {
+    const { data } = await aline.from("ig_regras").select(COLS_REGRA).eq("id", id).maybeSingle();
+    return (data as Regra | null) ?? null;
+  }
+
+  /** Acha a opção escolhida: numa regra (id) ou num passo de sequência ("passo:<id>"). */
+  async function opcaoDeOrigem(ref: string, indice: number, regras: Regra[]): Promise<{ regraId: string | null; opcao: Opcao } | null> {
+    if (ref.startsWith(PREFIXO_PASSO)) {
+      const { data } = await aline.from("ig_sequencia_passos").select("opcoes").eq("id", ref.slice(PREFIXO_PASSO.length)).maybeSingle();
+      const opcao = ((data as { opcoes?: Opcao[] } | null)?.opcoes ?? [])[indice];
+      return opcao ? { regraId: null, opcao } : null;
+    }
+    const regra = regras.find((r) => r.id === ref) ?? (await carregarRegraPorId(ref));
+    const opcao = regra?.opcoes?.[indice];
+    return regra && opcao ? { regraId: regra.id, opcao } : null;
   }
 
   async function regrasJaAplicadas(contatoId: string): Promise<Set<string>> {
@@ -299,12 +363,38 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   }
 
   async function registrarSaida(p: {
-    perfilId: string; contatoId: string; canal: "dm" | "comentario"; texto: string; origem: string; regraId?: string; mediaId?: string;
+    perfilId: string; contatoId: string; canal: "dm" | "comentario"; texto: string | null; origem: string; regraId?: string; mediaId?: string;
   }) {
     await aline.from("ig_mensagens").insert({
       perfil_id: p.perfilId, contato_id: p.contatoId, canal: p.canal, direcao: "saida",
       texto: p.texto, origem: p.origem, regra_id: p.regraId ?? null, media_id: p.mediaId ?? null,
     });
+  }
+
+  async function aplicarTags(contato: Contato, tags: string[]) {
+    if (tags.length === 0) return;
+    const novas = Array.from(new Set([...(contato.tags ?? []), ...tags]));
+    await aline.from("ig_contatos").update({ tags: novas }).eq("id", contato.id);
+    contato.tags = novas;
+  }
+
+  /** Manda a DM com botões; se a Meta recusar os botões, manda a lista numerada. */
+  async function enviarComBotoes(p: {
+    cred: Credenciais; ev: EventoInstagram; texto: string; regra: Regra; opcoes: Opcao[];
+  }): Promise<string> {
+    const botoes: BotaoRapido[] = p.opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(p.regra.id, i) }));
+    const ehComentario = p.ev.tipo === "comentario" && !!p.ev.commentId;
+    try {
+      if (ehComentario) await respostaPrivadaComentario(p.cred, p.ev.commentId!, p.texto, botoes);
+      else await enviarDm(p.cred, p.ev.igsid, p.texto, botoes);
+      return p.texto;
+    } catch (e) {
+      console.warn("[automacao] botões recusados, mandando lista numerada:", (e as Error).message.slice(0, 200));
+      const textoLista = opcoesComoTexto(p.texto, p.opcoes.map((o) => o.rotulo));
+      if (ehComentario) await respostaPrivadaComentario(p.cred, p.ev.commentId!, textoLista);
+      else await enviarDm(p.cred, p.ev.igsid, textoLista);
+      return textoLista;
+    }
   }
 
   async function executarRegra(p: {
@@ -313,6 +403,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   }) {
     const { perfil, cred, contato, ev, regra, vars } = p;
     const ehComentario = ev.tipo === "comentario";
+    const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
     if (ehComentario && regra.resposta_publica && ev.commentId) {
       const texto = preencherTexto(regra.resposta_publica, vars);
@@ -321,26 +412,45 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     }
     if (regra.resposta_privada) {
       const texto = preencherTexto(regra.resposta_privada, vars);
-      if (ehComentario && ev.commentId) await respostaPrivadaComentario(cred, ev.commentId, texto);
-      else await enviarDm(cred, ev.igsid, texto);
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
+      let enviado = texto;
+      if (opcoes.length > 0) {
+        enviado = await enviarComBotoes({ cred, ev, texto, regra, opcoes });
+        const ultimas: UltimasOpcoes = { regra_id: regra.id, rotulos: opcoes.map((o) => o.rotulo) };
+        await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", contato.id);
+      } else if (ehComentario && ev.commentId) {
+        await respostaPrivadaComentario(cred, ev.commentId, texto);
+      } else {
+        await enviarDm(cred, ev.igsid, texto);
+      }
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.
-      await aline.from("ig_mensagens").insert({
-        perfil_id: perfil.id, contato_id: contato.id, canal: ehComentario ? "comentario" : "dm", direcao: "saida",
-        texto: null, origem: "regra_sem_texto", regra_id: regra.id,
-      });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: ehComentario ? "comentario" : "dm", texto: null, origem: "regra_sem_texto", regraId: regra.id });
     }
-    if (regra.tags_adicionar.length > 0) {
-      const tags = Array.from(new Set([...(contato.tags ?? []), ...regra.tags_adicionar]));
-      await aline.from("ig_contatos").update({ tags }).eq("id", contato.id);
-    }
+    await aplicarTags(contato, regra.tags_adicionar);
     if (regra.sequencia_id) {
       // Sequência é DM: só entra na janela de 24h (comentário não abre janela;
       // a resposta privada abre quando a pessoa responder).
       await enfileirarSequencia({
         perfilId: perfil.id, contatoId: contato.id, igsid: ev.igsid, sequenciaId: regra.sequencia_id, regraId: regra.id, vars,
+      });
+    }
+  }
+
+  async function executarOpcao(p: {
+    perfil: PerfilInstagram; cred: Credenciais; contato: Contato; ev: EventoInstagram; regraId: string | null; opcao: Opcao;
+    vars: { nome?: string | null; username?: string | null };
+  }) {
+    const { perfil, cred, contato, ev, regraId, opcao, vars } = p;
+    const texto = preencherTexto(opcao.resposta, vars);
+    await enviarDm(cred, ev.igsid, texto);
+    await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto, origem: `opcao:${opcao.rotulo}`, regraId: regraId ?? undefined });
+    await aline.from("ig_contatos").update({ ultimas_opcoes: null }).eq("id", contato.id);
+    await aplicarTags(contato, opcao.tags ?? []);
+    if (opcao.sequencia_id) {
+      await enfileirarSequencia({
+        perfilId: perfil.id, contatoId: contato.id, igsid: ev.igsid, sequenciaId: opcao.sequencia_id, regraId, vars,
       });
     }
   }

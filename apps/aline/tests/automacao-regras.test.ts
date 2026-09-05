@@ -129,3 +129,31 @@ test("pergunta clínica em comentário é reconhecida; spam óbvio também", () 
   assert.equal(pareceSpam("ganhe seguidores https://x.y"), true);
   assert.equal(pareceSpam("quero o ebook"), false);
 });
+
+import { casarOpcao, opcoesComoTexto, payloadDaOpcao } from "../src/lib/automacao/regras.ts";
+
+test("botões: payload do toque vence; sem payload aceita número ou rótulo digitado", () => {
+  const ultimas = { regra_id: "r1", rotulos: ["Outro profissional", "Sim, sou nutri", "Não, sou paciente"] };
+  assert.deepEqual(casarOpcao({ texto: "Sim, sou nutri", payload: payloadDaOpcao("r1", 1) }, null), { regraId: "r1", indice: 1 });
+  assert.deepEqual(casarOpcao({ texto: "2" }, ultimas), { regraId: "r1", indice: 1 });
+  assert.deepEqual(casarOpcao({ texto: "nao, sou paciente" }, ultimas), { regraId: "r1", indice: 2 });
+  assert.equal(casarOpcao({ texto: "quero o material" }, ultimas), null);
+  assert.equal(casarOpcao({ texto: "2" }, null), null);
+  assert.match(opcoesComoTexto("Você é nutri?", ultimas.rotulos), /1\. Outro profissional[\s\S]*3\. Não, sou paciente/);
+});
+
+test("extrairEventos lê payload do botão e anexo de áudio", () => {
+  const ev = extrairEventos({
+    object: "instagram",
+    entry: [{
+      id: "1784",
+      messaging: [
+        { sender: { id: "u1" }, recipient: { id: "1784" }, message: { mid: "m1", text: "Sim, sou nutri", quick_reply: { payload: "opc:r1:1" } } },
+        { sender: { id: "u2" }, recipient: { id: "1784" }, message: { mid: "m2", attachments: [{ type: "audio", payload: { url: "https://cdn/x.mp4" } }] } },
+      ],
+    }],
+  });
+  assert.equal(ev[0].payload, "opc:r1:1");
+  assert.equal(ev[1].texto, "[audio]");
+  assert.deepEqual(ev[1].anexos, [{ tipo: "audio", url: "https://cdn/x.mp4" }]);
+});

@@ -60,6 +60,25 @@ export async function salvarRegra(slug: string, form: FormData): Promise<void> {
   const id = texto(form.get("id"));
   const gatilho = String(form.get("gatilho") ?? "comentario");
   if (!["comentario", "dm", "story_reply", "story_mention"].includes(gatilho)) throw new Error("Gatilho inválido");
+  // Botões: uma linha por botão — "Rótulo | resposta | tags | nome da sequência"
+  const { data: seqs } = await aline.from("ig_sequencias").select("id, nome").eq("perfil_id", pid);
+  const seqPorNome = new Map(((seqs ?? []) as Array<{ id: string; nome: string }>).map((s) => [s.nome.trim().toLowerCase(), s.id]));
+  const opcoes = String(form.get("opcoes") ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const [rotulo = "", resposta = "", tags = "", seq = ""] = l.split("|").map((x) => x.trim());
+      const sequencia_id = seq ? (seqPorNome.get(seq.toLowerCase()) ?? null) : null;
+      if (seq && !sequencia_id) throw new Error(`Botão "${rotulo}": sequência "${seq}" não existe.`);
+      return { rotulo, resposta, tags: lista(tags), sequencia_id };
+    })
+    .filter((o) => o.rotulo && o.resposta);
+  if (opcoes.length > 3) throw new Error("No máximo 3 botões por regra (limite pra caber na tela do Instagram).");
+  for (const o of opcoes) {
+    if (o.rotulo.length > 20) throw new Error(`Botão "${o.rotulo}" tem mais de 20 caracteres (limite do Instagram).`);
+  }
+
   const linha = {
     perfil_id: pid,
     nome: texto(form.get("nome")) ?? "Regra sem nome",
@@ -73,9 +92,13 @@ export async function salvarRegra(slug: string, form: FormData): Promise<void> {
     tags_adicionar: lista(form.get("tags_adicionar")),
     uma_vez_por_contato: form.get("uma_vez_por_contato") === "on",
     prioridade: Number(form.get("prioridade") ?? 100) || 100,
+    opcoes,
   };
   if (!linha.resposta_publica && !linha.resposta_privada && !linha.sequencia_id && linha.tags_adicionar.length === 0) {
     throw new Error("A regra precisa fazer alguma coisa: resposta pública, resposta privada, sequência ou tag.");
+  }
+  if (opcoes.length > 0 && !linha.resposta_privada) {
+    throw new Error("Botões precisam de uma pergunta na resposta do direct (ex.: \"Antes de te mandar, me conta: você é nutricionista?\").");
   }
   const q = id ? aline.from("ig_regras").update(linha).eq("id", id).eq("perfil_id", pid) : aline.from("ig_regras").insert(linha);
   const { error } = await q;
@@ -114,10 +137,25 @@ export async function salvarSequencia(slug: string, form: FormData): Promise<voi
     .map((l) => l.trim())
     .filter(Boolean)
     .map((l, i) => {
-      const m = l.match(/^(\d+)\s*\|\s*(.+)$/);
-      return m
+      // "minutos | texto || Rótulo -> resposta ;; Rótulo -> resposta"
+      const [corpo, botoesBruto = ""] = l.split("||").map((x) => x.trim());
+      const m = corpo.match(/^(\d+)\s*\|\s*(.+)$/);
+      const base = m
         ? { ordem: i + 1, atraso_minutos: Number(m[1]), texto: m[2].trim() }
-        : { ordem: i + 1, atraso_minutos: 0, texto: l };
+        : { ordem: i + 1, atraso_minutos: 0, texto: corpo };
+      const opcoes = botoesBruto
+        .split(";;")
+        .map((b) => b.trim())
+        .filter(Boolean)
+        .map((b) => {
+          const mm = b.match(/^(.+?)\s*->\s*(.+)$/);
+          if (!mm) throw new Error(`Botão do passo ${i + 1} sem "->": "${b}"`);
+          const rotulo = mm[1].trim();
+          if (rotulo.length > 20) throw new Error(`Botão "${rotulo}" tem mais de 20 caracteres (limite do Instagram).`);
+          return { rotulo, resposta: mm[2].trim(), tags: [], sequencia_id: null };
+        });
+      if (opcoes.length > 3) throw new Error(`Passo ${i + 1}: no máximo 3 botões.`);
+      return { ...base, opcoes };
     });
   if (passos.length === 0) throw new Error("A sequência precisa de pelo menos um passo.");
 
