@@ -26,6 +26,7 @@
         "INSTAGRAM_WEBHOOK_VERIFY_TOKEN",
         "SCANNER_API_URL",
         "MARKETING_WEBHOOK_SECRET",
+        "STUDIO_CONHECIMENTO_SECRET",
         "CRON_SECRET"
       ]
     },

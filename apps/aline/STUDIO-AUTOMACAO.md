@@ -118,7 +118,7 @@ Um robô, N contas: cada linha de `aline.perfis` tem o seu app da Meta.
 | `INSTAGRAM_REDIRECT_URI` | opcional; padrão `https://studio.scannerdasaude.com/api/auth/instagram/callback` |
 | `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | string qualquer; o MESMO valor vai no campo "Verificar token" do painel da Meta |
 | `ENCRYPTION_KEY` | cifra o token no banco (`openssl rand -base64 32`). Sem ela o "Conectar" falha em voz alta |
-| `MARKETING_WEBHOOK_SECRET` | bearer que o Scanner já aceita do app Marketing; aqui é usado pra ler o conhecimento. Sem ele o direct responde sem a base do Scanner |
+| `STUDIO_CONHECIMENTO_SECRET` | bearer pra ler o conhecimento do Scanner; o MESMO valor vai na Vercel do `scanner-saude-b1jf`. Sem ele o direct responde sem a base do Scanner |
 | `SCANNER_API_URL` | opcional; padrão `https://scannerdasaude.com` |
 | `CRON_SECRET` | já existia; o cron novo usa o mesmo |
 | `ANTHROPIC_API_KEY` | já existia; agradecimento usa Haiku 4.5, DM usa o `CLAUDE_MODEL` do Estúdio |
