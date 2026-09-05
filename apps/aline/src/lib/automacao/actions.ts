@@ -153,3 +153,25 @@ export async function alternarSilenciarContato(slug: string, contatoId: string, 
   await aline.from("ig_contatos").update({ silenciado }).eq("id", contatoId);
   revalidatePath(`/perfis/${slug}/automacoes`);
 }
+
+export type EstadoSimulacao = { resultado?: import("./simulador").ResultadoSimulacao; erro?: string } | null;
+
+export async function simularRobo(slug: string, _prev: EstadoSimulacao, form: FormData): Promise<EstadoSimulacao> {
+  await exigirSessao();
+  const gatilho = String(form.get("gatilho") ?? "comentario");
+  if (!["comentario", "dm", "story_reply", "story_mention"].includes(gatilho)) return { erro: "Gatilho inválido" };
+  const textoEv = String(form.get("texto") ?? "").trim();
+  if (!textoEv) return { erro: "Escreva o comentário ou a mensagem." };
+  try {
+    const { simularEvento } = await import("./simulador");
+    const resultado = await simularEvento({
+      slug,
+      gatilho: gatilho as "comentario" | "dm" | "story_reply" | "story_mention",
+      texto: textoEv,
+      mediaId: texto(form.get("media_id")),
+    });
+    return { resultado };
+  } catch (e) {
+    return { erro: (e as Error).message };
+  }
+}
