@@ -48,6 +48,7 @@ export async function salvarConfigAutomacao(slug: string, form: FormData): Promi
     instrucoes_etica: texto(form.get("instrucoes_etica")) ?? "",
     direcionamentos: lerDirecionamentos(String(form.get("direcionamentos") ?? "")),
     publicar_posts: form.get("publicar_posts") === "on",
+    gerar_posts_semanal: form.get("gerar_posts_semanal") === "on",
   };
   const { error } = await aline.from("perfis").update({ automacao_config: config }).eq("slug", slug);
   if (error) throw new Error(error.message);

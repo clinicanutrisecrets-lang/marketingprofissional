@@ -21,6 +21,8 @@ export type AutomacaoConfig = {
   direcionamentos: Direcionamento[];
   /** Chave-geral da PUBLICAÇÃO de posts pelo cron. Desligada por padrão: post aprovado sem isto NÃO sobe. */
   publicar_posts: boolean;
+  /** Chave-geral da GERAÇÃO semanal de posts (cron de quinta). Desligada por padrão desde 05/09: estratégia em revisão. */
+  gerar_posts_semanal: boolean;
 };
 
 export const CONFIG_PADRAO: AutomacaoConfig = {
@@ -33,6 +35,7 @@ export const CONFIG_PADRAO: AutomacaoConfig = {
   instrucoes_etica: "",
   direcionamentos: [],
   publicar_posts: false,
+  gerar_posts_semanal: false,
 };
 
 function textoOuPadrao(v: unknown, padrao: string): string {
@@ -64,6 +67,7 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
     instrucoes_etica: typeof c.instrucoes_etica === "string" ? c.instrucoes_etica.trim() : "",
     direcionamentos,
     publicar_posts: c.publicar_posts === true,
+    gerar_posts_semanal: c.gerar_posts_semanal === true,
   };
 }
 
