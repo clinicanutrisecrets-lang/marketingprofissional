@@ -99,6 +99,28 @@ export function preencherTexto(
   return out.trim();
 }
 
+/* ── Variações de texto ────────────────────────────────────────────────── */
+
+/** Separador entre variações de uma mesma resposta: uma linha só com "---". */
+export const SEPARADOR_VARIANTES = /\n\s*---\s*\n/;
+
+export function variantesDe(texto: string | null | undefined): string[] {
+  return (texto ?? "")
+    .split(SEPARADOR_VARIANTES)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Sorteia uma variação pra não responder todo mundo com a mesma frase.
+ * `sorteio` (0..1) existe pra teste; em produção é Math.random().
+ */
+export function escolherVariante(texto: string | null | undefined, sorteio = Math.random()): string {
+  const lista = variantesDe(texto);
+  if (lista.length === 0) return "";
+  return lista[Math.min(lista.length - 1, Math.floor(sorteio * lista.length))];
+}
+
 /* ── Escolha da regra ──────────────────────────────────────────────────── */
 
 export function selecionarRegra(

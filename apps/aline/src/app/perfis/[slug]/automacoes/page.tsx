@@ -198,6 +198,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-aline-text/60">Regras</h2>
           <p className="mb-4 text-xs text-aline-text/60">
             Gatilho + palavra-chave → resposta pública, resposta no direct, botões, sequência e tag. Use {"{primeiro_nome}"} e {"{username}"} no texto.
+            Pra não responder todo mundo igual, escreva várias variações separadas por uma linha só com <code>---</code>: o robô sorteia uma por vez.
             {posts.length > 0 && <> No campo de post, comece a digitar a legenda: a lista mostra seus {posts.length} posts mais recentes, novos e antigos.</>}
             {avisoPosts && <> (Não consegui listar seus posts agora: {avisoPosts})</>}
           </p>
@@ -358,7 +359,7 @@ function FormRegra({
           </option>
         ))}
       </datalist>
-      <textarea name="resposta_publica" defaultValue={regra?.resposta_publica ?? ""} rows={2} placeholder="Resposta pública no comentário (só gatilho comentário)" className={`${campo} md:col-span-2`} />
+      <textarea name="resposta_publica" defaultValue={regra?.resposta_publica ?? ""} rows={4} placeholder={"Resposta pública no comentário (só gatilho comentário).\nVárias variações? Separe com uma linha só com --- e o robô sorteia uma a cada comentário."} className={`${campo} md:col-span-2`} />
       <textarea name="resposta_privada" defaultValue={regra?.resposta_privada ?? ""} rows={3} placeholder="Resposta no direct (link do material, cupom, ou a pergunta que vem com os botões)" className={`${campo} md:col-span-2`} />
       <div className="md:col-span-2">
         <textarea
