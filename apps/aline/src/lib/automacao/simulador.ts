@@ -9,7 +9,7 @@ import { createAlineClient } from "@/lib/supabase/server";
 import { carregarPerfilPorSlug } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig } from "./config";
 import { gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
-import { pareceClinico, pareceSpam, preencherTexto, selecionarRegra, type Gatilho, type Regra } from "./regras";
+import { pareceClinico, pareceSpam, preencherTexto, selecionarRegra, variantesDe, type Gatilho, type Regra } from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 
 export type ResultadoSimulacao = {
@@ -44,10 +44,20 @@ export async function simularEvento(params: {
 
   if (regra) {
     if (params.gatilho === "comentario" && regra.resposta_publica) {
-      acoes.push(`Responde no comentário: "${preencherTexto(regra.resposta_publica, vars)}"`);
+      const vs = variantesDe(regra.resposta_publica);
+      acoes.push(
+        vs.length > 1
+          ? `Responde no comentário com UMA destas ${vs.length} variações (sorteio): ${vs.map((v) => `"${preencherTexto(v, vars)}"`).join(" / ")}`
+          : `Responde no comentário: "${preencherTexto(vs[0] ?? "", vars)}"`,
+      );
     }
     if (regra.resposta_privada) {
-      acoes.push(`Manda no direct: "${preencherTexto(regra.resposta_privada, vars)}"`);
+      const vs = variantesDe(regra.resposta_privada);
+      acoes.push(
+        vs.length > 1
+          ? `Manda no direct UMA destas ${vs.length} variações (sorteio): ${vs.map((v) => `"${preencherTexto(v, vars)}"`).join(" / ")}`
+          : `Manda no direct: "${preencherTexto(vs[0] ?? "", vars)}"`,
+      );
     }
     for (const o of regra.opcoes ?? []) {
       acoes.push(

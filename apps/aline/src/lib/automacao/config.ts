@@ -19,6 +19,8 @@ export type AutomacaoConfig = {
   instrucoes_etica: string;
   /** "Quando a pessoa quer X → faça Y": conduz a DM pra consulta, curso, teste, etc. */
   direcionamentos: Direcionamento[];
+  /** Chave-geral da PUBLICAÇÃO de posts pelo cron. Desligada por padrão: post aprovado sem isto NÃO sobe. */
+  publicar_posts: boolean;
 };
 
 export const CONFIG_PADRAO: AutomacaoConfig = {
@@ -30,6 +32,7 @@ export const CONFIG_PADRAO: AutomacaoConfig = {
   voz: "",
   instrucoes_etica: "",
   direcionamentos: [],
+  publicar_posts: false,
 };
 
 function textoOuPadrao(v: unknown, padrao: string): string {
@@ -60,6 +63,7 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
     voz: typeof c.voz === "string" ? c.voz.trim() : "",
     instrucoes_etica: typeof c.instrucoes_etica === "string" ? c.instrucoes_etica.trim() : "",
     direcionamentos,
+    publicar_posts: c.publicar_posts === true,
   };
 }
 

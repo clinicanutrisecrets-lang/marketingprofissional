@@ -157,3 +157,15 @@ test("extrairEventos lê payload do botão e anexo de áudio", () => {
   assert.equal(ev[1].texto, "[audio]");
   assert.deepEqual(ev[1].anexos, [{ tipo: "audio", url: "https://cdn/x.mp4" }]);
 });
+
+import { escolherVariante, variantesDe } from "../src/lib/automacao/regras.ts";
+
+test("variações: separadas por linha '---', sorteio cobre todas e texto único volta inteiro", () => {
+  const t = "Te mandei no direct 💛\n---\nJá está no seu direct 🫶\n---\nCorre lá no direct 🎯";
+  assert.equal(variantesDe(t).length, 3);
+  assert.equal(escolherVariante(t, 0), "Te mandei no direct 💛");
+  assert.equal(escolherVariante(t, 0.5), "Já está no seu direct 🫶");
+  assert.equal(escolherVariante(t, 0.99), "Corre lá no direct 🎯");
+  assert.equal(escolherVariante("Oi!\n\nTudo bem?"), "Oi!\n\nTudo bem?");
+  assert.equal(escolherVariante(null), "");
+});

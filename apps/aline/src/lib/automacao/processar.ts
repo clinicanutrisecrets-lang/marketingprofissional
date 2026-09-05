@@ -27,6 +27,7 @@ import { classificarOpcaoPorTexto, gerarAgradecimentoComentario, responderDmComS
 import {
   casarOpcao,
   ehDaPropriaConta,
+  escolherVariante,
   extrairEventos,
   opcoesComoTexto,
   pareceClinico,
@@ -406,12 +407,12 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
     if (ehComentario && regra.resposta_publica && ev.commentId) {
-      const texto = preencherTexto(regra.resposta_publica, vars);
+      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
       await responderComentario(cred, ev.commentId, texto);
       await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
     }
     if (regra.resposta_privada) {
-      const texto = preencherTexto(regra.resposta_privada, vars);
+      const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
       let enviado = texto;
       if (opcoes.length > 0) {
         enviado = await enviarComBotoes({ cred, ev, texto, regra, opcoes });
