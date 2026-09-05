@@ -9,6 +9,9 @@ export const ESCOPOS_INSTAGRAM = [
   "instagram_business_content_publish",
   "instagram_business_manage_comments",
   "instagram_business_manage_messages",
+  // Salvamentos, compartilhamentos e visualizações por post (Raio-X do público).
+  // Precisa estar adicionada em "Permissões e recursos" do app da Meta.
+  "instagram_business_manage_insights",
 ];
 
 export const PREFIXO_STATE = "ig:";

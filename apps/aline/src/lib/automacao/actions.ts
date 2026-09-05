@@ -234,3 +234,17 @@ export async function mapearVozAction(slug: string, _prev: EstadoVoz, _form: For
     return { erro: (e as Error).message };
   }
 }
+
+export type EstadoRaioX = { id?: string; erro?: string } | null;
+
+export async function gerarRaioXAction(slug: string, _prev: EstadoRaioX, _form: FormData): Promise<EstadoRaioX> {
+  await exigirSessao();
+  try {
+    const { gerarRaioXPublico } = await import("./raio-x-publico");
+    const r = await gerarRaioXPublico(slug);
+    revalidatePath(`/perfis/${slug}/publico`);
+    return { id: r.id };
+  } catch (e) {
+    return { erro: (e as Error).message };
+  }
+}

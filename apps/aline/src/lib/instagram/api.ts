@@ -162,3 +162,78 @@ export async function listarComentarios(cred: Credenciais, mediaId: string, limi
   });
   return r.data ?? [];
 }
+
+/* ── Leitura pro Raio-X do público ─────────────────────────────────────── */
+
+export type MidiaDetalhada = {
+  id: string;
+  caption?: string;
+  media_type?: string; // IMAGE | VIDEO | CAROUSEL_ALBUM
+  media_product_type?: string; // FEED | REELS | STORY
+  timestamp?: string;
+  like_count?: number;
+  comments_count?: number;
+  permalink?: string;
+};
+
+/** Últimas mídias com contagens básicas, paginando até `limite`. */
+export async function listarMidiasDetalhadas(cred: Credenciais, limite = 60): Promise<MidiaDetalhada[]> {
+  const out: MidiaDetalhada[] = [];
+  let after: string | undefined;
+  while (out.length < limite) {
+    const r = await chamar<{ data?: MidiaDetalhada[]; paging?: { cursors?: { after?: string }; next?: string } }>(
+      cred,
+      `${cred.pathId}/media`,
+      {
+        query: {
+          fields: "id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink",
+          limit: String(Math.min(50, limite - out.length)),
+          ...(after ? { after } : {}),
+        },
+      },
+    );
+    out.push(...(r.data ?? []));
+    after = r.paging?.next ? r.paging?.cursors?.after : undefined;
+    if (!after || (r.data ?? []).length === 0) break;
+  }
+  return out.slice(0, limite);
+}
+
+export type InsightsMidia = Partial<Record<"reach" | "saved" | "shares" | "views" | "total_interactions" | "likes" | "comments", number>>;
+
+/**
+ * Métricas de um post. Exige instagram_business_manage_insights; sem ela a
+ * Meta devolve erro de permissão e o chamador cai pra curtidas/comentários.
+ */
+export async function insightsDaMidia(cred: Credenciais, mediaId: string): Promise<InsightsMidia> {
+  const r = await chamar<{ data?: Array<{ name: string; values?: Array<{ value: number }>; total_value?: { value: number } }> }>(
+    cred,
+    `${mediaId}/insights`,
+    { query: { metric: "reach,saved,shares,views,total_interactions,likes,comments" } },
+  );
+  const out: InsightsMidia = {};
+  for (const m of r.data ?? []) {
+    const v = m.total_value?.value ?? m.values?.[0]?.value;
+    if (typeof v === "number") out[m.name as keyof InsightsMidia] = v;
+  }
+  return out;
+}
+
+export type ConversaResumo = {
+  id: string;
+  updated_time?: string;
+  participants?: { data?: Array<{ id: string; username?: string }> };
+  messages?: { data?: Array<{ id: string; message?: string; from?: { id: string; username?: string }; created_time?: string }> };
+};
+
+/** Conversas recentes do direct (o que a API entrega; testado por perfil). */
+export async function listarConversas(cred: Credenciais, limite = 50): Promise<ConversaResumo[]> {
+  const r = await chamar<{ data?: ConversaResumo[] }>(cred, `${cred.pathId}/conversations`, {
+    query: {
+      platform: "instagram",
+      fields: "id,updated_time,participants,messages.limit(8){id,message,from,created_time}",
+      limit: String(limite),
+    },
+  });
+  return r.data ?? [];
+}
