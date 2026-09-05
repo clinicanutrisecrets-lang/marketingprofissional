@@ -1,6 +1,8 @@
 "use server";
 
-import { createAlineClient, createPublicAdminClient } from "@/lib/supabase/server";
+import { createAlineClient } from "@/lib/supabase/server";
+import { carregarPerfilPorId, credenciaisDoPerfil } from "./credenciais";
+import { apiBase as apiBaseDe } from "./api";
 import {
   criarContainerImagem,
   criarContainerReels,
@@ -9,16 +11,6 @@ import {
   publicarContainer,
   aguardarContainerPronto,
 } from "./publish";
-
-type PerfilPublicacao = {
-  id: string;
-  slug: string;
-  nome: string;
-  instagram_handle: string;
-  instagram_conta_id: string | null;
-  access_token: string | null;
-  token_expiry: string | null;
-};
 
 /**
  * Publica um post do Studio Aline no Instagram.
@@ -45,24 +37,17 @@ export async function publicarPost(
     return { ok: false, erro: `Status invalido: ${post.status}` };
   }
 
-  // Pega perfil + token decryptado via RPC
-  const adminPublic = createPublicAdminClient();
-  const { data: perfilRows } = await adminPublic.rpc("get_perfil_publicacao", {
-    p_slug: await getPerfilSlug(post.perfil_id as string),
-  });
-  const perfil = (perfilRows as PerfilPublicacao[] | null)?.[0];
-
+  // Perfil + token decifrado no app (as RPCs de 006 dependem de pgsodium que
+  // não existe em produção — ver migração aline/009).
+  const perfil = await carregarPerfilPorId(post.perfil_id as string);
   if (!perfil) return { ok: false, erro: "Perfil nao encontrado" };
-  if (!perfil.instagram_conta_id || !perfil.access_token) {
-    return { ok: false, erro: "Instagram nao conectado" };
-  }
+  const acesso = await credenciaisDoPerfil(perfil);
+  if (!acesso.cred) return { ok: false, erro: acesso.motivo };
 
-  if (perfil.token_expiry && new Date(perfil.token_expiry).getTime() < Date.now()) {
-    return { ok: false, erro: "Token Instagram expirado — reconectar" };
-  }
-
-  const igUserId = perfil.instagram_conta_id;
-  const pageToken = perfil.access_token;
+  // Login direto do Instagram: caminhos com /me e base graph.instagram.com.
+  const igUserId = acesso.cred.pathId;
+  const pageToken = acesso.cred.token;
+  const apiBase = apiBaseDe(acesso.cred.loginTipo);
   const tipo = post.tipo as string;
   const caption = montarCaption(post);
 
@@ -84,6 +69,7 @@ export async function publicarPost(
       const c = await criarContainerImagem({
         igUserId,
         pageToken,
+        apiBase,
         imageUrl: img.url,
         caption,
       });
@@ -95,12 +81,13 @@ export async function publicarPost(
       const c = await criarContainerReels({
         igUserId,
         pageToken,
+        apiBase,
         videoUrl: video.url,
         caption,
         coverUrl: cover,
       });
       containerId = c.id;
-      await aguardarContainerPronto({ creationId: c.id, pageToken });
+      await aguardarContainerPronto({ creationId: c.id, pageToken, apiBase });
     } else if (tipo === "stories") {
       const img = midias.find((m) => m.tipo === "imagem")?.url;
       const video = midias.find((m) => m.tipo === "video")?.url;
@@ -108,17 +95,19 @@ export async function publicarPost(
       const c = await criarContainerStories({
         igUserId,
         pageToken,
+        apiBase,
         imageUrl: img,
         videoUrl: video,
       });
       containerId = c.id;
-      if (video) await aguardarContainerPronto({ creationId: c.id, pageToken });
+      if (video) await aguardarContainerPronto({ creationId: c.id, pageToken, apiBase });
     } else if (tipo === "feed_carrossel") {
       const urls = midias.filter((m) => m.tipo === "imagem").map((m) => m.url);
       if (urls.length < 2) throw new Error("feed_carrossel precisa de 2+ imagens");
       const c = await criarContainerCarrossel({
         igUserId,
         pageToken,
+        apiBase,
         imageUrls: urls,
         caption,
       });
@@ -130,6 +119,7 @@ export async function publicarPost(
     const published = await publicarContainer({
       igUserId,
       pageToken,
+      apiBase,
       creationId: containerId,
     });
 
@@ -148,18 +138,6 @@ export async function publicarPost(
     await aline.from("posts").update({ status: "erro" }).eq("id", postId);
     return { ok: false, erro: msg };
   }
-}
-
-async function getPerfilSlug(perfilId: string): Promise<string> {
-  const aline = createAlineClient();
-  const { data } = await aline
-    .from("perfis")
-    .select("slug")
-    .eq("id", perfilId)
-    .maybeSingle();
-  const row = data as { slug?: string } | null;
-  if (!row?.slug) throw new Error(`Perfil ${perfilId} sem slug`);
-  return row.slug;
 }
 
 function montarCaption(post: Record<string, unknown>): string {
