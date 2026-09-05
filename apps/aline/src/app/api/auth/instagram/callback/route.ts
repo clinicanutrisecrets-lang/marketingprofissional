@@ -139,7 +139,11 @@ export async function GET(request: Request) {
 
     return NextResponse.redirect(new URL(`/perfis/${state}?ig_conectado=1`, request.url));
   } catch (e) {
-    const msg = encodeURIComponent((e as Error).message);
-    return NextResponse.redirect(new URL(`/dashboard?ig_error=${msg}`, request.url));
+    // O motivo vai pro log E pra tela do perfil — antes o dashboard engolia
+    // o ?ig_error e a nutri via só o botão "conectar" de novo, sem explicação.
+    const motivo = (e as Error).message;
+    console.error("[instagram/callback] conexão falhou:", { state, motivo });
+    const slug = state.startsWith(PREFIXO_STATE) ? state.slice(PREFIXO_STATE.length) : state;
+    return NextResponse.redirect(new URL(`/perfis/${slug}?ig_error=${encodeURIComponent(motivo)}`, request.url));
   }
 }
