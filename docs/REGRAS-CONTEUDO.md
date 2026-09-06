@@ -233,15 +233,36 @@ saúde pelos alimentos e pelas ervas.
 Também fora: "comida é o melhor remédio", "farmácia natural", "receita médica da
 natureza" e variações.
 
-### 4.3 O vocabulário mágico é dela, e é autêntico
+### 4.3 A magia está no PASSADO. O presente é ciência.
 
-"Poção", "caldeirão", "magia", "fada" não são licença poética inventada pelo
-marketing: ela brincava de fazer poções quando criança, para tirar a dor das
-pessoas, e é ela quem diz que **"a cozinha virou a minha magia e a panela virou o
-meu caldeirão"**. Usar esse vocabulário é falar como ela.
+Ela brincava de fazer poções quando criança, e é ela quem diz que "a cozinha
+virou a minha magia, a panela virou o meu caldeirão". Mas o vocabulário mágico
+tem um lugar só, e é o **tempo verbal**:
 
-O que NÃO pode junto: promessa mágica. A magia é do vocabulário, nunca do
-resultado — segue valendo tudo do item 3 (sem cura, sem prazo, sem garantia).
+- **Passado — o que a criança via:** "quando eu era criança, eu via isso como
+  magia."
+- **Presente — o que a cientista sabe:** a frase dela, que é a ponte entre as
+  duas e a melhor síntese da marca:
+
+> **"Parece magia, mas é ciência."**
+
+- **Registro permitido no presente:** **alquimia**, no sentido de ofício e de
+  beleza da combinação. "Hoje eu trabalho com a alquimia dos compostos" é dela.
+
+**Por que a regra é estrita.** Duas razões, as duas dela:
+
+1. **Parte do público é religiosa.** Marca que se apresenta como mágica compete
+   com a fé de quem lê, e perde. A religiosidade que aparece na história é a
+   **da avó**, contada como memória — nunca uma posição da marca.
+2. **Ela fala de ciência.** Mestrado em genética, pesquisa com bolsa, dez mil
+   pacientes. Post que soe a misticismo joga fora a autoridade que sustenta um
+   produto de R$ 3.500.
+
+**PROIBIDO:** magia, mágico, feitiço, milagre, energia, cura espiritual,
+"poder místico do alimento" — no presente, afirmando o que a comida faz.
+**Permitido:** poção e caldeirão **quando narram a infância dela**; alquimia
+como ofício; e a frase "parece magia, mas é ciência", que existe justamente
+para desarmar a leitura mística antes que ela aconteça.
 
 ### 4.4 O olhar é multidisciplinar, nunca por pedaços
 

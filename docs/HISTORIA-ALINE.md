@@ -146,6 +146,17 @@ Contra o Câncer", o livro do primeiro ano de faculdade.
 A menina que fechava os olhos e imaginava a dor da pessoa desaparecendo é a mesma
 que hoje combina compostos para isso acontecer de verdade. **É a mesma poção.**
 
+> ⚠️ **Como contar isso sem virar misticismo** (correção dela, 06/09/2026): a
+> magia fica no PASSADO — é o que a criança via. O presente é ciência. A frase
+> que ela usa e gosta é **"parece magia, mas é ciência"**, e hoje ela trabalha
+> com a **alquimia** dos compostos, no sentido de ofício.
+>
+> Dois motivos, os dois dela: parte do público é religiosa, e marca que se
+> apresenta como mágica compete com a fé de quem lê; e ela fala de ciência —
+> misticismo joga fora a autoridade que sustenta um produto de R$ 3.500. A
+> religiosidade que aparece aqui é a **da avó**, como memória, nunca uma
+> posição da marca. Detalhe na regra 4.3 de `REGRAS-CONTEUDO.md`.
+
 ## O Canadá virou casa
 
 O país que entrou na história como bolsa de pesquisa não saiu mais. **Hoje ela mora
