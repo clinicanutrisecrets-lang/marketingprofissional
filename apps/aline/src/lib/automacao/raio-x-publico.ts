@@ -25,6 +25,9 @@ export type PostAnalisado = {
   id: string;
   permalink?: string;
   data?: string;
+  /** Timestamp completo (ISO, com hora e fuso) — necessário pra medir melhor horário.
+   *  `data` continua sendo só o dia, pra não quebrar quem já lê esse campo. */
+  publicado_em?: string;
   formato: string; // Reel | Carrossel | Imagem | Vídeo
   legenda: string; // primeiras 140 letras
   curtidas: number;
@@ -103,6 +106,7 @@ export async function gerarRaioXPublico(slug: string, limitePosts = 60): Promise
       id: m.id,
       permalink: m.permalink,
       data: m.timestamp?.slice(0, 10),
+      publicado_em: m.timestamp,
       formato: formatoDe(m),
       legenda: (m.caption ?? "").replace(/\s+/g, " ").slice(0, 140),
       curtidas: m.like_count ?? i.likes ?? 0,
