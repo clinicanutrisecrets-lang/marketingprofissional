@@ -67,6 +67,20 @@ function media(ns: Array<number | undefined>): number | undefined {
   return Math.round(v.reduce((a, b) => a + b, 0) / v.length);
 }
 
+/**
+ * Corta texto por PONTO DE CÓDIGO, não por unidade UTF-16.
+ *
+ * `slice()` conta unidades de 16 bits, e emoji ocupa duas. Cortar no meio de um
+ * deixa metade de um par substituto na string — que é JSON inválido e derruba a
+ * chamada seguinte com "no low surrogate in string". Só aparecia em leitura
+ * longa, porque com poucos posts a chance de o corte cair num emoji é pequena.
+ */
+export function cortarSeguro(texto: string, limite: number): string {
+  const limpo = texto.replace(/\s+/g, " ").trim();
+  const pontos = Array.from(limpo); // separa por ponto de código: emoji fica inteiro
+  return pontos.length <= limite ? limpo : pontos.slice(0, limite).join("");
+}
+
 export async function gerarRaioXPublico(slug: string, limitePosts = 60): Promise<ResultadoRaioX> {
   const perfil = await carregarPerfilPorSlug(slug);
   if (!perfil) throw new Error("Perfil não encontrado");
@@ -108,7 +122,7 @@ export async function gerarRaioXPublico(slug: string, limitePosts = 60): Promise
       data: m.timestamp?.slice(0, 10),
       publicado_em: m.timestamp,
       formato: formatoDe(m),
-      legenda: (m.caption ?? "").replace(/\s+/g, " ").slice(0, 140),
+      legenda: cortarSeguro(m.caption ?? "", 140),
       curtidas: m.like_count ?? i.likes ?? 0,
       comentarios: m.comments_count ?? i.comments ?? 0,
       alcance: i.reach,
