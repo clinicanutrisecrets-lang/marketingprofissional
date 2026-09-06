@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { geracaoAutomaticaAtiva } from "@/lib/features";
+import { geracaoPausadaParaConta } from "@/lib/features";
 import { gerarSugestoesSemana } from "@/lib/conteudo/gerador-sugestoes";
 
 export const dynamic = "force-dynamic";
@@ -17,13 +17,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
   }
 
-  if (!geracaoAutomaticaAtiva()) {
-    return NextResponse.json({
-      pulado: true,
-      motivo: "Geração automática desligada (GERACAO_AUTOMATICA_ATIVA).",
-    });
-  }
-
   const admin = createAdminClient();
 
   // Próxima segunda-feira
@@ -35,14 +28,19 @@ export async function GET(request: Request) {
 
   const { data: franqueadas } = await admin
     .from("franqueadas")
-    .select("id, nome_completo")
+    .select("id, nome_completo, email")
     .eq("status", "ativo")
     .eq("onboarding_completo", true);
 
-  const lista = (franqueadas ?? []) as Array<{ id: string; nome_completo: string | null }>;
-  const resultados: Array<{ id: string; criadas: number; erro?: string }> = [];
+  const lista = (franqueadas ?? []) as Array<{ id: string; nome_completo: string | null; email: string | null }>;
+  const resultados: Array<{ id: string; criadas: number; erro?: string; pausada?: boolean }> = [];
 
   for (const f of lista) {
+    // Pausa é POR CONTA: uma conta pausada nunca impede o pacote das outras.
+    if (geracaoPausadaParaConta(f.email)) {
+      resultados.push({ id: f.id, criadas: 0, pausada: true });
+      continue;
+    }
     try {
       const r = await gerarSugestoesSemana({ franqueadaId: f.id, semanaRef });
       resultados.push({ id: f.id, criadas: r.criadas, erro: r.erro });
