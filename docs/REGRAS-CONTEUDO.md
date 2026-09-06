@@ -49,6 +49,53 @@ A **estrutura** acima é emprestada de posts que funcionam. O **visual não é.*
 
 Carrossel em preto e branco puro está **fora do padrão**.
 
+### 1.6 Sobrepor público, em vez de triar
+
+O mesmo carrossel serve paciente e profissional **na mesma peça**, sem precisar
+separar por palavra-chave.
+
+- A **capa e o subtítulo** falam com a paciente: identidade, sequência vivida,
+  a frase que ela diz para si mesma.
+- O **prêmio do final** serve ao profissional: é o que ele salva para usar.
+
+A paciente se reconhece e leva a pergunta ao profissional dela. O profissional
+salva. Um post, dois públicos, nenhuma triagem.
+
+### 1.7 A sinergia é o prêmio, e ela sempre explica o PORQUÊ
+
+A última lâmina de valor é a **sinergia**, e ela é o que faz o post ser salvo.
+
+**Nunca listar combinação sem o mecanismo.** A regra é sempre:
+
+> [Composto A] + [Composto B] → porque [o que A faz com B]
+
+Falar em **composto bioativo e nutriente**, não em alimento genérico. É o que
+separa "coma maçã" de nutrição: quem trabalha é a pectina e a quercetina, e o
+alimento é como elas chegam na mesa (ver o dicionário da Fábrica).
+
+Dose específica só com aviso de individualização. Fórmula com miligramas para
+público leigo é terreno de farmacêutico, não de nutricionista.
+
+O prêmio que ninguém mais tem: **a leitura da Fábrica** — onde aquela queixa
+costuma nascer, e o que olhar antes de conduzir. Para o profissional isso é tão
+salvável quanto uma fórmula.
+
+### 1.8 Etiqueta de série na capa
+
+Toda capa declara a que série pertence, numa linha pequena em cima:
+
+> CANSAÇO · VOLUME 1
+> PERIMENOPAUSA · O QUE O EXAME NÃO MOSTRA
+
+É o que faz quem gostou de um post procurar os outros, em vez de voltar para o
+feed. Resolve a permanência sem depender de "veja mais no perfil".
+
+### 1.9 Post fixado de boas-vindas
+
+Um dos três fixados é sempre de recepção, para quem chega pela primeira vez:
+quem é a Aline, o que ela investiga, e por onde começar. É o que atende quem
+vem de anúncio e não sabe onde pisou.
+
 ### 1.3 Contraste: o Tiffany é fundo, nunca cor de letra
 
 Medido pela régua da WCAG sobre os HEX oficiais:
