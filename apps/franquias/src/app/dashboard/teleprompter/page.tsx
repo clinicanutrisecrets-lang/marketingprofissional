@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { corteIaLiberadoPara } from "@/lib/corte/gate";
 import { TeleprompterHub, type RoteiroSemana } from "./TeleprompterHub";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,11 @@ export default async function TeleprompterPage() {
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id")
+    .select("id, email")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   if (!franqueada) redirect("/onboarding");
+  const corteIa = corteIaLiberadoPara((franqueada as { email: string | null }).email);
 
   // Roteiros de reel sugeridos (mais recentes primeiro)
   const { data } = await supabase
@@ -39,5 +41,5 @@ export default async function TeleprompterPage() {
       gravado: r.status === "gravado",
     })) as RoteiroSemana[];
 
-  return <TeleprompterHub roteiros={roteiros} />;
+  return <TeleprompterHub roteiros={roteiros} corteIa={corteIa} />;
 }

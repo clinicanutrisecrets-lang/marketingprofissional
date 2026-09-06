@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { corteIaLiberadoPara } from "@/lib/corte/gate";
 import { Teleprompter } from "./Teleprompter";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,11 @@ export default async function ReelPage({ params }: { params: { id: string } }) {
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id")
+    .select("id, email")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   if (!franqueada) redirect("/onboarding");
+  const corteIa = corteIaLiberadoPara((franqueada as { email: string | null }).email);
 
   const { data: sugestao } = await supabase
     .from("sugestoes_conteudo")
@@ -59,6 +61,7 @@ export default async function ReelPage({ params }: { params: { id: string } }) {
       texto={texto}
       dicas={s.roteiro?.dicas ?? []}
       legenda={legenda}
+      corteIa={corteIa}
     />
   );
 }

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ReelAnimadoSection, type ReelAnimado } from "../conteudo/ReelAnimadoSection";
+import { corteIaLiberadoPara } from "@/lib/corte/gate";
+import { listarCortesAction } from "@/lib/corte/actions";
+import { CortesIaSection } from "./CortesIaSection";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +17,12 @@ export default async function VideosHubPage() {
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id")
+    .select("id, email")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   if (!franqueada) redirect("/onboarding");
+  const corteIa = corteIaLiberadoPara((franqueada as { email: string | null }).email);
+  const cortes = corteIa ? await listarCortesAction() : [];
 
   const { data: reelsData } = await supabase
     .from("reels_animados")
@@ -70,6 +75,8 @@ export default async function VideosHubPage() {
           </span>
         </a>
       </div>
+
+      {corteIa && <CortesIaSection cortes={cortes} />}
 
       <div id="reel-animado">
         <ReelAnimadoSection reels={reels} />

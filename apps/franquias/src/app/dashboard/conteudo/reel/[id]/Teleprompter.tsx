@@ -3,11 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { marcarStatusSugestao } from "@/lib/conteudo/actions";
+import { createClient } from "@/lib/supabase/client";
+import { prepararUploadCorteAction, criarCorteAction } from "@/lib/corte/actions";
+import { CORTE_MAX_SEG } from "@/lib/corte/constantes";
 
 /**
  * Teleprompter com gravação: câmera frontal ao fundo, roteiro rolando por
  * cima, botão de gravar. A nutri lê olhando pra câmera, baixa o vídeo e
  * posta como reel — sem depender de aprovação da Meta.
+ *
+ * Com `corteIa` ligado (teste fechado, ver lib/corte/gate.ts) a gravação tem
+ * teto de 60 s com cronômetro e, ao terminar, pode ser enviada pra edição
+ * automática (legendas, palavras-chave e b-roll) — ver lib/corte/actions.ts.
  */
 export function Teleprompter(props: {
   sugestaoId: string;
@@ -15,6 +22,7 @@ export function Teleprompter(props: {
   texto: string;
   dicas: string[];
   legenda: string;
+  corteIa?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -30,6 +38,13 @@ export function Teleprompter(props: {
   const [espelhado, setEspelhado] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Corte com IA: cronômetro, blob da gravação e envio
+  const blobRef = useRef<Blob | null>(null);
+  const [segundos, setSegundos] = useState(0);
+  const [enviando, setEnviando] = useState(false);
+  const [enviadoMsg, setEnviadoMsg] = useState<string | null>(null);
+  const limiteSeg = props.corteIa ? CORTE_MAX_SEG : null;
 
   // Liga a câmera frontal
   useEffect(() => {
@@ -75,23 +90,43 @@ export function Teleprompter(props: {
     };
   }, [rolando, velocidade]);
 
+  // Cronômetro da gravação. Com teto (corte IA), para sozinho no limite.
+  useEffect(() => {
+    if (!gravando) return;
+    setSegundos(0);
+    const t0 = Date.now();
+    const id = setInterval(() => setSegundos(Math.floor((Date.now() - t0) / 1000)), 250);
+    return () => clearInterval(id);
+  }, [gravando]);
+  useEffect(() => {
+    if (gravando && limiteSeg !== null && segundos >= limiteSeg) pararGravacao();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [segundos, gravando, limiteSeg]);
+
   function comecarGravacao() {
     const stream = videoRef.current?.srcObject as MediaStream | null;
     if (!stream) return;
     setErro(null);
     setVideoUrl(null);
+    setEnviadoMsg(null);
+    blobRef.current = null;
     chunksRef.current = [];
     const mime =
       ["video/mp4", "video/webm;codecs=vp9", "video/webm"].find((m) =>
         typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m),
       ) ?? "";
     try {
-      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      // Bitrate limitado: 60 s cabem folgados no teto de 100 MB do bucket.
+      const rec = new MediaRecorder(stream, {
+        ...(mime ? { mimeType: mime } : {}),
+        videoBitsPerSecond: 5_000_000,
+      });
       rec.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
       rec.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mime || "video/webm" });
+        blobRef.current = blob;
         setVideoUrl(URL.createObjectURL(blob));
         if (props.sugestaoId) void marcarStatusSugestao(props.sugestaoId, "gravado");
       };
@@ -111,7 +146,38 @@ export function Teleprompter(props: {
     setRolando(false);
   }
 
+  async function enviarParaCorte() {
+    const blob = blobRef.current;
+    if (!blob || enviando) return;
+    setEnviando(true);
+    setErro(null);
+    try {
+      const mime = blob.type || "video/webm";
+      const prep = await prepararUploadCorteAction({ mime, tamanhoBytes: blob.size });
+      if (!prep.ok) throw new Error(prep.msg);
+      // Upload direto do navegador pro Storage (URL assinada, sem passar pela Vercel)
+      const { error: upErr } = await createClient()
+        .storage.from("videos-biblioteca")
+        .uploadToSignedUrl(prep.path, prep.token, blob, { contentType: mime });
+      if (upErr) throw new Error(`upload: ${upErr.message}`);
+      const r = await criarCorteAction({
+        path: prep.path,
+        mime,
+        duracaoSeg: segundos,
+        tema: props.tema,
+        sugestaoId: props.sugestaoId || undefined,
+      });
+      if (!r.ok) throw new Error(r.msg);
+      setEnviadoMsg(r.msg);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "falha ao enviar o vídeo");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   const extensao = videoUrl && chunksRef.current[0]?.type.includes("mp4") ? "mp4" : "webm";
+  const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
     <main className="fixed inset-0 bg-black">
@@ -147,6 +213,17 @@ export function Teleprompter(props: {
       <div className="absolute inset-x-0 top-0 flex items-center gap-2 bg-black/60 px-4 py-2 text-white">
         <Link href="/dashboard/conteudo" className="text-sm opacity-80">← Sair</Link>
         <p className="flex-1 truncate text-center text-xs opacity-70">{props.tema}</p>
+        {gravando && (
+          <span
+            className={`rounded-full px-2 py-0.5 font-mono text-xs font-bold ${
+              limiteSeg !== null && limiteSeg - segundos <= 10
+                ? "animate-pulse bg-red-600 text-white"
+                : "bg-white/15 text-white"
+            }`}
+          >
+            ● {mmss(segundos)}{limiteSeg !== null ? ` / ${mmss(limiteSeg)}` : ""}
+          </span>
+        )}
         <button onClick={() => setFontSize((f) => Math.max(18, f - 3))} className="rounded bg-white/10 px-2 text-sm">A−</button>
         <button onClick={() => setFontSize((f) => Math.min(56, f + 3))} className="rounded bg-white/10 px-2 text-sm">A+</button>
         <button onClick={() => setVelocidade((v) => Math.max(0.2, v - 0.15))} className="rounded bg-white/10 px-2 text-sm">🐢</button>
@@ -160,6 +237,23 @@ export function Teleprompter(props: {
 
         {videoUrl ? (
           <div className="flex flex-wrap items-center justify-center gap-3">
+            {props.corteIa && !enviadoMsg && (
+              <button
+                onClick={enviarParaCorte}
+                disabled={enviando}
+                className="rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-bold text-black disabled:opacity-60"
+              >
+                {enviando ? "⏫ Enviando..." : "✨ Editar com IA"}
+              </button>
+            )}
+            {enviadoMsg && (
+              <Link
+                href="/dashboard/videos#cortes-ia"
+                className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-bold text-white"
+              >
+                ✅ Enviado · acompanhar em Vídeos →
+              </Link>
+            )}
             <a
               href={videoUrl}
               download={`reel-${(props.sugestaoId || "gravacao").slice(0, 8)}.${extensao}`}
@@ -220,6 +314,14 @@ export function Teleprompter(props: {
               {rolando ? "⏸ Pausar texto" : "▶️ Rolar texto"}
             </button>
           </div>
+        )}
+
+        {enviadoMsg && <p className="text-center text-xs text-emerald-300">{enviadoMsg}</p>}
+        {props.corteIa && !gravando && !videoUrl && (
+          <p className="text-center text-[11px] text-amber-200/80">
+            ✨ Corte com IA ligado: a gravação para sozinha em {mmss(CORTE_MAX_SEG)} e sai editada
+            com legendas e b-roll.
+          </p>
         )}
 
         {props.dicas.length > 0 && !gravando && !videoUrl && (
