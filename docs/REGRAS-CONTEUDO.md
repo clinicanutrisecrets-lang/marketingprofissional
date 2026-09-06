@@ -312,14 +312,59 @@ horário, mudar a combinação, olhar um exame que ela já tem. **Post que só
 assusta não é da marca**, e a própria história dela ("parece magia, mas é
 ciência") existe para desarmar isso.
 
-### 5.4 A conduta fica na consulta — e isso é bom para os dois lados
+### 5.4 Solução PARCIAL é o diferencial dela. "Conduta" é o plano inteiro.
 
-O post mostra **que existe uma conduta** e qual exame olhar. Ele nunca dá dose,
-suplemento ou protocolo individual.
+Correção da Aline (06/09/2026) sobre uma versão anterior desta regra, que estava
+apertada demais e teria produzido post covarde.
 
-Não é só o CFN: **é o modelo de negócio.** Post que entrega a solução completa
-elimina a razão de fazer o teste. A correlação cria a pergunta; a resposta
-individual é o produto.
+**Conduta é a dieta inteira e a suplementação inteira.** Isso é da consulta.
+Tudo abaixo disso é conteúdo, e é justamente o que diferencia o perfil dela:
+
+| Pode, e deve | É da consulta |
+|---|---|
+| Uma receita com a quantidade de cada alimento | O cardápio da pessoa |
+| Montar um prato, com as proporções | O plano alimentar completo |
+| "Magnésio só faz o efeito X a partir de 350 mg" | A prescrição daquele paciente |
+| O que combina com o quê, e em que horário | O protocolo individual |
+| Qual exame olhar, e a faixa funcional | A interpretação do exame dela |
+
+O post entrega **valor real e usável**. O que ele não entrega é **qual dessas
+condutas válidas é a sua** — e essa pergunta é o produto.
+
+Isso é mais forte que sonegar informação: quem recebeu uma receita que funcionou
+acredita que o resto funciona também.
+
+### 5.4b Pode falar de doença. Não pode DIAGNOSTICAR.
+
+Também correção dela, e a linha é precisa:
+
+- ✅ **"Para quem tem fibromialgia, os estudos mostram que…"** — fala de uma
+  população e da literatura. É educação.
+- ✅ **"Vamos traduzir essa ciência e descomplicar numa receita deliciosa"** —
+  a ciência chega na cozinha, que é o trabalho dela.
+- ❌ **"Você tem fibromialgia"** / "esses sintomas são fibromialgia" — estabelecer
+  diagnóstico de quem lê. Isso a lei veda, e é só isso que ela veda.
+- ❌ **"Isso trata / cura fibromialgia"** — promessa de resultado (regra 3).
+
+> 🔴 **Esta regra vale SÓ para conteúdo de marketing.** O output clínico do
+> Scanner — Top 3, análises, orientações, textos do portal da paciente — continua
+> obrigatoriamente por **processo funcional**, sem nome de doença, como manda o
+> CLAUDE.md do produto. São coisas diferentes: um post fala com uma audiência
+> sobre a literatura; um laudo fala com uma pessoa sobre o corpo dela.
+
+### 5.4c Receita é o que mais engaja — e é onde a ciência dela pousa
+
+Palavras dela: **"a receita é sempre o que dá mais ibope"**. E não é concessão ao
+algoritmo: receita é literalmente a sinergia acontecendo num prato, que é a
+pergunta que ela faz desde a graduação.
+
+Consequência para o calendário: **receita não é um post ocasional, é um formato
+recorrente** — e é o melhor lugar para a correlação, porque ela aparece na
+quantidade, na combinação e no modo de preparo, sem precisar de slide teórico.
+
+O formato que junta tudo: *condição ou sintoma → o que os estudos mostram → o
+composto e a dose que fazem efeito → a receita que entrega isso de um jeito
+gostoso → manda pra alguém que passa por isso.*
 
 ### 5.5 O gatilho de envio vem escrito no post
 
