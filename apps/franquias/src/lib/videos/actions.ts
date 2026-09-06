@@ -20,6 +20,7 @@ async function getFranqueadaId() {
 
 export async function adicionarVideoBiblioteca(params: {
   titulo: string;
+  descricao?: string;
   url: string;
   tags: string[];
   fonte?: "upload" | "pexels";
@@ -38,6 +39,7 @@ export async function adicionarVideoBiblioteca(params: {
     .insert({
       franqueada_id: franqueadaId,
       titulo: params.titulo,
+      descricao: params.descricao || null,
       url: params.url,
       tags: params.tags,
       fonte: params.fonte ?? "upload",

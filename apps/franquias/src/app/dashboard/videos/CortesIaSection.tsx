@@ -53,12 +53,20 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
             trecho e b-roll da sua biblioteca. Pronto em uns 3 a 5 minutos.
           </p>
         </div>
-        <Link
-          href="/dashboard/teleprompter"
-          className="rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
-        >
-          🎥 Gravar agora
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/dashboard/biblioteca-videos"
+            className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-text ring-1 ring-brand-text/10 hover:ring-brand-primary/40"
+          >
+            📚 Biblioteca de clipes
+          </Link>
+          <Link
+            href="/dashboard/teleprompter"
+            className="rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+          >
+            🎥 Gravar agora
+          </Link>
+        </div>
       </div>
 
       {cortes.length === 0 ? (

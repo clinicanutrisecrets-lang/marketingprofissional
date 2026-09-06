@@ -63,6 +63,7 @@ export function BibliotecaView({ videos: initial }: { videos: Video[] }) {
 function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagsInput, setTagsInput] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -82,7 +83,7 @@ function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
       return;
     }
     setSugerindoTags(true);
-    const r = await sugerirTagsParaVideo(titulo);
+    const r = await sugerirTagsParaVideo(titulo, descricao || undefined);
     setSugerindoTags(false);
     if (r.ok && r.tags) {
       setTags([...new Set([...tags, ...r.tags])]);
@@ -124,6 +125,7 @@ function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
     // Adiciona na biblioteca
     const r = await adicionarVideoBiblioteca({
       titulo,
+      descricao,
       url: upload.url,
       tags,
       fonte: "upload",
@@ -134,12 +136,14 @@ function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
       onAdded({
         id: r.id!,
         titulo,
+        descricao,
         url: upload.url,
         tags,
         fonte: "upload",
       });
       setArquivo(null);
       setTitulo("");
+      setDescricao("");
       setTags([]);
       setMsg("Vídeo adicionado!");
       setTimeout(() => setMsg(null), 2500);
@@ -163,7 +167,7 @@ function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
           {arquivo ? `📹 ${arquivo.name}` : "Arraste um vídeo ou clique pra selecionar"}
         </div>
         <div className="mt-1 text-xs text-brand-text/50">
-          MP4, MOV, WEBM · até 100MB · ideal 5-30s
+          MP4, MOV, WEBM · até 50MB · ideal 6-8s, vertical 9:16
         </div>
       </div>
 
@@ -174,6 +178,21 @@ function UploadForm({ onAdded }: { onAdded: (v: Video) => void }) {
         placeholder='Título descritivo (ex: "Café preparado de manhã")'
         className="w-full rounded-lg border border-brand-text/10 px-4 py-2 text-sm"
       />
+
+      <div>
+        <textarea
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          rows={2}
+          maxLength={300}
+          placeholder='O que se vê na cena (ex: "Mulher de costas caminhando num corredor claro, luz de manhã")'
+          className="w-full rounded-lg border border-brand-text/10 px-4 py-2 text-sm"
+        />
+        <p className="mt-1 text-xs text-brand-text/50">
+          Quanto melhor a descrição e as tags, melhor a IA escolhe este clipe pra
+          ilustrar o momento certo da sua fala nos cortes automáticos.
+        </p>
+      </div>
 
       <div>
         <div className="mb-2 flex items-center justify-between">
