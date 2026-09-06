@@ -1,7 +1,6 @@
 # Por que eu sou nutricionista — a história da Aline
 
-Contada por ela em 06/09/2026. **Está incompleta**: ela parou em "a minha primeira
-pesquisa científica foi com molho de tomate para câncer de mama" e vai continuar.
+Contada por ela em 06/09/2026, em duas partes, na íntegra.
 
 Este documento existe porque a história vale para várias coisas ao mesmo tempo:
 o post fixado de boas-vindas, a seção "quem cuida de você" das LPs, o campo
@@ -107,8 +106,103 @@ Três coisas que já estão prontas aqui e que raramente aparecem juntas:
    avó tinha sugerido. É o ponto mais delicado e o mais forte — e por isso não
    pode ser contado com a ordem trocada.
 
-## O que ainda falta
+## Ninguém quis orientar
 
-Ela vai continuar a partir do molho de tomate. Provavelmente vem daí o caminho
-até a genética, o mestrado, o Canadá e o Scanner — e é justamente a ponte entre
-"a menina das poções" e "a nutricionista que lê DNA".
+A sinergia era assunto novo demais. Nenhum professor de nutrição aceitou ser
+**orientador** dela — diziam que aquilo era tema de mestrado ou doutorado, não de
+graduação.
+
+Quem destravou foi o **pró-reitor de pós-graduação**, que era professor de
+parasitologia. Ou seja: nada a ver com o assunto.
+
+> "Aline, eu não entendo nada disso. Mas você está tão apaixonada pelo tema, acho
+> isso tão legal, que vou te colocar em contato com professores de outras áreas
+> que podem te ajudar."
+
+Ele a apresentou ao pessoal de enfermagem, biologia e genética. Foi ali que ela
+viu, na prática, o poder da **multidisciplinaridade** — que é como ela trabalha
+até hoje.
+
+## O livro voltou
+
+Aquela pesquisa virou a candidatura a uma bolsa de estudos no Canadá. Era preciso
+submeter um projeto; ela submeteu esse, e foi aceita.
+
+No Canadá vieram outras bolsas de pesquisa. E uma delas era com **o professor que
+tinha escrito o livro que o irmão dela deu quatro anos antes** — "Os Alimentos
+Contra o Câncer", o livro do primeiro ano de faculdade.
+
+> "Gente, que chance disso acontecer? Talvez tenha sido mesmo um sinal da vida de
+> que eu deveria fazer nutrição."
+
+## A panela virou o caldeirão
+
+É aqui que a história fecha:
+
+> "Estudando essa sinergia, a cozinha virou a minha magia. A panela virou o meu
+> caldeirão da bruxinha, da fada. Por isso eu tenho um brilho no olhar quando
+> falo disso."
+
+A menina que fechava os olhos e imaginava a dor da pessoa desaparecendo é a mesma
+que hoje combina compostos para isso acontecer de verdade. **É a mesma poção.**
+
+## Quem ela é hoje — e quem ela NÃO é
+
+Ela ama o poder que a alimentação tem. E não é, em nenhuma hipótese, a
+nutricionista do suco detox e do comer certinho:
+
+- ama **cozinhar, comer e viajar**;
+- ama **chocolate** (tem inclusive uma linha de chocolate), **brigadeiro** e
+  **sorvete**;
+- para ela, alimentação é **cultura, prazer e entretenimento** — não só nutriente.
+
+> "Não é pra gente tirar a beleza do alimento olhando só pro nutriente. Mas
+> também não é pra esquecer o poder que a alimentação tem na nossa saúde."
+
+E uma frase que ela **não usa e não gosta**: *"alimentação é remédio"*. O remédio
+tem a função dele e o alimento tem a dele — e é preciso respeitar as culturas
+milenares que cuidam da saúde pelos alimentos e pelas ervas, sem reduzir isso a
+farmacologia.
+
+**As credenciais, na ordem em que ela mesma cita:** nove especializações (ela ama
+estudar), mais de dez mil pacientes atendidos, mestrado em genética — onde ela
+passou a ver ainda mais a importância de olhar para a **individualidade** de cada
+paciente — e uma das especializações em **psicologia da nutrição**, porque o
+emocional impacta a saúde e a alimentação, e vice-versa.
+
+O motivo de tudo isso, na palavra dela: **não olhar o paciente por pedaços.** Nem
+só o pedaço da nutrição — mas a alimentação como coisa multifatorial, e como ela
+impacta a vida das pessoas.
+
+---
+
+## Por que esta história funciona como conteúdo
+
+Quatro coisas que já estão prontas aqui e que raramente aparecem juntas:
+
+1. **A pergunta da sinergia nasce na página 1.** O diferencial do negócio não é
+   posicionamento de marketing: é a dúvida de uma caloura lendo um livro que o
+   irmão trouxe. Isso é o que torna a história útil, e não apenas bonita.
+2. **A poção da criança e a sinergia da pesquisadora são a mesma coisa** — e ela
+   mesma amarra isso na frase do caldeirão. Trinta anos de diferença, mesma
+   pessoa. É o que dá autenticidade à Fábrica e ao Detetive: não são metáfora de
+   marketing, são como ela pensa desde criança.
+3. **A perda vem antes da escolha.** Ela não escolheu nutrição e depois perdeu a
+   avó: perdeu a avó, e a aprovação chegou uma semana depois, na profissão que a
+   avó tinha sugerido.
+4. **O livro voltou.** Ninguém acreditaria se fosse roteiro — e é verdade,
+   documentável. É o melhor "efeito wow" da história e ele não é sobre ciência,
+   é sobre insistência: ela virou pesquisadora do autor que a fez escolher a
+   profissão.
+
+## Como usar (e como não usar)
+
+- **Post fixado de boas-vindas:** o arco curto é *poção → livro → ninguém quis
+  orientar → o autor virou meu orientador → a panela é o caldeirão*. Fecha em
+  seis slides.
+- **Seção "quem cuida de você" das LPs:** vale a versão de dois parágrafos —
+  a pergunta da sinergia e o encontro com o autor do livro.
+- **Nunca** contar a parte da avó com a ordem trocada.
+- **Nunca** reproduzir a fala sobre o perfil de medicina sem a ressalva.
+- **Nunca** escrever nada que soe a "comer certinho", detox ou restrição moral —
+  contradiz quem ela é e ela vai corrigir o post.

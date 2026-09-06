@@ -202,3 +202,52 @@ da WCAG 2.1, critério AA.
 
 As leituras de audiência da conta @nutri_secrets vêm do Raio-X do público
 (`/perfis/nutrisecrets/publico`), lido pela API do Instagram.
+
+---
+
+## 4. Quem ela é, e quem ela NÃO é
+
+Contexto completo em `docs/HISTORIA-ALINE.md`. O que muda a escrita de todo post:
+
+### 4.1 Ela não é a nutricionista do "comer certinho"
+
+Ela ama cozinhar, comer e viajar. Ama chocolate (tem uma linha de chocolate),
+brigadeiro e sorvete. Para ela **alimentação é cultura, prazer e entretenimento**,
+não só nutriente.
+
+Um post que soe a suco detox, restrição moral, "alimento limpo" ou culpa
+contradiz quem ela é — e ela corrige o post. A frase dela:
+
+> "Não é pra gente tirar a beleza do alimento olhando só pro nutriente. Mas
+> também não é pra esquecer o poder que a alimentação tem na nossa saúde."
+
+As duas metades da frase valem juntas. Conteúdo que fica só na primeira vira
+hedonismo sem ciência; só na segunda vira a nutricionista chata que ela não é.
+
+### 4.2 PROIBIDO: "alimentação é remédio"
+
+Ela não usa e não gosta. O remédio tem a função dele e o alimento tem a dele — e
+reduzir a comida a farmacologia desrespeita as culturas milenares que cuidam da
+saúde pelos alimentos e pelas ervas.
+
+Também fora: "comida é o melhor remédio", "farmácia natural", "receita médica da
+natureza" e variações.
+
+### 4.3 O vocabulário mágico é dela, e é autêntico
+
+"Poção", "caldeirão", "magia", "fada" não são licença poética inventada pelo
+marketing: ela brincava de fazer poções quando criança, para tirar a dor das
+pessoas, e é ela quem diz que **"a cozinha virou a minha magia e a panela virou o
+meu caldeirão"**. Usar esse vocabulário é falar como ela.
+
+O que NÃO pode junto: promessa mágica. A magia é do vocabulário, nunca do
+resultado — segue valendo tudo do item 3 (sem cura, sem prazo, sem garantia).
+
+### 4.4 O olhar é multidisciplinar, nunca por pedaços
+
+Mestrado em genética (individualidade), especialização em psicologia da nutrição
+(o emocional impacta a alimentação e vice-versa), e a primeira pesquisa dela só
+saiu porque professores de enfermagem, biologia e genética ajudaram.
+
+Consequência prática: post que trata um sintoma como se tivesse **uma** causa
+está contra o método. É sempre "quais são as causas possíveis, e qual é a sua".
