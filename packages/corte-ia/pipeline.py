@@ -101,11 +101,18 @@ FORMATO EXATO:
 }
 
 REGRAS:
-- capa.linha1: o assunto em até 14 caracteres (1 ou 2 palavras, vira o título gigante). capa.linha2: até 18 caracteres. capa.apoio: até 48 caracteres, sem ponto final. Nada de promessa de resultado ou cura (CFN): linguagem de investigação.
+- capa: aparece só nos 2 primeiros segundos, junto com a promessa que a pessoa FALA. Ela reforça o que está sendo dito, nunca contextualiza nem dá "oi gente". capa.linha1: o assunto em até 14 caracteres (1 ou 2 palavras, vira o título gigante). capa.linha2: até 18 caracteres. capa.apoio: até 48 caracteres, sem ponto final. Quando a fala abrir com uma identidade ("cansada há mais de 2 anos"), a capa espelha essa identidade em vez do nome do mecanismo: identidade gera envio, assunto gera só salvamento.
 - secoes: cobrem o vídeo inteiro, de 0 até a duração, sem buracos e sem sobreposição. Entre 4 e 7 seções, cada uma com 5 a 15 segundos e uma palavra_chave de até 12 caracteres (1 palavra, no máximo 2) que resume o que está sendo dito naquele trecho. Corte as seções onde a fala muda de assunto, nunca no meio de uma frase.
-- broll: só ids que existem no catálogo recebido. Cada corte tem 3 a 6 segundos, nunca começa antes de 3.0 s, nunca invade os últimos 4 s (é onde fica a chamada pra ação), e entre dois cortes ficam ao menos 3 s de rosto. Total de b-roll no máximo 40% da duração. Escolha o clipe cujo conteúdo visual ilustra o que está sendo dito naquele momento (use titulo, descricao e tags). Se nada combinar de verdade, devolva lista vazia: b-roll ruim é pior que nenhum.
+- broll: só ids que existem no catálogo recebido. O rosto falando é a base do vídeo e o b-roll é só CORTE DE RETOMADA, o que reseta a atenção: cada corte tem 2 a 3 segundos, nunca começa antes de 3.0 s, nunca invade os últimos 4 s (é onde fica a chamada pra ação), e entre dois cortes ficam ao menos 3 s de rosto. Total de b-roll no máximo 25% da duração. Escolha o clipe cujo conteúdo visual ilustra o que está sendo dito naquele momento (use titulo, descricao e tags). Se nada combinar de verdade, devolva lista vazia: b-roll ruim é pior que nenhum.
 - correcoes: só erros claros do reconhecimento de voz em termos técnicos (nomes de bactérias, genes, exames, nutrientes). "de" é a palavra exatamente como aparece na transcrição, "para" é a grafia correta. Nunca mude a fala em si.
-- Português do Brasil. Sem travessão em nenhum texto: use vírgula ou ponto."""
+- Português do Brasil. Sem travessão em nenhum texto: use vírgula ou ponto.
+
+REGRAS DE MARCA (valem pra todo texto que você escreve — capa e palavras-chave):
+- NUNCA escreva "IA" nem "inteligência artificial". Quando precisar nomear, é "algoritmo Scanner".
+- Processo funcional, nunca nome de doença como diagnóstico (regra do CFN). Sem promessa de cura e sem promessa de prazo ("em 7 dias", "em 2 horas").
+- Termo técnico sempre com tradução prática ao lado quando couber no espaço.
+- Nada de xilitol, maltitol ou adoçante artificial.
+- Escreva pensando no ENVIO no direct, não na curtida: o texto tem que fazer a pessoa lembrar de alguém concreto."""
 
 
 def planejar(transcricao, catalogo, tema, nicho, dur):

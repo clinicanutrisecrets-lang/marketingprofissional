@@ -23,6 +23,16 @@ AMBER, TIFF, WHITE = "&H0B9EF5&", "&HA8B80B&", "&HFFFFFF&"
 NAVY_HEX = "171627"
 ROT = ["big", "pill_band", "big", "pill_top", "big", "pill_band", "big"]
 
+# --- Ritmo, de docs/REGRAS-CONTEUDO.md (seção 2) -------------------------
+# 2.3 promessa nos 2 primeiros segundos: a capa não passa disso
+COVER_SEG = 2.0
+# 2.2 um corte a cada 2 a 4 segundos. Como a gravação tem um ângulo só, o
+# corte no trecho de rosto é um punch-in (aproxima/afasta) — "close" e
+# "mudança de ângulo" contam como corte pela regra.
+CORTE_MAX_SEG = 3.4
+CORTE_MIN_SEG = 1.6
+ZOOMS = [1.0, 1.07, 1.0, 1.11]
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS_SRC = os.path.join(HERE, "..", "reel-engine", "fonts")
 
@@ -179,7 +189,9 @@ def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w):
     l1 = esc(capa.get("linha1", "")).upper()[:14]
     l2 = esc(capa.get("linha2", "")).upper()[:18]
     apoio = esc(capa.get("apoio", ""))[:48]
-    cover_end = min(3.0, dur)
+    # A promessa é dita nos 2 primeiros segundos (REGRAS-CONTEUDO 2.3): a capa
+    # reforça, mas sai de cena antes de virar concorrência do que está sendo dito.
+    cover_end = min(COVER_SEG, dur)
     fs1 = 150 if len(l1) <= 9 else 118
     fs2 = 104 if len(l2) <= 12 else 84
     cover = (f"Dialogue: 2,{ts(0)},{ts(cover_end)},Cover,,0,0,0,,{{\\pos(540,{layout['key_y'] + 60})\\fad(0,200)\\fscx92\\fscy92\\t(0,250,\\fscx100\\fscy100)}}"
@@ -218,7 +230,7 @@ WrapStyle: 0
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Cover,InterBlack,150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-2,0,1,0,0,5,30,30,0,1
 Style: Key,InterBlack,150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-3,0,1,0,0,5,30,30,0,1
-Style: Cap,InterBold,92,{WHITE},{WHITE},&H00000000,&H80000000,-1,0,0,0,100,100,1,0,1,5,3,5,60,60,0,1
+Style: Cap,InterBold,92,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,1,0,1,5,0,5,60,60,0,1
 Style: Pill,Inter,20,&H3A2E2B&,&H3A2E2B&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: PillTxt,InterBold,56,{WHITE},{WHITE},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
 Style: Tag,Inter,34,&HB4A39B&,&HB4A39B&,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,40,40,0,1
@@ -232,15 +244,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 # ---------------------------------------------------------------- vídeo
 def timeline(plano, dur, broll_files):
-    """Lista de (fonte, inicio, fim). fonte = 'head' ou caminho do b-roll."""
+    """Lista de (fonte, inicio, fim). fonte = 'head' ou caminho do b-roll.
+
+    B-roll é corte de retomada, não camada principal (REGRAS-CONTEUDO 2.1):
+    entra curto (2 a 3 s) e deixa o rosto sustentar o resto.
+    """
     cortes = []
     for b in plano.get("broll") or []:
         f = broll_files.get(str(b.get("video_id")))
         if not f:
             continue
         a, z = float(b["inicio"]), float(b["fim"])
-        a = max(a, 3.0); z = min(z, dur - 3.0, a + 6.0)
-        if z - a >= 2.0:
+        a = max(a, 3.0); z = min(z, dur - 3.0, a + 3.0)
+        if z - a >= 1.8:
             cortes.append((a, z, f))
     cortes.sort()
     tl, cur = [], 0.0
@@ -250,6 +266,44 @@ def timeline(plano, dur, broll_files):
         tl.append(("head", cur, a)); tl.append((f, a, z)); cur = z
     tl.append(("head", cur, dur))
     return [s for s in tl if s[2] - s[1] > 0.04]
+
+
+def cadenciar(tl):
+    """Quebra os trechos de rosto pra ter um corte a cada 2 a 4 segundos
+    (REGRAS-CONTEUDO 2.2). Sem segunda câmera, o corte é um punch-in: cada
+    pedaço entra com um zoom diferente do anterior.
+
+    Devolve (fonte, inicio, fim, zoom).
+    """
+    saida, z_i = [], 0
+    for src, a, b in tl:
+        if src != "head":
+            saida.append((src, a, b, 1.0))
+            z_i += 1  # o próprio b-roll já é um corte: o próximo rosto muda de zoom
+            continue
+        restante = b - a
+        n = max(1, int(restante / CORTE_MAX_SEG + 0.999))
+        passo = restante / n
+        # pedaço curto demais pisca; melhor um corte a menos
+        if passo < CORTE_MIN_SEG and n > 1:
+            n -= 1
+            passo = restante / n
+        for k in range(n):
+            ini = a + k * passo
+            fim = b if k == n - 1 else ini + passo
+            saida.append(("head", round(ini, 3), round(fim, 3), ZOOMS[z_i % len(ZOOMS)]))
+            z_i += 1
+    return saida
+
+
+def punch(label, zoom, larg, alt):
+    """Punch-in: recorta um pedaço menor e devolve ao tamanho cheio. O corte
+    fica levemente acima do centro, que é onde está o rosto."""
+    if zoom <= 1.001:
+        return f"[{label}]null"
+    cw, ch = int(larg / zoom) & ~1, int(alt / zoom) & ~1
+    return (f"[{label}]crop={cw}:{ch}:(iw-{cw})/2:(ih-{ch})/2.6,"
+            f"scale={larg}:{alt},setsar=1")
 
 
 def filtro_fonte(label, modo, band_h):
@@ -293,11 +347,12 @@ def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(montar_ass(plano, palavras, dur, layout, handle, rodape, text_w))
 
-    tl = timeline(plano, dur, broll_files)
+    tl = cadenciar(timeline(plano, dur, broll_files))
     fontes = sorted({s[0] for s in tl if s[0] != "head"})
     inputs = ["-i", video] + sum([["-i", f] for f in fontes], [])
     idx = {f: i + 1 for i, f in enumerate(fontes)}
     nh = sum(1 for s in tl if s[0] == "head")
+    alt_base = H if retrato else band_h
 
     fc = []
     if retrato:
@@ -305,9 +360,12 @@ def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir
     else:
         fc.append(f"[0:v]scale={W}:{band_h}:force_original_aspect_ratio=increase,crop={W}:{band_h},setsar=1,fps=25,split={nh}" + "".join(f"[h{i}]" for i in range(nh)))
     segs, hi = [], 0
-    for n, (src, a, b) in enumerate(tl):
+    for n, (src, a, b, zoom) in enumerate(tl):
         if src == "head":
-            fc.append(f"[h{hi}]trim={a}:{b},setpts=PTS-STARTPTS[s{n}]"); hi += 1
+            fc.append(f"[h{hi}]trim={a}:{b},setpts=PTS-STARTPTS,"
+                      + punch("__", zoom, W, alt_base).split("]", 1)[1]
+                      + f"[s{n}]")
+            hi += 1
         else:
             modo = "retrato" if retrato else "faixa"
             fc.append(filtro_fonte(f"{idx[src]}:v", modo, band_h) + f",trim=0:{b - a:.2f},setpts=PTS-STARTPTS[s{n}]")

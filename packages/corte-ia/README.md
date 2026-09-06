@@ -18,14 +18,31 @@ Fluxo completo:
    - marca `pronto` ou `erro` na tabela
 3. **App**: a aba Vídeos lista os cortes com status e se atualiza sozinha.
 
+## Regras de conteúdo
+
+O corte segue `docs/REGRAS-CONTEUDO.md` (seção 2, Vídeo). O que está codificado
+aqui e **não deve ser afrouxado sem mudar o documento antes**:
+
+| Regra | Onde vive |
+|---|---|
+| 2.1 rosto é a base, b-roll é retomada (máx. 25% do vídeo) | `SYSTEM_PLANO`, `timeline()` |
+| 2.2 um corte a cada 2 a 4 s | `cadenciar()` + `CORTE_MAX_SEG` |
+| 2.3 promessa nos 2 primeiros segundos (capa sai em 2 s) | `COVER_SEG` |
+| 2.4 legenda de duas linhas, fonte grande, **sem sombra** | estilos `Cap`/`PillTxt` |
+| 3. sem "IA" (é "algoritmo Scanner"), CFN, sem prazo, sem adoçante | `SYSTEM_PLANO` |
+
+Como a gravação tem um ângulo só, o corte a cada 2 a 4 s no trecho de rosto é
+um **punch-in** (aproxima e afasta) — a regra aceita close e mudança de ângulo
+como corte.
+
 ## Template visual (`render.py`)
 
-- Capa gigante nos 3 primeiros segundos (assunto em Tiffany, complemento em branco).
+- Capa gigante nos 2 primeiros segundos (assunto em Tiffany, complemento em branco).
 - Palavra-chave grande no topo, trocando por trecho, com fade e zoom.
 - Legendas palavra a palavra alternando por frase: grande em caixa alta embaixo
   (palavra falada em âmbar com "pulo") e pílula arredondada (palavra falada em
-  itálico), ora sobre o vídeo, ora abaixo da palavra-chave.
-- B-roll entra por corte seco, 3 a 6 s, nunca nos 3 s iniciais nem nos 4 s finais.
+  itálico), ora sobre o vídeo, ora abaixo da palavra-chave. Sem sombra.
+- B-roll entra por corte seco, 2 a 3 s, nunca nos 3 s iniciais nem nos 4 s finais.
 - Vídeo em pé preenche a tela (faixas escuras semitransparentes atrás dos textos).
   Vídeo deitado vira faixa central sobre fundo azul-marinho.
 - Áudio normalizado pra -16 LUFS, fade de saída, barra de progresso no rodapé.
