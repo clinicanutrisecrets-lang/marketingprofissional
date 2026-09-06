@@ -272,3 +272,76 @@ saiu porque professores de enfermagem, biologia e genética ajudaram.
 
 Consequência prática: post que trata um sintoma como se tivesse **uma** causa
 está contra o método. É sempre "quais são as causas possíveis, e qual é a sua".
+
+---
+
+## 5. Correlação é o núcleo. Composto sozinho não é post.
+
+Regra dada pela Aline em 06/09/2026, e é a que separa o conteúdo dela de qualquer
+perfil de nutrição. **O "por quê" da marca é a correlação.**
+
+### 5.1 Um post sobre um composto sozinho nunca é bom
+
+O post só existe quando cruza pelo menos duas coisas:
+
+- composto **+ exame alterado**
+- composto **+ outro sintoma**
+- alimento **+ alimento que potencializa**
+- gene **+ marcador de sangue + conduta**
+
+"A quercetina é antioxidante" não é post. "Quem metaboliza cafeína devagar
+precisa olhar o triglicerídeo" é post.
+
+### 5.2 O tchan é obrigatório — e o teste dele é uma frase
+
+> **"Não precisava de teste genético pra isso."**
+
+Se o leitor pode dizer essa frase no fim do post, o post fracassou. Ele ensinou
+algo verdadeiro e provou que a Aline é dispensável.
+
+O tchan não é curiosidade: é a **camada que só aparece quando se cruza**. No
+exemplo do café, o tchan não é "cafeína atrapalha o sono" (todo mundo sabe) — é
+"você dormir bem NÃO prova que você metabolizou; e em quem metaboliza devagar o
+mesmo café passa a pesar no sistema cardiovascular, o que se vê no
+triglicerídeo".
+
+### 5.3 Sempre uma saída, nunca medo
+
+Toda correlação termina em algo que a pessoa pode fazer hoje, de graça — mudar o
+horário, mudar a combinação, olhar um exame que ela já tem. **Post que só
+assusta não é da marca**, e a própria história dela ("parece magia, mas é
+ciência") existe para desarmar isso.
+
+### 5.4 A conduta fica na consulta — e isso é bom para os dois lados
+
+O post mostra **que existe uma conduta** e qual exame olhar. Ele nunca dá dose,
+suplemento ou protocolo individual.
+
+Não é só o CFN: **é o modelo de negócio.** Post que entrega a solução completa
+elimina a razão de fazer o teste. A correlação cria a pergunta; a resposta
+individual é o produto.
+
+### 5.5 O gatilho de envio vem escrito no post
+
+Envio é a métrica que traz quem não segue — o post da maçã fez **7.400 envios**.
+E envio acontece quando o leitor pensa em **uma pessoa específica**.
+
+Então o post nomeia essa pessoa: *"manda pra aquele conhecido que toma café à
+noite e dorme igual pedra"*. Não "compartilhe se gostou" — **a característica ou
+o sintoma de alguém que o leitor conhece.**
+
+### 5.6 O modelo do café, inteiro
+
+Serve de gabarito para qualquer post de correlação:
+
+1. **Capa** — a identidade: "Você toma café à noite e dorme igual pedra"
+2. **A quebra** — dormir bem não prova que metabolizou
+3. **O mecanismo** — o gene que decide a velocidade; quem é lento leva 6 a 8 horas
+4. **A correlação (o tchan)** — em quem é lento, o mesmo café pesa no sistema
+   cardiovascular. Cruze com o **triglicerídeo** (régua funcional da Aline:
+   acima de 90 já pede atenção, muito antes do 150 do laboratório)
+5. **A saída de graça** — café de dia, não à noite; se há ansiedade, o da tarde
+   já pesa
+6. **O que é da consulta** — a conduta depende do seu caso (é aqui que entram
+   compostos como o resveratrol, sem dose e sem prescrição)
+7. **O envio** — "manda pra aquela pessoa que…"
