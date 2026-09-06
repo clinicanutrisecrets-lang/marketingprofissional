@@ -146,6 +146,26 @@ Contra o Câncer", o livro do primeiro ano de faculdade.
 A menina que fechava os olhos e imaginava a dor da pessoa desaparecendo é a mesma
 que hoje combina compostos para isso acontecer de verdade. **É a mesma poção.**
 
+## O Canadá virou casa
+
+O país que entrou na história como bolsa de pesquisa não saiu mais. **Hoje ela mora
+no Canadá** — foi lá que casou e onde nasceu o filho. Nas palavras dela, a segunda
+casa.
+
+Isso fecha o círculo uma segunda vez: o livro era de **autores canadenses**, o
+irmão trouxe de uma biblioteca no Brasil, a pesquisa dela virou bolsa naquele
+país, um dos orientadores de lá era o autor do livro — e o país virou a vida dela.
+
+> Duas consequências práticas, que não são detalhe de biografia:
+> - **é por isso que as consultas são online.** A explicação existe, é simples e
+>   é boa — vale dizer, em vez de deixar parecer preferência;
+> - **é por isso que hoje quem atende é o time**, com o bebê ainda pequeno. A
+>   licença tem endereço, e o atendimento no Brasil continua acontecendo.
+
+⚠️ Ao usar em conteúdo: nunca deixar soar como "ela saiu do Brasil". O time
+atende no Brasil, o presencial existe em Curitiba, e a formação e o software são
+brasileiros. O Canadá é onde ela mora, não para onde a clínica foi.
+
 ## Quem ela é hoje — e quem ela NÃO é
 
 Ela ama o poder que a alimentação tem. E não é, em nenhuma hipótese, a
