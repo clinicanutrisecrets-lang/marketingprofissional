@@ -11,9 +11,9 @@ Fluxo completo:
 2. **Worker** (`pipeline.py`, GitHub Actions):
    - normaliza o vídeo (fps fixo, MP4)
    - transcreve local com faster-whisper (timestamp por palavra)
-   - pede o **plano** pro Claude: capa, palavra-chave por trecho, b-roll da
-     biblioteca (`videos_franqueada`, própria + compartilhada) e correções de
-     termos técnicos
+   - pede o **plano** pro Claude: capa, palavra-chave por trecho, b-roll do
+     catálogo (`videos_franqueada` da nutri + `acervo_videos`, o acervo
+     compartilhado com o Studio Aline) e correções de termos técnicos
    - renderiza (`render.py`) e sobe o MP4 pro bucket `franqueadas-assets`
    - marca `pronto` ou `erro` na tabela
 3. **App**: a aba Vídeos lista os cortes com status e se atualiza sozinha.

@@ -166,7 +166,45 @@ export async function escolherVideoParaPost(
     };
   }
 
-  // 2. Fallback Pexels
+  // 2. Acervo compartilhado (clipes coringa curados pela equipe). Vem depois
+  // da biblioteca dela, mas ANTES do Pexels: é conteúdo revisado e já no
+  // formato certo, enquanto o Pexels é sorte.
+  const { data: acervo } = await admin
+    .from("acervo_videos")
+    .select("id, url, thumbnail_url, duracao_seg, tags, usado_quantas_vezes")
+    .eq("ativo", true)
+    .overlaps("tags", keywords)
+    .order("usado_quantas_vezes", { ascending: true })
+    .limit(5);
+
+  if (acervo && acervo.length > 0) {
+    const ranked = (acervo as Array<Record<string, unknown>>)
+      .map((v) => ({
+        video: v,
+        matches: ((v.tags as string[]) ?? []).filter((t) =>
+          keywords.some((k) => k.toLowerCase() === t.toLowerCase()),
+        ).length,
+      }))
+      .sort((a, b) => b.matches - a.matches);
+    const escolhido = ranked[0].video;
+
+    await admin
+      .from("acervo_videos")
+      .update({
+        usado_quantas_vezes: ((escolhido.usado_quantas_vezes as number) ?? 0) + 1,
+      } as never)
+      .eq("id", escolhido.id as string);
+
+    return {
+      fonte: "biblioteca",
+      url: escolhido.url as string,
+      thumbnail: escolhido.thumbnail_url as string,
+      duracao: escolhido.duracao_seg as number,
+      videoId: escolhido.id as string,
+    };
+  }
+
+  // 3. Fallback Pexels
   if (process.env.PEXELS_API_KEY) {
     try {
       const pexels = await buscarMelhorVideo(keywords, { duracaoMaxSeg: 30 });

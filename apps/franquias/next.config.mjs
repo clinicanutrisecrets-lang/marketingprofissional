@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@scanner/ui"],
   typescript: {
     // Volta pro modo flexível até refinarmos tipos específicos do Supabase.
     // Sem isso alguns .maybeSingle() voltam 'never' por falha de inferência.

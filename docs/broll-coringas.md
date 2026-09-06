@@ -1,9 +1,22 @@
 # Biblioteca de b-roll "coringa"
 
-Lista de clipes pra gerar (Base44 ou stock) e subir na biblioteca de vídeos da
-plataforma. O worker do corte com IA (`packages/corte-ia`) escolhe o clipe
-pelo `titulo`, `descricao` e `tags` de cada vídeo em `videos_franqueada`, então
-**o cadastro importa tanto quanto o vídeo**.
+Lista de clipes pra gerar (Base44 ou stock) e subir no acervo compartilhado.
+O worker do corte com IA (`packages/corte-ia`) escolhe o clipe pelo `titulo`,
+`descricao` e `tags`, então **o cadastro importa tanto quanto o vídeo**.
+
+## Onde subir
+
+Três lugares, com papéis diferentes:
+
+| Onde | O quê | Quem enxerga |
+|---|---|---|
+| **Studio Aline** → perfil → Biblioteca de vídeos → aba "Subir vídeo", com **"Salvar no acervo compartilhado" marcado** | os 40 coringas | todos os perfis, todas as franqueadas e o corte com IA |
+| Studio Aline, mesma tela, **sem marcar** a caixa | clipe específico daquele perfil | só aquele perfil |
+| Scanner Franquias → Vídeos → Biblioteca de clipes | clipe da própria franqueada | só ela (mais o acervo, que ela vê em modo leitura) |
+
+Para os coringas, use sempre o Studio com a caixa marcada: sobe uma vez e vale
+pros dois produtos (`public.acervo_videos`). A biblioteca particular tem
+prioridade sobre o acervo na hora de escolher o clipe.
 
 ## Como gerar
 

@@ -131,10 +131,21 @@ def planejar(transcricao, catalogo, tema, nicho, dur):
 
 
 def catalogo_broll(franqueada_id, compartilhada_id):
+    """Biblioteca da franqueada + acervo compartilhado (acervo_videos).
+
+    O acervo é o catálogo curado que serve aos dois produtos; a biblioteca
+    dela vem primeiro na lista porque, empatando a descrição, o agente tende
+    a escolher o que aparece antes.
+    """
     ids = [franqueada_id] + ([compartilhada_id] if compartilhada_id and compartilhada_id != franqueada_id else [])
+    campos = "id,titulo,descricao,tags,duracao_seg,url,largura_px,altura_px"
     rows = rest_get("videos_franqueada", {
-        "select": "id,titulo,descricao,tags,duracao_seg,url,largura_px,altura_px",
-        "ativo": "eq.true", "franqueada_id": f"in.({','.join(ids)})", "limit": "300"})
+        "select": campos, "ativo": "eq.true",
+        "franqueada_id": f"in.({','.join(ids)})", "limit": "300"})
+    try:
+        rows += rest_get("acervo_videos", {"select": campos, "ativo": "eq.true", "limit": "300"})
+    except Exception as e:  # acervo é complemento: sem ele o corte ainda sai
+        print("acervo indisponível:", e)
     return [r for r in rows if r.get("url")]
 
 
