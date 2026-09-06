@@ -34,3 +34,21 @@ export function publerContasUrl(): string {
   const ws = process.env.NEXT_PUBLIC_PUBLER_WORKSPACE_ID;
   return ws ? `https://app.publer.com/workspace/${ws}/settings/accounts` : "";
 }
+
+/**
+ * Geração automática semanal de posts e de sugestões de conteúdo.
+ *
+ * DESLIGADA POR PADRÃO desde 06/09/2026, a pedido da Aline: os crons vinham
+ * gerando pacote toda semana pra todas as franqueadas ativas — 169 posts
+ * acumulados em `aguardando_aprovacao` — gastando crédito de modelo sem que
+ * ninguém tivesse aprovado, e antes das regras novas de conteúdo entrarem.
+ *
+ * Nada disso chegou a publicar: o cron de publicação exige `status='aprovado'`.
+ * O desperdício é de geração, não de alcance.
+ *
+ * Religar com GERACAO_AUTOMATICA_ATIVA=true (variável de servidor, exige
+ * redeploy) quando as regras novas estiverem no gerador.
+ */
+export function geracaoAutomaticaAtiva(): boolean {
+  return process.env.GERACAO_AUTOMATICA_ATIVA === "true";
+}

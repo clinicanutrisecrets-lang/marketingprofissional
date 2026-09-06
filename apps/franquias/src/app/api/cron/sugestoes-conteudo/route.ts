@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { geracaoAutomaticaAtiva } from "@/lib/features";
 import { gerarSugestoesSemana } from "@/lib/conteudo/gerador-sugestoes";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,13 @@ export async function GET(request: Request) {
   const auth = request.headers.get("authorization");
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
+  }
+
+  if (!geracaoAutomaticaAtiva()) {
+    return NextResponse.json({
+      pulado: true,
+      motivo: "Geração automática desligada (GERACAO_AUTOMATICA_ATIVA).",
+    });
   }
 
   const admin = createAdminClient();
