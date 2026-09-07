@@ -179,3 +179,48 @@ ManyChat cobra mensalidade fixa independente de uso.
 **Ordem para cancelar o ManyChat:** publicar o app → colar os dois links → testar
 com conta testadora → ativar as regras → **só então** cancelar. O histórico de
 quem já passou pelos fluxos não migra.
+
+---
+
+## 8. Comentário de anúncio (Aline, 06/09/2026)
+
+### O robô pega?
+
+**Post impulsionado** (promover um post que já existe no feed): o comentário cai
+numa mídia dela, então **o webhook de sempre entrega**. O robô pega.
+
+**Anúncio com criativo próprio**, que não existe no feed: o comentário vive no
+anúncio. A moderação desses fica na **API de Anúncios**, que é outra superfície.
+⚠️ **Não confirmado** se o webhook do Instagram entrega. A documentação separa as
+duas coisas, o que é indício forte de que não, mas indício não é prova. O teste
+real resolve em minutos quando o app estiver publicado.
+
+🔴 **Recomendação que resolve os dois casos: impulsionar post orgânico em vez de
+criar criativo só de anúncio.** Ganha três coisas: o robô vê os comentários, a
+prova social acumula num post só, e o post continua rendendo depois que o anúncio
+para.
+
+### Comentário negativo: avisa, NUNCA apaga sozinho
+
+Apagar crítica automaticamente é como se perde reputação, e sempre tem print.
+O robô detecta e **avisa na hora**, com o texto e uma sugestão de resposta pronta
+para ela aprovar, editar ou mandar apagar.
+
+Três categorias que **não** são a mesma coisa:
+
+| | O que fazer | Por quê |
+|---|---|---|
+| **Crítica legítima** ("achei caro", "comigo não funcionou") | responder em público, educada, e avisar a Aline | apagar é o pior erro: quem lê uma boa resposta confia mais do que quem não vê crítica nenhuma |
+| **Ofensa e ataque** | **ocultar, não apagar** | ocultar a pessoa não percebe (continua vendo o próprio comentário), então não vira briga. Apagar ela nota e volta pior |
+| **Spam e golpe** | ocultar direto | não precisa avisar |
+
+### Público errado no anúncio certo
+
+Paciente que vê o anúncio da Formação (ou da aula gratuita dela) e pergunta de
+consulta: **o robô responde, pela trilha de PACIENTE.** Comentou no anúncio
+errado, mas é pessoa certa para outro produto.
+
+🔴 **E isso vira medidor de qualidade do anúncio.** Como o robô já classifica cada
+pessoa em paciente ou profissional, ele conta sozinho quantos comentários de cada
+anúncio são do público errado. Muito paciente comentando no anúncio da Formação =
+segmentação errada, dinheiro sendo gasto para atrair quem não compra aquilo.
