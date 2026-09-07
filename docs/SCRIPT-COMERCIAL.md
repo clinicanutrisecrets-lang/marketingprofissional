@@ -24,8 +24,27 @@ válida para tudo que sai com o nome dela.
   preço cheio entre parênteses. O parcelado vem primeiro porque é o número que
   cabe na cabeça de quem lê.
 - **5 fios de cabelo** derruba a objeção antes de ela existir. Ninguém tem medo
-  de cabelo. Este detalhe nunca tinha aparecido em lugar nenhum.
+  de cabelo, e ele explica por que dá para fazer em qualquer lugar do Brasil.
 - **O vídeo de instruções** faz parte do argumento, não é detalhe operacional.
+
+### Como é a coleta de cada teste
+
+| Teste | Material | Onde já está escrito |
+|---|---|---|
+| **Epigenético** | **5 fios de cabelo** | LP do epigenético, em 3 lugares, com vídeo |
+| **Nutrigenético** | **Saliva** | 🔴 **em lugar nenhum** |
+
+Os dois são **não invasivos**, e isso é argumento, não detalhe.
+
+A LP do epigenético já diz muito bem: *"não tem agulha e não tem laboratório. A
+coleta é capilar: são 5 fios de cabelo, você mesma faz em casa, é rápido e
+indolor. O kit chega até você em até 2 dias úteis."*
+
+🔴 **A LP da Consulta Nutrigenética nunca nomeia o material.** Ela diz "coleta
+simples em casa" e "você mesma faz e devolve ao laboratório", e para por aí. Quem
+está decidindo R$ 3.500 lê "coleta" e imagina sangue. **O produto de menor ticket
+tem o desarmador de objeção escrito em detalhe, e o de maior ticket não tem.**
+Falta uma linha lá.
 
 ---
 
@@ -43,9 +62,13 @@ válida para tudo que sai com o nome dela.
 > 2. Sua dieta e os suplementos necessários para este momento
 > 3. Retorno após 60 dias, para ver se tem ajustes necessários
 >
-> E dá para aproveitar os bônus para quem é meu seguidor: tira dúvidas por um ano
-> pelo nosso aplicativo, para ajustes na dieta, e plano de longevidade sobre os
-> suplementos anuais.
+> E ainda vem junto: tira dúvidas por um ano pelo nosso aplicativo, para ajustes
+> na dieta, e o plano de longevidade sobre os suplementos anuais.
+
+⚠️ **Sem "para quem é meu seguidor".** A versão ditada dizia isso, e a LP entrega
+os dois a **qualquer comprador** (`extra_suporte` e `extra_longevidade` ligados).
+Prometer exclusividade que a página contradiz cria desconfiança por um ganho que
+não era necessário. O problema não é a palavra "bônus", é a condição.
 
 🔴 **"Vários sintomas e não só um" é a régua de qual produto oferecer**, e é
 melhor que qualquer classificação minha: está nas palavras da pessoa, ela mesma
@@ -85,15 +108,17 @@ pedir resposta, e é assim que ela encerra.
 
 ---
 
-## Duas coisas para ela decidir
+## Decidido em 06/09/2026
 
-1. **Tira-dúvidas de um ano e plano de longevidade: bônus ou entrega?**
-   No script eles são "bônus para quem é meu seguidor". Na LP da Consulta
-   Nutrigenética os dois estão ligados como **entrega para qualquer comprador**
-   (`extra_suporte` e `extra_longevidade`). Ou o script passa a chamar de entrega,
-   ou a LP passa a condicionar. Como está, quem compra sem ser seguidor recebe
-   uma coisa que o robô disse ser exclusiva.
+**Tira-dúvidas de um ano e plano de longevidade: ENTREGA, não bônus condicional.**
+Ficam ligados na LP para qualquer comprador, e no discurso entram como "e ainda
+vem junto".
 
-2. **O coprológico funcional não está na LP.** Ela cita como parte da correlação
-   da Consulta Nutrigenética, e a página não menciona. Ou entra lá, ou sai do
-   script.
+**O coprológico funcional fica FORA da LP, de propósito.** Ele entra no pedido
+médico junto com o exame de sangue (o médico do time assina, então dá para fazer
+pelo plano), e é benefício real que o robô pode citar. Não vai para a página
+porque **microbiota vai virar produto depois**, e antecipar isso queima a venda
+futura.
+
+🔴 Isto é decisão comercial, não esquecimento. Quem for "consertar" a LP
+acrescentando o coprológico está desfazendo uma escolha.
