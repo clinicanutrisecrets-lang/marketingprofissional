@@ -224,3 +224,28 @@ errado, mas é pessoa certa para outro produto.
 pessoa em paciente ou profissional, ele conta sozinho quantos comentários de cada
 anúncio são do público errado. Muito paciente comentando no anúncio da Formação =
 segmentação errada, dinheiro sendo gasto para atrair quem não compra aquilo.
+
+## 8b. Como conferir se a API pega os comentários de um post (inclusive de anúncio)
+
+A dúvida da Aline: *"se eu te mandar o link do anúncio com comentário, você
+consegue ver se pega ou não a API?"*. Consegue, e a checagem é a mesma pra
+qualquer post.
+
+**Rota:** `GET /api/interno/checar-post?slug=nutrisecrets&link=<url do post>`
+(Bearer `STUDIO_CONHECIMENTO_SECRET`). Só leitura — não responde, não apaga.
+
+Ela procura o permalink na lista de mídias da conta e, achando, tenta ler os
+comentários. As duas respostas possíveis:
+
+| Resultado | O que significa |
+|---|---|
+| **Achou e leu os comentários** | O post existe no perfil. O webhook `comments` entrega comentário novo dele. **O robô cobre.** |
+| **Não achou entre as mídias** | Ou é *dark post* (anúncio criado direto no Gerenciador, que nunca virou post do perfil) — e aí a API do Instagram não entrega esses comentários, só o Gerenciador de Anúncios / Business Suite entrega — ou é post antigo demais pra janela varrida (aumentar `&posts=`). |
+
+🔴 **Anúncio que IMPULSIONA um post do feed é coberto; anúncio que só existe no
+Gerenciador não é.** É a diferença que decide se o comentário de anúncio entra
+no fluxo do robô ou continua sendo trabalho manual no Business Suite.
+
+⚠️ Isso testa o lado da **leitura**. A entrega por **webhook** só começa quando
+o app estiver *publicado* na Meta (ver seção de pendências) — mas se a mídia
+aparece em `/me/media`, o webhook cobre ela.
