@@ -114,6 +114,17 @@ export default function LoginPage() {
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
+
+          {/* Sem isto a tela era um beco pra quem tinha senha e esqueceu: só
+              restava o "Invalid login credentials" (Aline, 08/09/2026). */}
+          <p className="text-center text-sm">
+            <Link
+              href="/recuperar-senha"
+              className="text-brand-text/60 underline hover:text-brand-primary"
+            >
+              Esqueci minha senha
+            </Link>
+          </p>
         </form>
       </div>
     </main>

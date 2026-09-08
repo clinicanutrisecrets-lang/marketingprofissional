@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
-import { listarBibliotecaPerfil } from "@/lib/videos/actions";
+import { listarBibliotecaPerfil, listarAcervoAline } from "@/lib/videos/actions";
 import { BibliotecaPerfilView } from "./BibliotecaPerfilView";
+import type { VideoBiblioteca } from "@scanner/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,10 @@ export default async function BibliotecaPerfilPage({ params }: PageProps) {
   if (!perfilData) notFound();
   const perfil = perfilData as { id: string; nome: string; slug: string; cor_primaria: string };
 
-  const videos = await listarBibliotecaPerfil(perfil.id);
+  const [videos, acervo] = await Promise.all([
+    listarBibliotecaPerfil(perfil.id),
+    listarAcervoAline(),
+  ]);
 
   return (
     <main className="min-h-screen bg-aline-bg">
@@ -43,14 +47,16 @@ export default async function BibliotecaPerfilPage({ params }: PageProps) {
             🎬 Biblioteca de vídeos · {perfil.nome}
           </h1>
           <p className="text-sm text-aline-text/60">
-            Vídeos pra usar como B-roll nos reels desse perfil. IA escolhe automático
-            por tags quando o tema bater.
+            Vídeos pra usar como B-roll nos reels desse perfil: suba os seus,
+            busque no Pexels ou use o acervo compartilhado. A IA escolhe
+            automático quando o tema bater.
           </p>
         </header>
 
         <BibliotecaPerfilView
           perfilId={perfil.id}
-          videos={videos}
+          videos={videos as unknown as VideoBiblioteca[]}
+          acervo={acervo as unknown as VideoBiblioteca[]}
           corPrimaria={perfil.cor_primaria}
         />
       </div>

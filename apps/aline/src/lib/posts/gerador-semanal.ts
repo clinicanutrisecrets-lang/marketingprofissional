@@ -1,6 +1,6 @@
 "use server";
 
-import Anthropic from "@anthropic-ai/sdk";
+import { createClaude } from "@/lib/claude/client";
 import { createAlineClient } from "@/lib/supabase/server";
 import { CLAUDE_MODEL } from "@/lib/claude/scripts";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
@@ -91,7 +91,7 @@ export async function gerarPackSemanal(params: {
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) return { ok: false, erro: "ANTHROPIC_API_KEY nao configurada" };
-    const claude = new Anthropic({ apiKey });
+    const claude = createClaude();
 
     const systemPrompt = montarSystemPrompt(perfil);
     const userPrompt = montarUserPrompt(perfil, distribuicao, semanaRef);

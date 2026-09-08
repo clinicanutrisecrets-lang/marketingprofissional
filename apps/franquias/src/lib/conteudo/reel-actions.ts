@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 const MODEL = "claude-sonnet-4-5";
@@ -172,7 +172,7 @@ export async function gerarReelAnimadoAction(
   if (!tema.trim()) return { ok: false, msg: "descreva o tema do reel" };
 
   // 1. Agente escreve o SPEC
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
   // Assinatura neutra: nome + registro de conselho (sem presumir profissão)
   const assinatura = [
     f.nome_completo,

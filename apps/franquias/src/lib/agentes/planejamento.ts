@@ -1,5 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
 const MODEL = "claude-sonnet-4-5";
@@ -133,7 +133,7 @@ export async function executarPlanejamento(
   const userMsg = `Input:\n${JSON.stringify(params.input, null, 2)}\n\nEntregue JSON conforme schema.`;
 
   const inicio = Date.now();
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
 
   let responseText: string;
   let usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number };

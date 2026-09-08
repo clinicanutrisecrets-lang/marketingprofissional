@@ -22,7 +22,13 @@ E dá pra investigar isso com precisão.
 
 Quer descobrir o que o seu corpo está tentando te dizer? Me chama no direct!`;
 
-export function TeleprompterHub({ roteiros }: { roteiros: RoteiroSemana[] }) {
+export function TeleprompterHub({
+  roteiros,
+  corteIa = false,
+}: {
+  roteiros: RoteiroSemana[];
+  corteIa?: boolean;
+}) {
   const [texto, setTexto] = useState("");
   const [gravando, setGravando] = useState(false);
   const [modo, setModo] = useState<"semana" | "livre">(roteiros.length ? "semana" : "livre");
@@ -35,6 +41,7 @@ export function TeleprompterHub({ roteiros }: { roteiros: RoteiroSemana[] }) {
         texto={texto}
         dicas={["Grave na vertical", "Luz de frente (janela ou ring light)", "Fale como se fosse pra uma amiga"]}
         legenda=""
+        corteIa={corteIa}
       />
     );
   }

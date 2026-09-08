@@ -2,7 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listarBiblioteca } from "@/lib/videos/actions";
+import { listarAcervo } from "@/lib/videos/acervo";
 import { BibliotecaView } from "./BibliotecaView";
+import type { VideoBiblioteca } from "@scanner/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +15,7 @@ export default async function BibliotecaVideosPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const videos = await listarBiblioteca();
+  const [videos, acervo] = await Promise.all([listarBiblioteca(), listarAcervo()]);
 
   return (
     <main className="min-h-screen bg-brand-muted">
@@ -30,12 +32,15 @@ export default async function BibliotecaVideosPage() {
             🎬 Meus vídeos
           </h1>
           <p className="text-sm text-brand-text/60">
-            Guarde aqui seus vídeos curtos e clipes do Pexels pra usar nos seus
-            reels quando quiser.
+            Vídeos curtos de apoio (b-roll) pros seus reels. A IA escolhe daqui
+            o clipe que entra por cima da sua fala nos cortes automáticos.
           </p>
         </header>
 
-        <BibliotecaView videos={videos} />
+        <BibliotecaView
+          videos={videos as unknown as VideoBiblioteca[]}
+          acervo={acervo as unknown as VideoBiblioteca[]}
+        />
       </div>
     </main>
   );

@@ -510,6 +510,8 @@ export function sugerirIlustracao(texto: string): IlustracaoId {
     .replace(/[̀-ͯ]/g, "");
 
   const regras: Array<[RegExp, IlustracaoId]> = [
+    [/fast food|ultraprocessad|industrializad|refrigerante|fritura|junk/, "prato"],
+    [/gravidez|gestac|gestante|amamenta|lactac|fertilidad|concepc|\bbebe\b|materno|preconcep|puerperio/, "coracao"],
     [/microbiot|bacteri|probiotic|disbiose|fermentad|kefir|estrobolom/, "microbiota"],
     [/\bdna\b|genetic|nutrigen|polimorfism|\bgene\b|genes\b|mthfr|comt|\brs\d/, "dna"],
     [/intestin|colon|constipa|diarreia|sii\b|barriga inchad/, "intestino"],
@@ -533,7 +535,8 @@ export function sugerirIlustracao(texto: string): IlustracaoId {
     [/prato|refeicao|almoco|jantar|comer|alimentac|receita/, "prato"],
     [/coracao|cardio|colesterol|pressao|apob|ldl/, "coracao"],
     [/consulta|clinic|atendiment|paciente|saude(?! da mulher)/, "estetoscopio"],
-    [/mulher|menopausa|hormon|tpm|sop\b|endometriose|gestante|feminin/, "mulher"],
+    // Tema de mulher NÃO vira figura humana: ver ILUSTRACOES_FIGURA abaixo.
+    [/mulher|menopausa|hormon|tpm|sop\b|endometriose|feminin/, "coracao"],
   ];
 
   for (const [re, id] of regras) {
@@ -541,4 +544,27 @@ export function sugerirIlustracao(texto: string): IlustracaoId {
   }
   // fallback elegante e neutro
   return "folhas";
+}
+
+/**
+ * Figuras humanas. Line art de pessoa é ambígua no tamanho em que a peça usa:
+ * o perfil da "mulher" foi lido como bebê num card de amamentação (Aline,
+ * 08/09/2026), porque o traço do cabelo vira um segundo contorno de cabeça e
+ * os ombros somem na borda.
+ *
+ * Objeto e natureza se reconhecem de relance; rosto exige interpretação. Por
+ * isso nenhuma regra de `sugerirIlustracao` devolve figura, e a capa troca a
+ * figura por um objeto quando alguém pede uma (`semFigura`).
+ */
+export const ILUSTRACOES_FIGURA: IlustracaoId[] = ["mulher"];
+
+export function ehFigura(id: IlustracaoId): boolean {
+  return ILUSTRACOES_FIGURA.includes(id);
+}
+
+/** Troca figura humana por um objeto/natureza coerente com o texto da peça. */
+export function semFigura(id: IlustracaoId | undefined, texto: string): IlustracaoId | undefined {
+  if (!id || !ehFigura(id)) return id;
+  const sugerida = sugerirIlustracao(texto);
+  return ehFigura(sugerida) ? "folhas" : sugerida;
 }
