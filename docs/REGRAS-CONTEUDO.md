@@ -188,6 +188,65 @@ segundos que dois terços terminam rende mais que um de 15 que todos terminam.
 - Termo técnico **sempre com tradução prática ao lado**, no padrão do dicionário
   da Fábrica (capacetinho, vassourinha, os quatro setores).
 
+
+## 6. A Fábrica entra em TODO texto, sempre colada na tradução
+
+Regra dada pela Aline em 08/09/2026, corrigindo um post que usava a palavra
+"setor" sozinha numa validação. A observação dela: *"a fábrica e o dicionário
+têm que ser explicados em todo texto até educar. Exemplo: vai falar da
+ferritina, aí fala a ferritina, que é como se fosse uma parte da matéria-prima
+da sua fábrica de saúde."*
+
+**Nunca a palavra sozinha.** O padrão é sempre `termo + tradução`, na mesma
+frase:
+
+| ❌ Nu | ✅ Colado |
+|---|---|
+| "a ferritina" | "a ferritina, que é uma parte da **matéria-prima** da sua fábrica de saúde" |
+| "é da logística" | "é da **logística**, que é o intestino e o que ele deixa passar" |
+| "certo para o setor errado" | "certo **para outra pessoa**" (aqui o que entra é a individualidade) |
+| "isso é maquinário" | "isso é **maquinário**, que é o jeito como a sua fábrica foi montada: a sua genética" |
+
+🔴 **A pessoa não aprende o vocabulário porque leu uma vez o post do
+dicionário.** Ela aprende porque encontra a palavra **toda vez**, sempre com a
+explicação do lado, até o dia em que usa a palavra sozinha. Aí ela virou
+leitora da Aline, e não leitora de qualquer nutricionista. É por isso que a
+repetição com tradução não é redundância: **é o mecanismo.**
+
+Vale também para a **etiqueta de série** na capa (§1.8): ela nomeia os dois
+lados, `LOGÍSTICA · O INTESTINO`, `MAQUINÁRIO · A SUA GENÉTICA`, em vez de só
+a palavra da casa.
+
+## 7. Validar é não invalidar NADA no caminho
+
+Também de 08/09/2026, e são duas correções seguidas dela no mesmo post.
+
+O post valida a leitora e, sem perceber, tira a razão de outra pessoa: de quem
+indicou o tratamento, do médico que pediu o exame, da amiga que sugeriu. Toda
+vez que isso acontece, o post perde a leitora junto.
+
+| ❌ Invalida | ✅ Soma |
+|---|---|
+| "Peça ferritina, **não** hemograma" | "Peça ferritina **além** do hemograma. Ele não está errado, responde outra pergunta." |
+| "O tratamento estava errado" | "O tratamento estava certo **para outra pessoa**." |
+| "Você tomou magnésio errado" | "Você tomou magnésio; o seu corpo é que recebeu pouco." |
+
+🔴 **A individualidade é o que entra no lugar da culpa.** É a coisa mais
+alinhada com quem ela é (mestrado em genética, o olhar multidisciplinar de
+§4.4) e é o argumento do produto: não existe conduta certa no vácuo, existe
+conduta certa **para aquela pessoa**.
+
+## 8. O envio descreve o traço, não o rótulo
+
+Correção dela no envio de um post: *"Manda para alguém que não tem problema em
+iniciar o sono, mas acorda já cansada"* no lugar de "manda para a amiga que
+dorme bem e acorda pior".
+
+Quanto mais **específico e observável** o traço, mais a leitora vê o rosto de
+alguém. Rótulo genérico ("quem vive cansada") não faz ninguém pensar em
+ninguém. Comportamento descrito ("não tem problema em iniciar o sono, mas
+acorda já cansada") faz.
+
 ---
 
 ## Procedência

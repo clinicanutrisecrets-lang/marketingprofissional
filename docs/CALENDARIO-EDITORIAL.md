@@ -37,6 +37,17 @@ faltava não era assunto, era estas cinco coisas:
 frustração."* "Qual dos quatro é o seu" convida; "você não vai conseguir
 sozinha" afasta, e nem é verdade.
 
+🔴 **A Fábrica em todo texto, sempre colada na tradução** (§6 de
+`REGRAS-CONTEUDO.md`). "A ferritina, que é uma parte da matéria-prima da sua
+fábrica de saúde." Nunca a palavra sozinha, nem na etiqueta de série.
+
+🔴 **Validar sem invalidar ninguém** (§7). É ferritina **além** do hemograma,
+não no lugar dele; e o tratamento que não funcionou estava certo **para outra
+pessoa**. No lugar da culpa entra a individualidade.
+
+🔴 **O envio descreve o traço, não o rótulo** (§8). "Alguém que não tem
+problema em iniciar o sono, mas acorda já cansada", não "a amiga cansada".
+
 🔴 **Zero travessão, em qualquer canal.** Regra dela, sem exceção.
 
 **Por que a mini solução muda o resultado:** quem recebeu uma coisa pequena que
