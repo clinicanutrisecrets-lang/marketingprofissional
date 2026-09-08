@@ -258,6 +258,92 @@ alguém. Rótulo genérico ("quem vive cansada") não faz ninguém pensar em
 ninguém. Comportamento descrito ("não tem problema em iniciar o sono, mas
 acorda já cansada") faz.
 
+
+## 9. Para quem é escrito (o público real, dito por ela em 08/09/2026)
+
+Palavras dela: *"pessoas já conscientes do que é saudável, que já tomam
+suplementos, mas frustradas que mesmo indo em médicos e nutris não melhoram."*
+
+🔴 **Não é conteúdo de iniciante, e essa é a correção mais cara desta rodada.**
+Metade da primeira versão do calendário explicava coisa que essa leitora já
+sabe ("coma a fruta com casca", "beterraba faz bem"). Post que ensina o básico
+para quem já passou do básico é lido como raso, e ela desliza.
+
+O que essa leitora precisa não é saber que precisa comer bem. É entender **por
+que o que ela já faz certo não está funcionando**. Consequências:
+
+- **A validação nunca soa a lição.** Ela fez tudo certo mesmo. A peça que
+  faltou não era dela: era de quem montou o conjunto.
+- **A frustração dela tem endereço:** já foi a médico, já foi a nutricionista,
+  já gastou com suplemento. O post não pode repetir o que esses já disseram.
+- **O tchan tem que ser uma camada que ninguém deu.** Se é algo que a
+  nutricionista dela já falou, o post não vale.
+
+## 10. As quatro lentes. Todo post declara a sua.
+
+A expertise da Aline, nas palavras dela: *"sinergia, biodisponibilidade,
+alquimia de compostos bioativos, poder terapêutico dos alimentos, nutrição de
+precisão, e correlação de sintomas e exames para causa raiz, tipo detetive
+juntando as peças do quebra-cabeça."*
+
+Isso não é bio de perfil: é a **régua de cada post**. Todo post é conduzido por
+uma destas quatro, e ela vira etiqueta na peça:
+
+| Lente | A pergunta que ela faz | Exemplo |
+|---|---|---|
+| **Biodisponibilidade** | o que entra, não o que você come | curcumina lipossolúvel sem gordura não chega; magnésio óxido não atravessa |
+| **Sinergia** | o que só funciona acompanhado | vitamina C que converte o ferro; vitamina E que impede o lipossolúvel de oxidar |
+| **Correlação exame × sintoma** | o que um número esconde | ferritina no limite com PCR alta é ferritina inflada, não estoque bom |
+| **Causa raiz** | onde aquilo nasce | o mesmo cansaço nascendo em quatro setores, cada um com conduta oposta |
+
+**Composto sozinho continua não sendo post** (§5.1). O que mudou é que agora
+está nomeado *qual* cruzamento está sendo feito.
+
+## 11. Todo mecanismo termina em "para QUEM isto serve"
+
+Correção dela sobre o post da beterraba, e é generalizável: *"óxido nítrico
+ajuda a proteger suas artérias para quem tem pressão alta, melhora a energia e
+disposição, ajuda quem tem lipedema e varizes. Entende a diferença de aplicação
+e identificação?"*
+
+| ❌ Mecanismo sem endereço | ✅ Mecanismo com endereço |
+|---|---|
+| "o óxido nítrico relaxa a parede do vaso" | "protege a artéria de **quem tem pressão alta**, melhora **energia e disposição**, e ajuda **quem convive com varizes e lipedema**" |
+
+🔴 **Mecanismo bonito não identifica ninguém.** Quem se reconhece é quem viu a
+própria situação escrita. E identificação é o que produz o envio (§5.5): a
+leitora com varizes manda para a irmã com varizes.
+
+Vale para todo composto: depois de explicar o que ele faz, nomear **as pessoas
+para quem aquilo muda alguma coisa**. Três ou quatro perfis, sem diagnosticar
+ninguém (§5.4b: falar da população é educação; dizer "você tem" é diagnóstico).
+
+## 12. Todo post abre com uma CENA
+
+*"posts que criam storytelling"*. A cena é uma pessoa concreta que já fez tudo
+certo, em duas frases, antes de qualquer explicação:
+
+> *"Ela me mandou a foto da bancada antes da consulta. Nove potes. Todos bem
+> indicados, um por um, por profissionais diferentes, em anos diferentes.
+> Nenhum deles conversando com o outro."*
+
+Sem nome, sem dado que identifique, sem diagnóstico. É o que faz a leitora
+sentar para ler, e é o que separa carrossel de aula de carrossel de história.
+
+## 13. Continuidade: prometer o próximo post, e cumprir
+
+Também de 08/09. No post da beterraba ela pediu que a diferença entre o nitrato
+dos vegetais e o nitrito conservante dos embutidos fosse **mencionada e
+adiada**: *"que é outra história, depois a gente conta"*.
+
+Isso faz três coisas ao mesmo tempo: evita o mal-entendido na hora, mostra que
+existe mais camada onde a leitora achava que não tinha, e **cria motivo para
+ela voltar**. É a versão honesta do gancho, porque a promessa é de conteúdo, não
+de resultado.
+
+🔴 **O que é prometido tem que entrar no calendário do mês seguinte.** Promessa
+não cumprida é pior que promessa não feita.
+
 ---
 
 ## Procedência
