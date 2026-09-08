@@ -1,5 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ICP_TICKET_ALTO_NUTRI_PREMIUM } from "./_icp";
 
@@ -288,7 +288,7 @@ export async function executarTracao(params: InputTracao): Promise<ResultTracao>
   const userMsg = `Input:\n${JSON.stringify(params.input, null, 2)}\n\nEntregue JSON conforme schema.`;
 
   const inicio = Date.now();
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
 
   // até 2 tentativas se violar vocabulário
   let tentativas = 0;

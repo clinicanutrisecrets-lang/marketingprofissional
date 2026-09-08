@@ -90,6 +90,28 @@ def transcrever(video, wav):
     return out
 
 
+def sem_travessoes(valor):
+    """Trava de travessão (Aline, 26/08/2026): nenhum texto sai com "—" ou "–".
+
+    Espelha apps/*/src/lib/texto/sem-travessoes.ts. O prompt também pede, mas
+    prompt é pedido; isto é a garantia. Hífen comum não é tocado.
+    """
+    if isinstance(valor, str):
+        if not re.search(r"[—–]", valor):
+            return valor
+        t = re.sub(r"(\d)\s*[—–]\s*(\d)", r"\1-\2", valor)          # faixa numérica
+        t = re.sub(r"^[—–]\s*", "- ", t, flags=re.M)                 # item de lista
+        t = re.sub(r"([.!?…:;])\s*[—–]\s*", r"\1 ", t)               # após pontuação
+        t = re.sub(r"\s*[—–]\s*(?=[A-ZÁÉÍÓÚÂÊÔÃÕÀÇ])", ". ", t)      # quebra de pensamento
+        t = re.sub(r"\s*[—–]\s*", ", ", t)                           # aposto
+        return re.sub(r",\s*,", ", ", t)
+    if isinstance(valor, list):
+        return [sem_travessoes(v) for v in valor]
+    if isinstance(valor, dict):
+        return {k: sem_travessoes(v) for k, v in valor.items()}
+    return valor
+
+
 SYSTEM_PLANO = """Você é o editor de vídeo de uma plataforma de marketing para profissionais de saúde integrativa (nutricionistas, médicos etc.). Recebe a transcrição de uma gravação curta (até 60 s) e devolve o PLANO DE EDIÇÃO em JSON. Saída: APENAS JSON válido, sem markdown, sem comentários.
 
 FORMATO EXATO:
@@ -131,7 +153,7 @@ def planejar(transcricao, catalogo, tema, nicho, dur):
     m = re.search(r"\{[\s\S]*\}", texto)
     if not m:
         raise RuntimeError("plano sem JSON")
-    plano = json.loads(m.group(0))
+    plano = sem_travessoes(json.loads(m.group(0)))
     ids = {str(c["id"]) for c in catalogo}
     plano["broll"] = [b for b in plano.get("broll") or [] if str(b.get("video_id")) in ids]
     return plano

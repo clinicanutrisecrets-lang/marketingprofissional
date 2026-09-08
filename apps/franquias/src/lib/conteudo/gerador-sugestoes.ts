@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import { buscarPautasQuentes } from "./trends";
-import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { renderCard, renderReceita, type IlustracaoId } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
@@ -314,7 +314,7 @@ export async function gerarSugestoesSemana(params: {
   const receitas = (receitasData ?? []) as Array<{ slug: string; titulo: string; url: string }>;
 
   // 2. Agente de conteúdo
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
   const input = {
     perfil: {
       nome: f.nome_comercial || f.nome_completo,

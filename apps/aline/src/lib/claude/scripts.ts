@@ -1,13 +1,12 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { createClaude } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 export const CLAUDE_MODEL = "claude-sonnet-4-5";
 
-export function createClaude() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY não configurada");
-  return new Anthropic({ apiKey });
-}
+// `createClaude` mudou de casa pra lib/claude/client.ts, onde a trava de
+// travessão é aplicada em toda resposta. Reexportado porque era exportado
+// daqui antes.
+export { createClaude };
 
 export type Perfil = {
   slug: string;
