@@ -184,6 +184,17 @@ segundos que dois terços terminam rende mais que um de 15 que todos terminam.
 - **Nunca dizer "IA" ou "inteligência artificial".** Usar "algoritmo Scanner".
 - **Processo funcional, nunca nome de doença como diagnóstico** (regra do CFN).
 - **Sem promessa de prazo** ("em 7 dias", "em 2 horas") e sem polêmica.
+- 🔴 **NUNCA falar de agrotóxico**, em post nenhum (Aline, 08/09/2026). É tema
+  polêmico, divide a audiência e desvia a conversa do que ela tem a dizer.
+  Vale para pesticida, veneno, "fruta suja", listas de resíduo e variações.
+  E há um erro técnico junto, que quase entrou num post: **agrotóxico
+  sistêmico vem desde a semente**, absorvido pela planta. Lavar, deixar de
+  molho em bicarbonato ou descascar **não resolve** o sistêmico, só o resíduo
+  de superfície. Prometer que resolve é afirmação falsa.
+- **Motivo de hábito ganha de motivo polêmico.** No post da maçã, a frase da
+  resignação virou *"a casca eu não como, nunca comi"* justamente por isso:
+  descreve o que a maioria de fato faz, e não abre uma discussão que não é a
+  da Aline.
 - **Nada de xilitol, maltitol ou adoçante artificial** em receita ou copy.
 - Termo técnico **sempre com tradução prática ao lado**, no padrão do dicionário
   da Fábrica (capacetinho, vassourinha, os quatro setores).
