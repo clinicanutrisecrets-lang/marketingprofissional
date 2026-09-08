@@ -344,6 +344,122 @@ de resultado.
 🔴 **O que é prometido tem que entrar no calendário do mês seguinte.** Promessa
 não cumprida é pior que promessa não feita.
 
+
+## 14. Mini solução é algo que ela FAZ e SENTE. Tarefa não é mini solução.
+
+Correção da Aline em 08/09/2026: *"lembra que a gente entrega sempre uma mini
+solução? Você não entregou nenhuma mini solução aqui."* O que estava escrito era
+"peça homocisteína", "peça insulina de jejum", "escreva os seus sintomas".
+
+| ❌ Tarefa | ✅ Mini solução |
+|---|---|
+| "Peça o exame X" | Vitamina C na MESMA garfada do feijão; café só uma hora depois do almoço; laticínio em outra refeição |
+| "Anote os seus sintomas" | Último café antes das 14h por 15 dias, e repare no sono e na tarde |
+| "Leve ao seu médico" | Proteína no café da manhã: a fome das dez muda de tamanho |
+| "Confira o seu laudo" | Folha verde escura CRUA todo dia; vire o pote e veja se é ácido fólico ou metilfolato |
+
+O teste é simples: **ela consegue fazer amanhã, sozinha, sem gastar, e percebe
+alguma diferença?** Se depende de terceiro, de dinheiro ou de exame novo, é
+tarefa. Tarefa não constrói a crença de que o resto funciona.
+
+## 15. 🔴 NUNCA mandar a leitora de volta ao profissional dela
+
+Também de 08/09, e é a correção mais cara desta rodada: *"se ele já foi na
+pessoa que acompanha e a pessoa disse que está normal, pra que que ele vai levar
+lá? Vai ficar parecendo que a gente quer que ele confronte."*
+
+"Leve essa pergunta para quem te acompanha" faz **duas** coisas ruins de uma vez:
+pede que ela confronte alguém em quem confia, e **devolve o lead para outra
+pessoa**. O post perde o foco do produto.
+
+A estrutura correta do fim de todo post é sempre esta, nesta ordem:
+
+1. **Faça isto hoje, sozinha** (a mini solução de §14)
+2. **O que eu faço na consulta é…** (a pergunta que sobrou)
+3. **O envio** (§8)
+
+## 16. A lâmina 7 é a que decide se ela passa
+
+Depois da abertura fixa da série, a primeira lâmina própria do post não anuncia
+o assunto: ela **cria dívida**. A fórmula, ditada por ela:
+
+> identificação + a frustração com o NOME CERTO + a promessa de uma descoberta
+
+| ❌ Constatação | ✅ Dívida |
+|---|---|
+| "Está tudo normal." | *"Mesmo comendo saudável, e mesmo tendo feito exame de sangue onde o profissional disse que estava tudo normal, você volta pra casa com a mesma frustração: não saber mais o que fazer. Se esse é o seu caso, tem uma coisa no seu exame que ninguém te mostrou."* |
+
+🔴 **Toda lâmina termina devendo alguma coisa à seguinte.** Se a leitora pode
+parar ali satisfeita, ela para, e o conteúdo que a gente quer mostrar não é visto.
+
+## 17. Escrever com as palavras DELA, não com as minhas
+
+*"Que que é 'cansaço inteiro'? Essa não é palavra que a pessoa usa."*
+
+Frase bonita que ninguém fala não gera reconhecimento, e sem reconhecimento não
+há envio (§5.5). O vocabulário real da leitora:
+
+> "não saber mais o que fazer" · "travar" · "voltar tudo" · "ler o mesmo
+> parágrafo três vezes" · "esquecer o que foi buscar" · "já tentei de tudo" ·
+> "cinco potes na bancada" · "cocô caro"
+
+## 18. Número que impressiona é PROPORÇÃO, nunca "pelo menos um"
+
+Correção dela sobre uma versão anterior deste calendário: *"as pessoas tinham
+pelo menos um marcador fora do ideal? Ué, então os outros todos estavam
+alterados, coitada dessa pessoa. Daí qualquer médico ou nutricionista teria
+visto."*
+
+🔴 **"Pelo menos um" não prova nada e ainda insinua que o profissional anterior
+foi desatento.** O que prova é a fatia: *"de cada dez marcadores que PASSARAM
+como normais, quatro não estavam no ponto."*
+
+Vale para todo número de post: dizer **que parte do todo**, não que existiu ao
+menos um caso.
+
+## 19. As duas réguas do exame, sempre com os dois nomes
+
+O vocabulário que sustenta o post do exame, e que impede a leitura de "o
+laboratório errou":
+
+- **Faixa de referência** — a impressa ao lado do resultado. Foi construída para
+  separar quem está doente de quem não está, e é ótima nisso. O médico está
+  certo em usá-la.
+- **Faixa ideal** — o intervalo onde aquele marcador de fato trabalha bem.
+  Ninguém imprime essa.
+
+> Estar na primeira quer dizer que **você não está doente**. Não quer dizer que
+> **você está bem**.
+
+Dizer as duas em toda peça é o que mantém a §7 (validar sem invalidar ninguém).
+
+## 20. Os números medidos da base clínica (08/09/2026)
+
+Levantados no banco de produção do Scanner. **Não re-medir por chute e não
+arredondar pra cima.** Se a base cresceu, medir de novo e atualizar AQUI.
+
+| Número | O que é | Base |
+|---|---|---|
+| **43,7%** | mediana da fatia do exame que passou como normal e estava fora da faixa ideal, no grupo do cansaço | 56 pacientes com ≥ 8 marcadores avaliáveis |
+| **42,3%** | a mesma mediana na base inteira | 204 pacientes |
+| **7,5%** | dos pacientes com cansaço tinham o laudo REALMENTE limpo (média de 6 alterados por pessoa) | 80 pacientes |
+| **68 / 26** | variações de risco que a pessoa do meio carrega, e quantas de risco alto | 161 pacientes com teste |
+| **11 de 161** | não tinham nenhuma variação de risco | 161 |
+| **38,5% × 5,5%** | causa raiz no maquinário, com teste × sem teste | análises da plataforma |
+| **1 de 14** | pacientes que chegaram culpando o metabolismo e em quem a causa estava mesmo lá (em 8 estava na matéria-prima) | 14 |
+| ferritina 57% · T4 livre 65% · estradiol 67% | dos "normais" desses marcadores estavam fora da faixa ideal, no grupo do cansaço | 26 a 53 medições cada |
+
+🔴 **Três cuidados ao usar:**
+1. **É a base dela, não a literatura.** "Nos meus atendimentos", "fui contar nos
+   meus". Nunca "a ciência mostra".
+2. **Hemograma diferencial, plaquetas e vitamina A ficaram FORA da conta** — o
+   mesmo marcador chega em unidade diferente conforme o laboratório (percentual
+   num, absoluto no outro) e comparar os dois inflava o resultado. Sem eles o
+   número caiu de 47% para 41%, e é o de 41% que vale.
+3. **O sintoma foi minerado do texto dos questionários**: é menção, não
+   gravidade. "Dos que relatam cansaço" é honesto; "dos que sofrem de cansaço
+   crônico" não é.
+
 ---
 
 ## Procedência
