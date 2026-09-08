@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import type { BrandGuidelines, ConteudoPeca, Dimensoes } from "./types";
 import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
-import { svgIlustracao, type IlustracaoId } from "./lineArt";
+import { svgIlustracao, semFigura, type IlustracaoId } from "./lineArt";
 
 /**
  * Motor de cards tipográficos — arte de estúdio, 100% determinística.
@@ -967,7 +967,13 @@ async function renderEditorial(params: {
   ilustracao?: IlustracaoId;
   corMarca: string;
 }): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle, ilustracao, corMarca } = params;
+  const { W, H, scheme, conteudo, handle, corMarca } = params;
+  // Figura humana vira objeto/natureza: no tamanho da peça o rosto é ambíguo
+  // (o perfil da mulher foi lido como bebê num card de amamentação).
+  const ilustracao = semFigura(
+    params.ilustracao,
+    `${conteudo.headline ?? ""} ${conteudo.subtitle ?? ""}`,
+  );
   // Editorial vive melhor no fundo claro: força creme se o esquema for escuro
   const bgClaro = luminancia(scheme.bg) >= 0.55 ? scheme.bg : CREME;
   // Título e ilustrações SEMPRE na cor da marca da nutri (escurecida p/ contraste)
@@ -1009,8 +1015,17 @@ async function renderEditorial(params: {
     return linhas;
   };
 
+  // Palavra que não quebra ("AMAMENTAÇÃO") estoura a coluna e invade a área da
+  // ilustração — o corpo tem que encolher até a MAIOR PALAVRA caber, não só até
+  // o número de linhas caber.
+  const maiorPalavraCabe = (tam: number) =>
+    headline
+      .split(/\s+/)
+      .filter(Boolean)
+      .every((p) => medirTexto(p, "serif", tam) <= larguraTexto);
+
   let linhas = quebrar(fs);
-  while (linhas.length * fs * 1.22 > H * 0.5 && fs > 30) {
+  while ((linhas.length * fs * 1.22 > H * 0.5 || !maiorPalavraCabe(fs)) && fs > 30) {
     fs = Math.floor(fs * 0.92);
     linhas = quebrar(fs);
   }
@@ -1099,16 +1114,33 @@ async function renderEditorial(params: {
     }
   }
 
-  // Ilustração à direita (grande, na cor verde)
+  // Ilustração à direita (grande, na cor verde). Mesma regra dos ramos: desvia
+  // do texto, encolhe se preciso e, se nem assim couber, não é desenhada.
+  // Enfeite nunca vale uma frase ilegível.
   if (ilustracao) {
-    const tam = Math.round(W * 0.42);
-    const il = svgIlustracao(ilustracao, tam, verde);
-    if (il) {
-      composites.push({
-        input: await sharp(il).png().toBuffer(),
-        top: Math.round(H * 0.42),
-        left: W - tam - Math.round(W * 0.06),
-      });
+    const FOLGA_IL = 24;
+    const x1T = margem - FOLGA_IL;
+    const x2T = margem + larguraRealTexto + FOLGA_IL;
+    const y1T = yIniTexto - FOLGA_IL;
+    const y2T = yFimTexto + FOLGA_IL;
+    const colide = (x1: number, y1: number, x2: number, y2: number) =>
+      !(x2 <= x1T || x1 >= x2T || y2 <= y1T || y1 >= y2T);
+
+    const tamBase = Math.round(W * 0.42);
+    const tamMin = Math.round(W * 0.22);
+    for (let tam = tamBase; tam >= tamMin; tam = Math.floor(tam * 0.88)) {
+      const left = W - tam - Math.round(W * 0.06);
+      // desce até sair do texto, sem passar do rodapé do handle
+      const topMax = H - tam - Math.round(H * 0.1);
+      let top = Math.round(H * 0.42);
+      while (colide(left, top, left + tam, top + tam) && top < topMax) {
+        top += Math.round(H * 0.02);
+      }
+      if (colide(left, top, left + tam, top + tam)) continue;
+
+      const il = svgIlustracao(ilustracao, tam, verde);
+      if (il) composites.push({ input: await sharp(il).png().toBuffer(), top, left });
+      break;
     }
   }
 
