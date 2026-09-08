@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { geracaoPausadaParaConta } from "@/lib/features";
 import { gerarPostsDaSemana } from "@/lib/geracao/semanal";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
   // Pega franqueadas ativas com onboarding completo
   const { data: franqueadas } = await admin
     .from("franqueadas")
-    .select("id, nome_completo")
+    .select("id, nome_completo, email")
     .eq("status", "ativo")
     .eq("onboarding_completo", true);
 
@@ -41,7 +42,18 @@ export async function GET(request: Request) {
 
   const resultados = [];
   for (const f of franqueadas) {
-    const franqueada = f as { id: string; nome_completo: string };
+    const franqueada = f as { id: string; nome_completo: string; email: string | null };
+    // Pausa é POR CONTA: uma conta pausada nunca pode impedir o pacote das outras.
+    if (geracaoPausadaParaConta(franqueada.email)) {
+      resultados.push({
+        franqueadaId: franqueada.id,
+        nome: franqueada.nome_completo,
+        ok: true,
+        total: 0,
+        pausada: true,
+      });
+      continue;
+    }
     const r = await gerarPostsDaSemana(franqueada.id, semanaRef);
     resultados.push({
       franqueadaId: franqueada.id,

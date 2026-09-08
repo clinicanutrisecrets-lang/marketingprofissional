@@ -6,10 +6,11 @@ import { GerarReelButton } from "@/components/GerarReelButton";
 
 export const dynamic = "force-dynamic";
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = { params: Promise<{ slug: string }>; searchParams?: Promise<Record<string, string | undefined>> };
 
-export default async function PerfilPage({ params }: PageProps) {
+export default async function PerfilPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const sp = (await searchParams) ?? {};
 
   const supabase = createClient();
   const {
@@ -73,11 +74,19 @@ export default async function PerfilPage({ params }: PageProps) {
                 <p className="text-sm text-aline-text/60">{perfil.nome as string}</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              {perfil.instagram_conta_id ? (
+            <div className="flex flex-wrap gap-2">
+              {perfil.instagram_conta_id && perfil.instagram_login_tipo === "instagram" ? (
                 <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
-                  Instagram conectado
+                  Instagram conectado (login direto)
                 </span>
+              ) : perfil.instagram_conta_id ? (
+                <a
+                  href={`/api/auth/instagram/connect?slug=${perfil.slug as string}`}
+                  className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-200"
+                  title="Conectado pelo fluxo antigo (Página do Facebook). Reconecte pelo login do Instagram pra ligar comentários e DMs."
+                >
+                  Reconectar pelo login do Instagram →
+                </a>
               ) : (
                 <a
                   href={`/api/auth/instagram/connect?slug=${perfil.slug as string}`}
@@ -86,9 +95,36 @@ export default async function PerfilPage({ params }: PageProps) {
                   Conectar Instagram →
                 </a>
               )}
+              <Link
+                href={`/perfis/${perfil.slug as string}/automacoes`}
+                className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 hover:bg-purple-200"
+              >
+                🤖 Robô do Instagram
+              </Link>
+              <Link
+                href={`/perfis/${perfil.slug as string}/publico`}
+                className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 hover:bg-blue-200"
+              >
+                🔎 Raio-X do público
+              </Link>
+              {perfil.instagram_conta_id && perfil.instagram_login_tipo === "instagram" ? (
+                <a href={`/api/auth/instagram/connect?slug=${perfil.slug as string}`} className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200" title="Refaz o login pra pegar permissões novas (ex.: insights)">
+                  Reconectar
+                </a>
+              ) : null}
             </div>
           </div>
           <p className="mt-3 text-sm text-aline-text/70">{perfil.objetivo as string}</p>
+          {sp.ig_error && (
+            <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+              <strong>A conexão do Instagram falhou:</strong> {sp.ig_error}
+            </p>
+          )}
+          {sp.ig_conectado && (
+            <p className="mt-3 rounded-lg bg-green-50 p-3 text-sm text-green-800">
+              Instagram conectado.{sp.webhook === "falhou" ? " A assinatura do webhook falhou; confira o passo 2 no painel da Meta." : ""}
+            </p>
+          )}
         </header>
 
         <section className="mb-6 flex flex-wrap gap-3">
