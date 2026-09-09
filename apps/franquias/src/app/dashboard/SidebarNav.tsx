@@ -29,8 +29,11 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
   if (props.embutido) {
     const itens = [...ITENS, { href: "/onboarding", icone: "⚙️", label: "Meu perfil de marketing", exato: true }];
     return (
-      <div className="sticky top-0 z-30 -mx-4 mb-4 overflow-x-auto border-b border-brand-text/8 bg-white/90 px-4 py-2 backdrop-blur">
-        <div className="flex w-max gap-2">
+      // Chips QUEBRAM em linhas (Aline, 09/09: "tem como o menu ficar em 2
+      // linhas pra não precisar arrastar pro lado?"). Dentro do iframe a
+      // largura é a do Scanner, e rolagem horizontal escondia metade do menu.
+      <div className="sticky top-0 z-30 -mx-4 mb-4 border-b border-brand-text/8 bg-white/90 px-4 py-2 backdrop-blur">
+        <div className="flex flex-wrap gap-2">
           {itens.map((item) => (
             <Link
               key={item.href}
