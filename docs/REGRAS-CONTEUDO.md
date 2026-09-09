@@ -460,6 +460,212 @@ arredondar pra cima.** Se a base cresceu, medir de novo e atualizar AQUI.
    gravidade. "Dos que relatam cansaço" é honesto; "dos que sofrem de cansaço
    crônico" não é.
 
+
+## 21. A validação não pode FECHAR o slide
+
+Correção da Aline em 08/09/2026 sobre a lâmina que dizia *"o médico está certo em
+usá-la"*: *"a pessoa vai parar ali. Você está falando que ele está certo, então
+ela não continua."*
+
+Concessão verdadeira é boa e é obrigatória (§7). Mas ela é um **ponto final**: a
+leitora concorda, relaxa e para de arrastar. A validação tem que carregar o "mas"
+**dentro dela**, na mesma respiração.
+
+| ❌ Fecha | ✅ Valida e continua devendo |
+|---|---|
+| "Ela é ótima nisso, e o médico está certo em usá-la." | **"Ninguém está errado em usar ela. Ela só não foi feita pra você."** Foi feita pra quem está doente. Não pra quem não está doente e mesmo assim não está bem, que é exatamente onde você está. |
+| "A faixa de referência não serve." | "Ela não é imprecisa: ela é **precisa para outra pergunta**." |
+
+🔴 **Nenhuma lâmina pode terminar num lugar onde a leitora fica satisfeita.**
+
+## 22. Todo post diz, escancarado, O QUE ISSO CUSTA
+
+*"Essa tentativa e erro está custando o quê pro meu paciente? Não é só uma noite
+mal dormida."*
+
+O número prova o problema. **O custo é o que faz agir.** E o custo nunca é o
+sintoma: é o que o sintoma tira da vida dela, escrito com o tema daquele post.
+
+- Cansaço: chegar em casa sem energia pros filhos, render metade no trabalho e
+  achar que ficou preguiçosa, desistir do treino e da viagem, começar a achar
+  que é assim mesmo.
+- Peso: parar de confiar no próprio corpo depois de cinco tentativas.
+- Memória: travar no meio da frase numa reunião, o medo de que seja o começo de
+  alguma coisa, mudar de função no trabalho.
+
+E a régua do tempo: **cada tentativa que não era a certa custa uns três meses.
+Três tentativas é quase um ano da vida dela.**
+
+### 22b. 🔴 O custo NUNCA pode ser dito em dinheiro
+
+Uma versão anterior fechava com *"a gente cobra por consulta, ele paga em tempo
+de vida"*. A Aline vetou: soa como se o profissional segurasse o paciente por
+interesse, e insinua que médico e nutri não resolvem porque não querem.
+
+A versão certa é pela **ética e pela assimetria**, e ela precisa dizer as três
+coisas nesta ordem:
+
+1. **Ninguém age de má-fé.** "Nenhum médico e nenhuma nutricionista quer que o
+   paciente volte sem estar melhor. Eu confio nas minhas colegas."
+2. **A assimetria.** "Pra gente, uma hipótese que não deu certo é uma consulta de
+   retorno. Pra ele, é mais um trimestre da vida dele."
+3. **A pergunta que a ética faz.** Deixa de ser *"eu fiz o melhor com o que eu
+   tinha?"* (a resposta é sim, e ela acalma) e passa a ser **"eu fui atrás do que
+   estava faltando?"**.
+
+## 23. 🔴 Nada de "laudo limpo", "pasta cheia" e outras gírias de consultório
+
+*"Tem que aparecer que está suja, a pessoa? Essa subjetividade muita gente não
+vai entender."*
+
+"Limpo" implica que o exame de alguém é **sujo**, e a leitora não quer ser a suja.
+"Pasta cheia" cada uma imagina de um jeito. Escrever o **fato literal**, mesmo
+ficando mais comprido:
+
+| ❌ Gíria | ✅ Fato |
+|---|---|
+| "laudo limpo" | "todos os resultados dentro da faixa de referência" |
+| "exame sujo" | "seis marcadores fora da faixa de referência" |
+| "pasta cheia de exames" | "anos de exames guardados" |
+
+## 24. A dinâmica da palestra: identificar, e depois virar
+
+*"Quando eu dou palestra eu falo: quem se identifica com A, quem se identifica
+com B. E no final: mas pra ter certeza, você tem que fazer o teste."*
+
+Descreva dois ou três perfis, peça que ela se identifique, e **depois vire**:
+**identificar não é saber**. É o fecho que leva ao teste sem prometer resultado, e
+é o melhor gerador de comentário que existe (*"me conta: você é das rápidas ou das
+devagar?"*), o que puxa alcance para fora de quem já segue.
+
+## 25. 🔴 O 5,5% NÃO é taxa de acerto de palpite
+
+A Aline leu o número como *"eu só acertei 5,5% das vezes que achei que era
+genética"*. **Isso não foi medido**, e afirmar seria inventar dado. O que foi
+medido é onde a causa raiz caiu em cada pilha de análises.
+
+A leitura verdadeira é a aritmética das duas, e é mais forte:
+
+> Sem o teste eu aponto genética em 5,5% dos casos; com o teste, em 38,5%. Logo,
+> **olhando só para o sintoma e para a característica da pessoa, eu perco quase
+> SETE DE CADA OITO vezes em que a resposta estava na genética.**
+
+E o remate: *"e eu tenho mestrado em genética. Se eu perco sete de cada oito, o
+que acontece com o palpite de qualquer pessoa?"*
+
+## 26. "Risco alto" precisa dizer risco DE QUÊ, e não é doença
+
+É que a instrução diferente veio nas **duas cópias** do gene, uma do pai e uma da
+mãe. Quando vem em uma só, a outra compensa em parte; quando vem nas duas, aquele
+caminho passa a **exigir mais**: mais de um nutriente, mais tempo para limpar uma
+substância, mais cuidado com um horário.
+
+> **Não é sentença. É exigência. E exigência a gente atende.**
+
+Sem essa explicação a leitora entende risco de doença, o post assusta, e assustar
+não é da marca (§5.3).
+
+### 26b. Nunca citar o número absoluto de pacientes da base do software
+
+*"Fica parecendo que só 161 pacientes fizeram teste comigo, e eu já atendi mais de
+cinco mil."* O software é recente; a clínica é antiga. **Sempre proporção**: "na
+leitura típica", "a pessoa do meio carrega", "mais de nove em cada dez".
+
+## 27. O post para a NUTRICIONISTA tem regras próprias
+
+- **A primeira lâmina diz a profissão e o desejo**, nunca uma categoria. *"Para
+  quem atende"* é vago e não recruta ninguém. **"Este é para a nutricionista que
+  quer atender com precisão."** Melhor ainda quando nomeia o momento: *"para a
+  nutricionista que já pede o teste genético e trava na hora de ler."*
+- **Não usa a abertura fixa da série** ("você já tentou de tudo"): quem atende não
+  se reconhece nela e passa direto.
+- **O mesmo número serve os dois públicos, em peças diferentes.** Para a paciente:
+  "quatro em cada dez que passaram não estavam no ponto". Para ela: a mesma fatia,
+  mais o mecanismo (faixa de referência é estatística populacional para doença
+  instalada) e o que fazer na próxima consulta.
+- **Termina em chamada para COMENTAR, com palavra-chave** (LAUDO, TEMPO).
+  Comentário puxa alcance e abre a janela do direct, e a palavra-chave diz ao robô
+  qual é a dor daquela pessoa antes de qualquer conversa.
+
+## 28. 🔴 O robô NUNCA joga o trial solto
+
+Regra da Aline em 09/09/2026: *"não pode só jogar a pessoa pra ser trial, tem que
+saber o que ela quer e dar o direcionamento, entender a relação da dor daquele
+post. Senão ela só faz o trial e fica perdida olhando as quinhentas
+funcionalidades."*
+
+A sequência, em três passos:
+
+1. **Entrega o que foi prometido, sem pedir nada.** Ela comentou LAUDO porque
+   trava em interpretar: manda a ordem de leitura.
+2. **Pergunta antes de oferecer.** "Você já usa algum sistema pra isso, ou faz à
+   mão?" É essa resposta que decide o caminho e é ela que marca a pessoa.
+3. **Oferece o teste GUIADO.** "Eu te libero 14 dias e te mando o caminho exato:
+   sobe um laudo que você já tenha, a paciente responde o questionário, e você vê
+   os Top 10 já priorizados e a apresentação pronta. Dá pra fazer com um caso seu
+   hoje."
+
+🔴 **A diferença está no passo 3.** "Faz um teste grátis" entrega a pessoa a uma
+tela cheia de botão. **"Faz ISTO nos seus 14 dias"** entrega um resultado no
+primeiro dia, com um caso real dela.
+
+Vale igual do lado da paciente: quem comenta num post de cansaço não recebe
+"agende sua consulta". Recebe a mini solução daquele post, e a pergunta de qual
+dos quatro setores parece o dela.
+
+## 29. A história das dez horas (material de post, contado por ela)
+
+Antes do Scanner, a interpretação de um laudo nutrigenético era feita **em
+planilha, e levava de seis a dez horas por paciente**: gene por gene, conferindo
+cada genótipo, cruzando à mão com o sangue e com o questionário, escrevendo o
+texto e montando a apresentação.
+
+O que isso produzia, e é o que dá o post: o gargalo era ela; a hora dela valia
+uma fração do que parecia; e, sem perceber, ela **começava a escolher não pedir o
+teste** em alguns casos.
+
+Hoje o caminho é subir o laudo, a paciente responder o questionário, e sair o
+**Top 10 já priorizado** cruzado com sangue e sintoma, mais a **apresentação para
+a paciente**.
+
+⚠️ **Conferir com ela antes de publicar tempo exato.** "Menos de um minuto" foi
+dito de fala e o que se mede hoje é a geração do Top 3 e da apresentação; cardápio
+e suplementos são outras chamadas. Número de produto errado num post é pior que
+post nenhum.
+
+
+## 30. ⏳ PENDENTE DE GRAVAÇÃO COM ELA: a história do Consultório de Precisão
+
+Pedido dela em 09/09/2026: *"não me deixe esquecer de te contar isso."* A história
+ainda **não foi contada** e este bloco existe só para não se perder.
+
+**O que ela adiantou que a história tem:**
+
+- as **mentorias de marketing** que ela fez, e o quanto investiu na parte digital;
+- a experiência **clínica** de mais de dez mil pacientes;
+- o conhecimento **teórico** (mestrado em genética) somado ao **prático**;
+- a parte de **rede social**, aprendida e paga;
+- tudo isso convergindo para construir a **infraestrutura do Consultório de
+  Precisão**, que é o que ela vende hoje para outras profissionais.
+
+**Por que ela quer:** cria **identificação com quem atende**. A colega que lê
+reconhece a própria jornada (investiu em curso, investiu em marketing, atende bem
+e mesmo assim não escala) e entende que a infraestrutura existe porque alguém
+igual a ela precisou dela primeiro.
+
+**Onde vai:** carrossel, e **candidata a POST FIXADO** — o fixado que fala do
+software. Hoje os três fixados são "Quem eu sou", "Ana Diamante" e "Por onde
+começar" (ver `CALENDARIO-EDITORIAL.md`).
+
+🔴 **Não escrever de imaginação.** Falta o relato dela: quais mentorias, quanto
+tempo, o que deu errado no caminho, e qual foi a virada. Sem isso o post vira
+biografia genérica, que é o oposto do efeito que ela quer. Cruzar com
+`HISTORIA-ALINE.md`, que cobre a infância e a decisão pela nutrição, mas **não**
+cobre esta fase, a de empreender.
+
+Conecta com §29 (a história das dez horas em planilha), que é o pedaço técnico da
+mesma virada: as duas provavelmente são o mesmo carrossel, ou dois de uma série.
+
 ---
 
 ## Procedência
