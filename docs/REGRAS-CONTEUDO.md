@@ -666,6 +666,99 @@ cobre esta fase, a de empreender.
 Conecta com §29 (a história das dez horas em planilha), que é o pedaço técnico da
 mesma virada: as duas provavelmente são o mesmo carrossel, ou dois de uma série.
 
+
+## 31. 🔴 O post encanta com o MÉTODO, nunca com a agenda dela
+
+Regra dada por ela em 09/09/2026: *"a consulta será com o meu time, porque eu
+não estou atendendo agora, da licença maternidade. Então tem que encantar por
+mim mas direcionar pro time sem deixar eles frustrados."*
+
+Quem se apaixona por um **método** não se frustra com quem o aplica. Quem se
+apaixona por uma **pessoa**, sim.
+
+🔴 **Nenhum post promete "comigo".** A fórmula é sempre **"o que A GENTE faz na
+consulta"**. "A gente" inclui a Aline sem prometê-la, e continua verdadeiro
+quando ela voltar. Uma versão anterior destes carrosséis dizia "o que EU faço na
+consulta" em seis lugares; foi corrigido.
+
+### 31b. No direct, a troca é ANTECIPADA, nunca escondida
+
+Quem descobre depois de já querer marcar se sente rebaixada. Quem é avisada
+antes entende que está comprando um método, não uma agenda. A frase que resolve,
+dita no momento do convite e não depois:
+
+> *"Uma coisa importante: eu estou em licença maternidade, então quem vai te
+> atender é uma das nutricionistas que eu formei. E eu digo isso com
+> tranquilidade porque a leitura do seu caso é a mesma: o método é meu, a
+> curadoria do sistema que lê o seu laudo é minha, e elas foram treinadas por
+> mim."*
+
+Ela faz três coisas de uma vez: antecipa, transfere a autoridade da pessoa para
+o método (que é o que a clínica precisa para escalar além dela), e se apoia numa
+verdade **verificável** — a curadoria do Scanner é dela mesmo, são 482 fichas
+revisadas por ela, e é ela que lê o laudo de todo mundo.
+
+⚠️ "Licença maternidade" não enfraquece: **humaniza**. É a única explicação que
+ninguém contesta e que ainda aproxima.
+
+🔴 **Não prometer o que não se cumpre.** Dizer que a Aline revê cada caso ou
+aprova cada Top 3 só entra se for verdade operacional. Promessa que a paciente
+descobre na consulta é pior que promessa não feita. **Pendente de confirmação
+dela.**
+
+## 32. 🔴 Não repetir "de graça"
+
+*"Eu nunca sei se ficar falando toda hora a palavra de graça. Esse número vai
+atrair o tipo de público que não paga nada."*
+
+Ela tem razão: repetir gratuidade treina a audiência a esperar gratuidade, e
+seleciona quem nunca compra. O rótulo da mini solução vira **"Pra fazer hoje"**
+ou **"Comece por aqui"**, e o CTA nomeia **o que ela recebe**, não o preço:
+
+> ❌ "Comenta DOPAMINA. É de graça, e vai no seu direct."
+> ✅ "Comenta DOPAMINA e eu te mando o guia das duas, com o prato de cada uma e o
+> que olhar no seu exame."
+
+O valor mora na descrição do que chega, não no fato de não custar.
+
+## 33. A mini solução é POR PERFIL quando o post separa perfis
+
+Se o post pede que ela se identifique em A ou B (§24), ele **tem** que entregar a
+saída de A e a saída de B. Post que separa e não resolve os dois lados deixa
+metade da audiência sem nada.
+
+E o perfil não é só o sintoma: descreve também **o que vem junto** (a rápida cria
+muito e enjoa antes de terminar, vai bem sob pressão e trava sem prazo; a devagar
+é detalhista, rumina discussão e trava quando a pressão aumenta). É isso que faz
+a pessoa dizer "sou eu" em vez de "talvez".
+
+## 34. Arte de carrossel: o sistema que ficou
+
+Sete rodadas de correção dela em 08 e 09/09/2026. O que vale:
+
+- 🔴 **Fundo claro SEMPRE, cor só em bloco.** Está na paleta gravada em
+  `aline.perfis`: *"sempre fundo claro/branco, cor em blocos sólidos de destaque
+  (faixas, números grandes, backgrounds de bullets)"*. Alternar lâminas inteiras
+  de escuro e de Tiffany faz o olho reajustar a cada slide, e é aí que ela
+  desiste. **A cor não segura atenção; a dívida segura.** A cor diz o que é
+  importante.
+- **Uma exceção, e ela significa algo:** a última lâmina inverte para o escuro,
+  porque acabou o conteúdo e começou o convite.
+- 🔴 **Texto grande, uma ideia por lâmina.** Título de 80 a 140 px, corpo de 44 a
+  58, nunca parágrafo com lista embaixo. Carrossel que engaja não tem texto
+  pequeno; a primeira versão tinha duas listas e um parágrafo numa lâmina só.
+- 🔴 **Uma fonte só.** Montserrat em tudo; a serifada entra apenas na fala entre
+  aspas, para marcar que aquilo é voz da pessoa. Uma lâmina tinha três fontes
+  (display, corpo serifado e negrito display dentro do serifado).
+- **Título dentro de bloco tem teto menor que título solto**, senão a última
+  letra vaza (aconteceu com o "?" de "personalidade?").
+- **A paleta verdadeira está em `aline.perfis`, não nos docs:** Tiffany
+  **#0ABFBC**, roxo **#D946EF**, creme **#F5EFE2**, escuro **#1A1A2E**. O
+  repositório guardava `#0ABAB5` e `#D6336C` (rosa framboesa), e foi esse rosa
+  que ela reprovou. **O magenta da marca é um VINHO, não um rosa** — em peça, o
+  acento sobre creme é **#8E2F4F**.
+- **CTA em lâmina inteira**, nunca espremido embaixo de outra mensagem.
+
 ---
 
 ## Procedência
