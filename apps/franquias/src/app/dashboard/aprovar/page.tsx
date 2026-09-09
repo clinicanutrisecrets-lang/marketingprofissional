@@ -14,12 +14,33 @@ export default async function AprovarPage() {
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id, nome_comercial, aprovacao_modo")
+    .select(
+      "id, nome_comercial, aprovacao_modo, instagram_conta_id, instagram_access_token, instagram_token_expiry, publer_profile_id",
+    )
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
   if (!franqueada) redirect("/onboarding");
-  const f = franqueada as { id: string; nome_comercial: string | null; aprovacao_modo: string | null };
+  const f = franqueada as {
+    id: string;
+    nome_comercial: string | null;
+    aprovacao_modo: string | null;
+    instagram_conta_id: string | null;
+    instagram_access_token: string | null;
+    instagram_token_expiry: string | null;
+    publer_profile_id: string | null;
+  };
+
+  // A tela dizia "posts serão publicados no horário agendado" pra TODA conta.
+  // Publicar automático depende de um canal: token do Instagram (que depende da
+  // aprovação do app na Meta) ou perfil no Publer. Sem canal o cron marca
+  // `semCanal` e deixa o post parado em "aprovado" — a nutri esperava a
+  // publicação que nunca vinha. Só prometemos o que a conta consegue cumprir.
+  const tokenValido =
+    !!f.instagram_conta_id &&
+    !!f.instagram_access_token &&
+    (!f.instagram_token_expiry || new Date(f.instagram_token_expiry).getTime() > Date.now());
+  const publicacaoAutomatica = tokenValido || !!f.publer_profile_id;
 
   // Aprovação mais recente, INDEPENDENTE do status.
   //
@@ -71,6 +92,7 @@ export default async function AprovarPage() {
           franqueadaId={f.id}
           aprovacao={aprovacaoRow}
           posts={posts}
+          publicacaoAutomatica={publicacaoAutomatica}
         />
       </div>
     </main>

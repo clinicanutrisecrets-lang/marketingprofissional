@@ -15,6 +15,8 @@ type Props = {
   franqueadaId: string;
   aprovacao: Record<string, unknown> | null;
   posts: Array<Record<string, unknown>>;
+  /** Conta tem canal de publicação (token do Instagram válido ou Publer). */
+  publicacaoAutomatica?: boolean;
 };
 
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -26,7 +28,12 @@ const TIPO_LABEL: Record<string, string> = {
   stories: "Stories",
 };
 
-export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
+export function AprovacaoView({
+  franqueadaId,
+  aprovacao,
+  posts,
+  publicacaoAutomatica = false,
+}: Props) {
   const router = useRouter();
   const [postsState, setPostsState] = useState(posts);
   const [isPending, startTransition] = useTransition();
@@ -80,8 +87,15 @@ export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
     startTransition(async () => {
       const r = await aprovarSemanaToda(aprovacao!.id as string);
       if (r.ok) {
-        setMsg("Semana aprovada! Posts serão publicados no horário agendado.");
-        setTimeout(() => router.push("/dashboard"), 1500);
+        setMsg(
+          publicacaoAutomatica
+            ? "Semana aprovada! Posts serão publicados no horário agendado."
+            : "Semana aprovada! Ela fica guardada aqui: baixe a arte e a legenda de cada post e publique no seu Instagram.",
+        );
+        // Sem publicação automática, mandar pro dashboard some com o pacote
+        // justamente quando ela precisa dele pra baixar. Fica na tela.
+        if (publicacaoAutomatica) setTimeout(() => router.push("/dashboard"), 1500);
+        else router.refresh();
       } else {
         setErro(r.erro ?? "Erro");
       }
@@ -109,7 +123,9 @@ export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
             pode dar a sensação de que o pacote sumiu (Juliana, 08/09/2026). */}
         {pendentes.length === 0 && aprovados.length > 0 ? (
           <div className="rounded-lg bg-green-50 px-5 py-2.5 text-sm font-semibold text-green-700">
-            ✓ Semana aprovada · publica no horário agendado
+            {publicacaoAutomatica
+              ? "✓ Semana aprovada · publica no horário agendado"
+              : "✓ Semana aprovada · baixe e publique no seu Instagram"}
           </div>
         ) : (
           <button
