@@ -90,6 +90,10 @@ Os planos dela que servem: `consult1` inteira (frontal), `consult2` 0-2,9
 
 ## O que falta gerar
 
+Aqui em baixo estão os clipes **sem pessoa**, que saem no ilimitado do
+site. Os que têm a Aline em cena, que gastam crédito e precisam de Soul
+ID, ficam em `PROMPTS-ALINE-EM-CENA.md`.
+
 Os dois reels de receita fecham com o material que existe, mas parte do
 tempo é coberta por laboratório e consultório. Isso não é remendo — a
 narração nesses trechos é genética, não receita — só que hoje a proporção
