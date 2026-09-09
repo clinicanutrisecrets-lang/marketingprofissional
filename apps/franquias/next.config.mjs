@@ -1,6 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // 🔴 EMBED DENTRO DO SCANNER (Aline, 09/09/2026): este app é aberto num
+  // iframe pela página "Posts e Conteúdo" do Scanner da Saúde
+  // (scannerdasaude.com e subdomínios). CSP frame-ancestors é o que autoriza
+  // isso — sem ele o navegador bloqueia o iframe e a nutri vê um retângulo
+  // branco. Só o domínio do Scanner; qualquer outro site continua proibido de
+  // embutir (proteção contra clickjacking de uma sessão logada).
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value:
+              "frame-ancestors 'self' https://scannerdasaude.com https://*.scannerdasaude.com",
+          },
+        ],
+      },
+    ];
+  },
   transpilePackages: ["@scanner/ui"],
   typescript: {
     // Volta pro modo flexível até refinarmos tipos específicos do Supabase.

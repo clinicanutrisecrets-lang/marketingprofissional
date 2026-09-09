@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache";
 export type ProdutoScannerLista = {
   id: string;
   produto_id: string;
+  /** Chave de esteira do Scanner ('teste_genetico', 'teste_epigenetico'…) — é por ela que a esteira do Scanner abre esta tela já no produto certo. */
+  scanner_produto_id: string | null;
   nome: string;
   tipo: string | null;
   descricao: string | null;
@@ -47,7 +49,7 @@ export async function listarProdutosScanner(): Promise<
 
   const { data, error } = await supabase
     .from("produtos_scanner")
-    .select("id, produto_id, nome, tipo, descricao, preco_centavos, checkout_url, sincronizado_em")
+    .select("id, produto_id, scanner_produto_id, nome, tipo, descricao, preco_centavos, checkout_url, sincronizado_em")
     .eq("franqueada_id", fr.id)
     .eq("ativo", true)
     .order("nome");
@@ -58,6 +60,7 @@ export async function listarProdutosScanner(): Promise<
     const row = p as {
       id: string;
       produto_id: string;
+      scanner_produto_id: string | null;
       nome: string;
       tipo: string | null;
       descricao: string | null;
@@ -68,6 +71,7 @@ export async function listarProdutosScanner(): Promise<
     return {
       id: row.id,
       produto_id: row.produto_id,
+      scanner_produto_id: row.scanner_produto_id ?? null,
       nome: row.nome,
       tipo: row.tipo,
       descricao: row.descricao,
