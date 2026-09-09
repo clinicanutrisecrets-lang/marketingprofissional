@@ -16,8 +16,38 @@ const ITENS = [
   { href: "/dashboard/videos", icone: "🎬", label: "Vídeos" },
 ];
 
-export function SidebarNav(props: { nome: string; corPrimaria: string }) {
+/**
+ * `embutido`: o app está dentro do iframe do Scanner ("Posts e Conteúdo").
+ * Nesse modo só a barra de chips aparece, em qualquer largura — a lateral
+ * seria um segundo menu ao lado do menu do Scanner — e o Sair fica de fora:
+ * deslogar de dentro do iframe deixaria um login do Marketing no meio da
+ * tela do Scanner. O perfil (⚙️) entra como chip.
+ */
+export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?: boolean }) {
   const pathname = usePathname();
+
+  if (props.embutido) {
+    const itens = [...ITENS, { href: "/onboarding", icone: "⚙️", label: "Meu perfil de marketing", exato: true }];
+    return (
+      <div className="sticky top-0 z-30 -mx-4 mb-4 overflow-x-auto border-b border-brand-text/8 bg-white/90 px-4 py-2 backdrop-blur">
+        <div className="flex w-max gap-2">
+          {itens.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
+                ativo(item)
+                  ? "bg-brand-primary text-white"
+                  : "bg-brand-muted text-brand-text/70"
+              }`}
+            >
+              {item.icone} {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   function ativo(item: (typeof ITENS)[number]): boolean {
     if (item.exato) return pathname === item.href;

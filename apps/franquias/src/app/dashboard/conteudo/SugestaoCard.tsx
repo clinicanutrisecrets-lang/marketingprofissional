@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { marcarStatusSugestao } from "@/lib/conteudo/actions";
+import { urlEbookNoScanner } from "@/lib/scanner-url";
 
 export type Sugestao = {
   id: string;
@@ -198,6 +199,19 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
             🎥 Gravar com teleprompter
           </Link>
         )}
+
+        {/* Ponte sugestão → e-book → LP (Aline, 09/09/2026): o tema que rendeu
+            um post rende uma isca. Abre o gerador de e-book do SCANNER com o
+            tema já preenchido; de lá, um clique monta a LP. target="_top"
+            porque este card pode estar dentro do iframe do Scanner. */}
+        <a
+          href={urlEbookNoScanner(s.tema)}
+          target="_top"
+          className="rounded-lg bg-violet-600/10 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-600/20"
+          title="Gerar um e-book (isca digital) sobre este tema no Scanner"
+        >
+          📖 Virar e-book
+        </a>
 
         <button
           onClick={() => void marcarStatusSugestao(s.id, "descartado")}

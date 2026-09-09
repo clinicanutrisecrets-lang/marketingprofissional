@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
+import { EMBED_COOKIE, EMBED_COOKIE_MAX_AGE, destinoSeguro, pediuEmbed } from "@/lib/embed/destino";
 
 export const dynamic = "force-dynamic";
 
@@ -31,9 +33,20 @@ export const dynamic = "force-dynamic";
  *   4. Cria a sessão via magic link server-side (generateLink + verifyOtp):
  *      o link nunca é enviado por e-mail, é consumido aqui.
  *   5. Manda pro /dashboard (onboarding pronto) ou /onboarding (a completar).
+ *
+ * Parâmetros opcionais (embed dentro do Scanner, 09/09/2026):
+ *   • `next=/dashboard/...` — abre direto numa tela (a esteira do Scanner
+ *     manda pra "Posts de venda" já no produto; o e-book, pro Estúdio).
+ *     Só caminho interno passa (`destinoSeguro`); o resto cai no /dashboard.
+ *     Onboarding incompleto SEMPRE vence o `next`: não adianta abrir Posts de
+ *     venda de quem ainda não tem perfil.
+ *   • `embed=1` — grava o cookie que faz o layout esconder barra lateral,
+ *     Sair e rodapé, porque o Scanner já desenha a moldura em volta.
  */
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
+  const next = destinoSeguro(req.nextUrl.searchParams.get("next"));
+  const embed = pediuEmbed(req.nextUrl.searchParams.get("embed"));
   if (!token) {
     console.error("[sso] chegou em /sso sem token na URL");
     return NextResponse.redirect(new URL("/login?erro=sso_token_ausente", req.url));
@@ -189,7 +202,19 @@ export async function GET(req: NextRequest) {
   // documentado do Supabase SSR depois de verifyOtp: garante que os cookies
   // de sessão gravados pelo client vão junto na resposta. Ele lança uma
   // exceção de controle do Next — por isso fica FORA de qualquer try/catch.
-  const destino = franq.onboarding_completo ? "/dashboard" : "/onboarding";
+  if (embed) {
+    cookies().set(EMBED_COOKIE, "1", {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: EMBED_COOKIE_MAX_AGE,
+    });
+  } else if (cookies().get(EMBED_COOKIE)) {
+    // Entrou pelo SSO "normal" (aba própria): garante a tela completa, com menu.
+    cookies().set(EMBED_COOKIE, "", { path: "/", maxAge: 0 });
+  }
+
+  const destino = franq.onboarding_completo ? (next ?? "/dashboard") : "/onboarding";
   redirect(destino);
 }
 
