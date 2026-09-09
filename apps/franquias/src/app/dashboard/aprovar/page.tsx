@@ -21,12 +21,18 @@ export default async function AprovarPage() {
   if (!franqueada) redirect("/onboarding");
   const f = franqueada as { id: string; nome_comercial: string | null; aprovacao_modo: string | null };
 
-  // Busca aprovação mais recente
+  // Aprovação mais recente, INDEPENDENTE do status.
+  //
+  // 🔴 Antes filtrava só ("aguardando", "aprovada_com_edicoes"): no instante em
+  // que a nutri aprovava, a semana virava "aprovada_integral", saía do filtro,
+  // e a tela caía numa aprovação velha e vazia mostrando "Nenhuma semana
+  // aguardando aprovação". Ela aprovava 13 posts e via a semana sumir
+  // (Juliana, 08/09/2026). Os posts nunca foram perdidos, só deixaram de ter
+  // onde aparecer: esta é a única tela do painel que lista posts_agendados.
   const { data: aprovacao } = await supabase
     .from("aprovacoes_semanais")
     .select("*")
     .eq("franqueada_id", f.id)
-    .in("status", ["aguardando", "aprovada_com_edicoes"])
     .order("semana_ref", { ascending: false })
     .limit(1)
     .maybeSingle();

@@ -105,14 +105,22 @@ export function AprovacaoView({ franqueadaId, aprovacao, posts }: Props) {
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={handleAprovarTudo}
-          disabled={isPending || pendentes.length === 0}
-          className="rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
-        >
-          {isPending ? "Aprovando..." : "✓ Aprovar tudo de uma vez"}
-        </button>
+        {/* Semana já aprovada continua VISÍVEL, só sem o botão: aprovar não
+            pode dar a sensação de que o pacote sumiu (Juliana, 08/09/2026). */}
+        {pendentes.length === 0 && aprovados.length > 0 ? (
+          <div className="rounded-lg bg-green-50 px-5 py-2.5 text-sm font-semibold text-green-700">
+            ✓ Semana aprovada · publica no horário agendado
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAprovarTudo}
+            disabled={isPending || pendentes.length === 0}
+            className="rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+          >
+            {isPending ? "Aprovando..." : "✓ Aprovar tudo de uma vez"}
+          </button>
+        )}
       </div>
 
       {msg && (
