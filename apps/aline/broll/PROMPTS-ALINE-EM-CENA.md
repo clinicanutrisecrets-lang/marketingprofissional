@@ -1,79 +1,96 @@
 # Prompts de B-roll com a Aline em cena
 
-Estes são os que **gastam crédito**: cena com o rosto dela precisa de Soul
-ID e de modelo que aceita frame inicial. Cena sem o rosto sai no ilimitado
-do site — a última seção lista as que não valem crédito nenhum.
+Cada bloco aqui embaixo é **inteiro**. Copia, cola no Higgsfield, gera.
+Não precisa juntar pedaço nenhum: a parte que se repete em todos já está
+escrita dentro de cada um.
 
-Ordenados pelo que a biblioteca não tem. O item 1 é o mais urgente por
-uma margem larga.
+Estes **gastam crédito**: rosto em cena precisa de Soul ID. Os que não
+gastam estão em `PROMPTS-COZINHA.md` (comida, sem pessoa) e no fim da
+lista de `BIBLIOTECA-CLIPES.md`.
 
----
+Ordem de urgência: o 1 é o mais escasso por uma margem larga. Se der pra
+gerar só um, gera as três variações do 1.
 
-## O bloco de travas que vai em todos
-
-Cole no fim de cada prompt, sem editar. Cada linha nasceu de um erro que
-já aconteceu.
-
-```
-LOCKS
-She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks, eyebrows move with the sentence. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
-```
-
-Por que cada uma existe:
-
-- **30 anos** e **pele lisa**: o gerador envelhece o rosto e inventa mancha
-  e sarda. Sem essa trava, sobra retoque na edição.
-- **cabelo igual dos dois lados**: é o primeiro detalhe a derivar, antes
-  mesmo do rosto.
-- **dente marfim**: sem isso sai dente de propaganda.
-- **sorriso fechado**: o sorriso largo gerado deforma a boca na pausa. Já
-  aconteceu no vídeo da menopausa.
-- **nada legível**: laudo ou tela com número inventado num vídeo seu é
-  problema de outra ordem.
-- **quadro parado**: com movimento de câmera o rosto deriva mais rápido.
-
-E mais uma trava de produção, que é minha e não do gerador:
-
-```
-FRAMING FOR TEXT
-Medium shot, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame. Vertical 9:16.
-```
-
-O motor de edição procura a faixa livre do quadro pra pôr a legenda. Se o
-plano não tem faixa livre, a legenda acaba no rodapé, que é onde a
-interface do Instagram cobre. Pedir o vão na geração resolve na origem.
+Antes de apertar o botão, em qualquer um deles: duração mais curta
+disponível, 9:16, resolução máxima, **"enhance prompt" desligado**, sem
+áudio. Duas gerações de cada e fica com a melhor.
 
 ---
 
-## 1. Frontal falando com a câmera — gere 3 variações
+## 1. Frontal falando com a câmera, blusa creme
 
-**Por que primeiro**: é o plano mais escasso e o mais caro de faltar. No
-vídeo do Lótus o mesmo trecho de 7 segundos teve que servir de gancho, de
-apresentação e de chamada final. Com três variações de figurino, cada
-vídeo abre diferente.
+Este é o plano mais escasso. No vídeo do Lótus o mesmo trecho de sete
+segundos teve que servir de gancho, de apresentação e de chamada final,
+porque não existe outro.
 
 ```
 SCENE
-A nutritionist sitting at her consulting room desk, speaking directly to the camera as if explaining something to one person.
+A nutritionist sitting at her consulting room desk, wearing a cream silk blouse, speaking directly to the camera as if explaining something to one person.
 
 ACTION
 She looks straight into the lens and speaks calmly and warmly, with small nods and natural pauses. Between sentences she glances briefly down at the desk, lips closed, then looks back up at the lens. Her hands rest on the desk, still.
 
 LIGHTING
 Soft daylight from a window on her left, warm neutral grade, shallow depth of field, bookshelf blurred behind her.
-```
 
-Nas variações troque só isto, mantendo o resto palavra por palavra:
-uma com **blusa creme de seda**, uma com **jaleco branco sobre blusa
-escura**, uma com **blazer verde-escuro**. Mesmo cenário, mesma luz. É o
-figurino que faz parecer dia diferente.
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks, eyebrows move with the sentence. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+```
 
 ---
 
-## 2. Em pé, jaleco, no corredor da clínica
+## 2. Frontal falando com a câmera, jaleco branco
 
-**Por que**: todo plano dela hoje é sentada. Um plano em pé abre reel de
-outro jeito e serve de transição entre dois assuntos.
+Mesmo cenário e mesma luz do 1. É o figurino que faz parecer outro dia
+de gravação.
+
+```
+SCENE
+A nutritionist sitting at her consulting room desk, wearing an open white lab coat over a dark blouse, speaking directly to the camera as if explaining something to one person.
+
+ACTION
+She looks straight into the lens and speaks calmly and warmly, with small nods and natural pauses. Between sentences she glances briefly down at the desk, lips closed, then looks back up at the lens. Her hands rest on the desk, still.
+
+LIGHTING
+Soft daylight from a window on her left, warm neutral grade, shallow depth of field, bookshelf blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks, eyebrows move with the sentence. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 3. Frontal falando com a câmera, blazer verde-escuro
+
+```
+SCENE
+A nutritionist sitting at her consulting room desk, wearing a dark green blazer over a light top, speaking directly to the camera as if explaining something to one person.
+
+ACTION
+She looks straight into the lens and speaks calmly and warmly, with small nods and natural pauses. Between sentences she glances briefly down at the desk, lips closed, then looks back up at the lens. Her hands rest on the desk, still.
+
+LIGHTING
+Soft daylight from a window on her left, warm neutral grade, shallow depth of field, bookshelf blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks, eyebrows move with the sentence. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 4. Em pé, jaleco, no corredor da clínica
+
+Todo plano seu hoje é sentada. Um plano em pé abre reel de outro jeito e
+serve de passagem entre dois assuntos.
 
 ```
 SCENE
@@ -83,15 +100,22 @@ ACTION
 She stands still and speaks to the camera, calm and confident. She shifts her weight once, very slightly. She does not walk.
 
 LIGHTING
-Cool clinical daylight, fluorescent ceiling panels, corridor receding blurred behind her.
+Cool clinical daylight, fluorescent ceiling panels, the corridor receding blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks, eyebrows move with the sentence. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
 
-## 3. Escrevendo a prescrição
+## 5. Escrevendo a prescrição
 
-**Por que**: você fala de conduta o tempo todo e não tem nenhuma imagem de
-conduta acontecendo.
+Você fala de conduta o tempo todo e não tem nenhuma imagem de conduta
+acontecendo. Aqui a mão é o assunto, e é onde o gerador mais erra:
+**gere duas e confira dedo por dedo antes de usar.**
 
 ```
 SCENE
@@ -103,19 +127,18 @@ She writes two lines, pauses, looks up at the camera for a moment, then goes bac
 LIGHTING
 Warm desk lamp from the right, soft daylight fill, shallow depth of field on the pad.
 
-HANDS
-Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The pen stays whole in her hand at all times.
-```
+FRAMING
+Vertical 9:16, the pad in the lower half of the frame, her face in the upper third, clear uncluttered space around the pad.
 
-O bloco `HANDS` substitui a linha de mãos fora de quadro das travas: aqui
-a mão é o assunto, e é onde o gerador mais erra. **Gere duas variações e
-confira dedo por dedo antes de usar.**
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The pen stays whole in her hand at all times. Nothing on the pad or on any screen or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+```
 
 ---
 
-## 4. Segurando o laudo genético
+## 6. Segurando o laudo genético
 
-**Por que**: é a imagem da sua tese e ela não existe no banco.
+É a imagem da sua tese e ela não existe no banco.
 
 ```
 SCENE
@@ -127,16 +150,19 @@ She reads the pages for a moment, turns one page, then lowers the report slightl
 LIGHTING
 Soft daylight from the left, warm neutral grade, shallow depth of field.
 
-PAPER
-The pages are plain printed sheets with unreadable blurred lines of text, no charts, no logos, no numbers, no colour highlights.
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the report held low near the desk so the middle of the frame stays clear.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted. The pages are plain printed sheets with unreadable blurred lines of text, no charts, no logos, no numbers, no colour highlights. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
 
-## 5. Ensinando, de pé, apontando para uma tela
+## 7. Ensinando de pé, apontando para uma tela
 
-**Por que**: os anúncios do imersivo são para nutricionistas, e precisam
-de você professora, não de você atendendo.
+É o plano dos anúncios do imersivo, onde você é professora e não nutri
+atendendo.
 
 ```
 SCENE
@@ -148,16 +174,20 @@ She looks at the camera while she speaks, gestures once toward the screen with a
 LIGHTING
 Bright even room light, the screen glowing softly out of focus behind her.
 
-SCREEN
-The screen shows only soft abstract shapes and colour, completely unreadable, no text, no charts, no letters.
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. Her hands are anatomically correct, five fingers each. The screen shows only soft abstract shapes and colour, completely unreadable, no text, no charts, no letters. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
 
-## 6. Escutando a paciente, plano por trás do ombro
+## 8. Escutando a paciente, plano por trás do ombro
 
-**Por que**: mostra consulta sem expor ninguém — a paciente é só uma nuca
-desfocada.
+Mostra consulta sem expor ninguém: a paciente é só uma nuca desfocada.
+Vai no ar com o selo **"Caso clínico ilustrativo · paciente fictícia"**,
+como os outros.
 
 ```
 SCENE
@@ -166,38 +196,37 @@ Over the shoulder of a seated patient, foreground and out of focus, looking towa
 ACTION
 The nutritionist listens, nods slowly twice, and answers calmly. The patient in the foreground does not move.
 
-FOREGROUND
-The patient is only a blurred shoulder and the back of a head, never their face, never recognisable.
-
 LIGHTING
 Soft daylight from the window behind the nutritionist, warm neutral grade.
+
+FRAMING
+Vertical 9:16, the nutritionist's head in the upper third, the blurred shoulder filling the lower left corner only, the rest of the lower frame clear.
+
+LOCKS
+She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. The patient in the foreground is only a blurred shoulder and the back of a head, never their face, never recognisable. Nothing on any screen, paper or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
 ```
 
-Esse ainda vai no ar com o selo **"Caso clínico ilustrativo · paciente
-fictícia"**, como os outros.
-
 ---
 
-## Estes NÃO valem crédito
+## Por que cada trava está ali
 
-Sem o rosto dela não existe identidade pra derivar, então **não precisa de
-Soul ID**: gere no site, no ilimitado, e com quatro cenas encadeadas num
-clipe só (regra 17 do guia).
+Não precisa ler pra usar. É só pra você saber que nenhuma linha é enfeite.
 
-- mãos com pipeta e tubos, close, sem rosto
-- mãos abrindo o kit de coleta de saliva
-- a balança de bioimpedância acendendo, só o aparelho
-- a mesa do consultório vazia, luz da manhã, com a caneta e o bloco
+- **30 anos** e **pele lisa, sem sarda nem mancha**: o gerador envelhece o
+  rosto e inventa marca na pele. Sem isso, sobra retoque no CapCut.
+- **cabelo igual dos dois lados**: é o primeiro detalhe a derivar, antes
+  mesmo do rosto.
+- **dente marfim**: sem isso sai dente de propaganda.
+- **sorriso fechado**: o sorriso largo gerado deforma a boca na pausa.
+  Aconteceu no vídeo da menopausa.
+- **nada legível**: laudo ou tela com número inventado num vídeo seu é
+  problema de outra ordem.
+- **quadro parado**: com movimento de câmera o rosto deriva mais rápido.
+- **cabeça no terço superior, vão livre embaixo**: essa é do meu motor,
+  não do gerador. Ele procura a faixa vazia do quadro pra pôr a legenda.
+  Se não existe faixa vazia, a legenda desce pro rodapé, que é onde a
+  interface do Instagram cobre.
 
-Guarde os créditos para os seis de cima. Um clipe sem rosto que consome
-crédito é crédito jogado fora.
-
----
-
-## Antes de gerar, o checklist do guia
-
-Duração mais curta disponível, 9:16, resolução máxima, um único movimento
-de câmera (aqui: nenhum), **"enhance prompt" desligado**, sem áudio. Duas
-variações de cada e fica com a melhor. Com pessoa em cena o clipe é
-**curto**: acima de uns 6 segundos o rosto começa a derivar, e é por isso
-que os multi-cena de 20s só valem para comida e cenário.
+E a regra que vale pra todos: **com pessoa em cena, clipe curto**. Acima
+de uns 6 segundos o rosto começa a derivar, e é por isso que os clipes
+multi-cena de 20 segundos só valem pra comida e cenário.

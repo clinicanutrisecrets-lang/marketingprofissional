@@ -90,9 +90,16 @@ Os planos dela que servem: `consult1` inteira (frontal), `consult2` 0-2,9
 
 ## O que falta gerar
 
-Aqui em baixo estão os clipes **sem pessoa**, que saem no ilimitado do
-site. Os que têm a Aline em cena, que gastam crédito e precisam de Soul
-ID, ficam em `PROMPTS-ALINE-EM-CENA.md`.
+Aqui em baixo estão os clipes **sem pessoa** das duas receitas que já
+existem. Fora daqui:
+
+- `PROMPTS-ALINE-EM-CENA.md`: os planos com a Aline em quadro, que gastam
+  crédito e precisam de Soul ID.
+- `PROMPTS-COZINHA.md`: ela cozinhando (gasta crédito) e sete refeições
+  saudáveis em prato pronto, sem pessoa (não gasta).
+
+Todo prompt nesses dois arquivos é copiar e colar inteiro: as travas
+repetidas já estão dentro de cada bloco.
 
 Os dois reels de receita fecham com o material que existe, mas parte do
 tempo é coberta por laboratório e consultório. Isso não é remendo — a
