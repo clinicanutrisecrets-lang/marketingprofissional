@@ -79,6 +79,18 @@ COR = ["-color_range", "tv", "-colorspace", "bt709",
        "-color_primaries", "bt709", "-color_trc", "bt709"]
 FMT = "scale=out_range=tv:out_color_matrix=bt709,format=yuv420p"
 
+# Suavização de pele nas cenas com ela em quadro. O gerador devolve
+# mancha e marca de idade mesmo com a trava de pele no prompt, e ela não
+# quer abrir o CapCut pra isso. lr é o raio, no máximo 5; ls a força, no
+# máximo 1; lt positivo filtra só as áreas planas, que é a pele, e
+# preserva a borda do olho, do óculos e do cabelo.
+PELE = ("split[cru][sv];[sv]smartblur=lr=4:ls=1.0:lt=18[suave];"
+        "[cru][suave]blend=all_mode=normal:all_opacity=0.75")
+
+# clipes do banco em que ela aparece: nesses a suavização entra sozinha.
+# O roteiro pode forçar com "pele": true ou desligar com "pele": false.
+ROSTO = {"consult1", "consult2", "consult3", "lab", "centrifuga", "micro"}
+
 # a legenda ocupa o rodapé; manchete e selo têm que ficar acima dela
 RODAPE_LEGENDA = 210
 
@@ -501,6 +513,23 @@ def dur_video(path):
     return float(out.stdout.strip())
 
 
+def tem_rosto(video):
+    """Se o clipe é um daqueles em que ela aparece.
+
+    Aceita o caminho direto ou o apelido do banco, que é como o roteiro
+    costuma escrever.
+    """
+    nome = Path(video)
+    if nome.stem in ROSTO:
+        return True
+    banco = Path(__file__).with_name("video") / "biblioteca.json"
+    if banco.exists():
+        for apelido, caminho in json.loads(banco.read_text()).items():
+            if Path(caminho).name == nome.name:
+                return apelido in ROSTO
+    return False
+
+
 def junta_clipes(clipes, tmp):
     """Recorta cada clipe e emenda tudo num vídeo só.
 
@@ -522,9 +551,12 @@ def junta_clipes(clipes, tmp):
         if vel != 1:
             vf.append(f"setpts={1 / vel:.4f}*PTS")
         vf.append(f"fps={FPS}")
+        graf = ",".join(vf) + "," + FMT
+        if c.get("pele", tem_rosto(c["video"])):
+            graf += "," + PELE
         subprocess.run([
             "ffmpeg", "-v", "error", "-y", *corte, "-i", c["video"],
-            "-vf", ",".join(vf) + "," + FMT, "-an",
+            "-vf", graf, "-an",
             "-pix_fmt", "yuv420p", *COR, "-c:v", "libx264", "-crf", "18",
             str(p)], check=True)
         partes.append(p)

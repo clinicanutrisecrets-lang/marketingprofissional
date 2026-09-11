@@ -17,47 +17,69 @@ Em todos: 9:16, resolução máxima, **"enhance prompt" desligado**, sem
 
 # Parte 1 — você cozinhando
 
+Todos mudos, de lábio fechado: sua narração é gravada depois e boca
+falando não bate com nada. Cada um vem com uma expressão escolhida, e
+a lista das quatro para trocar está em `PROMPTS-ALINE-EM-CENA.md`.
+
 ## 1. Apresentando o prato pronto para a câmera
 
 O plano que fecha receita. Hoje toda receita termina em close de comida,
 sem você. É o mais útil dos quatro.
 
 ```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
 SCENE
-A nutritionist in a home kitchen holding a finished bowl of food in both hands at chest height, presenting it to the camera. The bowl holds grilled salmon, bright green broccoli and quinoa.
+She is in a home kitchen holding a finished bowl of food in both hands at chest height, presenting it to the camera. The bowl holds grilled salmon, bright green broccoli and quinoa.
 
 ACTION
-She holds the bowl steady and looks into the lens, speaking calmly, with one small nod. She lifts the bowl very slightly toward the camera once, then holds it still again.
+She holds the bowl steady and looks into the lens, her lips closed. She lifts the bowl very slightly toward the camera once, then holds it still again, and blinks naturally.
+
+EXPRESSION
+Her expression is warm and pleased, a soft closed-lip smile that reaches her eyes, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
 
 LIGHTING
-Soft daylight from a window on her left, warm neutral grade, blurred kitchen counter behind her.
+Soft even beauty light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
 
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the bowl in the lower middle, and clear uncluttered space around the bowl.
 
 LOCKS
-She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The food in the bowl stays exactly the same from the first frame to the last, it does not change or move. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The food in the bowl stays exactly the same from the first frame to the last, it does not change or move. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
 
-## 2. Mexendo a panela, olhando para a câmera
+## 2. Mexendo a panela
 
 ```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
 SCENE
-A nutritionist at a home kitchen stove, stirring vegetables in a shallow pan with a wooden spoon.
+She is at a home kitchen stove, stirring vegetables in a shallow pan with a wooden spoon.
 
 ACTION
-She stirs the pan slowly and steadily, looks up into the lens for a moment while she speaks, then looks back down at the pan and keeps stirring. Light steam rises from the pan.
+She stirs the pan slowly and steadily, raises her eyes to the lens for a moment with her lips closed, then looks back down at the pan and keeps stirring. Light steam rises from the pan.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
 
 LIGHTING
-Soft daylight from a window on her left, warm neutral grade, blurred kitchen behind her.
+Soft even beauty light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
 
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the pan in the lower part of the frame, and clear uncluttered space between her chin and the pan.
 
 LOCKS
-She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never a wide smile, never laughing. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the wooden spoon stays whole in her hand at all times. The steam is light and thin, never smoke, never a cloud. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the wooden spoon stays whole in her hand at all times. The steam is light and thin, never smoke, never a cloud. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -65,20 +87,29 @@ She is 30 years old. Her face, glasses, hair and clothing match the reference ex
 ## 3. Picando os vegetais, close nas mãos
 
 ```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
 SCENE
-Close on a nutritionist's hands slicing courgette and red pepper on a wooden board in a home kitchen, her face visible and slightly out of focus behind her hands.
+Close on her hands slicing courgette and red pepper on a wooden board in a home kitchen, her face visible and slightly out of focus behind her hands.
 
 ACTION
-The knife cuts three even slices, the free hand holds the vegetable with the fingertips curled safely under the knuckles. She pauses, looks up at the camera for a moment, then goes back to cutting.
+The knife cuts three even slices, the free hand holding the vegetable with the fingertips curled safely under the knuckles. She pauses, raises her eyes to the lens for a moment with her lips closed, then goes back to cutting.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
 
 LIGHTING
-Soft daylight from a window on the left, warm neutral grade, shallow depth of field on the board.
+Soft even beauty light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
 
 FRAMING
 Vertical 9:16, the board in the lower half of the frame, her face in the upper third, clear uncluttered space between them.
 
 LOCKS
-She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. Her teeth are natural ivory, slightly warm, never bright white. At most a slight closed-lip smile, never laughing. Natural blinks. Both hands are visible and anatomically correct, five fingers each, all fingers whole and unharmed, nails short and unpainted, no rings. The knife stays whole and its blade never touches her fingers. The slices are even and stay on the board. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, all fingers whole and unharmed, nails short and unpainted, no rings. The knife stays whole and its blade never touches her fingers. The slices are even and stay on the board. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -86,20 +117,29 @@ She is 30 years old. Her face, glasses, hair and clothing match the reference ex
 ## 4. Regando o azeite no prato pronto
 
 ```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
 SCENE
-Close on a nutritionist's hands pouring a thin thread of olive oil from a small jug over a finished plate of roasted vegetables and leaves, her face visible and slightly out of focus behind her hands.
+Close on her hands pouring a thin thread of olive oil from a small jug over a finished plate of roasted vegetables and leaves, her face visible and slightly out of focus behind her hands.
 
 ACTION
-She pours a thin steady thread of oil across the plate, stops, sets the jug down beside it, and looks up at the camera with a small nod.
+She pours a thin steady thread of oil across the plate, stops, sets the jug down beside it, and raises her eyes to the lens with a small nod, her lips closed.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
 
 LIGHTING
-Soft daylight from a window on the left, warm neutral grade, a gentle sheen on the oiled surface, shallow depth of field on the plate.
+Soft even beauty light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
 
 FRAMING
 Vertical 9:16, the plate in the lower half of the frame, her face in the upper third, clear uncluttered space between them.
 
 LOCKS
-She is 30 years old. Her face, glasses, hair and clothing match the reference exactly, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is smooth and even, with a natural healthy tone, no freckles, no blemishes, no age spots, no redness. At most a slight closed-lip smile, never laughing. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the jug stays whole in her hand at all times. The oil falls as one thin continuous thread, never a splash, never a puddle, and the amount is modest, about one tablespoon. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the jug stays whole in her hand at all times. The oil falls as one thin continuous thread, never a splash, never a puddle, and the amount is modest, about one tablespoon. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
