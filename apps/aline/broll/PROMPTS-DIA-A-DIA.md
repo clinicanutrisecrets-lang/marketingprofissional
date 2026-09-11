@@ -11,7 +11,7 @@ Todos são **mudos**, de lábio fechado, porque a narração entra depois.
 Cada um vem com uma expressão escolhida, e as quatro linhas pra trocar
 estão em `PROMPTS-ALINE-EM-CENA.md`.
 
-Os dezoito primeiros **gastam crédito**, porque você aparece. Do 19 ao 24
+Os vinte primeiros **gastam crédito**, porque você aparece. Do 21 ao 26
 são as mesmas cenas sem o seu rosto, e essas saem no ilimitado do site,
 sem custo nenhum.
 
@@ -715,13 +715,93 @@ legenda.
 
 ---
 
+## 19. Passando o café
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter making filter coffee by hand, pouring hot water from a gooseneck kettle over ground coffee in a cloth filter held in a wooden stand above a clear glass jug.
+
+ACTION
+She pours a thin steady thread of hot water in slow circles over the coffee, watching it bloom and drip through with her lips closed, then straightens the kettle and rests it on the counter. Thin steam rises from the jug.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the coffee stand in the lower part of the frame with clear uncluttered space between her chin and the jug.
+
+WARDROBE
+Easy clothes at home on a slow morning: a soft oversized knit jumper in one plain colour worn over a plain t shirt, the sleeves long and falling to her wrists, the jumper loose enough to fall away from her body on its own, with relaxed straight leg jeans. Young and current, the comfortable clothes a woman in her early thirties actually wears at home, nothing dressed up and nothing formal. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the kettle stays whole in her hand at all times. The water falls as one thin continuous thread in slow circles, never a splash, never overflowing the filter. The coffee is fresh dark ground coffee in a plain cloth filter, and the brewed coffee drips through into the glass jug below and slowly fills it. The steam is thin and light, never a cloud. There is no coffee machine, no capsule and no instant coffee anywhere in frame. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Café passado na hora, no coador, e o prompt diz por nome que não existe
+máquina nem cápsula em quadro. O que segura a cena é a água caindo em fio,
+em círculos lentos: é o gesto que o gerador faz bonito.
+
+---
+
+## 20. Fazendo um chá de ervas
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter making herbal tea from loose dried herbs, a small glass jar of dried leaves open beside a clear glass teapot with a metal strainer basket inside it.
+
+ACTION
+She takes a spoonful of dried leaves from the jar and drops them into the strainer basket, then pours hot water over them from a kettle and watches the leaves open and the water turn colour, her lips closed.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the glass teapot in the lower part of the frame with clear uncluttered space between her chin and the teapot.
+
+WARDROBE
+Easy clothes at home on a slow morning: a soft oversized knit jumper in one plain colour worn over a plain t shirt, the sleeves long and falling to her wrists, the jumper loose enough to fall away from her body on its own, with relaxed straight leg jeans. Young and current, the comfortable clothes a woman in her early thirties actually wears at home, nothing dressed up and nothing formal. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the spoon and the kettle stay whole in her hands at all times. The tea is made only from loose dried whole herb leaves, green and grey green, poured from an open jar and held in the metal strainer: there is no tea bag anywhere in frame, no paper tag, no string, no sachet, no powder. The amount is modest, about one heaped teaspoon. The water falls as one steady stream and the leaves swell and open in the water, the liquid slowly taking on a pale golden colour. The steam is thin and light, never a cloud. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Erva solta, nunca saquinho. Essa é a trava do prompt, escrita em cima de
+tudo que o gerador poderia inventar no lugar: saquinho, etiqueta de papel,
+barbante, sachê e pó. O bule de vidro existe pra folha aparecer abrindo.
+
+---
+
 # Sem rosto, sem gastar crédito
 
 As mesmas cenas, sem você em quadro. Sem rosto não há identidade pra
 derivar, então saem no ilimitado do site, e cada uma emenda direto com a
 sua versão com rosto lá em cima.
 
-## 19. Os pés descalços na grama
+## 21. Os pés descalços na grama
 
 ```
 SCENE CONTEXT
@@ -761,7 +841,7 @@ POSITIVE LOCKS
 The feet are anatomically correct, five toes each, bare and clean, nails short and unpainted. The skin is bare and unmarked, no tattoos, no henna, no body art. Only the feet and the lower legs are visible, nothing above the knees, no face, no other people. No text or labels.
 ```
 
-## 20. A xícara na cafeteria
+## 22. A xícara na cafeteria
 
 ```
 SCENE CONTEXT
@@ -801,7 +881,7 @@ POSITIVE LOCKS
 The cup is plain white with no logo. The notebook is closed and blank. No hands, no arms, no people. No text or labels.
 ```
 
-## 21. A mesa do café da manhã com o sol entrando
+## 23. A mesa do café da manhã com o sol entrando
 
 ```
 SCENE CONTEXT
@@ -841,7 +921,7 @@ POSITIVE LOCKS
 The mug is plain with no logo. The portion is modest, one bowl. No hands, no arms, no people. No text or labels.
 ```
 
-## 22. A banca da feira
+## 24. A banca da feira
 
 ```
 SCENE CONTEXT
@@ -881,7 +961,7 @@ POSITIVE LOCKS
 The produce is fresh and unblemished. No hands, no arms, no people. No price signs, no text, no labels, no numbers.
 ```
 
-## 23. O copo de água com o sol
+## 25. O copo de água com o sol
 
 ```
 SCENE CONTEXT
@@ -921,7 +1001,7 @@ POSITIVE LOCKS
 The glass and the jug are plain, with no logo and no pattern. No hands, no arms, no people. No text or labels.
 ```
 
-## 24. As plantas sendo regadas
+## 26. As plantas sendo regadas
 
 ```
 SCENE CONTEXT
