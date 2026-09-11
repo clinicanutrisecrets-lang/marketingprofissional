@@ -1142,3 +1142,57 @@ manchete ia dar duas linhas abaixo.
 A etiqueta declara a série (§1.8) para quem gostou de um post procurar os outros.
 Só isso. Assunto, tema, volume e número de episódio são catalogação nossa e ficam
 no calendário.
+
+## 42. 🔴 TODO POST TEM GENÉTICA — porque é o teste que a gente vende
+
+Regra dada por ela em 10/09/2026: *"se a gente sempre vai tentar vender o teste
+nutrigenético, o conteúdo que a gente entrega tem que ter algo genético. Mesmo
+que também fale de exame de sangue, também fale de microbiota — mas tem que
+falar de nutrigenético. E sempre dar essa energia de sinergia nutricional, de
+alquimia."*
+
+Post que explica tudo por exame de sangue e termina oferecendo teste genético
+não fecha: a leitora não viu por que o teste responderia algo que o sangue não
+respondeu. **A genética não é o CTA — ela é o miolo.** O sangue mostra como você
+está hoje; o gene mostra como a máquina veio. São perguntas diferentes, e é essa
+diferença que justifica a compra.
+
+E junto vem a assinatura dela: **sinergia, biodisponibilidade, alquimia de
+compostos bioativos**. Não é enfeite — é o que separa "coma maçã" de nutrição
+(§1.7, §5.1).
+
+## 43. 🔴 PROMETEU "NÃO É ONDE VOCÊ IMAGINA" TEM QUE DIZER ONDE É
+
+A correção mais dura de 10/09, sobre o carrossel do peso: *"a gente acabou de
+falar que não é onde ela imaginava, e daí não conta onde que é, e só fala
+solução. Não dá pra entender isso."*
+
+O carrossel ia da pergunta direto pra conduta. Faltava o miolo, que é **a lista
+das possibilidades** — e é justamente ele que faz o post parecer investigação em
+vez de dica.
+
+**A sequência que fecha, e ela tem quatro tempos:**
+
+1. **Não é onde você imagina.** (a virada)
+2. **Então é onde?** — as possibilidades, com NOME. Quais nutrientes, quais
+   genes, qual via. Sem nome não existe descoberta: existe suspense vazio.
+3. **E em cada uma a conduta é DIFERENTE.** É aqui que o teste se vende sozinho,
+   porque a leitora vê com os próprios olhos que a saída muda conforme a causa.
+4. **Se identificar não é saber** (§24) → o teste.
+
+🔴 **Nomear é obrigatório.** "Pode ser falta de vitamina" não descobre nada.
+"Ferritina, vitamina D, B12, zinco, magnésio ou T3 — e todos podem estar dentro
+do normal no seu exame" é uma descoberta.
+
+🔴 **O ouro está onde a conduta se INVERTE.** No COMT, quem limpa dopamina rápido
+precisa de mais proteína e quem limpa devagar piora com ela. Mesma queixa, mesmo
+gene, conduta oposta. Esse é o argumento mais honesto que existe para o teste, e
+nenhum concorrente consegue copiar sem ter a curadoria.
+
+⚠️ **Conduta por gene NUNCA se escreve de cabeça.** Sai de `conteudo_genes`, que
+tem os nomes que a Aline deu a cada um na Fábrica ("FTO, o Controlador das
+Escolhas Alimentares"; "MC4R, o Controlador da Fome Emocional"; "LEPR, o Receptor
+da Saciedade"; "IRS1, o Mensageiro da Insulina") e o `objetivo_nutricional` por
+genótipo. Foi lá que apareceu o fato mais forte do post — o `rs9939609` registra
+que **o padrão mediterrâneo neutraliza o efeito do FTO em ensaio clínico** — e
+esse fato não estava em nenhum rascunho meu.
