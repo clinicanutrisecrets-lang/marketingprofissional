@@ -1096,3 +1096,49 @@ peça não sai; volta e conserta.
 
 🔴 **O item 1 é o que mais falha, e é o mais fácil de checar.** Ler só as últimas
 frases em sequência leva trinta segundos e pega o defeito que ela mais corrige.
+
+## 40. 🔴 A PALETA VEM DE `aline.perfis`, E "ESCURO É O TEXTO"
+
+Correção da Aline em 10/09/2026: *"suas cores têm esse azul-marinho que não é
+nosso, não é da Nutri Secrets."* Ela tinha razão: eu peguei `#161B33` e
+`#F8F9FE` do guia de GLP-1 (que é peça do Scanner, outro perfil e outra paleta) e
+usei como se fossem da marca dela.
+
+**A fonte da verdade é a linha `nutrisecrets` de `aline.perfis`**, no banco do
+Marketing (`mfldshdxulqxskwcoxrl`) — não um doc, não a memória, não outra peça
+que por acaso ficou bonita:
+
+| Token | Hex | Papel, nas palavras do campo `sistema_cor_regra` |
+|---|---|---|
+| tiffany | `#0ABFBC` | **fundo e bloco, nunca cor de letra** (contraste insuficiente sobre creme) |
+| magenta | `#D946EF` | **contraste em destaque**: número, CTA, palavra da virada, marcador |
+| creme | `#F5EFE2` | **o fundo** dos slides |
+| escuro | `#1A1A2E` | **o texto** |
+
+🔴 **"Escuro é o texto" — não é fundo de lâmina.** Eu vinha usando o escuro como
+fundo da capa e do CTA, e é daí que saiu a sensação de azul-marinho. A regra
+termina com *"nunca preto e branco editorial"*, que é o mesmo espírito: a peça
+vive no creme.
+
+⚠️ **`scannerdasaude` tem OUTRA paleta na mesma tabela** (roxo `#8B5CF6` como
+primária, e uma cor por pilar de conteúdo). Peça do Scanner não é referência de
+cor para peça da Nutri Secrets, por mais que o layout sirva de inspiração.
+
+**Cinza de corpo não se inventa.** O `#6B7280` que eu estava usando veio do guia
+do Scanner. O secundário sai do próprio escuro com opacidade, ou de um cinza
+derivado dele — nunca de um cinza neutro de outro sistema.
+
+## 41. 🔴 A ETIQUETA DE SÉRIE É O NOME DA SÉRIE, NÃO A NOSSA TAXONOMIA
+
+Mesma correção, 10/09: a capa trazia **"O SINTOMA ENGANA · PESO"**, e ela cortou
+o segundo pedaço: *"isso é pra gente. A pessoa não sabe o que é 'o sintoma engana
+· peso'. Pode ser só 'o sintoma engana', e aí vem 'você emagrece e engorda tudo
+de novo'."*
+
+A leitora não conhece a nossa organização interna. **"PESO" ali é o nome da pasta
+onde o post mora**, não informação para quem lê — e ainda rouba a surpresa que a
+manchete ia dar duas linhas abaixo.
+
+A etiqueta declara a série (§1.8) para quem gostou de um post procurar os outros.
+Só isso. Assunto, tema, volume e número de episódio são catalogação nossa e ficam
+no calendário.
