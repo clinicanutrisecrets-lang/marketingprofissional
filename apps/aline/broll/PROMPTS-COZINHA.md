@@ -26,7 +26,7 @@ enfeitar você com pérola e echarpe.
 ## 1. Apresentando o prato pronto para a câmera
 
 O plano que fecha receita. Hoje toda receita termina em close de comida,
-sem você. É o mais útil dos quatro.
+sem você. É o mais útil dos cinco.
 
 ```
 SUBJECT
@@ -170,12 +170,51 @@ Her glasses, hair, face shape and clothing match the reference, and her hair kee
 
 ---
 
+## 5. Amassando a massa de pão
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at a wooden kitchen counter dusted with flour, kneading a round of bread dough with both hands.
+
+ACTION
+She pushes the dough forward with the heel of one hand, folds it back over itself and turns it a quarter turn, twice. She pauses, raises her eyes to the lens for a moment with her lips closed, then goes back to kneading.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even beauty light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the dough in the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The dough stays one single round piece at all times, soft and elastic, it never splits into pieces, never sticks in strings to her hands and never changes size. The flour on the counter is a light dusting, never a cloud in the air. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+Amassar pão é a imagem de calma que nenhum outro plano da cozinha dá, e
+serve tanto de receita quanto de respiro no meio de assunto pesado.
+
+---
+
 # Parte 2 — só comida, sem gastar crédito
 
 Sete refeições diferentes, quatro cenas cada. Vinte segundos por clipe,
 quatro blocos de montagem por clipe.
 
-## 5. Ovos mexidos com espinafre e abacate
+## 6. Ovos mexidos com espinafre e abacate
 
 ```
 SCENE CONTEXT
@@ -217,7 +256,7 @@ The portion is modest, about two eggs. Only the pan, the spatula and the plate a
 
 ---
 
-## 6. Bowl de quinoa com grão-de-bico e ovo mole
+## 7. Bowl de quinoa com grão-de-bico e ovo mole
 
 ```
 SCENE CONTEXT
@@ -259,7 +298,7 @@ The bowl is filled about two thirds, never overflowing. Only the spoon is visibl
 
 ---
 
-## 7. Sopa de lentilha com couve e limão
+## 8. Sopa de lentilha com couve e limão
 
 ```
 SCENE CONTEXT
@@ -301,7 +340,7 @@ The amount of lemon juice is modest, a few drops, never a stream. Only the pot, 
 
 ---
 
-## 8. Frango grelhado com purê de couve-flor e cúrcuma
+## 9. Frango grelhado com purê de couve-flor e cúrcuma
 
 ```
 SCENE CONTEXT
@@ -343,7 +382,7 @@ The portion is modest, one chicken breast and two spoonfuls of purée. The chick
 
 ---
 
-## 9. Salada morna de beterraba assada, rúcula e nozes
+## 10. Salada morna de beterraba assada, rúcula e nozes
 
 ```
 SCENE CONTEXT
@@ -385,7 +424,7 @@ The walnuts are coarsely broken pieces, never whole nuts, about one tablespoon. 
 
 ---
 
-## 10. Iogurte natural com frutas vermelhas, chia e castanhas
+## 11. Iogurte natural com frutas vermelhas, chia e castanhas
 
 ```
 SCENE CONTEXT
@@ -427,7 +466,7 @@ The yoghurt is plain and white, no honey, no syrup, no sauce. The fruit is fresh
 
 ---
 
-## 11. Crucíferas salteadas com limão
+## 12. Crucíferas salteadas com limão
 
 A refeição mais alinhada com o que você fala: brócolis e couve-de-bruxelas
 com limão em cima, que é exatamente a cena da via do GST fechando com a
