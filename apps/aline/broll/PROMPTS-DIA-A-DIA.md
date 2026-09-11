@@ -11,8 +11,9 @@ Todos são **mudos**, de lábio fechado, porque a narração entra depois.
 Cada um vem com uma expressão escolhida, e as quatro linhas pra trocar
 estão em `PROMPTS-ALINE-EM-CENA.md`.
 
-Estes **gastam crédito**, porque você aparece. No fim do arquivo tem três
-variações sem rosto, dessas mesmas cenas, que saem no ilimitado do site.
+Os catorze primeiros **gastam crédito**, porque você aparece. Do 15 ao 20
+são as mesmas cenas sem o seu rosto, e essas saem no ilimitado do site,
+sem custo nenhum.
 
 Antes de gerar: duração mais curta disponível, 9:16, resolução máxima,
 **"enhance prompt" desligado**, sem áudio.
@@ -259,13 +260,253 @@ Her glasses, hair, face shape and clothing match the reference, and her hair kee
 
 ---
 
+## 8. Na feira, escolhendo folhas e frutas
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is at an open air produce market, standing in front of wooden crates of fresh vegetables and fruit, holding a bunch of dark green leaves in one hand.
+
+ACTION
+She turns the bunch of leaves over once to look at it, with her lips closed, then places it in a cloth bag hanging from her shoulder and looks at the crates again.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the crates filling the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The produce stays the same from the first frame to the last, it does not change type or colour. Any other people are far in the background, out of focus and never recognisable. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+É o plano que diz "comida de verdade" sem precisar de nenhuma palavra, e
+abre qualquer reel de receita melhor do que a panela.
+
+---
+
+## 9. Alongando de manhã na sala
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is standing on a mat in a bright living room in the morning, doing a slow simple stretch, one arm reaching across her chest.
+
+ACTION
+She holds the stretch, breathes once slowly with her lips closed, releases the arm and lets it fall easily to her side. Nothing athletic or strained, just an easy morning stretch.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Wide medium shot, vertical 9:16, her whole upper body in frame with her head in the upper third, the mat and the floor filling the lower part of the frame.
+
+WARDROBE
+Simple modern activewear, plain leggings and a plain fitted top in soft neutral colours, nothing ornate, no logos. No jewellery beyond small plain stud earrings. No pearls, no necklace, no brooch, no large or ornate jewellery, no floral print, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her hands and arms are anatomically correct, five fingers each. Her feet stay flat on the mat, never floating, never sliding. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Movimento é metade do que você fala sobre longevidade, e não existe um
+único plano seu em movimento no banco.
+
+---
+
+## 10. Bebendo água
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is in a bright kitchen holding a clear glass of water in one hand, a glass jug of water on the counter beside her.
+
+ACTION
+She lifts the glass, drinks once, lowers it and rests it on the counter, her lips closing again as she looks ahead. Calm and unhurried.
+
+EXPRESSION
+Her expression is warm and pleased, a soft closed-lip smile that reaches her eyes, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter in the lower part of the frame and clear uncluttered space above it.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the glass stays whole in her hand at all times. The water is clear and still, it never spills. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 11. Escrevendo no caderno de manhã
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is sitting at a table in the morning with an open notebook and a mug of coffee, writing by hand.
+
+ACTION
+She writes two lines, pauses with the pen resting on the page and her lips closed, looks out toward the light for a moment, then writes again.
+
+EXPRESSION
+Her expression is thoughtful, as if turning an idea over, her eyes lowering for a moment and then lifting again, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the notebook in the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the pen stays whole in her hand at all times. The pages are plain and unreadable, no text, no lines of writing that can be read. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 12. Regando as plantas na varanda
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is on a small balcony with green potted plants, holding a metal watering can, watering one of the pots.
+
+ACTION
+She tilts the can slowly and a thin thread of water falls into the pot. She straightens the can, touches one leaf lightly with her fingertips, and looks at the plant with her lips closed.
+
+EXPRESSION
+Her expression is warm and pleased, a soft closed-lip smile that reaches her eyes, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the plants filling the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the watering can stays whole in her hand at all times. The water falls as one thin continuous thread, never a splash, never a flood. The leaves are green and healthy. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 13. Caminhando na beira do mar ao amanhecer
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is walking slowly barefoot along wet sand at the edge of the sea at sunrise, the water shallow and calm behind her.
+
+ACTION
+She takes two slow steps along the water line, looking ahead with her lips closed, then stops and looks out toward the horizon. Her hair moves lightly in the breeze.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Warm golden hour light coming from behind her, with a large soft bounce from the front so her face stays evenly lit and nothing on it casts a hard shadow. Low contrast, soft rim of light on her hair, background softly blurred.
+
+FRAMING
+Wide medium shot, vertical 9:16, her whole body in frame with her head in the upper third, the wet sand and the shallow water filling the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her feet are bare and anatomically correct, five toes each, in contact with the sand at all times, never floating, never sliding. Her hands are anatomically correct, five fingers each. The sea is calm, small shallow waves only. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+---
+
+## 14. Passando protetor solar
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+
+SCENE
+She is on a sunlit balcony applying a little sunscreen to her cheek with her fingertips, a small plain white tube in her other hand.
+
+ACTION
+She spreads the cream over her cheek with two fingertips in one slow circular movement, lowers the hand, and looks ahead with her lips closed.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Close medium shot, vertical 9:16, her head in the upper third with headroom above it, clear uncluttered space from her chin down to the bottom of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are anatomically correct, five fingers each, nails short and unpainted, no rings. The cream blends in completely and leaves no white patch on her skin. The tube is plain white with nothing written on it. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Combina com tudo que você fala de pele e de envelhecimento, e é o tipo de
+cena que ninguém no seu nicho tem.
+
+---
+
 # Sem rosto, sem gastar crédito
 
 As mesmas cenas, sem você em quadro. Sem rosto não há identidade pra
 derivar, então saem no ilimitado do site, e cada uma emenda direto com a
 sua versão com rosto lá em cima.
 
-## 8. Os pés descalços na grama
+## 15. Os pés descalços na grama
 
 ```
 SCENE CONTEXT
@@ -305,7 +546,7 @@ POSITIVE LOCKS
 The feet are anatomically correct, five toes each, bare and clean, nails short and unpainted. Only the feet and the lower legs are visible, nothing above the knees, no face, no other people. No text or labels.
 ```
 
-## 9. A xícara na cafeteria
+## 16. A xícara na cafeteria
 
 ```
 SCENE CONTEXT
@@ -345,7 +586,7 @@ POSITIVE LOCKS
 The cup is plain white with no logo. The notebook is closed and blank. No hands, no arms, no people. No text or labels.
 ```
 
-## 10. A mesa do café da manhã com o sol entrando
+## 17. A mesa do café da manhã com o sol entrando
 
 ```
 SCENE CONTEXT
@@ -383,4 +624,124 @@ Photoreal food cinematography, visible natural texture, true to life colors, fin
 
 POSITIVE LOCKS
 The mug is plain with no logo. The portion is modest, one bowl. No hands, no arms, no people. No text or labels.
+```
+
+## 18. A banca da feira
+
+```
+SCENE CONTEXT
+Four short shots of an open air produce market stall, food only, no people.
+
+LOCATION MAP
+Wooden crates of fresh vegetables and fruit under a market awning. Camera at crate height, straight on. Soft diffused morning light.
+
+FORMAT MODE
+Four separate shots with hard cuts between them, no dissolves. Same stall, same light and same lens in all four.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Scene 1 (0-5s): a crate of dark green leafy bunches, the leaves fresh and slightly damp.
+Hard cut.
+Scene 2 (5-10s): extreme macro of ripe tomatoes stacked in a crate, the skin taut and glossy.
+Hard cut.
+Scene 3 (10-15s): a crate of bright citrus fruit, the peel textured and even in colour.
+Hard cut.
+Scene 4 (15-20s): the whole stall seen straight on, crates side by side, soft morning light across them.
+
+PHYSICS
+The produce sits still and stacked, nothing rolls or falls. The leaves are fresh and upright, never wilted.
+
+LIGHTING
+Soft diffused morning light under the awning.
+
+STYLE
+Photoreal food cinematography, visible natural texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+The produce is fresh and unblemished. No hands, no arms, no people. No price signs, no text, no labels, no numbers.
+```
+
+## 19. O copo de água com o sol
+
+```
+SCENE CONTEXT
+Four short shots of water being poured and standing in the light, no people.
+
+LOCATION MAP
+A clear glass and a glass jug of water on a light kitchen counter beside a window. Camera at glass height, straight on. Soft daylight from the left.
+
+FORMAT MODE
+Four separate shots with hard cuts between them, no dissolves. Same counter, same light and same lens in all four.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Scene 1 (0-5s): water pours from the jug into the empty glass in one steady clear stream and the level rises.
+Hard cut.
+Scene 2 (5-10s): extreme macro of the surface of the water settling, the last ripples fading out.
+Hard cut.
+Scene 3 (10-15s): the full glass standing still, the light from the window refracting through it onto the counter.
+Hard cut.
+Scene 4 (15-20s): the glass and the jug side by side on the counter, both still, warm light across them.
+
+PHYSICS
+The water pours as one clean stream, never splashing over the rim. The ripples settle and the surface goes still. The glass is clear, with no condensation trails running down it.
+
+LIGHTING
+Soft daylight from the left through the window.
+
+STYLE
+Photoreal cinematography, visible natural texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+The glass and the jug are plain, with no logo and no pattern. No hands, no arms, no people. No text or labels.
+```
+
+## 20. As plantas sendo regadas
+
+```
+SCENE CONTEXT
+Four short shots of potted plants on a balcony being watered, no people.
+
+LOCATION MAP
+Three green potted plants on a small balcony, terracotta pots on a tiled floor. Camera at pot height, straight on. Soft morning light.
+
+FORMAT MODE
+Four separate shots with hard cuts between them, no dissolves. Same balcony, same light and same lens in all four.
+
+OPTICS
+Extreme close-up, 50mm equivalent, shallow depth of field.
+
+CAMERA
+Static locked off, no movement.
+
+ACTION
+Scene 1 (0-5s): a thin thread of water falls from a metal watering can into the soil of one pot and soaks in.
+Hard cut.
+Scene 2 (5-10s): extreme macro of a green leaf with two small water drops sitting on it.
+Hard cut.
+Scene 3 (10-15s): the wet soil in the pot, dark and freshly watered.
+Hard cut.
+Scene 4 (15-20s): the three pots side by side on the balcony floor, leaves still, morning light across them.
+
+PHYSICS
+The water falls as one thin continuous thread and soaks into the soil, it never floods or pools over the rim. The drops stay on the leaf and do not slide off. The leaves are green and healthy.
+
+LIGHTING
+Soft morning light on the balcony.
+
+STYLE
+Photoreal cinematography, visible natural texture, true to life colors, fine grain.
+
+POSITIVE LOCKS
+The pots are plain terracotta with no pattern. No hands, no arms, no people. No text or labels.
 ```
