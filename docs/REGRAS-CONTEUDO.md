@@ -1053,3 +1053,46 @@ perde quem nunca saiu do lugar.
 em todos os posts que eu já fiz"*. Efeito sanfona, efeito rebote, efeito platô —
 a leitora já usa o termo, então ele gera reconhecimento imediato (§17) sem custar
 explicação. Preferir "efeito X" a descrever o fenômeno por extenso.
+
+## 39. 🔴 A CONFERÊNCIA ANTES DE MANDAR — a lista roda aqui, não nela
+
+Pedido da Aline em 10/09/2026: *"se precisa ser uma regra, porque eu fico tendo
+que corrigir coisa óbvia, e você tem aí os agentes todos de marketing. Não era
+pra eu estar falando tudo isso toda hora."*
+
+**Ela está certa, e o diagnóstico é o pior possível: a regra já existia.** A capa
+que ela devolveu terminava em *"o efeito sanfona não é falta de força de
+vontade"* — uma conclusão, que satisfaz e encerra. A §21 diz, com essas palavras,
+que *"nenhuma lâmina pode terminar num lugar onde a leitora fica satisfeita"*, e
+a §1.4 diz que *"cada lâmina termina devendo alguma coisa à seguinte"*.
+
+Ou seja: **regra nova não conserta isso.** O que faltou foi conferir a peça
+contra as regras antes de mandar. Então o que entra aqui não é mais uma regra —
+é a lista que se roda ANTES de entregar qualquer carrossel. Se um item falha, a
+peça não sai; volta e conserta.
+
+### A lista
+
+1. **Toda lâmina termina devendo?** Leia só a ÚLTIMA frase de cada uma, em
+   sequência, ignorando o resto. Se alguma delas puder ser lida como ponto final
+   satisfatório, aquela lâmina é onde a leitora para. (§1.4, §16, §21)
+2. **A terceira linha da capa ABRE um mistério?** Ela é a que decide o arrasto.
+   Conclusão fecha; pergunta, "talvez", "o que ninguém te mostrou" abrem. O teste
+   é o do detetive: *"vai desvendar esse mistério"*. (§16)
+3. **A capa é óbvia ou sutil?** Palavra de gente, não de nutricionista. E cobre
+   os DOIS jeitos de fracassar, não só um. (§38)
+4. **Tem mini solução que ela FAZ e SENTE amanhã**, sem gastar e sem depender de
+   terceiro? Tarefa não conta. (§14)
+5. **Alguma lâmina manda de volta pro profissional dela?** Se sim, corta. (§15)
+6. **Todo número é proporção**, nunca "pelo menos um" nem base absoluta. (§18, §26b)
+7. **O vocabulário da Fábrica aparece colado na tradução**, nunca pelado. (§6)
+8. **Nenhuma gíria de consultório** ("laudo limpo", "pasta cheia"). (§23)
+9. **O custo está escancarado, e não é em dinheiro.** (§22, §22b)
+10. **A validação carrega o "mas" dentro dela**, na mesma respiração. (§21)
+11. **Promete "comigo"?** Se sim, troca por "a gente". (§31)
+12. **Repete "de graça"?** Se sim, troca pelo que ela RECEBE. (§32)
+13. **A arte:** fundo claro, Playfair no título e DM Sans leve no corpo, uma
+    ideia por lâmina, e a última invertida para o escuro. (§34, §40)
+
+🔴 **O item 1 é o que mais falha, e é o mais fácil de checar.** Ler só as últimas
+frases em sequência leva trinta segundos e pega o defeito que ela mais corrige.
