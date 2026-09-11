@@ -82,6 +82,12 @@ estampa floral nem ombreira. No máximo brinco de pressão pequeno e uma
 corrente fina. Sem essa instrução o gerador enfeita sozinho, e o que ele
 escolhe envelhece dez anos.
 
+**A tatuagem.** Mesma classe de erro da pérola: eu não disse nada sobre a
+pele do braço, então ele preencheu sozinho. Agora a pele sem marca está
+dita duas vezes, no `SUBJECT` e na trava, e nomeando cada parte que
+aparece em quadro, porque "sem tatuagem" solto o gerador atravessa. Braço,
+punho, mão, dedo, pescoço, ombro, colo, costas e tornozelo.
+
 ---
 
 ## 1. Frontal, blusa creme
@@ -92,7 +98,7 @@ existe outro.
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is sitting at her consulting room desk, wearing a cream silk blouse, facing the camera.
@@ -116,7 +122,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -128,7 +134,7 @@ gravação.
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is sitting at her consulting room desk, wearing her open white lab coat over a dark blouse, facing the camera.
@@ -152,7 +158,7 @@ WARDROBE
 A clean modern white lab coat with the name ALINE QUISSAK embroidered in small dark letters on the left chest, spelled exactly like that, and nothing else written anywhere on the coat. Underneath, simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -161,7 +167,7 @@ Her glasses, hair, face shape and clothing match the reference, and her hair kee
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is sitting at her consulting room desk, wearing a dark green blazer over a light top, facing the camera.
@@ -185,7 +191,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -197,7 +203,7 @@ serve de passagem entre dois assuntos.
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is standing in the corridor of a modern clinic in a white coat, one hand holding a closed folder against her chest.
@@ -221,7 +227,7 @@ WARDROBE
 A clean modern white lab coat with the name ALINE QUISSAK embroidered in small dark letters on the left chest, spelled exactly like that, and nothing else written anywhere on the coat. Underneath, simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -234,7 +240,7 @@ acontecendo. Aqui a mão é o assunto, e é onde o gerador mais erra:
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 Close on her hands writing on a prescription pad at her desk, her face visible and slightly out of focus behind her hands.
@@ -258,7 +264,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. Never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the pen stays whole in her hand at all times. Nothing on the pad or on any screen or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. Never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the pen stays whole in her hand at all times. Nothing on the pad or on any screen or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -269,7 +275,7 @@ Her glasses, hair, face shape and clothing match the reference, and her hair kee
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is at her desk holding a printed multi-page report in both hands, reading it.
@@ -293,7 +299,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted. The pages are plain printed sheets with unreadable blurred lines of text, no charts, no logos, no numbers, no colour highlights. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted. The pages are plain printed sheets with unreadable blurred lines of text, no charts, no logos, no numbers, no colour highlights. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -305,7 +311,7 @@ atendendo.
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 She is standing beside a large wall screen in a bright teaching room, turned three quarters toward the camera, one hand raised toward the screen.
@@ -329,7 +335,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each. The screen shows only soft abstract shapes and colour, completely unreadable, no text, no charts, no letters. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each. The screen shows only soft abstract shapes and colour, completely unreadable, no text, no charts, no letters. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -342,7 +348,7 @@ como os outros.
 
 ```
 SUBJECT
-A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
 
 SCENE
 Over the shoulder of a seated patient, foreground and out of focus, looking toward the nutritionist across the desk.
@@ -366,7 +372,7 @@ WARDROBE
 Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. The patient in the foreground is only a blurred shoulder and the back of a head, never their face, never recognisable. Nothing on any screen, paper or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. The patient in the foreground is only a blurred shoulder and the back of a head, never their face, never recognisable. Nothing on any screen, paper or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -402,6 +408,8 @@ Não precisa ler pra usar. É só pra você saber que nenhuma linha é enfeite.
 - **cabelo igual dos dois lados**: é o primeiro detalhe a derivar.
 - **dente não aparece**: sem isso sai dente de propaganda, e o sorriso
   largo gerado deforma a boca na pausa. Aconteceu no vídeo da menopausa.
+- **pele sem marca, parte por parte**: tatuagem, pérola e nome errado no
+  jaleco são o mesmo erro. Onde eu não digo nada, o gerador inventa.
 - **nada legível**: laudo ou tela com número inventado num vídeo seu é
   problema de outra ordem.
 - **quadro parado**: com movimento de câmera o rosto deriva mais rápido.
