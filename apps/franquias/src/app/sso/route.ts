@@ -7,6 +7,12 @@ import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
 import { EMBED_COOKIE, EMBED_COOKIE_MAX_AGE, destinoSeguro, pediuEmbed } from "@/lib/embed/destino";
 
 export const dynamic = "force-dynamic";
+// 🔴 Sem cache de fetch NESTA rota, dito duas vezes de propósito (11/09/2026):
+// `force-dynamic` não desliga o Data Cache do Next 14, e o magic link cacheado
+// foi o que derrubou o SSO (ver lib/supabase/server.ts). O client já sai com
+// `cache: "no-store"`; esta linha garante que nenhum fetch novo aqui volte a
+// guardar resposta, mesmo que alguém troque o client.
+export const fetchCache = "force-no-store";
 
 /**
  * GET /sso?token=<jwt>
@@ -189,13 +195,34 @@ export async function GET(req: NextRequest) {
 
   // ── 6. Abre a sessão com o hash obtido no passo 3 ──
   const supabase = createClient();
-  const { error: otpErr } = await supabase.auth.verifyOtp({
+  let { error: otpErr } = await supabase.auth.verifyOtp({
     type: "magiclink",
     token_hash: tokenHash,
   });
   if (otpErr) {
-    console.error("[sso] verifyOtp falhou:", otpErr.message);
-    return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    // Segunda chance com hash NOVO. Um hash que "não existe" é hash já
+    // consumido ou vencido — nunca é motivo pra trancar a nutri do lado de
+    // fora, porque quem chega aqui já se autenticou no Scanner. Foi assim que
+    // o cache de fetch (ver lib/supabase/server.ts) virou "Marketing fora do
+    // ar" por um mês: o hash velho falhava e a rota desistia na primeira.
+    console.warn("[sso] verifyOtp falhou, tentando com hash novo:", otpErr.message);
+    const { data: novo, error: novoErr } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: emailToken,
+    });
+    const novoHash = novo?.properties?.hashed_token;
+    if (novoErr || !novoHash) {
+      console.error("[sso] generateLink (2ª tentativa) falhou:", novoErr?.message);
+      return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    }
+    ({ error: otpErr } = await supabase.auth.verifyOtp({
+      type: "magiclink",
+      token_hash: novoHash,
+    }));
+    if (otpErr) {
+      console.error("[sso] verifyOtp falhou de novo:", otpErr.message);
+      return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    }
   }
 
   // redirect() do next/navigation (não NextResponse.redirect) é o padrão
