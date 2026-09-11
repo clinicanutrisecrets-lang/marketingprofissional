@@ -1196,3 +1196,44 @@ da Saciedade"; "IRS1, o Mensageiro da Insulina") e o `objetivo_nutricional` por
 genótipo. Foi lá que apareceu o fato mais forte do post — o `rs9939609` registra
 que **o padrão mediterrâneo neutraliza o efeito do FTO em ensaio clínico** — e
 esse fato não estava em nenhum rascunho meu.
+
+## 44. 🔴 MC4R É FOME EMOCIONAL (serotonina). SACIEDADE É LEPR E FTO.
+
+Correção da Aline em 10/09/2026, e ela apanhou um erro meu de mistura: eu tinha
+dado ao MC4R a conduta de saciedade mecânica ("salada antes do prato, não comer
+em menos de dez minutos") e deixado o LEPR com uma conduta genérica.
+
+**A confusão tem uma causa concreta: os dois SNPs de MC4R na curadoria têm nomes
+e papéis DIFERENTES**, e eu puxei o campo de um enquanto citava o outro.
+
+| SNP | Nome na Fábrica | Do que ele trata |
+|---|---|---|
+| `rs17782313` | **Controlador da Fome Emocional** | comer por emoção, estresse, prazer — *"mesmo quando o organismo não necessita de energia"*. É comportamento hedônico. |
+| `rs12970134` | Centro de Controle da Fome | saciedade hipotalâmica, sinal de "chega" mais lento |
+
+**A via do MC4R emocional é SEROTONINÉRGICA**, e está escrita na curadoria:
+`aminoacidos_chave` traz *"triptofano (saciedade via serotonina)"*,
+`vitaminas_chave` traz *"B6 piridoxal-5-fosfato (síntese de serotonina)"*, e
+`minerais_chave` traz **cromo**, com a justificativa *"sensibilidade insulínica e
+controle de compulsão por carboidrato"*. É isso que a Aline quis dizer com *"ele
+também tem metabolismo de carboidrato diminuído"*.
+
+**Saciedade, com fibra, é LEPR e FTO** — não MC4R. No LEPR o corpo produz leptina
+e o cérebro não escuta, então o alvo é **desinflamar**, não comer menos.
+
+⚠️ **Lição de método: citar um gene não basta, tem que citar o SNP.** É a REGRA
+SUPREMA de `lib/conteudo-genes-lookup.ts` aparecendo no marketing — a chave é o
+rs, nunca o nome do gene. Foi o mesmo erro que inverteu o CYP2C9 no laudo em PDF
+(02/09), e ele reapareceu aqui, num carrossel.
+
+## 45. "Emagrecer é mais do que caloria. É alquimia."
+
+Frase dela, 10/09. É a assinatura que fecha a §42: o post pode falar de gene, de
+exame e de microbiota, mas o que amarra tudo é **sinergia** — nutriente sozinho é
+dose, nutriente no par certo é efeito.
+
+⚠️ Nota de transcrição, para não se repetir: o áudio dela saiu como *"onde a
+Valéria fala…"*, e eu procurei uma pessoa chamada Valéria na base inteira. Não
+existe — ela disse *"é aí que **valeria** falar daquela parte"*. Antes de sair
+procurando um nome próprio que apareceu uma vez só, considerar que pode ser o
+verbo.
