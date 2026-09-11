@@ -97,8 +97,11 @@ existem. Fora daqui:
   crédito e precisam de Soul ID.
 - `PROMPTS-COZINHA.md`: ela cozinhando (gasta crédito) e sete refeições
   saudáveis em prato pronto, sem pessoa (não gasta).
+- `PROMPTS-DIA-A-DIA.md`: a vida fora do consultório, acordando, café da
+  manhã, cafeteria, parque, descalça na grama, pôr do sol e fim de tarde,
+  mais três versões sem rosto das mesmas cenas (não gastam).
 
-Todo prompt nesses dois arquivos é copiar e colar inteiro: as travas
+Todo prompt nesses arquivos é copiar e colar inteiro: as travas
 repetidas já estão dentro de cada bloco.
 
 Os dois reels de receita fecham com o material que existe, mas parte do

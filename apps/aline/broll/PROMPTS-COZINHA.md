@@ -19,7 +19,9 @@ Em todos: 9:16, resolução máxima, **"enhance prompt" desligado**, sem
 
 Todos mudos, de lábio fechado: sua narração é gravada depois e boca
 falando não bate com nada. Cada um vem com uma expressão escolhida, e
-a lista das quatro para trocar está em `PROMPTS-ALINE-EM-CENA.md`.
+a lista das quatro para trocar está em `PROMPTS-ALINE-EM-CENA.md`, junto
+com a explicação do bloco `WARDROBE`, que é o que impede o gerador de
+enfeitar você com pérola e echarpe.
 
 ## 1. Apresentando o prato pronto para a câmera
 
@@ -47,6 +49,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the bowl in the lower middle, and clear uncluttered space around the bowl.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The food in the bowl stays exactly the same from the first frame to the last, it does not change or move. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
@@ -78,6 +83,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the pan in the lower part of the frame, and clear uncluttered space between her chin and the pan.
 
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the wooden spoon stays whole in her hand at all times. The steam is light and thin, never smoke, never a cloud. Nothing on any label, screen or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
@@ -108,6 +116,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Vertical 9:16, the board in the lower half of the frame, her face in the upper third, clear uncluttered space between them.
 
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, all fingers whole and unharmed, nails short and unpainted, no rings. The knife stays whole and its blade never touches her fingers. The slices are even and stay on the board. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
@@ -137,6 +148,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 
 FRAMING
 Vertical 9:16, the plate in the lower half of the frame, her face in the upper third, clear uncluttered space between them.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the jug stays whole in her hand at all times. The oil falls as one thin continuous thread, never a splash, never a puddle, and the amount is modest, about one tablespoon. Nothing on any label or packaging is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.

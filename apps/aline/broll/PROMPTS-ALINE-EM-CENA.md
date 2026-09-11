@@ -66,6 +66,22 @@ Her expression is calm and serene, unhurried and at ease, eyes soft, lips togeth
 Vale gerar a mesma cena com duas expressões diferentes: sai como se
 fossem dois planos, e custa o mesmo que gerar duas variações da mesma.
 
+**O jaleco.** Todo prompt de jaleco agora traz o bordado escrito por
+extenso, `ALINE QUISSAK`, em duas partes do prompt: no figurino e na
+trava de texto. A trava antiga dizia que nada em quadro podia ser
+legível, e era por isso que o gerador escrevia qualquer nome ali: ele
+precisava pôr alguma coisa e eu não tinha dito o quê. Agora diz.
+
+> Texto em vídeo gerado erra com frequência mesmo assim. Confira o
+> bordado em cada geração antes de usar, letra por letra. Nome curto
+> ajuda, por isso está só o nome, sem CRN e sem "nutricionista".
+
+**As joias e a roupa.** Entrou um bloco `WARDROBE` em todos, e ele diz
+em letras claras: nada de pérola, broche, colar grande, echarpe, xale,
+estampa floral nem ombreira. No máximo brinco de pressão pequeno e uma
+corrente fina. Sem essa instrução o gerador enfeita sozinho, e o que ele
+escolhe envelhece dez anos.
+
 ---
 
 ## 1. Frontal, blusa creme
@@ -96,6 +112,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
 
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
@@ -112,7 +131,7 @@ SUBJECT
 A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties.
 
 SCENE
-She is sitting at her consulting room desk, wearing an open white lab coat over a dark blouse, facing the camera.
+She is sitting at her consulting room desk, wearing her open white lab coat over a dark blouse, facing the camera.
 
 ACTION
 She sits still and looks into the lens, calm and warm, her lips closed. She blinks naturally, tilts her head very slightly once, lowers her eyes to the desk for a moment, then looks back into the lens. Her hands rest on the desk, still.
@@ -129,8 +148,11 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
 
+WARDROBE
+A clean modern white lab coat with the name ALINE QUISSAK embroidered in small dark letters on the left chest, spelled exactly like that, and nothing else written anywhere on the coat. Underneath, simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -158,6 +180,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
@@ -192,8 +217,11 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
 
+WARDROBE
+A clean modern white lab coat with the name ALINE QUISSAK embroidered in small dark letters on the left chest, spelled exactly like that, and nothing else written anywhere on the coat. Underneath, simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. Nothing on any screen, paper or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks, eyebrows calm. The only readable text anywhere in frame is the embroidery ALINE QUISSAK on her lab coat, spelled exactly like that. Nothing on any screen, paper or label is readable, no other text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
 
 ---
@@ -226,6 +254,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Vertical 9:16, the pad in the lower half of the frame, her face in the upper third, clear uncluttered space between them.
 
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. Never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the pen stays whole in her hand at all times. Nothing on the pad or on any screen or label is readable, no text, no numbers. No other people in frame. Static framing, no zoom, no camera move.
 ```
@@ -257,6 +288,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the report held low near the desk so the middle of the frame stays clear.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, nails short and unpainted. The pages are plain printed sheets with unreadable blurred lines of text, no charts, no logos, no numbers, no colour highlights. No other people in frame. Static framing, no zoom, no camera move.
@@ -291,6 +325,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, and clear uncluttered space from her chin down to the bottom of the frame.
 
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each. The screen shows only soft abstract shapes and colour, completely unreadable, no text, no charts, no letters. No other people in frame. Static framing, no zoom, no camera move.
 ```
@@ -324,6 +361,9 @@ Soft even beauty light, one large diffused source just above the camera and a so
 
 FRAMING
 Vertical 9:16, the nutritionist's head in the upper third, the blurred shoulder filling the lower left corner only, the rest of the lower frame clear.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
 
 LOCKS
 Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never laughing, teeth not visible. Natural blinks. The patient in the foreground is only a blurred shoulder and the back of a head, never their face, never recognisable. Nothing on any screen, paper or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
