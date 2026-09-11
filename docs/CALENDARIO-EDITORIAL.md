@@ -124,8 +124,41 @@ post + story de quarta + B-roll do mês seguinte) · 8 carrosséis saem do Marke
 Envios por alcance (régua: 7.400 do post da maçã) · comentários por 100 curtidas
 (melhor histórico: 35) · quantas pessoas do direct chegaram na Avaliação.
 
+## Horário de publicação (medido na Meta, 10/09/2026)
+
+Dado do painel Insights → Público → "Horários de atividade dos seguidores", lido
+por ela no aparelho.
+
+**Dias:** segunda, terça e quinta — são os três que a Meta aponta.
+**Janela de pico:** **19h às 22h de Brasília**.
+**Publicar por volta de 18h30–19h BRT**, para o post já estar circulando quando o
+pico chega.
+
+🔴 **A CONVERSÃO DE FUSO É OBRIGATÓRIA, E É ONDE SE ERRA.** O painel mostra os
+horários **no relógio de quem está lendo**, e ela está no Canadá: o print diz
+"com base no seu fuso horário atual (GMT-4)" e lista *18 a 21*. O público é quase
+todo brasileiro (Portugal 2,0%, EUA 1,1%, Reino Unido e Paraguai 0,2% cada — o
+resto é Brasil), e o Brasil é GMT-3 o ano inteiro desde que acabou o horário de
+verão. Logo **soma-se uma hora**: 18–21 no print = **19h–22h em Brasília**.
+
+⚠️ A diferença não é fixa. Ela é de 1 hora enquanto o Canadá está no horário de
+verão; quando ele acaba (primeiro domingo de novembro), o painel passa a marcar
+GMT-5 e a diferença vira 2 horas. **Reconferir o rótulo do fuso no print sempre
+que for reler esse número** — o horário na tela muda sem o comportamento do
+público mudar.
+
+**O que isso corrige:** a grade provisória era terça, quarta, quinta e sábado.
+**Sábado sai** (não está entre os três) e **segunda entra**. Para o quarto post da
+semana não há dado — a Meta só entrega os três primeiros dias —, então fica
+quarta, que é dia útil e se parece mais com os três de cima do que o fim de
+semana.
+
+⚠️ **O que esse número é, e o que ele não é.** Ele mede quando o seguidor está
+COM O APLICATIVO ABERTO, não quando ele compra nem quando o post performa. É o
+melhor proxy disponível e vale usar, mas quem decide de verdade é o alcance por
+horário dos posts reais — que só dá para medir depois de algumas semanas
+publicando na janela certa.
+
 ## Pendências
 
-- **Horário**: não medível ainda (ver `PESQUISA-PUBLICO.md` §1). Grade provisória
-  terça, quarta, quinta e sábado.
 - **Réguas clínicas**: confirmar os três números acima.
