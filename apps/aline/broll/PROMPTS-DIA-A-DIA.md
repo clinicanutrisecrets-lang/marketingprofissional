@@ -11,7 +11,7 @@ Todos são **mudos**, de lábio fechado, porque a narração entra depois.
 Cada um vem com uma expressão escolhida, e as quatro linhas pra trocar
 estão em `PROMPTS-ALINE-EM-CENA.md`.
 
-Os catorze primeiros **gastam crédito**, porque você aparece. Do 15 ao 20
+Os dezoito primeiros **gastam crédito**, porque você aparece. Do 19 ao 24
 são as mesmas cenas sem o seu rosto, e essas saem no ilimitado do site,
 sem custo nenhum.
 
@@ -542,13 +542,173 @@ cena que ninguém no seu nicho tem.
 
 ---
 
+## 15. Comendo um quadrado de chocolate 70%
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at a kitchen counter with a bar of very dark chocolate on a small plain plate in front of her, breaking one square off the bar.
+
+ACTION
+She snaps one small square off the bar, lifts it, places it in her mouth and closes her lips over it, then chews slowly with her mouth closed and looks ahead, unhurried. She takes only one square.
+
+EXPRESSION
+Her expression is warm and pleased, a soft closed-lip smile that reaches her eyes, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the plate and the bar in the lower part of the frame with clear uncluttered space around them.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. She never speaks, no talking, no dialogue, no mouth movement other than the one small bite and the slow closed mouth chewing. Her mouth stays closed while she chews, never open, never wide, teeth never visible, never laughing. Her hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the chocolate square stays whole until she eats it. The chocolate is very dark, almost black brown, matte and hard, it snaps cleanly and never melts or smears on her fingers. The bar is plain with no wrapper, no foil, no printing on it. Only one square is taken and the rest of the bar stays on the plate. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Prazer sem culpa é um dos seus assuntos e não existe nenhuma imagem dele.
+A trava aqui é a boca: uma mordida só, mastigando de boca fechada, dente
+nunca à mostra. É o que impede de parecer que você está falando.
+
+---
+
+## 16. Tomando o suplemento
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at a kitchen counter holding a single capsule between her thumb and index finger, a glass of water on the counter beside her.
+
+ACTION
+She looks at the capsule for a moment with her lips closed, sets it down beside the glass, and rests her hand on the counter. She does not swallow it on camera.
+
+EXPRESSION
+Her expression is focused and absorbed in what she is doing, eyes steady, brows relaxed, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter in the lower part of the frame and clear uncluttered space above it.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are anatomically correct, five fingers each, nails short and unpainted, no rings, and the capsule stays whole and single at all times, never multiplying, never splitting. The capsule is a plain single colour with no printing on it. There are no pill bottles, no blister packs and no boxes anywhere in frame. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Você fala de conduta e de dose o tempo todo, e não tem uma única imagem de
+suplemento. Ela não engole na cena de propósito: ilustra a conversa sem
+virar demonstração de uso de produto nenhum.
+
+---
+
+## 17. Lendo o rótulo no mercado
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is in a supermarket aisle holding a plain package in both hands, turning it to read the back of it.
+
+ACTION
+She turns the package over, reads the back for a moment with her lips closed, then lowers it slightly and looks up, considering. She does not put it in a basket.
+
+EXPRESSION
+Her expression is thoughtful, as if turning an idea over, her eyes lowering for a moment and then lifting again, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft even light, one large diffused source just above the camera and a soft fill from below, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the package held low near her chest so the middle of the frame stays clear.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The package is a plain unbranded box with blurred unreadable print, no logo, no brand, no legible words, no numbers. The shelves behind her are softly blurred and their packaging is unreadable. Any other people are far in the background, out of focus and never recognisable. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Leitura de rótulo é o conteúdo mais pedido do seu nicho. A embalagem é
+propositalmente sem marca e ilegível: assim serve pra qualquer produto e
+não vira propaganda nem processo.
+
+---
+
+## 18. Tomando o sol da manhã na varanda
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is standing on a balcony in the early morning with the low sun in front of her, her face turned toward the light and her eyes closed.
+
+ACTION
+She stands still with her eyes closed and her face turned to the morning sun, takes one slow easy breath with her lips closed, then opens her eyes and looks out at the view. Her arms rest easily at her sides.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, background softly blurred.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the balcony rail and the view filling the lower part of the frame.
+
+WARDROBE
+Modern, young and minimal. Simple clean lines. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no pearl necklace, no pearl earrings, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads, nothing that reads as older or formal dress.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Her hands are anatomically correct, five fingers each, resting at her sides. The sunlight is soft and low, warm on her face, never a hard flare, never a harsh shadow across her, and she never squints or frowns. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Sol da manhã é vitamina D, e é o plano que falta toda vez que você fala
+disso. Serve de abertura calma e o vão de baixo do quadro fica livre pra
+legenda.
+
+---
+
 # Sem rosto, sem gastar crédito
 
 As mesmas cenas, sem você em quadro. Sem rosto não há identidade pra
 derivar, então saem no ilimitado do site, e cada uma emenda direto com a
 sua versão com rosto lá em cima.
 
-## 15. Os pés descalços na grama
+## 19. Os pés descalços na grama
 
 ```
 SCENE CONTEXT
@@ -588,7 +748,7 @@ POSITIVE LOCKS
 The feet are anatomically correct, five toes each, bare and clean, nails short and unpainted. The skin is bare and unmarked, no tattoos, no henna, no body art. Only the feet and the lower legs are visible, nothing above the knees, no face, no other people. No text or labels.
 ```
 
-## 16. A xícara na cafeteria
+## 20. A xícara na cafeteria
 
 ```
 SCENE CONTEXT
@@ -628,7 +788,7 @@ POSITIVE LOCKS
 The cup is plain white with no logo. The notebook is closed and blank. No hands, no arms, no people. No text or labels.
 ```
 
-## 17. A mesa do café da manhã com o sol entrando
+## 21. A mesa do café da manhã com o sol entrando
 
 ```
 SCENE CONTEXT
@@ -668,7 +828,7 @@ POSITIVE LOCKS
 The mug is plain with no logo. The portion is modest, one bowl. No hands, no arms, no people. No text or labels.
 ```
 
-## 18. A banca da feira
+## 22. A banca da feira
 
 ```
 SCENE CONTEXT
@@ -708,7 +868,7 @@ POSITIVE LOCKS
 The produce is fresh and unblemished. No hands, no arms, no people. No price signs, no text, no labels, no numbers.
 ```
 
-## 19. O copo de água com o sol
+## 23. O copo de água com o sol
 
 ```
 SCENE CONTEXT
@@ -748,7 +908,7 @@ POSITIVE LOCKS
 The glass and the jug are plain, with no logo and no pattern. No hands, no arms, no people. No text or labels.
 ```
 
-## 20. As plantas sendo regadas
+## 24. As plantas sendo regadas
 
 ```
 SCENE CONTEXT
