@@ -961,3 +961,69 @@ Serve de gabarito para qualquer post de correlação:
 6. **O que é da consulta** — a conduta depende do seu caso (é aqui que entram
    compostos como o resveratrol, sem dose e sem prescrição)
 7. **O envio** — "manda pra aquela pessoa que…"
+
+## 35. 🔴 O PÚBLICO É O PRODUTO: duas trilhas completas, nunca uma com dois botões
+
+Correção da Aline em 10/09/2026, depois de eu propor **uma** página de entrega com
+dois pares de botões: *"são duas páginas, uma pra paciente, uma pra profissional
+de saúde, porque o produto também é diferente, a aula também é diferente, enfim,
+tudo é diferente. Até a linguagem do material é diferente — o GLP-1 tem a versão
+pra paciente e a versão pra profissional."*
+
+Então a separação não acontece no fim, num `if` de botão. Ela acontece **na
+origem**, e desce por tudo:
+
+| | Paciente | Profissional |
+|---|---|---|
+| Carrossel | próprio | próprio |
+| Material de isca | versão paciente | versão profissional |
+| Aula paga | própria | própria |
+| Página de entrega | própria | própria |
+| Botão do fim | teste nutrigenético · epigenético · **combo com 20%** | testar o Scanner 14 dias · montar o Consultório de Precisão (agenda da Viviane) |
+
+🔴 **A paciente nunca vê "monte seu consultório de precisão".** Um botão que não
+é pra ela não é neutro: ele diz que o material não era pra ela.
+
+**Quando separar na origem e quando separar no direct:**
+
+- **Dois carrosséis** quando o assunto já nasce separado e as audiências nem se
+  cruzam no feed (microbiota do lactente: a mãe e o pediatra não são o mesmo
+  post). Palavra-chave diferente em cada um.
+- **Um carrossel e a pergunta no direct** quando o sintoma é o mesmo para os dois
+  (peso, cansaço, névoa mental). É o que a lâmina de CTA já faz: *"se você cuida
+  de você… se você atende…"*. A resposta é o que decide o material, a aula e a
+  página.
+
+## 36. A entrega da aula paga NÃO vai para a área de curso
+
+Também de 10/09: *"não aparecer lá no tratamentos como é o Lótus, porque é muita
+informação num lugar só. Ela vai ficar abrir senha, coisa do tipo. O povo é meio
+perdido."*
+
+Para uma compra de impulso de R$ 29,90, **login é onde a pessoa desiste** — e a
+plataforma de curso ainda enterra o botão que é o motivo da aula existir.
+
+**O formato é uma coluna só, sem menu e sem senha:** vídeo no topo → material
+para baixar → o fecho → **o botão**.
+
+⚠️ Isso **não** é feature nova. `cursos.produtos.acesso_url` já manda o comprador
+para uma URL externa em vez da área de curso (é o que o Caderno de Receitas
+Fertilidade faz hoje, apontando para um app na Vercel), e
+`cursos.matriculas.scanner_portal_token` já existe e já é usado — 26 das 217
+matrículas têm token. É o mesmo padrão de link sem senha do portal da paciente e
+da página de gestão do agendamento. Logo dá para entregar um **link pessoal**:
+sem senha, e ainda assim sabendo quem abriu.
+
+## 37. 🔴 A aula termina em venda — mas o pago tem que estar COMPLETO
+
+A Aline: *"a aula tem que sempre terminar meio de venda, vincular aquele conteúdo
+com o nutrigenético e o epigenético, e falar que o botão está embaixo."* Certo — e
+tem uma trava que protege ela, porque **a aula é paga**.
+
+A régua é a que ela mesma já usou no material do lactente: **o grátis é um
+pedaço, o pago é completo, e o botão é o que vem DEPOIS de completo.**
+
+O teste que decide: se a pessoa sentir que a aula guardou a parte boa para
+vender, vira reembolso e boca ruim — e isso custa mais do que o combo ganha. O
+epigenético não é o pedaço que faltou na aula; é o passo seguinte de quem já
+entendeu a aula inteira.
