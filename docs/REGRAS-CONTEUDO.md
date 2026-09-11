@@ -1027,3 +1027,29 @@ O teste que decide: se a pessoa sentir que a aula guardou a parte boa para
 vender, vira reembolso e boca ruim — e isso custa mais do que o combo ganha. O
 epigenético não é o pedaço que faltou na aula; é o passo seguinte de quem já
 entendeu a aula inteira.
+
+## 38. 🔴 ÓBVIO, NÃO SUTIL — e "efeito" é palavra que viraliza
+
+Correção da Aline em 10/09/2026 sobre a capa do carrossel do peso. Eu escrevi
+*"Você emagrece, recupera, e começa de novo"* e ela cortou: *"tem que falar
+assim: **engorda**, e começa tudo de novo. Não dá pra ser sutil, o povo não
+entende, tem que ser óbvio."*
+
+**"Recupera" é palavra de nutricionista. "Engorda de novo" é palavra de gente.**
+A leitora não decodifica eufemismo em três segundos de feed — ela passa.
+
+| ❌ Sutil | ✅ Óbvio |
+|---|---|
+| "recupera" | **"engorda tudo de novo"** |
+| "e cada vez volta mais rápido" | **"ou nem isso: empaca no meio do caminho e não sai mais do lugar"** |
+| "o cansaço aumenta" | "chega em casa sem energia pros filhos" |
+
+🔴 **E a capa tem que cobrir os DOIS jeitos de fracassar**, não só um. Quem
+emagrece e engorda de novo é um caso; quem **nem chega a emagrecer e empaca no
+meio** é outro, e metade da audiência está nele. Capa que descreve só a sanfona
+perde quem nunca saiu do lugar.
+
+**"Efeito" é palavra dela, e funciona:** *"essa palavra 'efeito' sempre viralizou
+em todos os posts que eu já fiz"*. Efeito sanfona, efeito rebote, efeito platô —
+a leitora já usa o termo, então ele gera reconhecimento imediato (§17) sem custar
+explicação. Preferir "efeito X" a descrever o fenômeno por extenso.
