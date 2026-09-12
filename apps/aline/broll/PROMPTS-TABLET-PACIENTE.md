@@ -1,6 +1,13 @@
-# O tablet mostrando a área do paciente
+# O cenário se gera uma vez, a tela se troca sempre
 
-Sem pessoa em cena, então **não gasta crédito**: sai no ilimitado do site.
+Sem pessoa reconhecível em cena, então **não gasta crédito**: sai no
+ilimitado do site.
+
+E gasta **uma vez só**. O clipe do aparelho é cenário: mesa, luz, tablet ou
+monitor com a tela vazia. A tela é um retângulo, e retângulo se troca no
+render quantas vezes quiser. Área genética hoje, plano alimentar amanhã,
+scanner da saúde depois: o mesmo clipe serve a todos, e o que muda é um
+arquivo HTML em `telas/`.
 
 A regra que manda aqui é a mesma que já está em todos os outros prompts:
 **gerador não escreve tela**. Ele borra ícone, inventa letra e troca
@@ -113,3 +120,82 @@ E antes de publicar: **nenhum dado real de paciente na tela**. Nome,
 data de nascimento, CPF e telefone saem, ou a captura é de um cadastro
 fictício. Vale o mesmo selo dos outros: "Caso clínico ilustrativo ·
 paciente fictícia".
+
+
+---
+
+# A mesa do escritório, com o monitor
+
+Mesmo princípio do tablet, em outro aparelho: a tela sai vazia e recebe a
+tela real por cima. Serve pra mostrar o software como quem atende vê.
+
+O monitor é deitado e o reel é em pé, então o enquadramento põe o monitor
+nos dois terços de cima e deixa a mesa embaixo. Sobra faixa livre pra
+legenda, que é o que o motor de edição procura.
+
+## Versão 1, a mesa sem ninguém
+
+```
+SCENE CONTEXT
+The point of view of someone sitting at their own desk in a consulting room, looking at their computer monitor. No people in frame.
+
+LOCATION MAP
+A wide light wooden desk seen from the chair behind it. A slim modern monitor stands centred on the desk, its screen facing the camera. On the desk, in soft focus: a closed notebook, a pen, a plain ceramic cup and a small green plant. Behind the monitor, an empty upholstered armchair for the patient, softly out of focus, and beyond it a calm consulting room wall.
+
+FRAMING
+Vertical 9:16. The monitor occupies the upper two thirds of the frame and its screen fills at least 80 percent of the frame width. The near edge of the desk fills the lower part of the frame, uncluttered.
+
+GEOMETRY
+The monitor is seen straight on, its screen square and parallel to the camera, flat to the lens. It is not tilted, not angled, not turned, and there is no perspective distortion: the screen reads as a clean rectangle with straight edges and square corners.
+
+OPTICS
+35mm equivalent, the screen in sharp focus, the room behind falling off softly.
+
+CAMERA
+Completely static, locked off on a tripod at seated eye height. No pan, no tilt, no push in, no zoom, no handheld drift.
+
+ACTION
+Nothing in the scene moves except the ambience: thin steam rising slowly from the cup, one leaf of the plant shifting very slightly, and the daylight changing almost imperceptibly across the desk.
+
+LIGHTING
+Soft even daylight from a large window behind the camera, warm neutral grade, low contrast. No hard reflection and no glare anywhere on the screen.
+
+SCREEN
+The screen is one flat, even, matte light grey, completely blank and uniform from edge to edge. No interface, no icons, no text, no numbers, no charts, no logo, no wallpaper, no glow, no reflection of the room, no fingerprints, no smudges. It never flickers and never changes brightness.
+
+STYLE
+Photoreal cinematography, true to life colours, fine grain, calm and premium.
+
+POSITIVE LOCKS
+The monitor keeps exactly the same position, size, angle and shape in every frame, and its screen stays one flat even grey the whole time. The four corners of the screen stay exactly where they are. No hands, no arms, no people, no reflections of people. Vertical 9:16.
+```
+
+## Versão 2, com a paciente na poltrona
+
+Igual à de cima, trocando estes dois blocos. A paciente nunca é
+reconhecível: é nuca e ombro, fora de foco, atrás do monitor.
+
+```
+LOCATION MAP
+A wide light wooden desk seen from the chair behind it. A slim modern monitor stands centred on the desk, its screen facing the camera. On the desk, in soft focus: a closed notebook, a pen, a plain ceramic cup and a small green plant. Behind the monitor and well beyond it, a patient sits in an upholstered armchair, seen only as a soft out of focus shape at the edge of the frame, and beyond her a calm consulting room wall.
+
+FOREGROUND AND BACKGROUND
+The patient is only a blurred silhouette far behind the monitor, strongly out of focus, never sharp, never recognisable: no face, no features, no eyes, never looking at the camera. She sits still and does not move. She is dressed in plain neutral clothes. The monitor and the desk stay in sharp focus and she stays soft.
+```
+
+Vai no ar com o selo **"Caso clínico ilustrativo · paciente fictícia"**,
+como os outros. E a mesma regra de sempre: nenhum dado real de paciente
+na tela.
+
+---
+
+# Sobre a duração
+
+O clipe gerado é curto, cinco segundos. Isso não limita o vídeo final.
+
+Como a cena é quase parada, ela **repete sem emenda aparente**: o clipe
+corre pra frente, volta de trás pra frente e corre de novo, o que rende
+vinte, trinta segundos do mesmo cenário. O que muda ao longo do tempo é a
+tela, que rola sozinha, e é isso que o olho segue.
+
+Ou seja: um crédito de cenário, e o tempo que o roteiro pedir.
