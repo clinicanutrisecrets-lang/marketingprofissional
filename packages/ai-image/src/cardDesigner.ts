@@ -1,7 +1,18 @@
 import sharp from "sharp";
 import type { BrandGuidelines, ConteudoPeca, Dimensoes } from "./types";
 import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
-import { svgIlustracao, semFigura, type IlustracaoId } from "./lineArt";
+import {
+  AVISO_LAYOUT_SEM_FOTO,
+  larguraColunaTexto,
+  normalizarFotoLugar,
+  normalizarFotoTamanho,
+  planejarFoto,
+  resolverLugar,
+  type FotoLugar,
+  type FotoTamanho,
+  type PlanoFoto,
+  type Rect,
+} from "./fotoLayout";
 
 /**
  * Motor de cards tipográficos — arte de estúdio, 100% determinística.
@@ -11,6 +22,12 @@ import { svgIlustracao, semFigura, type IlustracaoId } from "./lineArt";
  * marca, tipografia editorial grande (Playfair Display), apoio em
  * Montserrat e detalhe manuscrito em Caveat. Padrão visual de social media
  * premium (referências da usuária).
+ *
+ * SEM ILUSTRAÇÃO (Aline, 12/09/2026): os desenhos em traço fino "estavam
+ * sempre dando algum problema" e saíram por completo. O que dá identidade é
+ * a paleta, a diagramação de título/subtítulo (letras maiores e menores) e o
+ * espaço pra FOTO que a própria profissional sobe — em que lugar e tamanho
+ * ela escolher (`fotoLayout.ts`).
  *
  * Zero chamadas de IA → zero custo, zero surpresa, zero revisão.
  */
@@ -30,10 +47,14 @@ export type CardInput = {
   dimensoes: Dimensoes;
   brand: BrandGuidelines;
   conteudo: ConteudoPeca;
-  /** Foto opcional (tirinha decorativa no layout "foto") */
+  /** Foto opcional da profissional (layouts foto/hero, editorial, citação e lista) */
   fotoBuffer?: Buffer;
-  /** Enquadramento vertical da foto na tirinha (default "centro") */
+  /** Enquadramento vertical (crop) da foto (default "centro") */
   fotoPosicao?: "topo" | "centro" | "base";
+  /** Onde a foto entra em relação ao texto (default "topo") */
+  fotoLugar?: FotoLugar;
+  /** Tamanho da foto (default "media" — a tirinha de sempre) */
+  fotoTamanho?: FotoTamanho;
   /** Força um esquema de cor (0..2); default = hash do headline */
   schemeIndex?: number;
   /** Cor de fundo personalizada (hex) — as cores de texto se adaptam
@@ -41,8 +62,19 @@ export type CardInput = {
   corFundoHex?: string;
   /** Logo (PNG/JPG) composta no topo-centro do card */
   logoBuffer?: Buffer;
-  /** Ilustração line-art da biblioteca interna (layout editorial) */
-  ilustracao?: IlustracaoId;
+};
+
+/**
+ * Resultado completo do render. `avisoFoto` existe pra a tela nunca ficar sem
+ * saber que a foto encolheu, saiu ou não é aceita naquele layout — descartar
+ * foto em silêncio era o defeito dos layouts editorial/citação/lista.
+ */
+export type CardResultado = {
+  buffer: Buffer;
+  /** A foto enviada foi de fato desenhada no card. */
+  fotoDesenhada: boolean;
+  /** Motivo, em linguagem da tela, quando a foto não saiu como pedido. */
+  avisoFoto: string | null;
 };
 
 type Scheme = {
@@ -290,12 +322,73 @@ function posicionar(b: Bloco, left: number, top: number): sharp.OverlayOptions[]
   return b.pedacos.map((p) => ({ input: p.svg, left: left + p.left, top: top + p.top }));
 }
 
+
+
+// ————— Foto: preparação comum a todos os layouts —————
+
+/** Foto crua + escolhas da profissional, já normalizadas. */
+type FotoPedida = {
+  raw: Buffer;
+  lugar: FotoLugar;
+  tamanho: FotoTamanho;
+  posicao: "topo" | "centro" | "base";
+};
+
+function fotoPedida(input: CardInput): FotoPedida | null {
+  if (!input.fotoBuffer) return null;
+  return {
+    raw: input.fotoBuffer,
+    lugar: normalizarFotoLugar(input.fotoLugar),
+    tamanho: normalizarFotoTamanho(input.fotoTamanho),
+    posicao: input.fotoPosicao ?? "centro",
+  };
+}
+
+const AVISO_FOTO_ILEGIVEL = "Não foi possível ler a foto enviada — tente JPG ou PNG.";
+
+/**
+ * Desenha a foto no retângulo planejado. Falha de leitura NÃO derruba o card:
+ * o texto sai e o aviso viaja pra tela.
+ */
+async function desenharFoto(
+  composites: sharp.OverlayOptions[],
+  foto: FotoPedida,
+  rect: Rect,
+  raio: number,
+): Promise<boolean> {
+  try {
+    const buf = await fotoArredondada(foto.raw, rect.w, rect.h, raio, foto.posicao);
+    composites.push({ input: buf, top: rect.y, left: rect.x });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Junta os avisos numa frase só (lugar caiu pra topo + foto encolheu, etc.). */
+function juntarAvisos(...avisos: Array<string | null | undefined>): string | null {
+  const lista = avisos.filter((a): a is string => !!a);
+  return lista.length ? lista.join(" ") : null;
+}
+
+function fundo(W: number, H: number, bgHex: string, composites: sharp.OverlayOptions[]): Promise<Buffer> {
+  const [r, g, b] = hexToRgb(bgHex);
+  return sharp({ create: { width: W, height: H, channels: 3, background: { r, g, b } } })
+    .composite(composites)
+    .png()
+    .toBuffer();
+}
+
 // ————— Renderizador principal —————
 
+/** Compatibilidade: só o PNG. Quem precisa saber da foto usa `renderCardDetalhado`. */
 export async function renderCard(input: CardInput): Promise<Buffer> {
-  const { layout, dimensoes, brand, conteudo, fotoBuffer } = input;
+  return (await renderCardDetalhado(input)).buffer;
+}
+
+export async function renderCardDetalhado(input: CardInput): Promise<CardResultado> {
+  const { layout, dimensoes, brand, conteudo } = input;
   const [W, H] = dimensoes.split("x").map(Number) as [number, number];
-  const stories = H / W > 1.5;
 
   const corFundoValida =
     input.corFundoHex && /^#[0-9a-fA-F]{6}$/.test(input.corFundoHex) ? input.corFundoHex : null;
@@ -309,116 +402,138 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
   }
 
   const handle = derivarHandle(brand);
+  const foto = fotoPedida(input);
 
   if (layout === "conteudo") {
-    // Logo e ilustração também valem aqui (slides de carrossel). Antes só o
-    // caminho hero/foto desenhava logo, então a marca sumia dos slides
-    // internos e a ilustração era calculada e descartada.
-    return renderConteudo({
+    // Logo também vale aqui (slides de carrossel) — a marca aparece em todos.
+    const buffer = await renderConteudo({
       W, H, scheme, conteudo, handle,
       logoComposite: await prepararLogo(input, brand, W, H),
-      ilustracao: input.ilustracao,
     });
+    return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
   }
   if (layout === "citacao") {
-    return renderCitacao({ W, H, scheme, conteudo, handle });
+    return renderCitacao({ W, H, scheme, conteudo, handle, foto });
   }
   if (layout === "lista") {
-    return renderLista({ W, H, scheme, conteudo, handle });
+    return renderLista({ W, H, scheme, conteudo, handle, foto });
   }
   if (layout === "capa_clara" || layout === "capa_escura") {
-    return renderCapa({
+    const buffer = await renderCapa({
       W, H, conteudo, handle,
       escura: layout === "capa_escura",
       corMarca: brand.corPrimariaHex || "#2F5D50",
       logoComposite: await prepararLogo(input, brand, W, H),
     });
+    return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
   }
   if (layout === "editorial") {
     return renderEditorial({
-      W, H, scheme, conteudo, handle,
-      ilustracao: input.ilustracao,
+      W, H, scheme, conteudo, handle, foto,
       corMarca: brand.corPrimariaHex || "#2F5D50",
     });
   }
+
+  // hero / foto: a mesma pilha — "hero" com foto vira "foto".
+  return renderPilha({
+    W, H, scheme, conteudo, handle, foto,
+    logoComposite: await prepararLogo(input, brand, W, H),
+  });
+}
+
+// ————— Layout hero / foto (pilha central) —————
+
+async function renderPilha(params: {
+  W: number;
+  H: number;
+  scheme: Scheme;
+  conteudo: ConteudoPeca;
+  handle: string;
+  foto: FotoPedida | null;
+  logoComposite: { buf: Buffer; w: number; h: number } | null;
+}): Promise<CardResultado> {
+  const { W, H, scheme, conteudo, handle, foto, logoComposite } = params;
+  const stories = H / W > 1.5;
 
   const headline = (conteudo.headline ?? "").trim();
   const eyebrow = (conteudo.eyebrow ?? "").trim();
   const subtitle = (conteudo.subtitle ?? "").trim();
   const kicker = (conteudo.cta ?? "").trim();
 
-  const contentW = Math.round(W * 0.84);
   const composites: sharp.OverlayOptions[] = [];
+  const margem = Math.round(W * 0.08);
+  const gapUnit0 = Math.round(H * (stories ? 0.028 : 0.038));
 
-  // ——— hero / foto: pilha central ———
-  // Com foto, tudo encolhe um pouco pra sobrar respiro (a foto rouba ~22% da altura)
-  const esc = layout === "foto" && fotoBuffer ? 0.86 : 1;
-  type Item = { bloco: Bloco; gapAntes: number; foto?: Buffer };
+  // Com foto ao lado, o texto vive numa coluna à esquerda; nos outros casos,
+  // ocupa 84% da largura como sempre.
+  const lugarResolvido = foto ? resolverLugar("foto", foto.lugar) : null;
+  const lugar: FotoLugar = lugarResolvido?.lugar ?? "topo";
+  const aoLado = !!foto && lugar === "direita";
+  const gapFotoTexto = aoLado ? Math.round(W * 0.03) : Math.round(gapUnit0 * 1.75);
+  const contentW = aoLado ? larguraColunaTexto(W, margem, gapFotoTexto) : Math.round(W * 0.84);
+
+  // Com foto, tudo encolhe um pouco pra sobrar respiro
+  const esc = foto ? 0.86 : 1;
+  type Item = { bloco: Bloco; gapAntes: number };
   const itens: Item[] = [];
-  const gapUnit = Math.round(H * (stories ? 0.028 : 0.038) * esc);
-
-  let fotoStrip: { buf: Buffer; w: number; h: number } | null = null;
-  if (layout === "foto" && fotoBuffer) {
-    const fotoW = contentW;
-    const fotoH = Math.round(H * (stories ? 0.2 : 0.22));
-    try {
-      const foto = await fotoArredondada(fotoBuffer, fotoW, fotoH, Math.round(W * 0.024), input.fotoPosicao);
-      fotoStrip = { buf: foto, w: fotoW, h: fotoH };
-    } catch {
-      // foto falhou — card segue tipográfico puro
-    }
-  }
-
-  // Logo no topo-centro (estilo @patibianco). Empurra o conteúdo pra baixo.
-  // Usa o buffer enviado ou baixa da logoUrl da marca (onboarding).
-  const logoComposite = await prepararLogo(input, brand, W, H);
-
-  // Capa e card único ficam TIPOGRÁFICOS de propósito (pedido da Aline):
-  // o ícone entra só nos slides de conteúdo, e é esse contraste que dá
-  // hierarquia ao carrossel. `input.ilustracao` é honrada em renderConteudo.
+  const gapUnit = Math.round(gapUnit0 * esc);
 
   if (eyebrow) {
     const pill = blocoPill(eyebrow, scheme.pill, W);
-    if (pill) itens.push({ bloco: pill, gapAntes: itens.length ? Math.round(gapUnit * 0.8) : 0 });
+    if (pill) itens.push({ bloco: pill, gapAntes: 0 });
   }
 
   if (headline) {
-    const budget = H * (stories ? 0.34 : fotoStrip ? 0.24 : 0.38);
+    const budget =
+      H *
+      (stories
+        ? 0.34
+        : foto
+          ? aoLado
+            ? 0.34
+            : foto.tamanho === "grande"
+              ? 0.2
+              : 0.24
+          : 0.38);
     const titulo = blocoTitulo(
       headline,
       scheme.titulo,
       contentW,
       budget,
-      Math.round(W * (stories ? 0.095 : 0.1) * esc),
+      Math.round(W * (stories ? 0.095 : aoLado ? 0.078 : 0.1) * esc),
     );
-    itens.push({ bloco: titulo, gapAntes: itens.length || fotoStrip ? Math.round(gapUnit * 1.15) : 0 });
+    itens.push({ bloco: titulo, gapAntes: itens.length ? Math.round(gapUnit * 1.15) : 0 });
   }
 
   if (subtitle) {
-    const sub = blocoDeTexto(subtitle, "sans", scheme.sub, Math.round(W * 0.041 * esc), Math.round(W * 0.78), {
-      peso: 1.1,
-      lineHeight: 1.42,
-    });
+    const sub = blocoDeTexto(
+      subtitle,
+      "sans",
+      scheme.sub,
+      Math.round(W * 0.041 * esc),
+      Math.min(contentW, Math.round(W * 0.78)),
+      { peso: 1.1, lineHeight: 1.42 },
+    );
     itens.push({ bloco: sub, gapAntes: Math.round(gapUnit * 1.1) });
   }
 
   if (kicker) {
-    const k = blocoDeTexto(kicker, "manuscrita", scheme.kicker, Math.round(W * 0.07 * esc), Math.round(W * 0.8), {
-      lineHeight: 1.15,
-    });
+    const k = blocoDeTexto(
+      kicker,
+      "manuscrita",
+      scheme.kicker,
+      Math.round(W * 0.07 * esc),
+      Math.min(contentW, Math.round(W * 0.8)),
+      { lineHeight: 1.15 },
+    );
     itens.push({ bloco: k, gapAntes: gapUnit });
   }
 
-  const alturaFoto = fotoStrip ? fotoStrip.h + Math.round(gapUnit * 0.6) : 0;
-  const alturaGrupo =
-    alturaFoto + itens.reduce((acc, x) => acc + x.gapAntes + x.bloco.altura, 0);
+  const alturaTexto = itens.reduce((acc, x) => acc + x.gapAntes + x.bloco.altura, 0);
   // Com logo, a área útil começa abaixo dela
   const areaTopo = Math.round(H * 0.07) + (logoComposite ? logoComposite.h + Math.round(H * 0.02) : 0);
   // Base da área útil: acima do handle (que fica fixo no rodapé)
   const areaBase = H - Math.round(H * (stories ? 0.13 : 0.12));
-  const centrado = Math.round(areaTopo + (areaBase - areaTopo - alturaGrupo) * 0.46);
-  // Nunca deixa o grupo invadir o rodapé: se for alto demais, ancora no teto
-  let y = Math.max(areaTopo, Math.min(centrado, areaBase - alturaGrupo));
 
   if (logoComposite) {
     composites.push({
@@ -428,21 +543,40 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
     });
   }
 
-  if (fotoStrip) {
-    composites.push({ input: fotoStrip.buf, top: y, left: Math.round((W - fotoStrip.w) / 2) });
-    y += fotoStrip.h + Math.round(gapUnit * 0.6);
+  let fotoDesenhada = false;
+  let avisoFoto: string | null = null;
+  let textoRect: Rect;
+
+  if (foto) {
+    const plano: PlanoFoto = planejarFoto({
+      W, H, lugar, tamanho: foto.tamanho, areaTopo, areaBase,
+      margemX: margem, larguraTexto: contentW, alturaTexto, gap: gapFotoTexto,
+    });
+    textoRect = plano.texto;
+    if (plano.foto) {
+      fotoDesenhada = await desenharFoto(composites, foto, plano.foto, Math.round(W * 0.024));
+      avisoFoto = juntarAvisos(lugarResolvido?.aviso, plano.aviso, fotoDesenhada ? null : AVISO_FOTO_ILEGIVEL);
+    } else {
+      avisoFoto = juntarAvisos(lugarResolvido?.aviso, plano.aviso);
+    }
+  } else {
+    const centrado = Math.round(areaTopo + (areaBase - areaTopo - alturaTexto) * 0.46);
+    // Nunca deixa o grupo invadir o rodapé: se for alto demais, ancora no teto
+    const y = Math.max(areaTopo, Math.min(centrado, areaBase - alturaTexto));
+    textoRect = { x: Math.round((W - contentW) / 2), y, w: contentW, h: alturaTexto };
   }
 
+  let y = textoRect.y;
   for (const { bloco, gapAntes } of itens) {
     y += gapAntes;
-    composites.push(...posicionar(bloco, Math.round((W - bloco.largura) / 2), y));
+    composites.push(...posicionar(bloco, textoRect.x + Math.round((textoRect.w - bloco.largura) / 2), y));
     y += bloco.altura;
   }
 
   // Handle na base (fixo)
   if (handle) {
     const fsH = Math.round(W * 0.02);
-    const hBloco = blocoDeTexto(handle, "sans", scheme.handle, fsH, contentW, {
+    const hBloco = blocoDeTexto(handle, "sans", scheme.handle, fsH, Math.round(W * 0.84), {
       letterSpacing: Math.round(fsH * 0.18),
       peso: 0.5,
     });
@@ -455,16 +589,10 @@ export async function renderCard(input: CardInput): Promise<Buffer> {
     );
   }
 
-  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
-  return sharp({
-    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
+  return { buffer: await fundo(W, H, scheme.bg, composites), fotoDesenhada, avisoFoto };
 }
 
-// ————— Slide de conteúdo (carrossel interno) —————
+// ————— Logo —————
 
 /**
  * Prepara a logo pra composição: usa o upload da nutri ou, na falta dele, a
@@ -501,6 +629,8 @@ async function prepararLogo(
   }
 }
 
+// ————— Slide de conteúdo (carrossel interno) —————
+
 async function renderConteudo(params: {
   W: number;
   H: number;
@@ -508,9 +638,8 @@ async function renderConteudo(params: {
   conteudo: ConteudoPeca;
   handle: string;
   logoComposite?: { buf: Buffer; w: number; h: number } | null;
-  ilustracao?: IlustracaoId;
 }): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle, logoComposite, ilustracao } = params;
+  const { W, H, scheme, conteudo, handle, logoComposite } = params;
   const contentW = Math.round(W * 0.82);
   const composites: sharp.OverlayOptions[] = [];
 
@@ -522,30 +651,17 @@ async function renderConteudo(params: {
   // slides do carrossel ficavam colados no topo enquanto a capa (layout hero)
   // vinha centralizada, e o conjunto parecia desalinhado. Agora medimos o
   // grupo inteiro e centralizamos, igual o hero faz.
+  //
+  // Sem ícone de cabeçalho (Aline, 12/09/2026): o slide abre direto no
+  // título, e a régua fina abaixo dele é o único ornamento.
   type Peca = { desenhar: (topo: number) => void; altura: number; gapAntes: number };
   const pecas: Peca[] = [];
-
-  // Ilustração temática (line-art) como cabeçalho do slide — some quando não
-  // há tema reconhecido. Fica ACIMA do título pra nunca colidir com o texto.
-  if (ilustracao) {
-    const tam = Math.round(W * 0.13);
-    const il = svgIlustracao(ilustracao, tam, scheme.kicker, 0.9);
-    if (il) {
-      const buf = await sharp(il).png().toBuffer();
-      pecas.push({
-        altura: tam,
-        gapAntes: 0,
-        desenhar: (topo) =>
-          composites.push({ input: buf, top: topo, left: Math.round((W - tam) / 2) }),
-      });
-    }
-  }
 
   if (headline) {
     const titulo = blocoTitulo(headline, scheme.titulo, contentW, H * 0.24, Math.round(W * 0.062));
     pecas.push({
       altura: titulo.altura,
-      gapAntes: pecas.length ? Math.round(H * 0.022) : 0,
+      gapAntes: 0,
       desenhar: (topo) =>
         composites.push(...posicionar(titulo, Math.round((W - titulo.largura) / 2), topo)),
     });
@@ -628,13 +744,7 @@ async function renderConteudo(params: {
     );
   }
 
-  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
-  return sharp({
-    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
+  return fundo(W, H, scheme.bg, composites);
 }
 
 // ————— Layout citação —————
@@ -645,8 +755,9 @@ async function renderCitacao(params: {
   scheme: Scheme;
   conteudo: ConteudoPeca;
   handle: string;
-}): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle } = params;
+  foto: FotoPedida | null;
+}): Promise<CardResultado> {
+  const { W, H, scheme, conteudo, handle, foto } = params;
   const contentW = Math.round(W * 0.78);
   const composites: sharp.OverlayOptions[] = [];
 
@@ -658,7 +769,14 @@ async function renderCitacao(params: {
     lineHeight: 0.8,
   });
 
-  const citacao = blocoTitulo(frase, scheme.titulo, contentW, H * 0.44, Math.round(W * 0.078));
+  // Com foto o orçamento da frase encolhe — a foto precisa de lugar honesto.
+  const citacao = blocoTitulo(
+    frase,
+    scheme.titulo,
+    contentW,
+    H * (foto ? (foto.tamanho === "grande" ? 0.26 : 0.32) : 0.44),
+    Math.round(W * (foto ? 0.068 : 0.078)),
+  );
 
   const autorBloco = autor
     ? blocoDeTexto(autor.toUpperCase(), "sans", scheme.sub, Math.round(W * 0.024), contentW, {
@@ -675,7 +793,30 @@ async function renderCitacao(params: {
   const alturaGrupo =
     aspas.altura + gap1 + citacao.altura + gap2 + linhaAltura +
     (autorBloco ? gap2 + autorBloco.altura : 0);
-  let y = Math.max(Math.round(H * 0.08), Math.round((H - alturaGrupo) * 0.44));
+
+  const areaTopo = Math.round(H * 0.08);
+  const areaBase = H - Math.round(H * 0.12);
+
+  let fotoDesenhada = false;
+  let avisoFoto: string | null = null;
+  let y: number;
+  if (foto) {
+    const { lugar, aviso: avisoLugar } = resolverLugar("citacao", foto.lugar);
+    const plano = planejarFoto({
+      W, H, lugar, tamanho: foto.tamanho, areaTopo, areaBase,
+      margemX: Math.round((W - contentW) / 2), larguraTexto: contentW,
+      alturaTexto: alturaGrupo, gap: Math.round(H * 0.04), ancora: 0.44,
+    });
+    y = plano.texto.y;
+    if (plano.foto) {
+      fotoDesenhada = await desenharFoto(composites, foto, plano.foto, Math.round(W * 0.024));
+      avisoFoto = juntarAvisos(avisoLugar, plano.aviso, fotoDesenhada ? null : AVISO_FOTO_ILEGIVEL);
+    } else {
+      avisoFoto = juntarAvisos(avisoLugar, plano.aviso);
+    }
+  } else {
+    y = Math.max(areaTopo, Math.round((H - alturaGrupo) * 0.44));
+  }
 
   composites.push(...posicionar(aspas, Math.round((W - aspas.largura) / 2), y));
   y += aspas.altura + gap1;
@@ -701,13 +842,7 @@ async function renderCitacao(params: {
     );
   }
 
-  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
-  return sharp({
-    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
+  return { buffer: await fundo(W, H, scheme.bg, composites), fotoDesenhada, avisoFoto };
 }
 
 // ————— Layout lista —————
@@ -718,60 +853,104 @@ async function renderLista(params: {
   scheme: Scheme;
   conteudo: ConteudoPeca;
   handle: string;
-}): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle } = params;
+  foto: FotoPedida | null;
+}): Promise<CardResultado> {
+  const { W, H, scheme, conteudo, handle, foto } = params;
   const contentW = Math.round(W * 0.8);
   const composites: sharp.OverlayOptions[] = [];
 
   const titulo = (conteudo.headline ?? "").trim();
   const eyebrow = (conteudo.eyebrow ?? "").trim();
   // Itens vêm do corpo, um por linha
-  const itens = (conteudo.corpo ?? "")
+  const itensTexto = (conteudo.corpo ?? "")
     .split(/\n+/)
     .map((l) => l.replace(/^[-•*\d.)\s]+/, "").trim())
     .filter(Boolean)
     .slice(0, 7);
 
-  let y = Math.round(H * 0.09);
+  // ── Medir tudo primeiro (a foto precisa saber a altura do texto) ────────
+  type Peca = { altura: number; gapAntes: number; desenhar: (topo: number) => void };
+  const pecas: Peca[] = [];
 
   if (eyebrow) {
     const pill = blocoPill(eyebrow, scheme.pill, W);
     if (pill) {
-      composites.push(...posicionar(pill, Math.round((W - pill.largura) / 2), y));
-      y += pill.altura + Math.round(H * 0.035);
+      pecas.push({
+        altura: pill.altura,
+        gapAntes: 0,
+        desenhar: (topo) => composites.push(...posicionar(pill, Math.round((W - pill.largura) / 2), topo)),
+      });
     }
   }
 
   if (titulo) {
-    const t = blocoTitulo(titulo, scheme.titulo, contentW, H * 0.22, Math.round(W * 0.07));
-    composites.push(...posicionar(t, Math.round((W - t.largura) / 2), y));
-    y += t.altura + Math.round(H * 0.05);
+    const t = blocoTitulo(titulo, scheme.titulo, contentW, H * (foto ? 0.16 : 0.22), Math.round(W * (foto ? 0.062 : 0.07)));
+    pecas.push({
+      altura: t.altura,
+      gapAntes: pecas.length ? Math.round(H * 0.035) : 0,
+      desenhar: (topo) => composites.push(...posicionar(t, Math.round((W - t.largura) / 2), topo)),
+    });
   }
 
-  const fsItem = Math.round(W * 0.036);
+  const fsItem = Math.round(W * (foto ? 0.032 : 0.036));
   const bolinha = Math.round(W * 0.012);
   const gapItem = Math.round(fsItem * 1.15);
   const xTexto = Math.round((W - contentW) / 2) + bolinha * 3;
   const larguraTexto = contentW - bolinha * 3;
-  const maxY = H - Math.round(H * 0.13);
 
-  for (const item of itens) {
+  let primeiroItem = true;
+  for (const item of itensTexto) {
     const b = blocoDeTexto(item, "sans", scheme.sub, fsItem, larguraTexto, {
       lineHeight: 1.4,
       align: "left",
       peso: 0.5,
     });
-    if (y + b.altura > maxY) break;
     const dot = Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="${bolinha * 2}" height="${bolinha * 2}"><circle cx="${bolinha}" cy="${bolinha}" r="${bolinha}" fill="${scheme.kicker}"/></svg>`,
     );
-    composites.push({
-      input: dot,
-      top: y + Math.round(fsItem * 0.45),
-      left: Math.round((W - contentW) / 2),
+    pecas.push({
+      altura: b.altura,
+      gapAntes: primeiroItem ? (pecas.length ? Math.round(H * 0.05) : 0) : gapItem,
+      desenhar: (topo) => {
+        composites.push({ input: dot, top: topo + Math.round(fsItem * 0.45), left: Math.round((W - contentW) / 2) });
+        composites.push(...posicionar(b, xTexto, topo));
+      },
     });
-    composites.push(...posicionar(b, xTexto, y));
-    y += b.altura + gapItem;
+    primeiroItem = false;
+  }
+
+  const areaTopo = Math.round(H * 0.09);
+  const areaBase = H - Math.round(H * 0.13);
+  const somar = (lista: Peca[]) => lista.reduce((acc, x) => acc + x.gapAntes + x.altura, 0);
+  // Item que não cabe sai (de trás pra frente) — como antes, mas medido.
+  while (pecas.length > 1 && somar(pecas) > areaBase - areaTopo) pecas.pop();
+  const alturaTexto = somar(pecas);
+
+  let fotoDesenhada = false;
+  let avisoFoto: string | null = null;
+  let y: number;
+  if (foto) {
+    const { lugar, aviso: avisoLugar } = resolverLugar("lista", foto.lugar);
+    const plano = planejarFoto({
+      W, H, lugar, tamanho: foto.tamanho, areaTopo, areaBase,
+      margemX: Math.round((W - contentW) / 2), larguraTexto: contentW,
+      alturaTexto, gap: Math.round(H * 0.04), ancora: 0.3,
+    });
+    y = plano.texto.y;
+    if (plano.foto) {
+      fotoDesenhada = await desenharFoto(composites, foto, plano.foto, Math.round(W * 0.024));
+      avisoFoto = juntarAvisos(avisoLugar, plano.aviso, fotoDesenhada ? null : AVISO_FOTO_ILEGIVEL);
+    } else {
+      avisoFoto = juntarAvisos(avisoLugar, plano.aviso);
+    }
+  } else {
+    y = areaTopo;
+  }
+
+  for (const peca of pecas) {
+    y += peca.gapAntes;
+    peca.desenhar(y);
+    y += peca.altura;
   }
 
   if (handle) {
@@ -785,16 +964,10 @@ async function renderLista(params: {
     );
   }
 
-  const [bgR, bgG, bgB] = hexToRgb(scheme.bg);
-  return sharp({
-    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
+  return { buffer: await fundo(W, H, scheme.bg, composites), fotoDesenhada, avisoFoto };
 }
 
-// ————— Layout editorial (headline em dois tons + ramos + ilustração) —————
+// ————— Capas grotescas (carrossel) —————
 
 const DOURADO = "#A9803F";
 
@@ -958,44 +1131,44 @@ async function renderCapa(params: {
     .toBuffer();
 }
 
+// ————— Layout editorial (headline em dois tons + foto opcional) —————
+
+/**
+ * Editorial: título serif em caixa alta alinhado à esquerda, a cada três
+ * linhas uma dourada, separador fino com losango e subtítulo. Sem ilustração
+ * e sem ramos nos cantos (Aline, 12/09/2026) — o lado direito, onde ficava o
+ * desenho, é o lugar natural da FOTO (`fotoLugar: "direita"`); sem foto, o
+ * texto ocupa a largura toda.
+ */
 async function renderEditorial(params: {
   W: number;
   H: number;
   scheme: Scheme;
   conteudo: ConteudoPeca;
   handle: string;
-  ilustracao?: IlustracaoId;
+  foto: FotoPedida | null;
   corMarca: string;
-}): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle, corMarca } = params;
-  // Figura humana vira objeto/natureza: no tamanho da peça o rosto é ambíguo
-  // (o perfil da mulher foi lido como bebê num card de amamentação).
-  const ilustracao = semFigura(
-    params.ilustracao,
-    `${conteudo.headline ?? ""} ${conteudo.subtitle ?? ""}`,
-  );
+}): Promise<CardResultado> {
+  const { W, H, scheme, conteudo, handle, foto, corMarca } = params;
   // Editorial vive melhor no fundo claro: força creme se o esquema for escuro
   const bgClaro = luminancia(scheme.bg) >= 0.55 ? scheme.bg : CREME;
-  // Título e ilustrações SEMPRE na cor da marca da nutri (escurecida p/ contraste)
+  // Título SEMPRE na cor da marca da nutri (escurecida p/ contraste)
   const prim = /^#[0-9a-fA-F]{6}$/.test(corMarca) ? corMarca : "#2F5D50";
   const verde = luminancia(prim) < 0.5 ? prim : shade(prim, 0.45);
   const dourado = DOURADO;
 
   const composites: sharp.OverlayOptions[] = [];
 
-  // Os ramos decorativos dos cantos são montados DEPOIS do texto ser medido
-  // (bloco no fim desta função): eles precisam DESVIAR do texto. Com posição
-  // fixa, um título de 6 linhas + subtítulo longo descia até o canto e o ramo
-  // ficava em cima da frase (Juliana, 22/08/2026 — "os galhinhos ficaram em
-  // cima da frase", card "A saúde do bebê começa antes da concepção").
-
   const headline = (conteudo.headline ?? "").trim().toUpperCase();
   const subtitle = (conteudo.subtitle ?? "").trim();
-  const temIlustracao = !!ilustracao;
 
   const margem = Math.round(W * 0.09);
-  const larguraTexto = temIlustracao ? Math.round(W * 0.52) : Math.round(W * 0.72);
-  let fs = Math.round(W * 0.072);
+  const lugarResolvido = foto ? resolverLugar("editorial", foto.lugar) : null;
+  const lugar: FotoLugar = lugarResolvido?.lugar ?? "topo";
+  const aoLado = !!foto && lugar === "direita";
+  const gapFotoTexto = aoLado ? Math.round(W * 0.04) : Math.round(H * 0.04);
+  const larguraTexto = aoLado ? larguraColunaTexto(W, margem, gapFotoTexto) : W - margem * 2;
+  let fs = Math.round(W * (aoLado ? 0.062 : 0.072));
 
   // Quebra manual em linhas para alternar as cores (verde/dourado)
   const quebrar = (tam: number): string[] => {
@@ -1016,132 +1189,90 @@ async function renderEditorial(params: {
   };
 
   // Palavra que não quebra ("AMAMENTAÇÃO") estoura a coluna e invade a área da
-  // ilustração — o corpo tem que encolher até a MAIOR PALAVRA caber, não só até
-  // o número de linhas caber.
+  // foto — o corpo tem que encolher até a MAIOR PALAVRA caber, não só até o
+  // número de linhas caber.
   const maiorPalavraCabe = (tam: number) =>
     headline
       .split(/\s+/)
       .filter(Boolean)
       .every((p) => medirTexto(p, "serif", tam) <= larguraTexto);
 
+  // Orçamento de altura do título: com foto em cima/embaixo sobra menos.
+  const budgetTitulo = H * (foto && !aoLado ? (foto.tamanho === "grande" ? 0.28 : 0.36) : 0.5);
   let linhas = quebrar(fs);
-  while ((linhas.length * fs * 1.22 > H * 0.5 || !maiorPalavraCabe(fs)) && fs > 30) {
+  while ((linhas.length * fs * 1.22 > budgetTitulo || !maiorPalavraCabe(fs)) && fs > 30) {
     fs = Math.floor(fs * 0.92);
     linhas = quebrar(fs);
   }
 
-  // Bloco de texto: começa no terço superior, alinhado à esquerda
-  let y = Math.round(H * (temIlustracao ? 0.16 : 0.18));
-  const yIniTexto = y;
-  let larguraRealTexto = 0;
+  // ── Medir o bloco inteiro antes de posicionar ─────────────────────────
   const lineGap = Math.round(fs * 1.22);
-  linhas.forEach((linha, i) => {
+  const blocosLinha = linhas.map((linha, i) => {
     const dourada = i % 3 === 2; // a cada 3 linhas, uma dourada (ritmo das referências)
-    const bloco = blocoDeTexto(linha, "serif", dourada ? dourado : verde, fs, larguraTexto + 40, {
+    return blocoDeTexto(linha, "serif", dourada ? dourado : verde, fs, larguraTexto + 40, {
       align: "left",
       lineHeight: 1.05,
     });
-    composites.push(...posicionar(bloco, margem, y));
-    larguraRealTexto = Math.max(larguraRealTexto, bloco.largura);
+  });
+  const alturaTitulo = blocosLinha.length
+    ? lineGap * (blocosLinha.length - 1) + (blocosLinha[blocosLinha.length - 1]?.altura ?? fs)
+    : 0;
+  const gapSep1 = Math.round(fs * 0.5);
+  const sepAltura = 14;
+  const gapSep2 = Math.round(fs * 0.9);
+  const sub = subtitle
+    ? blocoDeTexto(subtitle, "sans", TEXTO_ESCURO, Math.round(W * (aoLado ? 0.03 : 0.032)), larguraTexto, {
+        align: "left",
+        lineHeight: 1.5,
+        peso: 0.5,
+      })
+    : null;
+  const alturaTexto = alturaTitulo + gapSep1 + sepAltura + gapSep2 + (sub ? sub.altura : 0);
+
+  const areaTopo = Math.round(H * 0.1);
+  const areaBase = H - Math.round(H * 0.12);
+
+  let fotoDesenhada = false;
+  let avisoFoto: string | null = null;
+  let textoRect: Rect;
+  if (foto) {
+    const plano = planejarFoto({
+      W, H, lugar, tamanho: foto.tamanho, areaTopo, areaBase,
+      margemX: margem, larguraTexto, alturaTexto, gap: gapFotoTexto, ancora: 0.4,
+    });
+    textoRect = plano.texto;
+    if (plano.foto) {
+      fotoDesenhada = await desenharFoto(composites, foto, plano.foto, Math.round(W * 0.024));
+      avisoFoto = juntarAvisos(lugarResolvido?.aviso, plano.aviso, fotoDesenhada ? null : AVISO_FOTO_ILEGIVEL);
+    } else {
+      avisoFoto = juntarAvisos(lugarResolvido?.aviso, plano.aviso);
+    }
+  } else {
+    // Sem foto: bloco começa no terço superior, alinhado à esquerda (de sempre)
+    textoRect = { x: margem, y: Math.round(H * 0.18), w: larguraTexto, h: alturaTexto };
+  }
+
+  // Na pilha (topo/base) o texto fica centralizado como bloco, mas as linhas
+  // seguem alinhadas à esquerda dentro dele: é a marca do editorial.
+  const xTexto = aoLado ? textoRect.x : margem;
+  let y = textoRect.y;
+  blocosLinha.forEach((bloco) => {
+    composites.push(...posicionar(bloco, xTexto, y));
     y += lineGap;
   });
+  if (blocosLinha.length) y = y - lineGap + (blocosLinha[blocosLinha.length - 1]?.altura ?? fs);
 
-  // Separador: linha fina + losango
-  y += Math.round(fs * 0.5);
+  // Separador: linha fina + losango (régua de layout, não desenho)
+  y += gapSep1;
   const sepW = Math.round(W * 0.2);
   const sep = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${sepW + 20}" height="14"><line x1="0" y1="7" x2="${sepW}" y2="7" stroke="${dourado}" stroke-width="1.6"/><rect x="${sepW + 4}" y="3" width="8" height="8" transform="rotate(45 ${sepW + 8} 7)" fill="${dourado}"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${sepW + 20}" height="${sepAltura}"><line x1="0" y1="7" x2="${sepW}" y2="7" stroke="${dourado}" stroke-width="1.6"/><rect x="${sepW + 4}" y="3" width="8" height="8" transform="rotate(45 ${sepW + 8} 7)" fill="${dourado}"/></svg>`,
   );
-  composites.push({ input: sep, top: y, left: margem });
-  y += Math.round(fs * 0.9);
+  composites.push({ input: sep, top: y, left: xTexto });
+  y += sepAltura + gapSep2;
 
-  // Subtítulo
-  if (subtitle) {
-    const sub = blocoDeTexto(subtitle, "sans", TEXTO_ESCURO, Math.round(W * 0.032), larguraTexto, {
-      align: "left",
-      lineHeight: 1.5,
-      peso: 0.5,
-    });
-    composites.push(...posicionar(sub, margem, y));
-    larguraRealTexto = Math.max(larguraRealTexto, sub.largura);
-    y += sub.altura;
-  }
-  const yFimTexto = y;
-
-  // Ramos decorativos nos cantos — DESVIANDO do texto (Juliana 22/08/2026:
-  // "os galhinhos ficaram em cima da frase"). Cada ramo tenta o tamanho
-  // padrão; se o retângulo dele encosta no retângulo do texto, encolhe; se
-  // nem pequeno cabe, NÃO é desenhado — enfeite nunca vale uma frase ilegível.
-  // Entram no INÍCIO da pilha (unshift) pra continuarem atrás de tudo.
-  {
-    const FOLGA = 18;
-    const x1Texto = margem - FOLGA;
-    const x2Texto = margem + larguraRealTexto + FOLGA;
-    const y1Texto = yIniTexto - FOLGA;
-    const y2Texto = yFimTexto + FOLGA;
-    const colideComTexto = (x1: number, y1: number, x2: number, y2: number) =>
-      !(x2 <= x1Texto || x1 >= x2Texto || y2 <= y1Texto || y1 >= y2Texto);
-
-    const ramoTamBase = Math.round(W * 0.26);
-    const ramoTamMin = Math.round(W * 0.12);
-
-    // Topo-direita (folhas, giradas)
-    for (let tam = ramoTamBase; tam >= ramoTamMin; tam = Math.floor(tam * 0.8)) {
-      const left = W - tam + Math.round(tam * 0.18);
-      const top = -Math.round(tam * 0.22);
-      if (colideComTexto(left, top, left + tam, top + tam)) continue;
-      const ramoTR = svgIlustracao("folhas", tam, verde, 0.5);
-      if (ramoTR) {
-        composites.unshift({
-          input: await sharp(ramoTR).rotate(180, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer(),
-          top,
-          left,
-        });
-      }
-      break;
-    }
-
-    // Base-esquerda (ramo)
-    for (let tam = ramoTamBase; tam >= ramoTamMin; tam = Math.floor(tam * 0.8)) {
-      const left = -Math.round(tam * 0.18);
-      const top = H - tam + Math.round(tam * 0.15);
-      if (colideComTexto(left, top, left + tam, top + tam)) continue;
-      const ramoBL = svgIlustracao("ramo", tam, verde, 0.5);
-      if (ramoBL) {
-        composites.unshift({ input: await sharp(ramoBL).png().toBuffer(), top, left });
-      }
-      break;
-    }
-  }
-
-  // Ilustração à direita (grande, na cor verde). Mesma regra dos ramos: desvia
-  // do texto, encolhe se preciso e, se nem assim couber, não é desenhada.
-  // Enfeite nunca vale uma frase ilegível.
-  if (ilustracao) {
-    const FOLGA_IL = 24;
-    const x1T = margem - FOLGA_IL;
-    const x2T = margem + larguraRealTexto + FOLGA_IL;
-    const y1T = yIniTexto - FOLGA_IL;
-    const y2T = yFimTexto + FOLGA_IL;
-    const colide = (x1: number, y1: number, x2: number, y2: number) =>
-      !(x2 <= x1T || x1 >= x2T || y2 <= y1T || y1 >= y2T);
-
-    const tamBase = Math.round(W * 0.42);
-    const tamMin = Math.round(W * 0.22);
-    for (let tam = tamBase; tam >= tamMin; tam = Math.floor(tam * 0.88)) {
-      const left = W - tam - Math.round(W * 0.06);
-      // desce até sair do texto, sem passar do rodapé do handle
-      const topMax = H - tam - Math.round(H * 0.1);
-      let top = Math.round(H * 0.42);
-      while (colide(left, top, left + tam, top + tam) && top < topMax) {
-        top += Math.round(H * 0.02);
-      }
-      if (colide(left, top, left + tam, top + tam)) continue;
-
-      const il = svgIlustracao(ilustracao, tam, verde);
-      if (il) composites.push({ input: await sharp(il).png().toBuffer(), top, left });
-      break;
-    }
+  if (sub) {
+    composites.push(...posicionar(sub, xTexto, y));
   }
 
   // Handle dourado na base, centralizado
@@ -1156,13 +1287,7 @@ async function renderEditorial(params: {
     );
   }
 
-  const [bgR, bgG, bgB] = hexToRgb(bgClaro);
-  return sharp({
-    create: { width: W, height: H, channels: 3, background: { r: bgR, g: bgG, b: bgB } },
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
+  return { buffer: await fundo(W, H, bgClaro, composites), fotoDesenhada, avisoFoto };
 }
 
 // ————— Layout receita (foto dominante + título + condição) —————

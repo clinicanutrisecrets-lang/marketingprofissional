@@ -16,42 +16,33 @@ const FORMATOS = [
 
 const LAYOUTS = [
   { valor: "auto", nome: "Clássico", desc: "Título grande (+ sua foto se subir)", thumb: "/editor-thumbs/classico.png" },
-  { valor: "editorial", nome: "Editorial", desc: "Dois tons + ilustração em traço", thumb: "/editor-thumbs/editorial.png" },
+  { valor: "editorial", nome: "Editorial", desc: "Título em dois tons, alinhado à esquerda (+ sua foto ao lado)", thumb: "/editor-thumbs/editorial.png" },
   { valor: "citacao", nome: "Citação", desc: "Frase de impacto com aspas", thumb: "/editor-thumbs/citacao.png" },
   { valor: "lista", nome: "Lista", desc: "Título + itens com marcadores", thumb: "/editor-thumbs/lista.png" },
   { valor: "carrossel", nome: "Carrossel", desc: "Vários slides pra deslizar", thumb: "/editor-thumbs/carrossel.png" },
 ];
 
-const ILUSTRACOES = [
-  { id: "auto", nome: "✨ Automática (o sistema escolhe pelo tema)" },
-  { id: "", nome: "Sem ilustração" },
-  { id: "mulher", nome: "Mulher (traço)" },
-  { id: "folhas", nome: "Ramo de folhas" },
-  { id: "ramo", nome: "Ramo fino" },
-  { id: "laranja", nome: "Laranja" },
-  { id: "cha", nome: "Xícara de chá" },
-  { id: "cafe", nome: "Café" },
-  { id: "suco", nome: "Suco" },
-  { id: "coracao", nome: "Coração botânico" },
-  { id: "intestino", nome: "Intestino" },
-  { id: "dna", nome: "DNA / genética" },
-  { id: "celulas", nome: "Células" },
-  { id: "microbiota", nome: "Microbiota" },
-  { id: "exame", nome: "Exames (tubo)" },
-  { id: "estetoscopio", nome: "Estetoscópio" },
-  { id: "lupa", nome: "Lupa" },
-  { id: "balanca", nome: "Balança" },
-  { id: "prato", nome: "Prato e talheres" },
-  { id: "salada", nome: "Salada" },
-  { id: "maca", nome: "Maçã" },
-  { id: "abacate", nome: "Abacate" },
-  { id: "uvas", nome: "Uvas" },
-  { id: "morango", nome: "Morango" },
-  { id: "cereais", nome: "Cereais" },
-  { id: "leguminosas", nome: "Leguminosas" },
-  { id: "peixe", nome: "Peixe" },
-  { id: "ovo", nome: "Ovo" },
-];
+/**
+ * Onde a foto entra e que tamanho tem — escolha da nutri (Aline, 12/09/2026:
+ * "ela pode mover a posição da foto que ela subiu e não ficar só no topo —
+ * às vezes ficou só uma frase em cima e ela quer colocar a fotinho menor
+ * embaixo"). Os desenhos em traço saíram por completo no mesmo pedido.
+ */
+const FOTO_LUGARES = [
+  { v: "topo", label: "No topo", desc: "acima do texto" },
+  { v: "base", label: "Embaixo", desc: "abaixo do texto" },
+  { v: "direita", label: "Ao lado", desc: "coluna à direita" },
+] as const;
+
+const FOTO_TAMANHOS = [
+  { v: "pequena", label: "Pequena" },
+  { v: "media", label: "Média" },
+  { v: "grande", label: "Grande" },
+] as const;
+
+/** Citação e Lista são pilhas: a foto entra em cima ou embaixo, nunca ao lado. */
+const LAYOUTS_SEM_FOTO_AO_LADO = new Set(["citacao", "lista"]);
+
 
 export function EditorArte(props: {
   headlineInicial?: string;
@@ -80,7 +71,10 @@ export function EditorArte(props: {
   const [layout, setLayout] = useState("auto");
   const [fotoPos, setFotoPos] = useState("centro");
   const [itens, setItens] = useState("");
-  const [ilustracao, setIlustracao] = useState("auto");
+  const [fotoLugar, setFotoLugar] = useState("topo");
+  const [fotoTamanho, setFotoTamanho] = useState("media");
+  // Motivo pelo qual a foto encolheu, não coube ou não entrou — vem do render
+  const [avisoFoto, setAvisoFoto] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [salvoMsg, setSalvoMsg] = useState<string | null>(null);
   const logoRef = useRef<HTMLInputElement>(null);
@@ -105,7 +99,8 @@ export function EditorArte(props: {
     fd.set("layout", layout);
     fd.set("fotoPos", fotoPos);
     fd.set("itens", itens);
-    fd.set("ilustracao", ilustracao);
+    fd.set("fotoLugar", fotoLugar);
+    fd.set("fotoTamanho", fotoTamanho);
     fd.set("slides", slidesTexto);
     fd.set("fotoCarrossel", fotoCarrossel);
     if (usarCorCustom) fd.set("corFundo", corFundo);
@@ -122,6 +117,7 @@ export function EditorArte(props: {
     setGerando(true);
     setErro(null);
     setSalvoMsg(null);
+    setAvisoFoto(null);
     try {
       const res = await fetch("/api/conteudo/render-card", { method: "POST", body: montarForm() });
       if (!res.ok) {
@@ -129,10 +125,15 @@ export function EditorArte(props: {
         throw new Error(j?.erro ?? `erro ${res.status}`);
       }
       if (layout === "carrossel") {
-        const j = (await res.json()) as { slides?: string[] };
+        const j = (await res.json()) as { slides?: string[]; avisoFoto?: string | null };
         setPreviewSlides(j.slides ?? []);
         setPreviewUrl(null);
+        setAvisoFoto(j.avisoFoto ?? null);
       } else {
+        // O PNG vem no corpo; o motivo de a foto não ter saído como pedido vem
+        // no header — a tela nunca fica sem saber.
+        const avisoHeader = res.headers.get("x-aviso-foto");
+        setAvisoFoto(avisoHeader ? decodeURIComponent(avisoHeader) : null);
         const blob = await res.blob();
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl(URL.createObjectURL(blob));
@@ -229,20 +230,6 @@ export function EditorArte(props: {
           />
         </Campo>
 
-        {layout === "editorial" && (
-          <Campo label="Ilustração (desenho em traço)">
-            <select
-              value={ilustracao}
-              onChange={(e) => setIlustracao(e.target.value)}
-              className="w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
-            >
-              {ILUSTRACOES.map((i) => (
-                <option key={i.id} value={i.id}>{i.nome}</option>
-              ))}
-            </select>
-          </Campo>
-        )}
-
         {layout === "carrossel" && (
           <Campo label="Slides internos (separe cada slide com uma linha contendo só ---)">
             <textarea
@@ -311,7 +298,7 @@ export function EditorArte(props: {
           />
         </Campo>
 
-        <Campo label="Sua foto (opcional — entra no topo do card)">
+        <Campo label="Sua foto (opcional)">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -393,17 +380,75 @@ export function EditorArte(props: {
           </p>
         </Campo>
 
-        {foto && layout === "auto" && (
-          <Campo label="Enquadramento da foto">
-            <div className="flex gap-3">
-              {(["topo", "centro", "base"] as const).map((p) => (
-                <label key={p} className="flex cursor-pointer items-center gap-1.5 text-xs capitalize">
-                  <input type="radio" checked={fotoPos === p} onChange={() => setFotoPos(p)} />
-                  {p}
-                </label>
-              ))}
-            </div>
-          </Campo>
+        {foto && (
+          <div className="space-y-3 rounded-xl bg-brand-primary/5 p-3">
+            <Campo label="Onde a foto entra">
+              <div className="flex flex-wrap gap-3">
+                {FOTO_LUGARES.map((o) => {
+                  const indisponivel = o.v === "direita" && LAYOUTS_SEM_FOTO_AO_LADO.has(layout);
+                  return (
+                    <label
+                      key={o.v}
+                      className={`flex items-center gap-1.5 text-xs ${indisponivel ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}
+                      title={indisponivel ? "Neste tipo de arte a foto entra no topo ou embaixo" : o.desc}
+                    >
+                      <input
+                        type="radio"
+                        name="fotoLugar"
+                        disabled={indisponivel}
+                        checked={fotoLugar === o.v}
+                        onChange={() => setFotoLugar(o.v)}
+                      />
+                      <span className="font-semibold">{o.label}</span>
+                      <span className="text-brand-text/45">{o.desc}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {layout === "carrossel" && (
+                <p className="mt-1 text-[11px] text-brand-text/40">
+                  Vale pro slide escolhido em &ldquo;Sua foto no carrossel&rdquo;.
+                </p>
+              )}
+            </Campo>
+
+            <Campo label="Tamanho da foto">
+              <div className="flex flex-wrap gap-3">
+                {FOTO_TAMANHOS.map((o) => (
+                  <label key={o.v} className="flex cursor-pointer items-center gap-1.5 text-xs">
+                    <input
+                      type="radio"
+                      name="fotoTamanho"
+                      checked={fotoTamanho === o.v}
+                      onChange={() => setFotoTamanho(o.v)}
+                    />
+                    <span className="font-semibold">{o.label}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-1 text-[11px] text-brand-text/40">
+                A foto nunca cobre o texto: se não couber, ela encolhe — e se nem
+                assim couber, a arte sai sem ela e a gente avisa aqui.
+              </p>
+            </Campo>
+
+            <Campo label="Enquadramento da foto">
+              <div className="flex gap-3">
+                {(["topo", "centro", "base"] as const).map((p) => (
+                  <label key={p} className="flex cursor-pointer items-center gap-1.5 text-xs capitalize">
+                    <input type="radio" name="fotoPos" checked={fotoPos === p} onChange={() => setFotoPos(p)} />
+                    {p}
+                  </label>
+                ))}
+              </div>
+            </Campo>
+
+            {avisoFoto && (
+              <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-200">
+                📷 {avisoFoto}
+              </p>
+            )}
+          </div>
         )}
 
         <div className="grid grid-cols-2 gap-4">
@@ -504,6 +549,7 @@ export function EditorArte(props: {
                 {salvando ? "Salvando..." : "💾 Salvar tudo na galeria"}
               </button>
             </div>
+            {avisoFoto && <p className="mt-2 text-xs text-amber-700">📷 {avisoFoto}</p>}
             {salvoMsg && <p className="mt-2 text-xs text-brand-text/60">{salvoMsg}</p>}
           </>
         ) : previewUrl ? (
@@ -530,6 +576,7 @@ export function EditorArte(props: {
                 {salvando ? "Salvando..." : "💾 Salvar na galeria"}
               </button>
             </div>
+            {avisoFoto && <p className="mt-2 text-xs text-amber-700">📷 {avisoFoto}</p>}
             {salvoMsg && <p className="mt-2 text-xs text-brand-text/60">{salvoMsg}</p>}
           </>
         ) : (

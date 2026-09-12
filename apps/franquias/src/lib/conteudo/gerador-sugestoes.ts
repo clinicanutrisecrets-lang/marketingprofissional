@@ -5,7 +5,7 @@ import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render
 import { buscarPautasQuentes } from "./trends";
 import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
-import { renderCard, renderReceita, type IlustracaoId } from "@scanner/ai-image";
+import { renderCard, renderReceita } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 
 const MODEL = "claude-sonnet-4-5";
@@ -76,7 +76,11 @@ type SugestaoIA = {
   subtitle?: string;
   cta_card?: string;
   slides?: Array<{ headline: string; corpo?: string; subtitle?: string; cta?: string }>;
-  ilustracao?: string;
+  /**
+   * "editorial" = 1 dos 2 feed_imagem sai no layout editorial (tipográfico,
+   * dois tons); o outro fica no card clássico com foto no topo.
+   */
+  layout_card?: string;
   /** Tema EXATO do pedido da nutri que esta sugestão atende (quando atende). */
   atende_pedido?: string;
   receita_slug?: string;
@@ -212,7 +216,7 @@ CARDS (arte tipográfica premium — sem foto):
   - UMA ideia por slide, em NO MÁXIMO 2 frases curtas. Se as frases do slide não falam da MESMA ideia, corte: slide com 3 fatos empilhados confunde e a pessoa desliza embora.
   - O carrossel é UMA história contínua: cada corpo retoma o slide anterior e prepara o próximo. Lido em sequência, o texto forma um parágrafo único que faz sentido. NUNCA lista de fatos soltos.
   - Termo técnico (exame, gene, citocina, marcador): NO MÁXIMO 1 por slide, SEMPRE traduzido na mesma frase em linguagem simples, ex.: "PCR ultrassensível (o exame que mostra inflamação escondida)". PROIBIDO empilhar siglas sem explicar (ex.: citar TNF-alfa, IL-6 e homocisteína no mesmo slide).
-- Para 1 dos 2 feed_imagem, defina "ilustracao" com UMA opção que combine com o tema: mulher | folhas | ramo | laranja | cha | cafe | suco | coracao | intestino | dna | celulas | microbiota | exame | estetoscopio | lupa | balanca | prato | salada | maca | abacate | uvas | morango | cereais | leguminosas | peixe | ovo — vira um layout editorial elegante com desenho em traço. O outro feed_imagem fica sem "ilustracao".
+- Para 1 dos 2 feed_imagem, defina "layout_card": "editorial" — vira um layout editorial elegante, só tipografia (título em dois tons, sem desenho). O outro feed_imagem fica sem "layout_card".
 
 PEDIDOS DA NUTRI (quando o input trouxer "pedidos_da_nutri"):
 - São temas que a própria pessoa dona do perfil pediu — TÊM PRIORIDADE MÁXIMA sobre as manchetes.
@@ -428,15 +432,14 @@ export async function gerarSugestoesSemana(params: {
         );
       } else if (s.tipo === "feed_imagem") {
         const conteudo = conteudoDoCard(s)!;
-        const ILUSTRACOES_VALIDAS =["mulher","folhas","ramo","laranja","cha","cafe","suco","coracao","intestino","dna","celulas","microbiota","exame","estetoscopio","lupa","balanca","prato","salada","maca","abacate","uvas","morango","cereais","leguminosas","peixe","ovo"];
-        if (s.ilustracao && ILUSTRACOES_VALIDAS.includes(s.ilustracao)) {
-          // Layout editorial com ilustração em traço (zero custo de IA)
+        if (s.layout_card === "editorial") {
+          // Layout editorial tipográfico (zero custo de IA, sem ilustração —
+          // os desenhos em traço saíram em 12/09/2026)
           const buffer = await renderCard({
             layout: "editorial",
             dimensoes: "1080x1080",
             brand,
             conteudo,
-            ilustracao: s.ilustracao as IlustracaoId,
           });
           const path = `${params.franqueadaId}/ai-image/${Date.now()}_editorial.png`;
           const { error: upErr } = await admin.storage

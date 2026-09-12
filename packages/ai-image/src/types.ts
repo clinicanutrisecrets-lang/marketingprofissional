@@ -98,3 +98,11 @@ export function getSafeZone(dim: Dimensoes): SafeZone {
 export type EstiloCapa = "editorial" | "grotesca_clara" | "grotesca_escura";
 
 export const ESTILO_CAPA_PADRAO: EstiloCapa = "grotesca_clara";
+
+/**
+ * Foto enviada pela profissional: onde entra (`topo` | `base` | `direita`) e
+ * tamanho (`pequena` | `media` | `grande`). A geometria mora em
+ * `fotoLayout.ts` (puro); aqui só o tipo, pra quem consome o pacote.
+ */
+export type { FotoLugar, FotoTamanho } from "./fotoLayout";
+export { FOTO_LUGAR_PADRAO, FOTO_TAMANHO_PADRAO } from "./fotoLayout";

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/lib/embed/destino.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

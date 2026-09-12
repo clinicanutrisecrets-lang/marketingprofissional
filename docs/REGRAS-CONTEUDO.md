@@ -42,9 +42,14 @@ Repetir a frase da resignação é a parte mais forte. A pessoa se vê sendo cit
 A **estrutura** acima é emprestada de posts que funcionam. O **visual não é.**
 
 - Fundo em **cor da marca**, nunca branco com texto preto
-- **Traços de line art** como decoração, usando a biblioteca que já existe
-  (`packages/ai-image/src/lineArt.ts`, `ILUSTRACOES_DISPONIVEIS` e
-  `sugerirIlustracao`)
+- **Sem ilustração em traço.** Decisão da Aline em 12/09/2026: *"aqueles
+  desenhos de linhas finas está sempre tendo algum problema, então é melhor
+  retirar totalmente"*. A biblioteca de line art (`lineArt.ts`) foi apagada do
+  `packages/ai-image`. O que dá identidade ao card é a paleta, a diagramação
+  de título/subtítulo (letras maiores e menores) e o **espaço pra foto** que a
+  própria profissional sobe — ela escolhe onde a foto entra (topo, base ou ao
+  lado do texto) e o tamanho (pequena, média, grande). A foto nunca cobre
+  texto: se não cabe, encolhe; se nem assim, o card sai sem ela e a tela avisa.
 - Paleta e mini-logo conforme a skill `nutri-secrets-carrossel`
 
 Carrossel em preto e branco puro está **fora do padrão**.
