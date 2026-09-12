@@ -6,6 +6,7 @@ import {
   DURACAO_CLIPE_SEG,
   custoTreinoUsd,
   inicioDoTrecho,
+  lerCuradoria,
   legendaDoNome,
   montarLegenda,
   nomeDoLora,
@@ -114,5 +115,22 @@ describe("args", () => {
   it("sem declarar a flag como booleana, o próximo token vira valor (documentado)", () => {
     const a = lerArgs(["--forcar", "extra"]);
     assert.equal(texto(a, "forcar"), "extra");
+  });
+});
+
+describe("curadoria.json e trecho", () => {
+  it("lê legenda e inicio_seg, ignora chaves com _ e lixo", () => {
+    const c = lerCuradoria(JSON.stringify({ _como_usar: "x", "a.mp4": { legenda: " calda ", inicio_seg: 13.5 }, "b.jpg": { legenda: "" }, "c.jpg": "texto", "d.jpg": { inicio_seg: "3" } }));
+    assert.deepEqual(c, { "a.mp4": { legenda: "calda", inicio_seg: 13.5 } });
+    assert.deepEqual(lerCuradoria(null), {});
+  });
+  it("início manual vale, mas nunca passa do fim do vídeo", () => {
+    assert.equal(inicioDoTrecho(19.33, "meio", 13.5), 13.5);
+    assert.ok(Math.abs(inicioDoTrecho(19.33, "meio", 40) - (19.33 - DURACAO_CLIPE_SEG)) < 1e-9);
+    assert.equal(inicioDoTrecho(19.33, "meio", -2), 0);
+    assert.equal(inicioDoTrecho(3, "meio", 2), 0);
+  });
+  it("--trecho fim corta o final", () => {
+    assert.ok(Math.abs(inicioDoTrecho(12, "fim") - (12 - DURACAO_CLIPE_SEG)) < 1e-9);
   });
 });

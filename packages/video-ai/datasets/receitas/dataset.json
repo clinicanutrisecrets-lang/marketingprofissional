@@ -1,0 +1,135 @@
+{
+  "versao": 1,
+  "dataset": "receitas",
+  "formato": "9:16",
+  "trigger": "nutrisecrets style",
+  "atualizado_em": "2026-09-12T23:57:22.295Z",
+  "entradas": [
+    {
+      "origem": "bolo-chocolate-fatia-calda-vermelha-prato-cinza.jpeg",
+      "hash": "608e8332d94aad44",
+      "tipo": "imagem",
+      "saida": "001-bolo-chocolate-fatia-calda-vermelha-prato-cinza.jpg",
+      "legenda": "nutrisecrets style. fatia de bolo de chocolate denso e úmido sobre calda vermelha brilhante de frutas vermelhas, pétalas de flor comestível e creme claro ao lado, prato de pedra cinza, mesa cinza clara, luz natural suave vinda da lateral, vista de cima em ângulo leve",
+      "legenda_fonte": "manual",
+      "origem_bytes": 305720
+    },
+    {
+      "origem": "bowl-branco-salpicado-frutas-vermelhas-croche.jpeg",
+      "hash": "fa8607d4969c077a",
+      "tipo": "imagem",
+      "saida": "002-bowl-branco-salpicado-frutas-vermelhas-croche.jpg",
+      "legenda": "nutrisecrets style. bowl de cerâmica branca salpicada com iogurte cremoso, morangos, framboesas e mirtilos em calda vermelha, biscoito amanteigado e folha de hortelã, sobre toalha de crochê branca, ângulo de 45 graus, luz natural difusa de dia, fundo bege claro, cores reais e suaves, fotografia de comida",
+      "legenda_fonte": "manual",
+      "origem_bytes": 200668
+    },
+    {
+      "origem": "bowl-ceramica-iogurte-granola-colher-dourada.jpeg",
+      "hash": "2d94ab6f9d6e6625",
+      "tipo": "imagem",
+      "saida": "003-bowl-ceramica-iogurte-granola-colher-dourada.jpg",
+      "legenda": "nutrisecrets style. bowl de cerâmica artesanal cinza-esverdeada com iogurte, granola, framboesas, figo e flor comestível amarela, colher dourada com cabo azul tiffany ao lado, toalha de crochê branca, parede terracota rosada com folhagem verde desfocada ao fundo, luz natural de fim de tarde, ângulo de 45 graus",
+      "legenda_fonte": "manual",
+      "origem_bytes": 209544
+    },
+    {
+      "origem": "bowl-granola-calda-flor-amarela-recuo.mp4",
+      "hash": "18ddf2bbaeaf33dd",
+      "tipo": "video",
+      "saida": "004-bowl-granola-calda-flor-amarela-recuo.mp4",
+      "legenda": "nutrisecrets style. bowl de cerâmica cinza-esverdeada com iogurte, granola crocante, riscos de calda vermelha e flor comestível amarela, toalha de crochê verde menta, tigela pequena com frutas vermelhas, talheres dourados com cabo azul e xícara ao fundo, câmera recuando devagar revelando a mesa, luz natural suave, vista de cima em ângulo",
+      "legenda_fonte": "manual",
+      "duracao_seg": 5.968345,
+      "inicio_seg": 0.4529225000000001,
+      "origem_bytes": 988747
+    },
+    {
+      "origem": "bowl-iogurte-compota-framboesa-giro.mp4",
+      "hash": "c20e9454bbc0efaf",
+      "tipo": "video",
+      "saida": "005-bowl-iogurte-compota-framboesa-giro.mp4",
+      "legenda": "nutrisecrets style. bowl de cerâmica artesanal cinza-esverdeada com iogurte branco, compota de frutas vermelhas, framboesas, pêssego, granola e flor amarela, sobre toalha de crochê branca com garfo dourado, câmera girando devagar ao redor do bowl, luz natural de dia, close em 45 graus",
+      "legenda_fonte": "manual",
+      "duracao_seg": 12.198345,
+      "inicio_seg": 3.5679225,
+      "origem_bytes": 2012909
+    },
+    {
+      "origem": "cafe-espresso-xicara-ceramica-chocolate.jpeg",
+      "hash": "3a1cd72b6c26dc2a",
+      "tipo": "imagem",
+      "saida": "006-cafe-espresso-xicara-ceramica-chocolate.jpg",
+      "legenda": "nutrisecrets style. xícara de cerâmica branca com borda escura e café espresso com crema, pires irregular com pedaços de chocolate e uma castanha caramelizada, guardanapo branco, mesa cinza, interior de cafeteria desfocado ao fundo, luz suave, close em 45 graus",
+      "legenda_fonte": "manual",
+      "origem_bytes": 105534
+    },
+    {
+      "origem": "cheesecake-calda-vermelha-prato-cinza-varanda.jpeg",
+      "hash": "5fc725dfa1a8a344",
+      "tipo": "imagem",
+      "saida": "007-cheesecake-calda-vermelha-prato-cinza-varanda.jpg",
+      "legenda": "nutrisecrets style. cheesecake individual com calda de frutas vermelhas escorrendo e um morango inteiro com folhas, sobre prato de pedra cinza texturizado, varanda com plantas e cadeiras desfocadas ao fundo, luz natural difusa, ângulo de 45 graus, foco raso",
+      "legenda_fonte": "manual",
+      "origem_bytes": 324092
+    },
+    {
+      "origem": "cheesecake-frutas-vermelhas-topo-prato-cinza.jpeg",
+      "hash": "4f1d72dd782a61fe",
+      "tipo": "imagem",
+      "saida": "008-cheesecake-frutas-vermelhas-topo-prato-cinza.jpg",
+      "legenda": "nutrisecrets style. vista de cima de um cheesecake pequeno coberto com compota de amora, mirtilo e framboesa e um morango cortado, calda vermelha se espalhando no prato de pedra cinza texturizado, luz natural difusa, fotografia de comida com foco no brilho da calda",
+      "legenda_fonte": "manual",
+      "origem_bytes": 408595
+    },
+    {
+      "origem": "croissant-tabua-rosa-sol-duro.jpeg",
+      "hash": "8fb80e5d49af1cd1",
+      "tipo": "imagem",
+      "saida": "009-croissant-tabua-rosa-sol-duro.jpg",
+      "legenda": "nutrisecrets style. croissant dourado e brilhante sobre tábua rosa clara, atrás um sanduíche de croissant com ovos ao pesto e broto, xícara de café desfocada, mesa cinza escura, sol direto lateral com sombra marcada, ângulo baixo em close, cores quentes",
+      "legenda_fonte": "manual",
+      "origem_bytes": 149250
+    },
+    {
+      "origem": "guacamole-pure-tortinha-prato-escuro.jpeg",
+      "hash": "a889a7de6c2e872e",
+      "tipo": "imagem",
+      "saida": "010-guacamole-pure-tortinha-prato-escuro.jpg",
+      "legenda": "nutrisecrets style. prato de cerâmica escura com guacamole moldado em disco com tomatinhos, purê amarelo com cebolinha em bowl pequeno de cerâmica e tortinha coberta de amêndoas laminadas, mesa de aço inox desfocada, luz natural fria e suave, ângulo de 45 graus",
+      "legenda_fonte": "manual",
+      "origem_bytes": 189052
+    },
+    {
+      "origem": "ovo-assado-abacate-panelinha-ferro.mp4",
+      "hash": "d9db562ef722f744",
+      "tipo": "video",
+      "saida": "011-ovo-assado-abacate-panelinha-ferro.mp4",
+      "legenda": "nutrisecrets style. panelinha de ferro preta com ovo assado de gema amarela, queijo gratinado, meio abacate e folha de sálvia, sobre mesa bege com toalha de crochê branca e talheres, parede terracota com folhagem desfocada ao fundo, luz natural difusa, câmera quase parada com leve aproximação, vista de cima em ângulo",
+      "legenda_fonte": "manual",
+      "duracao_seg": 3.866667,
+      "inicio_seg": 0,
+      "origem_bytes": 645889
+    },
+    {
+      "origem": "rosquinhas-assadas-quebra-miolo-coador.mp4",
+      "hash": "80dfa174564a6edc",
+      "tipo": "video",
+      "saida": "012-rosquinhas-assadas-quebra-miolo-coador.mp4",
+      "legenda": "nutrisecrets style. mão segurando uma rosquinha assada dourada e partindo ao meio mostrando o miolo macio amarelo, outras rosquinhas no prato, coador de café de cerâmica e caneca com borda azul tiffany desfocados ao fundo, plantas verdes, luz natural de dia, close com movimento de mão",
+      "legenda_fonte": "manual",
+      "duracao_seg": 19.33,
+      "inicio_seg": 13.5,
+      "origem_bytes": 3146144
+    },
+    {
+      "origem": "salada-grao-de-bico-concha-prato-escuro.jpeg",
+      "hash": "1c6793c2bd922797",
+      "tipo": "imagem",
+      "saida": "013-salada-grao-de-bico-concha-prato-escuro.jpg",
+      "legenda": "nutrisecrets style. concha de cerâmica bege com salada de grão-de-bico, abacate, tomate e manjericão, azeitonas roxas e legumes grelhados ao lado, ramo de alecrim, prato de cerâmica marrom escuro, mesa de inox desfocada, luz natural suave, close em 45 graus",
+      "legenda_fonte": "manual",
+      "origem_bytes": 185087
+    }
+  ],
+  "pacotes": []
+}

@@ -25,11 +25,13 @@ import {
   MINIMO_ARQUIVOS_RECOMENDADO,
   inicioDoTrecho,
   legendaDoNome,
+  lerCuradoria,
   montarLegenda,
   nomePreparado,
   tipoDoArquivo,
   type EntradaManifesto,
   type Formato,
+  type Trecho,
 } from "./lib/regras.ts";
 import { subirParaFal, subirParaSupabase } from "./lib/storage.ts";
 import { zipar } from "./lib/zip.ts";
@@ -53,7 +55,8 @@ async function main() {
     process.exit(2);
   }
   const formato: Formato = formatoTexto;
-  const trecho = texto(args, "trecho", "meio") === "inicio" ? "inicio" : "meio";
+  const trechoTexto = texto(args, "trecho", "meio");
+  const trecho: Trecho = trechoTexto === "inicio" || trechoTexto === "fim" ? trechoTexto : "meio";
   const forcar = ligado(args, "forcar");
   const semLegenda = ligado(args, "sem-legenda");
   const semUpload = ligado(args, "sem-upload");
@@ -67,6 +70,11 @@ async function main() {
   const pastaQuadros = path.join(pasta, "frames");
   const pastaZips = path.join(pasta, "zips");
   for (const p of [pastaPreparado, pastaQuadros, pastaZips]) fs.mkdirSync(p, { recursive: true });
+
+  // Legendas escritas à mão (e início do clipe por vídeo) têm precedência sobre o modelo.
+  const arquivoCuradoria = path.join(pasta, "curadoria.json");
+  const curadoria = lerCuradoria(fs.existsSync(arquivoCuradoria) ? fs.readFileSync(arquivoCuradoria, "utf8") : null);
+  if (Object.keys(curadoria).length) log.info(`curadoria.json: ${Object.keys(curadoria).length} arquivo(s) com legenda ou trecho definidos à mão.`);
 
   const manifesto = lerManifesto(dataset, formato, cfg.trigger);
   if (manifesto.formato !== formato && manifesto.entradas.length && !forcar) {
@@ -114,10 +122,15 @@ async function main() {
     const saida = path.join(pastaPreparado, saidaNome);
     const saidaTxt = saida.replace(/\.[^.]+$/, ".txt");
     const anterior = porHash.get(hash);
+    const curado = curadoria[nome];
 
     // Reaproveita se a mídia preparada existe, a legenda existe e o gatilho não mudou.
-    const legendaAnteriorVale = anterior && anterior.legenda.startsWith(cfg.trigger + ".") || (anterior && anterior.legenda === cfg.trigger);
-    if (!forcar && anterior && legendaAnteriorVale && fs.existsSync(path.join(pastaPreparado, anterior.saida))) {
+    const legendaCurada = curado?.legenda ? montarLegenda(curado.legenda, cfg.trigger) : null;
+    const legendaAnteriorVale = anterior && (
+      legendaCurada ? anterior.legenda === legendaCurada : (anterior.legenda.startsWith(cfg.trigger + ".") || anterior.legenda === cfg.trigger)
+    );
+    const inicioAnteriorVale = !anterior || tipo !== "video" || curado?.inicio_seg === undefined || anterior.inicio_seg === curado.inicio_seg;
+    if (!forcar && anterior && legendaAnteriorVale && inicioAnteriorVale && fs.existsSync(path.join(pastaPreparado, anterior.saida))) {
       if (anterior.saida !== saidaNome) {
         fs.renameSync(path.join(pastaPreparado, anterior.saida), saida);
         const txtAntigo = path.join(pastaPreparado, anterior.saida.replace(/\.[^.]+$/, ".txt"));
@@ -131,11 +144,13 @@ async function main() {
 
     refeitos++;
     let duracao: number | undefined;
+    let inicioUsado: number | undefined;
     try {
       if (tipo === "video") {
         const info = await sondarVideo(origem);
         duracao = info.duracaoSeg;
-        const inicio = inicioDoTrecho(info.duracaoSeg, trecho);
+        const inicio = inicioDoTrecho(info.duracaoSeg, trecho, curado?.inicio_seg);
+        inicioUsado = inicio;
         await normalizarVideo(origem, saida, formato, inicio);
         if (info.duracaoSeg < DURACAO_CLIPE_SEG - 0.5) {
           log.aviso(`  ${nome} tem ${info.duracaoSeg.toFixed(1)}s (menos que ${DURACAO_CLIPE_SEG.toFixed(1)}s); o clipe sai mais curto.`);
@@ -151,7 +166,10 @@ async function main() {
 
     let legenda: string;
     let fonte: EntradaManifesto["legenda_fonte"];
-    if (usarClaude) {
+    if (legendaCurada) {
+      legenda = legendaCurada;
+      fonte = "manual";
+    } else if (usarClaude) {
       try {
         const quadros = tipo === "video"
           ? await extrairQuadros(saida, pastaQuadros, saidaNome.replace(/\.[^.]+$/, ""))
@@ -171,7 +189,7 @@ async function main() {
       fonte = "nome-do-arquivo";
     }
     fs.writeFileSync(saidaTxt, legenda + "\n");
-    entradas.push({ origem: nome, hash, tipo, saida: saidaNome, legenda, legenda_fonte: fonte, duracao_seg: duracao, origem_bytes: fs.statSync(origem).size });
+    entradas.push({ origem: nome, hash, tipo, saida: saidaNome, legenda, legenda_fonte: fonte, duracao_seg: duracao, inicio_seg: inicioUsado, origem_bytes: fs.statSync(origem).size });
     log.ok(`  ${nome} → ${saidaNome}`);
     log.info(`    "${legenda}"`);
   }
@@ -194,6 +212,8 @@ async function main() {
   if (entradas.length < MINIMO_ARQUIVOS_RECOMENDADO) {
     log.aviso(`Só ${entradas.length} arquivos. A fal recomenda pelo menos ${MINIMO_ARQUIVOS_RECOMENDADO}; o briefing pede 20 a 40.`);
   }
+  const manuais = entradas.filter((e) => e.legenda_fonte === "manual").length;
+  if (manuais) log.info(`Legendas escritas à mão (curadoria.json): ${manuais}.`);
   if (usarClaude) {
     log.info(`Legendas: ${tokensEntrada} tokens de entrada, ${tokensSaida} de saída no ${cfg.legendaModel}.`);
   }

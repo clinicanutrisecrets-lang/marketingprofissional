@@ -18,5 +18,7 @@ Regras:
   vídeo curto, …"). Com a chave, o modelo descreve a cena e o nome só ajuda.
 - Vídeo maior que 5 s é cortado no **miolo** (`--trecho inicio` corta do começo).
   Vídeo em pé de celular sai em pé (a orientação é respeitada).
-- O que fica versionado é só o `dataset.json` de cada pasta (hash, legenda e
-  onde o pacote está). Mídia, `preparado/`, `frames/` e `zips/` ficam fora do git.
+- `curadoria.json` na pasta guarda legenda escrita à mão por arquivo e, pra
+  vídeo, `inicio_seg` (onde o clipe de 5 s começa). Tem precedência sobre o modelo.
+- A mídia crua curada fica no git enquanto é pequena (é o material que a Aline
+  mandou). `preparado/`, `frames/` e `zips/` são derivados e ficam fora.

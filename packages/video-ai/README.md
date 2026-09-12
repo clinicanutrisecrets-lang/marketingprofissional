@@ -54,10 +54,14 @@ Rodar de novo só refaz o que mudou (hash do arquivo). Flags:
 `--forcar` (refaz tudo), `--sem-legenda` (não chama o modelo),
 `--sem-upload` (só zipa; o treino exige pacote enviado).
 
-**Confira as legendas** em `datasets/receitas/preparado/*.txt` antes de
-treinar. Pra corrigir uma à mão: edite o `.txt` E o campo `legenda` no
-`dataset.json` (marque `legenda_fonte: "manual"`), depois rode de novo com
-`--sem-legenda` pra reempacotar. Legenda errada ensina o estilo errado.
+**Legenda escrita à mão tem precedência**: `datasets/<nome>/curadoria.json`
+mapeia o nome do arquivo pra `{ "legenda": "...", "inicio_seg": 13.5 }`. A
+`legenda` substitui a do modelo (sem a frase-gatilho, o preparo põe sozinho) e
+o `inicio_seg` escolhe, num vídeo longo, onde o clipe de 5 s começa (ex.: o
+momento em que a mão parte a rosquinha). O dataset `receitas` já vem com as
+13 legendas escritas à mão a partir das fotos da Aline, e o vocabulário do
+estilo está em `docs/ESTILO.md`. Legenda errada ensina o estilo errado:
+confira em `preparado/*.txt` antes de treinar.
 
 Repita pra `datasets/ciencia/` quando os renders do Blender existirem (Fase 3).
 
@@ -85,7 +89,7 @@ Custo de referência: 2000 passos ≈ US$ 8; as três variações ≈ US$ 26.
 Comparar as variações é o próximo passo (Fase 2): um grid com 4 prompts fixos,
 mesma seed, um LoRA por coluna. Quem ganha vira `aprovado = true` na tabela.
 
-## 4. Como me mandar as fotos e os vídeos modelo
+## 4. Como me mandar mais fotos e vídeos
 
 Duas formas, qualquer uma serve:
 
@@ -109,10 +113,12 @@ pnpm test        # regras puras: formato, legenda, custo, pacote, trava do i2v
 pnpm typecheck
 ```
 
-O que ainda **não** foi exercitado de ponta a ponta nesta entrega: uma
-chamada real ao trainer da fal e uma legenda real pelo modelo (a sessão não
-tinha as chaves). O preparo foi conferido com mídia sintética: 480x832,
-16 fps, 81 quadros, zip plano, segunda rodada reaproveitando tudo.
+O que ainda **não** foi exercitado de ponta a ponta: uma chamada real ao
+trainer da fal e uma legenda real pelo modelo (a sessão não tinha as chaves).
+O preparo rodou com o dataset REAL de 12/09 (13 arquivos, legendas à mão):
+480x832, 16 fps, 81 quadros, zip de 4,4 MB, segunda rodada reaproveitando
+tudo. Falta só o upload e o treino, que dependem de `FAL_KEY` (e do Supabase
+pra guardar o pacote).
 
 ## Estrutura
 
@@ -125,7 +131,8 @@ packages/video-ai/
 ├── src/lib/legendar.ts      # legenda por visão (Anthropic)
 ├── src/lib/storage.ts       # Supabase Storage (bucket privado) ou storage da fal
 ├── src/lib/registro.ts      # loras.json + aline.video_loras
-├── datasets/<nome>/         # mídia crua (fora do git) + dataset.json (no git)
+├── datasets/<nome>/         # mídia crua curada (no git enquanto pequena), curadoria.json e dataset.json
+├── docs/ESTILO.md           # o que define o visual, lido nas fotos dela
 ├── loras.json               # registro dos LoRAs treinados
 └── .env.example
 ```

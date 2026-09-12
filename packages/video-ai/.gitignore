@@ -1,19 +1,11 @@
-# Mídia do dataset fica fora do git (vai pro Supabase Storage em .zip).
-# O manifesto datasets/<nome>/dataset.json É versionado: é ele que diz onde o
-# pacote está e permite treinar de qualquer máquina.
+# A mídia CRUA de datasets/<nome>/ é versionada de propósito enquanto é pequena
+# (é o material que a Aline mandou, curado; sem ele ninguém consegue re-treinar).
+# O que é DERIVADO fica fora do git: preparado/, frames/, zips/ e qualquer zip.
 datasets/**/preparado/
 datasets/**/frames/
 datasets/**/zips/
-datasets/**/*.jpg
-datasets/**/*.jpeg
-datasets/**/*.png
-datasets/**/*.webp
+datasets/**/*.zip
 datasets/**/*.heic
 datasets/**/*.heif
-datasets/**/*.mp4
-datasets/**/*.mov
-datasets/**/*.webm
-datasets/**/*.m4v
-datasets/**/*.zip
 outputs/
 .env

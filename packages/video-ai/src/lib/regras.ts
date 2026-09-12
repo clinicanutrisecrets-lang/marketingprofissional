@@ -72,10 +72,37 @@ export function nomePreparado(indice: number, origem: string, tipo: TipoMidia): 
  * Onde cortar um vídeo mais longo que o clipe de treino. Padrão: o miolo,
  * que é onde a ação costuma estar (o começo tem a mão entrando no quadro).
  */
-export function inicioDoTrecho(duracaoSeg: number, trecho: "inicio" | "meio" = "meio"): number {
+export type Trecho = "inicio" | "meio" | "fim";
+
+export function inicioDoTrecho(duracaoSeg: number, trecho: Trecho = "meio", inicioManual?: number): number {
   if (!Number.isFinite(duracaoSeg) || duracaoSeg <= DURACAO_CLIPE_SEG) return 0;
+  const maximo = duracaoSeg - DURACAO_CLIPE_SEG;
+  // Início escolhido à mão (curadoria.json): vale, mas nunca deixa o clipe
+  // passar do fim do vídeo, senão o ffmpeg devolve menos quadros.
+  if (inicioManual !== undefined && Number.isFinite(inicioManual)) {
+    return Math.min(Math.max(0, inicioManual), maximo);
+  }
   if (trecho === "inicio") return 0;
-  return Math.max(0, (duracaoSeg - DURACAO_CLIPE_SEG) / 2);
+  if (trecho === "fim") return maximo;
+  return Math.max(0, maximo / 2);
+}
+
+/** curadoria.json: legenda escrita à mão e, pra vídeo, onde o clipe começa. */
+export type Curadoria = Record<string, { legenda?: string; inicio_seg?: number }>;
+
+export function lerCuradoria(texto: string | null): Curadoria {
+  if (!texto) return {};
+  const bruto = JSON.parse(texto) as Record<string, unknown>;
+  const saida: Curadoria = {};
+  for (const [nome, v] of Object.entries(bruto)) {
+    if (nome.startsWith("_") || !v || typeof v !== "object") continue;
+    const item = v as { legenda?: unknown; inicio_seg?: unknown };
+    const entrada: { legenda?: string; inicio_seg?: number } = {};
+    if (typeof item.legenda === "string" && item.legenda.trim()) entrada.legenda = item.legenda.trim();
+    if (typeof item.inicio_seg === "number" && Number.isFinite(item.inicio_seg)) entrada.inicio_seg = item.inicio_seg;
+    if (entrada.legenda !== undefined || entrada.inicio_seg !== undefined) saida[nome] = entrada;
+  }
+  return saida;
 }
 
 /**
@@ -163,6 +190,8 @@ export type EntradaManifesto = {
   legenda: string;
   legenda_fonte: "claude" | "nome-do-arquivo" | "manual";
   duracao_seg?: number;
+  /** Vídeo: segundo em que o clipe de treino começa (trecho ou curadoria). */
+  inicio_seg?: number;
   origem_bytes: number;
 };
 
