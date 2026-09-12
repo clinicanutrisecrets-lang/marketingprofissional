@@ -1,0 +1,161 @@
+<meta charset="utf-8">
+<style>
+  :root{
+    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
+    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --laranja:#D9772B;
+    --vermelho:#C8455A; --verde:#2E8B6E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1176px;height:2180px;background:var(--pagina);
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
+       padding:40px 34px;display:flex;flex-direction:column;gap:26px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:18px;
+          padding:32px 34px}
+  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
+
+  /* cabeçalho */
+  .topo{position:relative;overflow:hidden}
+  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;
+               background:var(--ambar)}
+  .sobrancelha{font-size:24px;color:var(--cinza);letter-spacing:.2px;margin-bottom:10px}
+  .titulo{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  .titulo h1{font-size:66px;line-height:1.05;letter-spacing:-.5px}
+  .selo{display:inline-flex;align-items:center;gap:9px;background:#FBF3E3;
+        color:#8A6416;border-radius:999px;padding:8px 18px;font-size:24px;font-weight:700}
+  .selo i{width:10px;height:10px;border-radius:50%;background:var(--ambar);display:block}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{border-radius:999px;padding:9px 18px;font-size:22px;font-weight:600;
+        background:#E6F3F4;color:#0B5F67}
+  .chip.mono{font-family:"Liberation Mono",monospace;background:#F1F3F5;color:#4A5560;font-weight:400}
+  .chip.leve{background:#F3F0FA;color:#5B4593}
+
+  /* escala */
+  .escala{margin-top:26px;border-top:1px solid var(--linha);padding-top:20px}
+  .escala .rotulo{font-size:19px;letter-spacing:1.6px;color:var(--cinza);margin-bottom:12px}
+  .barras{display:flex;gap:10px}
+  .barras span{flex:1;height:6px;border-radius:3px;background:var(--linha)}
+  .barras span.on{background:var(--ambar)}
+  .nomes{display:flex;gap:10px;margin-top:9px;font-size:20px;color:var(--cinza)}
+  .nomes b{flex:1;text-align:center;font-weight:400}
+  .nomes b.on{color:#8A6416;font-weight:700}
+
+  /* listas */
+  h2{font-size:40px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  h2 em{width:11px;height:11px;border-radius:50%;display:block;font-style:normal}
+  .item{display:flex;gap:14px;font-size:26px;line-height:1.45;color:#39424E;
+        margin-bottom:14px}
+  .item s{text-decoration:none;font-weight:700;flex:none;width:18px}
+  .reduzir s{color:var(--ambar)} .potenciar s{color:var(--teal)}
+
+  /* alimentos */
+  .alim h2{margin-bottom:6px}
+  .alim .sub{font-size:24px;color:var(--cinza);margin-bottom:20px}
+  .linha{display:flex;align-items:flex-start;gap:18px;padding:22px 0;
+         border-top:1px solid var(--linha)}
+  .n{flex:none;width:44px;height:44px;border-radius:12px;display:grid;
+     place-items:center;font-size:25px;font-weight:700;color:#fff}
+  .corpo{flex:1}
+  .corpo h3{font-size:31px;font-weight:700;margin-bottom:5px}
+  .corpo p{font-size:22px;color:var(--cinza);line-height:1.4}
+  .corpo p.qtd{color:#39424E;margin-top:6px}
+  .tag{flex:none;border:1px solid var(--linha);border-radius:999px;
+       padding:7px 16px;font-size:20px;color:#5A6672}
+</style>
+
+<div class="cartao topo">
+  <div class="sobrancelha">Área genética · Maquinário</div>
+  <div class="titulo">
+    <h1 class="serif">Ritmo circadiano</h1>
+    <span class="selo"><i></i>Moderado</span>
+  </div>
+  <div class="chips">
+    <span class="chip">Gene CLOCK</span>
+    <span class="chip mono">Alelo AG (heterozigoto)</span>
+    <span class="chip leve">sono</span>
+    <span class="chip leve">metabolismo</span>
+  </div>
+  <div class="escala">
+    <div class="rotulo">ESCALA DE IMPACTO</div>
+    <div class="barras"><span></span><span class="on"></span><span></span></div>
+    <div class="nomes"><b>Protetor</b><b class="on">Moderado</b><b>Atenção</b></div>
+  </div>
+</div>
+
+<div class="cartao reduzir">
+  <h2 class="serif"><em style="background:var(--ambar)"></em>Como reduzir o impacto</h2>
+  <div class="item"><s>–</s><span>Evite madrugar ou dormir muito tarde com frequência — a regularidade é o que mais protege seu relógio</span></div>
+  <div class="item"><s>–</s><span>Reduza a exposição a telas brilhantes após 21h — isso confunde seu ritmo interno</span></div>
+  <div class="item"><s>–</s><span>Gerencie o estresse antes de dormir: respiração, leitura leve ou meditação ajudam muito</span></div>
+</div>
+
+<div class="cartao potenciar">
+  <h2 class="serif"><em style="background:var(--teal)"></em>Como potencializar</h2>
+  <div class="item"><s>+</s><span>Mantenha horários parecidos para dormir e acordar todos os dias — até no fim de semana</span></div>
+  <div class="item"><s>+</s><span>Aproveite a luz natural pela manhã para "dar corda" no seu relógio interno</span></div>
+  <div class="item"><s>+</s><span>Exercícios regulares durante o dia ajudam seu organismo a saber quando é hora de descansar</span></div>
+</div>
+
+<div class="cartao alim">
+  <h2 class="serif">Alimentos recomendados</h2>
+  <div class="sub">6 combinações com sinergia nutricional</div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--teal)">1</div>
+    <div class="corpo">
+      <h3>Ovos + abacate</h3>
+      <p>Proteína de alto valor biológico + gorduras monoinsaturadas</p>
+      <p class="qtd">2 ovos + ¼ de abacate</p>
+    </div>
+    <div class="tag">Café da manhã</div>
+  </div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--roxo)">2</div>
+    <div class="corpo">
+      <h3>Iogurte natural + aveia</h3>
+      <p>Proteína + β-glucanas — maior saciedade e estabilidade metabólica</p>
+      <p class="qtd">170 g de iogurte + 40 g de aveia</p>
+    </div>
+    <div class="tag">Ao longo do dia</div>
+  </div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--laranja)">3</div>
+    <div class="corpo">
+      <h3>Frutas roxas + cacau 70%</h3>
+      <p>Antocianinas + flavonoides — proteção mitocondrial e equilíbrio do ritmo circadiano</p>
+      <p class="qtd">1 xícara de frutas + 20 g de cacau</p>
+    </div>
+    <div class="tag">Ao longo do dia</div>
+  </div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--verde)">4</div>
+    <div class="corpo">
+      <h3>Kiwi + castanhas</h3>
+      <p>Serotonina natural + magnésio — auxilia a qualidade do sono</p>
+      <p class="qtd">2 kiwis + 30 g de castanhas</p>
+    </div>
+    <div class="tag">Noite</div>
+  </div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--vermelho)">5</div>
+    <div class="corpo">
+      <h3>Cereja ácida (tart cherry) + nozes</h3>
+      <p>Melatonina natural + triptofano</p>
+      <p class="qtd">1 xícara de cereja + 30 g de nozes</p>
+    </div>
+    <div class="tag">Noite</div>
+  </div>
+
+  <div class="linha">
+    <div class="n" style="background:var(--teal)">6</div>
+    <div class="corpo">
+      <h3>Grão-de-bico + semente de abóbora</h3>
+      <p>Triptofano + magnésio — apoio à produção noturna de melatonina</p>
+      <p class="qtd">1 xícara de grão-de-bico + 20 g de sementes</p>
+    </div>
+    <div class="tag">Noite</div>
+  </div>
+</div>
