@@ -58,6 +58,31 @@ captura desliza por cima dele e denuncia a montagem.
 
 ---
 
+## O enquadramento, que é o que deu errado na primeira geração
+
+Sem instrução de tamanho o gerador afasta a câmera e o tablet sai pequeno
+no meio da mesa. Ele também inclina o tablet, e tela inclinada perde
+metade da legibilidade e estraga qualquer colagem por cima.
+
+As três linhas que resolvem, e elas valem para qualquer um dos caminhos
+aqui embaixo:
+
+```
+FRAMING
+Vertical 9:16, the camera close to the tablet. The tablet is centred and fills the frame: its screen occupies at least 85 percent of the frame width, with only a small margin of desk visible around it.
+
+GEOMETRY
+The tablet is shot straight on, its screen square and parallel to the camera, flat to the lens. It is not tilted, not angled, not turned, and there is no perspective distortion: the screen reads as a clean rectangle with straight edges and square corners.
+
+CAMERA
+Completely static, locked off on a tripod. No pan, no tilt, no push in, no zoom, no handheld drift.
+```
+
+Substitua os blocos `FRAMING`, `GEOMETRY` e `CAMERA` do prompt por estes,
+ou cole os três no fim do prompt que você já usou.
+
+---
+
 ## Caminho 2, o mais rápido: animar a sua própria montagem
 
 Monte antes uma imagem parada com o print já dentro do tablet, no Canva
