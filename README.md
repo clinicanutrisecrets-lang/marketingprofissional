@@ -35,6 +35,7 @@ marketingprofissional/
 │   ├── bannerbear/             # Geração de criativos
 │   ├── meta-ads/               # Anúncios (abstração "objetivo de negócio")
 │   ├── heygen/                 # Reels com avatar (só apps/aline)
+│   ├── video-ai/               # Nutri Video AI: LoRA Wan 2.2 na fal.ai (CLI, só apps/aline)
 │   ├── benchmarks/             # Avaliação CPL/CAC vs mercado
 │   └── ui/                     # Componentes compartilhados
 │

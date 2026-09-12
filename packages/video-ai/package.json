@@ -1,0 +1,30 @@
+{
+  "name": "@scanner/video-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nutri Video AI: dataset + LoRA (Wan 2.2 na fal.ai) para clipes no padrão visual da Nutri Secrets. CLI local, só apps/aline.",
+  "scripts": {
+    "prepare-dataset": "tsx src/prepare-dataset.ts",
+    "train": "tsx src/train-lora.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types tests/*.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
+    "@fal-ai/client": "^1.10.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "archiver": "^7.0.1",
+    "dotenv": "^16.4.5",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/ffprobe-static": "^2.0.3",
+    "@types/node": "^22.7.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.2"
+  }
+}
