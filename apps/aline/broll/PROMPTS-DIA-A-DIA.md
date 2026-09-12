@@ -755,7 +755,17 @@ em círculos lentos: é o gesto que o gerador faz bonito.
 
 ---
 
-## 20. Fazendo um chá de ervas
+## 20. Chá de ervas, três versões
+
+Mesma cozinha, mesma luz, mesmo bule de vidro: o que muda é a erva e a
+roupa. Geradas assim, as três parecem três manhãs diferentes e não três
+tentativas da mesma cena.
+
+Em todas, a folha é solta e o saquinho está proibido por nome, junto com
+etiqueta, barbante, sachê e pó. É a lista nomeada que segura: negação
+genérica o gerador atravessa.
+
+### 20a. Camomila, camisa de linho branca
 
 ```
 SUBJECT
@@ -765,10 +775,10 @@ BODY
 Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
 
 SCENE
-She is at her kitchen counter making herbal tea from loose dried herbs, a small glass jar of dried leaves open beside a clear glass teapot with a metal strainer basket inside it.
+She is at her kitchen counter making chamomile tea from loose dried flowers, a small glass jar of whole dried chamomile flowers open beside a clear glass teapot with a metal strainer basket inside it.
 
 ACTION
-She takes a spoonful of dried leaves from the jar and drops them into the strainer basket, then pours hot water over them from a kettle and watches the leaves open and the water turn colour, her lips closed.
+She takes a spoonful of the dried chamomile flowers from the jar and drops them into the strainer basket, then pours hot water over them from a kettle and watches the flowers float and the water turn colour, her lips closed.
 
 EXPRESSION
 Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
@@ -783,15 +793,89 @@ FRAMING
 Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the glass teapot in the lower part of the frame with clear uncluttered space between her chin and the teapot.
 
 WARDROBE
-Easy clothes at home on a slow morning: a soft oversized knit jumper in one plain colour worn over a plain t shirt, the sleeves long and falling to her wrists, the jumper loose enough to fall away from her body on its own, with relaxed straight leg jeans. Young and current, the comfortable clothes a woman in her early thirties actually wears at home, nothing dressed up and nothing formal. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no shawl, no floral print, no shoulder pads.
+A loose oversized white linen shirt worn untucked over a plain white t shirt, with relaxed straight leg jeans. Everything loose and easy, cut to fall away from the chest and shoulders on its own, in a soft fabric that moves. Young and current, the comfortable clothes a woman in her early thirties actually wears at home. Sleeves down to the wrists. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
 
 LOCKS
-Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the spoon and the kettle stay whole in her hands at all times. The tea is made only from loose dried whole herb leaves, green and grey green, poured from an open jar and held in the metal strainer: there is no tea bag anywhere in frame, no paper tag, no string, no sachet, no powder. The amount is modest, about one heaped teaspoon. The water falls as one steady stream and the leaves swell and open in the water, the liquid slowly taking on a pale golden colour. The steam is thin and light, never a cloud. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the spoon and the kettle stay whole in her hands at all times. The tea is made only from whole loose dried chamomile flowers, small round golden yellow flower heads with pale dried petals, poured from an open jar and held in the metal strainer: there is no tea bag anywhere in frame, no paper tag, no string, no sachet, no powder. The amount is modest, about one heaped teaspoon. The water falls as one steady stream, the flower heads float and slowly swell, and the liquid takes on a clear pale gold colour. The steam is thin and light, never a cloud. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
 ```
 
-Erva solta, nunca saquinho. Essa é a trava do prompt, escrita em cima de
-tudo que o gerador poderia inventar no lugar: saquinho, etiqueta de papel,
-barbante, sachê e pó. O bule de vidro existe pra folha aparecer abrindo.
+A camomila é a que fica mais bonita no bule de vidro, porque a florzinha
+inteira flutua e dá o que olhar enquanto a água tinge.
+
+---
+
+### 20b. Erva-doce, tricô verde-oliva
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter making fennel tea from loose dried seeds, a small glass jar of dried fennel seeds open beside a clear glass teapot with a metal strainer basket inside it.
+
+ACTION
+She takes a spoonful of the dried fennel seeds from the jar and drops them into the strainer basket, then pours hot water over them from a kettle and watches them swirl and settle as the water turns colour, her lips closed.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the glass teapot in the lower part of the frame with clear uncluttered space between her chin and the teapot.
+
+WARDROBE
+A soft oversized olive green knit jumper worn over a plain white t shirt, with relaxed straight leg jeans. Everything loose and easy, cut to fall away from the chest and shoulders on its own, in a soft fabric that moves. Young and current, the comfortable clothes a woman in her early thirties actually wears at home. Sleeves down to the wrists. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the spoon and the kettle stay whole in her hands at all times. The tea is made only from loose dried fennel seeds, small pale green and straw coloured oval seeds with fine ridges, poured from an open jar and held in the metal strainer: there is no tea bag anywhere in frame, no paper tag, no string, no sachet, no powder, no ground spice. The amount is modest, about one heaped teaspoon. The water falls as one steady stream, the seeds swirl and then settle in the strainer, and the liquid takes on a very pale straw yellow colour. The steam is thin and light, never a cloud. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
+
+Erva-doce é semente, não folha, então a física muda: elas rodopiam e
+descem, não abrem. Sem essa linha o gerador inventa folha.
+
+---
+
+### 20c. Capim-limão, moletom bege
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter making lemongrass tea from loose dried stalks, a small glass jar of cut dried lemongrass open beside a clear glass teapot with a metal strainer basket inside it.
+
+ACTION
+She takes a spoonful of the cut dried lemongrass from the jar and drops it into the strainer basket, then pours hot water over it from a kettle and watches the pieces swell as the water turns colour, her lips closed.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the glass teapot in the lower part of the frame with clear uncluttered space between her chin and the teapot.
+
+WARDROBE
+A light beige oversized cotton sweatshirt with a plain round neck, worn with relaxed straight leg jeans. Everything loose and easy, cut to fall away from the chest and shoulders on its own, in a soft fabric that moves. Young and current, the comfortable clothes a woman in her early thirties actually wears at home. Sleeves down to the wrists. Never sleeveless, never a tank top, never a clinging knit across the chest, never a stiff tailored dress, a belted shirt dress or a knee length skirt. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the spoon and the kettle stay whole in her hands at all times. The tea is made only from loose dried lemongrass, long thin pale green blades cut into short pieces, poured from an open jar and held in the metal strainer: there is no tea bag anywhere in frame, no paper tag, no string, no sachet, no powder. The amount is modest, about one heaped teaspoon. The water falls as one steady stream, the cut blades swell and soften, and the liquid takes on a pale yellow green colour. The steam is thin and light, never a cloud. No other people in frame. Nothing on any screen, paper, cup or label is readable, no text, no numbers. Static framing, no zoom, no camera move.
+```
 
 ---
 
