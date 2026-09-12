@@ -99,7 +99,10 @@ existem. Fora daqui:
   saudáveis em prato pronto, sem pessoa (não gasta).
 - `PROMPTS-DIA-A-DIA.md`: a vida fora do consultório, acordando, café da
   manhã, cafeteria, parque, descalça na grama, pôr do sol e fim de tarde,
-  mais três versões sem rosto das mesmas cenas (não gastam).
+  mais seis versões sem rosto das mesmas cenas (não gastam).
+- `PROMPTS-TABLET-PACIENTE.md`: o tablet mostrando a área do paciente, sem
+  pessoa (não gasta). A tela vai vazia no gerador e recebe a captura real
+  por cima no render, porque gerador não escreve tela.
 
 Todo prompt nesses arquivos é copiar e colar inteiro: as travas
 repetidas já estão dentro de cada bloco.
