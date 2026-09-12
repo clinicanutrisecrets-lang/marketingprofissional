@@ -1,15 +1,33 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { renderCard, ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type CardLayout, type ConteudoPeca, type Dimensoes, type IlustracaoId } from "@scanner/ai-image";
+import {
+  renderCardDetalhado,
+  normalizarFotoLugar,
+  normalizarFotoTamanho,
+  type CardLayout,
+  type ConteudoPeca,
+  type Dimensoes,
+} from "@scanner/ai-image";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
  * Editor de arte: renderiza um card sob demanda com os textos digitados
- * pela nutri e, opcionalmente, uma FOTO DELA (upload) na tirinha do topo.
- * Retorna o PNG direto — o front usa como preview e como download.
+ * pela nutri e, opcionalmente, uma FOTO DELA (upload) — no lugar e tamanho
+ * que ela escolher (topo, base ou ao lado; pequena, média ou grande).
+ * Retorna o PNG direto — o front usa como preview e como download. Quando a
+ * foto encolheu, não coube ou o layout não a usa, o motivo vai no header
+ * `x-aviso-foto` (URL-encoded) pra tela nunca descartar foto em silêncio.
+ *
+ * Sem ilustração em traço (Aline, 12/09/2026): o campo `ilustracao` deixou
+ * de existir — se um cliente antigo mandar, é ignorado.
  */
+
+/** Header ASCII-safe com o aviso da foto (o corpo da resposta é o PNG). */
+function headerAviso(aviso: string | null): Record<string, string> {
+  return aviso ? { "x-aviso-foto": encodeURIComponent(aviso) } : {};
+}
 export async function POST(request: Request) {
   const supabase = createClient();
   const {
@@ -78,6 +96,10 @@ export async function POST(request: Request) {
   const fotoPosRaw = String(form.get("fotoPos") ?? "centro");
   const fotoPosicao =
     fotoPosRaw === "topo" || fotoPosRaw === "base" ? fotoPosRaw : ("centro" as const);
+  // Onde a foto entra e que tamanho tem — escolha da nutri (12/09/2026).
+  // Valor desconhecido cai no padrão de sempre (topo + média).
+  const fotoLugar = normalizarFotoLugar(String(form.get("fotoLugar") ?? ""));
+  const fotoTamanho = normalizarFotoTamanho(String(form.get("fotoTamanho") ?? ""));
 
   const itens = String(form.get("itens") ?? "").trim();
   const layoutRaw = String(form.get("layout") ?? "auto");
@@ -86,15 +108,6 @@ export async function POST(request: Request) {
   else if (layoutRaw === "lista") layout = "lista";
   else if (layoutRaw === "editorial") layout = "editorial";
   else layout = fotoBuffer ? "foto" : "hero";
-
-  const ilustracaoRaw = String(form.get("ilustracao") ?? "");
-  let ilustracao: IlustracaoId | undefined;
-  if (ilustracaoRaw === "auto") {
-    // O sistema escolhe pelo tema do texto — evita ficar regerando pra testar
-    ilustracao = sugerirIlustracao(`${headline} ${subtitle} ${eyebrow}`);
-  } else if (ILUSTRACOES_DISPONIVEIS.some((i) => i.id === ilustracaoRaw)) {
-    ilustracao = ilustracaoRaw as IlustracaoId;
-  }
 
   // Onde a foto entra no carrossel: "sem" (padrão), "inicio" (capa) ou
   // "fim" (slide de CTA). Pedido da Aline — repetir a foto nos 8 slides
@@ -128,16 +141,25 @@ export async function POST(request: Request) {
 
     try {
       const buffers: Buffer[] = [];
+      let avisoFoto: string | null = null;
+      // Foto pedida pra um slide que não existe (ex.: "no slide final" sem
+      // frase de CTA) — avisar, nunca sumir com a foto em silêncio.
+      const temSlideFinal = conteudos.length > 1 && !!cta;
+      if (fotoBuffer && fotoCarrossel === "fim" && !temSlideFinal) {
+        avisoFoto = "Escreva a frase manuscrita pra existir o slide final — sem ela a foto não entrou.";
+      }
       for (let i = 0; i < conteudos.length; i++) {
         const ehCapa = i === 0;
-        const ehUltimo = i === conteudos.length - 1 && conteudos.length > 1 && !!cta;
+        const ehUltimo = i === conteudos.length - 1 && temSlideFinal;
         const levaFoto =
           !!fotoBuffer &&
           ((fotoCarrossel === "inicio" && ehCapa) || (fotoCarrossel === "fim" && ehUltimo));
-        const buf = await renderCard({
+        const r = await renderCardDetalhado({
           layout: levaFoto ? "foto" : ehCapa || ehUltimo ? "hero" : "conteudo",
           fotoBuffer: levaFoto ? fotoBuffer : undefined,
           fotoPosicao,
+          fotoLugar,
+          fotoTamanho,
           dimensoes: "1080x1350",
           brand: brandCard,
           conteudo: conteudos[i]!,
@@ -146,22 +168,9 @@ export async function POST(request: Request) {
           // Logo em TODOS os slides (antes só na capa — os miolos saíam sem
           // marca nenhuma). Sem upload, o renderer cai na logo do onboarding.
           logoBuffer,
-          // Ilustração por slide, escolhida pelo texto DAQUELE slide. Antes o
-          // carrossel nem repassava o campo, então nenhum slide vinha com
-          // ícone. Capa e CTA seguem tipográficos, sem ícone.
-          // Em "auto", cada slide ganha o ícone do PRÓPRIO texto (senão os 8
-          // sairiam com o mesmo desenho, escolhido pelo título da capa).
-          // Ícone escolhido à mão vale pra todos.
-          ilustracao:
-            ehCapa || ehUltimo
-              ? undefined
-              : ilustracaoRaw === "auto"
-                ? sugerirIlustracao(
-                    `${conteudos[i]!.headline ?? ""} ${conteudos[i]!.corpo ?? ""}`,
-                  )
-                : ilustracao,
         });
-        buffers.push(buf);
+        if (levaFoto && r.avisoFoto) avisoFoto = r.avisoFoto;
+        buffers.push(r.buffer);
       }
 
       if (salvar) {
@@ -184,11 +193,12 @@ export async function POST(request: Request) {
             params: { layout: "carrossel", formato: "retrato", headline: `${headline} (slide ${i + 1}/${buffers.length})` },
           } as never);
         }
-        return NextResponse.json({ ok: true, urls });
+        return NextResponse.json({ ok: true, urls, avisoFoto });
       }
 
       return NextResponse.json({
         ok: true,
+        avisoFoto,
         slides: buffers.map((b) => `data:image/png;base64,${b.toString("base64")}`),
       });
     } catch (e) {
@@ -200,17 +210,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    const buffer = await renderCard({
+    const { buffer, avisoFoto } = await renderCardDetalhado({
       layout,
       dimensoes,
       brand: brandCard,
       conteudo: { headline, eyebrow, subtitle, cta, corpo: itens || undefined },
       fotoBuffer,
       fotoPosicao,
+      fotoLugar,
+      fotoTamanho,
       schemeIndex: esquema >= 0 && esquema <= 2 ? esquema : undefined,
       corFundoHex,
       logoBuffer,
-      ilustracao,
     });
 
     if (salvar) {
@@ -229,15 +240,16 @@ export async function POST(request: Request) {
         franqueada_id: f.id,
         url,
         path,
-        params: { layout, formato, esquema, corFundoHex, headline },
+        params: { layout, formato, esquema, corFundoHex, headline, fotoLugar, fotoTamanho },
       } as never);
-      return NextResponse.json({ ok: true, url });
+      return NextResponse.json({ ok: true, url, avisoFoto });
     }
 
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "content-type": "image/png",
         "cache-control": "no-store",
+        ...headerAviso(avisoFoto),
       },
     });
   } catch (e) {

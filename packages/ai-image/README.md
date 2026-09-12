@@ -2,6 +2,20 @@
 
 Renderer de imagens geradas por IA pra feed, carrossel e stories do Instagram. Substitui Bannerbear e parte do uso do Creatomate (Creatomate segue só pra vídeo/reels).
 
+## Cards tipográficos (`renderCard`) — sem ilustração
+
+O caminho padrão do editor de artes e do carrossel é o `cardDesigner`: card
+desenhado com sharp + fontes vetoriais (Playfair, Montserrat, Caveat), cores da
+paleta da marca e diagramação de título/subtítulo. **É um renderer tipográfico,
+sem ilustração nenhuma** — a biblioteca de line art foi retirada por completo
+em 12/09/2026 (decisão da Aline: os traços "estavam sempre dando algum
+problema"). O único elemento gráfico além do texto é a **foto que a
+profissional sobe**, com lugar (`fotoLugar`: topo, base, direita) e tamanho
+(`fotoTamanho`: pequena, media, grande) escolhidos por ela; a geometria mora em
+`src/fotoLayout.ts` (puro, testado em `src/cardDesigner.test.ts`) e a foto
+nunca sobrepõe texto. `renderCardDetalhado` devolve, além do PNG, `avisoFoto`
+quando a foto encolheu, não coube ou o layout não a usa.
+
 ## Providers suportados
 
 - **OpenAI `gpt-image-1`** (env `OPENAI_API_KEY`) — qualidade máxima, ~$0,19/img

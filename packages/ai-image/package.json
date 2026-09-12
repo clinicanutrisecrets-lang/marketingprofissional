@@ -7,6 +7,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "test": "node --experimental-strip-types --test src/cardDesigner.test.ts"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "openai": "^4.70.0",
