@@ -52,6 +52,12 @@ outra parte do texto"*. É `.sub`, `display:inline-block` **de propósito**: a
 caixa acompanha a frase, não a coluna inteira — faixa da largura toda leria como
 tarja, e tarja ela já recusou na legenda do vídeo.
 
+E o texto dentro dela é **centralizado com `text-wrap: balance`**. Alinhado à
+esquerda, quando a frase quebra em duas linhas a sobra fica encostada num canto
+— *"um pedaço ficou palhinha embaixo"*. O `balance` divide as linhas por peso em
+vez de encher a primeira até o fim, que é o que evita a órfã de uma palavra só
+("Vem / comigo.").
+
 ⚠️ E **sem cor inline no elemento**: o `style` do elemento vence a regra da
 folha, então pintar o texto com a cor do destaque (que virou o fundo da caixa)
 deixa roxo sobre roxo — retângulo aparece vazio, sem erro nenhum.

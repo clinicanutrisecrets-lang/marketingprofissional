@@ -84,7 +84,13 @@ p:last-child{margin-bottom:0}
 .sub{display:inline-block;align-self:flex-start;
    font-family:Montserrat,sans-serif;font-weight:700;font-size:44px;line-height:1.26;
    margin-top:34px;padding:18px 26px;border-radius:14px;
-   background:var(--destaque);color:var(--sobre-destaque)}
+   background:var(--destaque);color:var(--sobre-destaque);
+   /* 🔴 CENTRALIZADO E BALANCEADO quando quebra em duas linhas (Aline, 13/09:
+      "um pedaco ficou palhinha embaixo"). Alinhado a esquerda, a sobra da
+      segunda linha ("Vem / comigo.") fica encostada num canto e o retangulo
+      parece torto. `balance` divide as linhas por peso em vez de encher a
+      primeira ate o fim — e o que evita a orfa de uma palavra so. */
+   text-align:center;text-wrap:balance}
 small{display:block;font-family:Montserrat,sans-serif;font-weight:500;font-size:24px;
    line-height:1.4;margin-top:30px;opacity:.72}
 b{font-weight:700}
