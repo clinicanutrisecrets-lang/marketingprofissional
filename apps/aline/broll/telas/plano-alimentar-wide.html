@@ -1,0 +1,133 @@
+<meta charset="utf-8">
+<!-- Área do paciente: plano alimentar do dia, no formato deitado do monitor.
+     Reconstrução na linguagem visual da área do paciente. Paciente fictícia.
+     Conferir com a tela real antes de publicar. -->
+<style>
+  :root{
+    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
+    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --verde:#2E8B6E;
+    --laranja:#D9772B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);padding:26px 30px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
+       display:flex;flex-direction:column;gap:16px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:15px;
+          padding:22px 26px}
+  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
+
+  .topo{position:relative;overflow:hidden;display:flex;align-items:flex-start;
+        justify-content:space-between;gap:30px}
+  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+               background:var(--verde)}
+  .sobrancelha{font-size:18px;color:var(--cinza);margin-bottom:5px}
+  .topo h1{font-size:46px;line-height:1.05}
+  .topo .nota{font-size:17px;color:var(--cinza);margin-top:8px;max-width:520px;
+              line-height:1.5}
+  .resumo{flex:none;display:flex;gap:26px;text-align:right}
+  .resumo div span{display:block;font-size:13px;letter-spacing:1.2px;color:var(--cinza)}
+  .resumo div b{font-size:30px}
+
+  h2{font-size:26px;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  h2 em{width:9px;height:9px;border-radius:50%;display:block;font-style:normal}
+  .hora{font-size:16px;color:var(--cinza);margin-bottom:14px}
+  .prato{display:flex;gap:14px;padding:13px 0;border-top:1px solid var(--linha)}
+  .prato:first-of-type{border-top:0;padding-top:2px}
+  .bola{flex:none;width:34px;height:34px;border-radius:10px;display:grid;
+        place-items:center;font-size:17px}
+  .prato h3{font-size:22px;font-weight:700;margin-bottom:3px}
+  .prato p{font-size:17px;color:var(--cinza);line-height:1.45}
+  .prato p.qtd{color:#39424E;margin-top:4px}
+  .porque{border-radius:8px;padding:8px 11px;font-size:15px;line-height:1.45;
+          margin-top:8px;background:#EDF7F7;color:#175C60;border:1px solid #D5EBEC}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+</style>
+
+<div class="cartao topo">
+  <div>
+    <div class="sobrancelha">Seu plano · ajustado ao seu perfil genético</div>
+    <h1 class="serif">Plano alimentar do dia</h1>
+    <div class="nota">Montado a partir dos seus genes, dos seus exames e da sua rotina. A ordem das refeições importa tanto quanto o que tem nelas.</div>
+  </div>
+  <div class="resumo">
+    <div><span>REFEIÇÕES</span><b>5</b></div>
+    <div><span>AJUSTADO A</span><b>7 genes</b></div>
+  </div>
+</div>
+
+<div class="cartao">
+  <h2 class="serif"><em style="background:var(--ambar)"></em>Café da manhã</h2>
+  <div class="hora">até 1h depois de acordar</div>
+  <div class="prato">
+    <span class="bola" style="background:#FBF3E3">☀</span>
+    <div>
+      <h3>Ovos mexidos + abacate + café</h3>
+      <p>Proteína e gordura boa logo cedo seguram a fome do resto do dia</p>
+      <p class="qtd">2 ovos · ¼ de abacate · 1 xícara de café</p>
+      <div class="porque">Seu gene do relógio pede o carboidrato mais cedo: a maior parte dele fica no café da manhã e no almoço.</div>
+    </div>
+  </div>
+</div>
+
+<div class="duas">
+  <div class="cartao">
+    <h2 class="serif"><em style="background:var(--verde)"></em>Lanche da manhã</h2>
+    <div class="hora">meio da manhã</div>
+    <div class="prato">
+      <span class="bola" style="background:#E9F5F0">🍎</span>
+      <div>
+        <h3>Iogurte natural + aveia</h3>
+        <p>Fibra que alimenta a sua microbiota</p>
+        <p class="qtd">170 g · 40 g de aveia</p>
+      </div>
+    </div>
+  </div>
+  <div class="cartao">
+    <h2 class="serif"><em style="background:var(--roxo)"></em>Lanche da tarde</h2>
+    <div class="hora">meio da tarde</div>
+    <div class="prato">
+      <span class="bola" style="background:#F3F0FA">🫐</span>
+      <div>
+        <h3>Frutas roxas + cacau 70%</h3>
+        <p>Antocianinas e flavonoides, proteção para as suas mitocôndrias</p>
+        <p class="qtd">1 xícara · 20 g de cacau</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cartao">
+  <h2 class="serif"><em style="background:var(--teal)"></em>Almoço</h2>
+  <div class="hora">entre 12h e 13h30</div>
+  <div class="prato">
+    <span class="bola" style="background:#E6F3F4">🥗</span>
+    <div>
+      <h3>Salmão + brócolis no vapor + arroz integral</h3>
+      <p>Ômega-3 e crucífera na mesma refeição: uma abre a via, a outra sustenta</p>
+      <p class="qtd">150 g de salmão · 1 xícara de brócolis · 4 colheres de arroz</p>
+      <div class="porque">Esprema limão em cima do brócolis na hora de comer. A vitamina C fecha a via que o seu GST usa para limpar o que sobra.</div>
+    </div>
+  </div>
+</div>
+
+<div class="cartao">
+  <h2 class="serif"><em style="background:var(--laranja)"></em>Jantar</h2>
+  <div class="hora">até 3h antes de dormir</div>
+  <div class="prato">
+    <span class="bola" style="background:#FCEFE3">🌙</span>
+    <div>
+      <h3>Omelete de espinafre + salada morna de beterraba</h3>
+      <p>Leve, com pouco carboidrato, pra não atrapalhar o seu sono</p>
+      <p class="qtd">2 ovos · 1 xícara de beterraba assada · folhas</p>
+      <div class="porque">Jantar cedo e leve é a parte do plano que mais muda o seu resultado, pelo seu perfil de ritmo circadiano.</div>
+    </div>
+  </div>
+  <div class="prato">
+    <span class="bola" style="background:#FCEFE3">🍒</span>
+    <div>
+      <h3>Antes de dormir: cereja ácida + nozes</h3>
+      <p>Melatonina natural e triptofano</p>
+      <p class="qtd">1 xícara · 30 g de nozes</p>
+    </div>
+  </div>
+</div>

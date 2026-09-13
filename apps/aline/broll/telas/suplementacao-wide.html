@@ -1,0 +1,103 @@
+<meta charset="utf-8">
+<!-- Área do paciente: suplementação, no formato deitado do monitor.
+     Reconstrução na linguagem visual da área do paciente. Paciente fictícia.
+     As doses são ilustrativas: conferir com a tela real antes de publicar. -->
+<style>
+  :root{
+    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
+    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --verde:#2E8B6E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);padding:26px 30px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
+       display:flex;flex-direction:column;gap:16px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:15px;
+          padding:22px 26px}
+  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
+
+  .topo{position:relative;overflow:hidden;display:flex;align-items:flex-start;
+        justify-content:space-between;gap:30px}
+  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+               background:var(--teal)}
+  .sobrancelha{font-size:18px;color:var(--cinza);margin-bottom:5px}
+  .topo h1{font-size:46px;line-height:1.05}
+  .topo .nota{font-size:17px;color:var(--cinza);margin-top:8px;max-width:560px;
+              line-height:1.5}
+  .resumo{flex:none;text-align:right}
+  .resumo span{display:block;font-size:13px;letter-spacing:1.2px;color:var(--cinza)}
+  .resumo b{font-size:30px}
+
+  .item{display:flex;gap:16px;padding:16px 0;border-top:1px solid var(--linha)}
+  .item:first-of-type{border-top:0}
+  .bola{flex:none;width:40px;height:40px;border-radius:12px;display:grid;
+        place-items:center;color:#fff;font-size:16px;font-weight:700}
+  .corpo{flex:1}
+  .corpo h3{font-size:23px;font-weight:700;margin-bottom:3px}
+  .corpo .dose{font-size:18px;color:#39424E;margin-bottom:6px}
+  .corpo p{font-size:16.5px;color:var(--cinza);line-height:1.5}
+  .porque{border-radius:8px;padding:8px 11px;font-size:15px;line-height:1.45;
+          margin-top:8px;background:#EDF7F7;color:#175C60;border:1px solid #D5EBEC}
+  .quando{flex:none;border:1px solid var(--linha);border-radius:999px;
+          padding:6px 14px;font-size:15px;color:#5A6672;height:fit-content}
+  .rodape{font-size:15px;color:var(--cinza);line-height:1.5}
+</style>
+
+<div class="cartao topo">
+  <div>
+    <div class="sobrancelha">Sua suplementação · pelo que os seus genes e exames pedem</div>
+    <h1 class="serif">O que suplementar, e por quê</h1>
+    <div class="nota">Cada item aqui tem um motivo escrito do lado. Nada entra por moda, e nada entra sem um marcador ou um gene pedindo.</div>
+  </div>
+  <div class="resumo"><span>ITENS</span><b>4</b></div>
+</div>
+
+<div class="cartao">
+  <div class="item">
+    <span class="bola" style="background:var(--ambar)">D</span>
+    <div class="corpo">
+      <h3>Vitamina D com vitamina A</h3>
+      <div class="dose">dose diária, junto de uma refeição com gordura</div>
+      <p>Seu exame veio em 27,1 ng/mL, abaixo do ideal funcional para o seu caso.</p>
+      <div class="porque">Diária e menor, nunca uma dose alta uma vez por semana. E acompanhada de vitamina A, porque o seu receptor de vitamina D precisa das duas para trabalhar.</div>
+    </div>
+    <span class="quando">Manhã</span>
+  </div>
+
+  <div class="item">
+    <span class="bola" style="background:var(--teal)">Ω</span>
+    <div class="corpo">
+      <h3>Ômega-3, EPA e DHA</h3>
+      <div class="dose">dose diária, junto do almoço</div>
+      <p>Seu marcador de inflamação de baixo grau está no limite superior.</p>
+      <div class="porque">Entra junto com polifenóis da alimentação: os dois agem na mesma via, e separados rendem menos.</div>
+    </div>
+    <span class="quando">Almoço</span>
+  </div>
+
+  <div class="item">
+    <span class="bola" style="background:var(--roxo)">Mg</span>
+    <div class="corpo">
+      <h3>Magnésio</h3>
+      <div class="dose">dose diária, à noite</div>
+      <p>Apoio ao relaxamento muscular e à qualidade do sono.</p>
+      <div class="porque">À noite de propósito: seu perfil de ritmo circadiano pede tudo o que ajuda o sono empurrado para o fim do dia.</div>
+    </div>
+    <span class="quando">Noite</span>
+  </div>
+
+  <div class="item">
+    <span class="bola" style="background:var(--verde)">C</span>
+    <div class="corpo">
+      <h3>Vitamina C</h3>
+      <div class="dose">dose diária, junto do almoço</div>
+      <p>Pode vir da comida: limão espremido no prato já conta.</p>
+      <div class="porque">É ela que fecha a via que o seu GST usa. Sem esse passo, a crucífera abre o processo e ele para no meio.</div>
+    </div>
+    <span class="quando">Almoço</span>
+  </div>
+</div>
+
+<div class="cartao rodape">
+  Doses e formas são definidas na consulta, caso a caso, e revistas a cada
+  exame. Nada aqui substitui a avaliação individual.
+</div>
