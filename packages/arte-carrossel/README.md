@@ -106,3 +106,18 @@ Todas as fontes vão embutidas em base64 (`FACES` + `_faces()`), não por `<link
 pro Google Fonts. Com o link, numa sessão com a saída de rede bloqueada, cada
 slide ficava parado esperando `fonts.googleapis.com` e os 22 slides não
 terminavam. Sem rede: **21 segundos** pros 22.
+
+## 🔴 O miolo usa a MESMA família da capa
+
+Antes o corpo era Lora (serifa) e a capa era Anton: davam a impressão de dois
+posts de marcas diferentes dentro do mesmo carrossel. A Aline reparou — *"os
+demais conteúdos você fez em outro layout, letras pequenas e tudo"*.
+
+A unificação **não** é pôr tudo em caixa alta gigante. Capa e miolo têm
+trabalhos diferentes: a capa para o rolar na grade, o miolo é lido depois que a
+pessoa já parou. Caixa alta gigante em texto científico cansa e derruba a
+compreensão. **O que unifica é a família e a escala**, não o tamanho:
+
+- título do slide (`h2`): Anton caixa alta, 82px (a capa vai de 104 a 176)
+- corpo (`p`): Montserrat 500, 46px — era serifa em 43px
+- destaque (`b`): Montserrat 800 em roxo

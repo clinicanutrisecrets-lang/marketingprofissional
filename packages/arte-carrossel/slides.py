@@ -56,7 +56,14 @@ def _logo(perfil: str, variante: str) -> str:
 
 CSS = """
 *{box-sizing:border-box;margin:0}
-body{width:1080px;height:1080px;overflow:hidden;font-family:Lora,Georgia,serif}
+/* 🔴 O MIOLO USA A MESMA FAMILIA DA CAPA. Antes o corpo era Lora (serifa) e a
+   capa era Anton: davam a impressao de dois posts de marcas diferentes no
+   mesmo carrossel. A Aline reparou — "os demais conteudos voce fez em outro
+   layout". A unificacao NAO e pôr tudo em caixa alta gigante: capa e miolo tem
+   trabalhos diferentes (uma para o rolar, o outro se le). O que unifica e a
+   FAMILIA e a escala, nao o tamanho. */
+body{width:1080px;height:1080px;overflow:hidden;
+   font-family:Montserrat,-apple-system,sans-serif}
 .s{width:1080px;height:1080px;padding:88px 80px;display:flex;flex-direction:column;
    justify-content:center;position:relative}
 .logo{position:absolute;top:46px;right:52px;height:96px;width:auto}
@@ -72,9 +79,9 @@ h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:132px;line-heig
    simula engordando o traco, o que borra a contra-forma em corpo grande. */
 h1.longo{font-size:104px}
 h1.curto{font-size:158px}
-h2{font-family:Montserrat,sans-serif;font-weight:800;font-size:62px;line-height:1.12;
-   margin-bottom:28px;text-wrap:balance}
-p{font-size:43px;line-height:1.42;margin-bottom:24px}
+h2{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:82px;line-height:1.1;
+   letter-spacing:.005em;text-transform:uppercase;margin-bottom:30px;text-wrap:balance}
+p{font-weight:500;font-size:46px;line-height:1.38;margin-bottom:26px}
 p:last-child{margin-bottom:0}
 /* 🔴 A FRASE DE FECHO GANHA UM RETANGULO (Aline, 13/09: "da pra ter aquele
    retangulo atras? so pra dar uma diferenciada da outra parte do texto").
@@ -91,9 +98,9 @@ p:last-child{margin-bottom:0}
       parece torto. `balance` divide as linhas por peso em vez de encher a
       primeira ate o fim — e o que evita a orfa de uma palavra so. */
    text-align:center;text-wrap:balance}
-small{display:block;font-family:Montserrat,sans-serif;font-weight:500;font-size:24px;
+small{display:block;font-family:Montserrat,sans-serif;font-weight:500;font-size:26px;
    line-height:1.4;margin-top:30px;opacity:.72}
-b{font-weight:700}
+b{font-weight:800}
 .cta{text-align:center}
 .cta p{font-family:Montserrat,sans-serif;font-weight:600;font-size:46px;line-height:1.42}
 .soco{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:176px;

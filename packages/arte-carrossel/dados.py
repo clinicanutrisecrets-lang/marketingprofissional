@@ -71,7 +71,7 @@ IL6 = {"slug":"il6-1909","slides":[
 LAUDO = {"slug":"laudo-conduta-2409","slides":[
  {"soco":"O laudo chegou.<br>E agora?", "fundo":"capa","eyebrow":"do laudo à conduta",
   "titulo":f'Você já pediu teste nutrigenético e {M("ficou perdida")} na hora de aplicar a conduta?',
-  "sub":"O laudo diz o gene. Quem diz a dose é você."},
+  "sub":"O laudo diz o gene. Quem diz a conduta é você."},
  {"fundo":"branco","eyebrow":"o problema real",
   "titulo":"O laudo não é o difícil. O difícil é o depois.",
   "corpo":["Chega uma lista de genes com setinha pra cima e pra baixo.",
