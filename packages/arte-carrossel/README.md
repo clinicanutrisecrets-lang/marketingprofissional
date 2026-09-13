@@ -143,3 +143,18 @@ forte e o CTA no verde cheio.
 e o destaque roxo, não o fundo. Fundo forte por slide brigaria com o texto e
 cansaria antes do CTA. Três tons quietos bastam pra não parecer oito telas
 iguais.
+
+## 🔴 No aperto, quem cede é o CORPO. O título cede por último.
+
+`AJUSTAR` tentava encolher só o título até o piso. Num slide de texto denso a
+manchete saía visivelmente menor que a dos vizinhos e **o carrossel perdia o
+ritmo** — a régua que a Aline aprovou é justamente a manchete constante.
+
+A ordem agora é: título até **86% do corpo** (o que ninguém percebe) → corpo em
+passos de 3,5% → só então o título cede de verdade. O corpo perde 1 px e
+ninguém nota; a manchete perde 20 e todo mundo nota.
+
+## Espaço duro também no HTML
+
+`&nbsp;` mantém junto o que não pode quebrar: "Comenta 1,&nbsp;2 ou&nbsp;3",
+"vitamina&nbsp;C", "10&nbsp;mg". É o irmão do ` ` da tipografia dos vídeos.

@@ -165,19 +165,23 @@ AJUSTAR = """() => {
   if (!alvo) return;
   const antes = s.style.justifyContent;
   s.style.justifyContent = 'flex-start';   // pra altura do conteudo ser medivel
+  const cabe = () => s.scrollHeight <= s.clientHeight;
+  const corpo = [...s.querySelectorAll('p, .gancho, .sub')];
+
+  // 🔴 A ORDEM IMPORTA: o TITULO cede por ultimo. Antes ele encolhia primeiro,
+  // ate o piso, e um slide de texto denso saia com a manchete visivelmente
+  // menor que a dos vizinhos — o carrossel perdia o ritmo. O corpo perde 1 px
+  // e ninguem nota; a manchete perde 20 e todo mundo nota.
   let px = parseFloat(getComputedStyle(alvo).fontSize);
-  const piso = 54;
-  while (s.scrollHeight > s.clientHeight && px > piso) {
-    px -= 4;
-    alvo.style.fontSize = px + 'px';
+  const confortavel = Math.round(px * 0.86);
+  while (!cabe() && px > confortavel) { px -= 3; alvo.style.fontSize = px + 'px'; }
+
+  const base = corpo.map((el) => parseFloat(getComputedStyle(el).fontSize));
+  for (let passo = 1; passo <= 8 && !cabe(); passo++) {
+    corpo.forEach((el, i) => { el.style.fontSize = (base[i] * (1 - passo * 0.035)) + 'px'; });
   }
-  // se mesmo no piso nao coube, o corpo do texto e que cede
-  if (s.scrollHeight > s.clientHeight) {
-    for (const el of s.querySelectorAll('p, .gancho, .sub')) {
-      const q = parseFloat(getComputedStyle(el).fontSize);
-      el.style.fontSize = Math.max(28, q * 0.86) + 'px';
-    }
-  }
+  // so agora o titulo cede de verdade
+  while (!cabe() && px > 54) { px -= 3; alvo.style.fontSize = px + 'px'; }
   s.style.justifyContent = antes;
 }"""
 
