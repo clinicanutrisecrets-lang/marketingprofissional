@@ -22,9 +22,14 @@ intestino com barriga de gente.
   a definir na folha de personagens.
 - **Alimentos**: abacate, brócolis, castanhas, ovo, peixe, chocolate amargo,
   todos com carinha simples.
-- **A pessoa**: mulher jovem de cabelo cacheado escuro, expressão caricata
-  (preguiça = olho meio fechado e boca reta; irritada = sobrancelha; focada;
-  alegre). ⚠️ Aparência recorrente ainda a fixar com a Aline.
+- **A pessoa (personagem FIXA, decidida pela Aline em 13/09)**: a mulher da
+  cena do sofá: jovem, cabelo cacheado escuro na altura do ombro, rosto redondo
+  com bochecha rosada, blusa verde sálvia. É sempre ELA em todo reel; o que muda
+  é a emoção (feliz, irritada, focada, com preguiça, com dor), o sintoma e a
+  roupa. Expressão sempre caricata (preguiça = olho meio fechado e boca reta;
+  irritada = sobrancelha franzida; feliz = olho fechado sorrindo). A imagem de
+  referência é `preguica-leve` da rodada de 13/09: toda geração dela entra com
+  essa imagem como referência de personagem.
 
 ## Paleta
 Papel creme; terracota rosado; verde sálvia; toques de azul tiffany e magenta
