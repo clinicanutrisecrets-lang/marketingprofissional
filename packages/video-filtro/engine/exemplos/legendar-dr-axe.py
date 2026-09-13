@@ -19,9 +19,14 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 # meio do quadro e tapa a acao — justamente a fruta entrando no liquidificador,
 # que e o motivo do video existir. A frase cede espaco pra imagem, nunca o
 # contrario.
+# 🔴 A FRASE DA TELA E GANCHO, NAO INFORMACAO. A primeira versao dizia "17x
+# mais vitamina C que a laranja" e a Aline cortou: "vitamina C e muito batido,
+# isso pode ser parte do conteudo da LEGENDA, mas nao a frase do meio do
+# video". O formato do Dr. Axe e outro: (1) curiosidade — "a fruta que eu como
+# todo dia" —, (2) pra quem e. Numero vai pra legenda; a tela desperta.
 FRASES = [
-    (0.7, 10.6, "17x mais vitamina\u00a0C que a laranja"),
-    (11.2, 22.6, "A fruta mais anti-inflamatória da tabela"),
+    (0.7, 10.6, "A fruta que eu como todo dia"),
+    (11.2, 22.6, "Se você vive com dor e inflamação, é essa"),
 ]
 FADE = 8  # quadros
 
