@@ -213,45 +213,56 @@ sono, onde o consultório frio não combina.
 O vapor do chá é o que dá vida: é o único movimento do plano, e foi ele
 que salvou o clipe do monitor de parecer foto parada.
 
-## Por que a primeira geração saiu com o tablet pequeno
+## Duas tentativas erradas, e o que cada uma ensinou
 
-O prompt já pedia "pelo menos 80 por cento da largura do quadro" e veio
-53. Não adianta subir o número: o problema não era o número, era o que
-estava escrito duas linhas acima. O `LOCATION MAP` punha os livros de um
-lado e a xícara do outro, e três objetos lado a lado num quadro 9:16 só
-cabem se a câmera andar pra trás. Composição ganha de porcentagem, toda
-vez.
+**Primeira: tablet pequeno.** O prompt já pedia "pelo menos 80 por cento
+da largura do quadro" e veio 53. Não adianta subir o número: o problema
+estava duas linhas acima. O `LOCATION MAP` punha os livros de um lado e a
+xícara do outro, e três objetos lado a lado num quadro 9:16 só cabem se a
+câmera andar pra trás. Composição ganha de porcentagem.
 
-A correção é tirar a concorrência, não apertar a ordem: **tudo vai pra
-trás do tablet**. Livro, xícara e prateleira ficam atrás, menores e
-desfocados, e na frente não fica nada.
+**Segunda: tablet de lado.** Mandei tudo pra trás e ele obedeceu no
+fundo, mas virou o aparelho em três quartos. A culpa foi da primeira
+linha: `"a close product shot of a tablet on a wooden table"`. Foto de
+produto em cima de mesa é, no mundo inteiro, três quartos. O gerador leu
+o gênero antes de ler a regra, e o bloco `GEOMETRY` lá embaixo dizendo
+"straight on" perdeu pro gênero.
 
-Junto vai um teste que o gerador consegue conferir sozinho, que é melhor
-que um número solto: *"a tela sozinha é mais alta do que o quadro é
-largo"*. Numa tela 3:4 ocupando 80% da largura isso é verdade, e é uma
-afirmação que ou bate ou não bate.
+Então a terceira versão muda três coisas de fundo:
+
+1. **A primeira linha descreve a imagem, não o objeto.** Não é "uma foto
+   de um tablet numa mesa", é "uma vista frontal de uma tela de tablet".
+   E diz de quem é o ponto de vista: alguém sentado na frente lendo.
+2. **Frontalidade vira fato conferível.** "Reto" é adjetivo e adjetivo
+   escorrega. "A lateral do tablet não aparece: não dá pra ver a
+   espessura dele" é uma afirmação que ou bate ou não bate — e em três
+   quartos ela nunca bate.
+3. **Os livros saem da mesa e vão pra prateleira.** Pilha de livro na
+   mesa foi o que empurrou a câmera pra trás nas duas vezes. Na
+   prateleira, ao fundo e desfocados, eles dão o cenário sem disputar o
+   quadro.
 
 ```
-SCENE CONTEXT
-A close product shot of one single tablet standing on a wooden table at the end of the afternoon, the camera very close to it, its screen facing the camera, no people.
-
-FRAMING
-Vertical 9:16. The tablet is the entire subject of this shot and it is very large in frame: its screen alone is wider than three quarters of the frame width, and the screen alone is taller than the frame is wide. The screen runs from near the top of the picture to near the bottom, centred. The camera sits about thirty centimetres from the screen, at the height of the middle of the screen. Nothing at all stands between the camera and the tablet: the only thing in the foreground is the bare near edge of the table.
-
-LOCATION MAP
-The tablet stands upright and alone in a slim matte stand on a dark wooden table, dead centre, and it is the closest object to the camera. Everything else sits behind it and further away: a bookshelf along the back wall, far out of focus; a short stack of hardcover books lying flat on the table well behind the tablet and to one side, partly hidden behind it; a plain ceramic cup of herbal tea also behind the tablet, on the other side, with thin steam rising above it. The books, the cup and the shelf are each much smaller in frame than the tablet, all softly out of focus, and none of them ever comes forward of the tablet or crosses in front of its screen.
+SHOT
+A straight-on, head-on, perfectly frontal view of a tablet screen. This is not a product photograph and not a styled table scene: it is the point of view of one person sitting directly in front of the tablet, at the height of the middle of the screen, looking straight at it from close range.
 
 GEOMETRY
-The tablet is shot straight on, its screen square and parallel to the camera, flat to the lens. It is not tilted, not angled, not turned, and there is no perspective distortion: the screen reads as a clean rectangle with straight edges and square corners.
+The tablet faces the camera square and flat. Its screen is a true rectangle: the left and right edges are vertical, parallel and the same length as each other; the top and bottom edges are horizontal, parallel and the same length as each other. The bezel is exactly the same width down the left side as down the right side. The side of the tablet is not visible at all: you cannot see its thickness, its edge, its buttons or its back, only the flat face of the screen. It is not turned, not angled, not tilted, not rotated, never seen from the side, never seen in three quarter view, and there is no perspective distortion of any kind.
+
+SIZE IN FRAME
+The tablet screen dominates the picture. The screen alone is taller than the frame is wide. There is less than one tenth of the frame width of empty space to the left of the screen, and less than one tenth to the right of it. Above and below the screen there is a little more room, showing the top edge of the tablet and the dark table below it, and nothing else.
+
+LOCATION MAP
+One single tablet stands upright and alone on a dark wooden table, dead centre, and it is by far the closest thing to the camera. There is nothing at all on the table beside it and nothing in front of it. Everything else in the picture is far behind it and out of focus: a tall bookshelf filling the back wall, its books reduced to soft blocks of muted colour, and a plain ceramic cup of herbal tea standing well behind the tablet to one side, small, softly blurred and cut off by the edge of the frame, with thin steam rising from it.
 
 OPTICS
-50mm equivalent, shallow depth of field, the tablet screen in sharp focus edge to edge and everything behind it falling off softly.
+The camera is close, about thirty centimetres from the screen. The screen is in sharp focus edge to edge and everything behind it falls off into a soft blur.
 
 CAMERA
 Completely static, locked off on a tripod. No pan, no tilt, no push in, no zoom, no handheld drift.
 
 ACTION
-Nothing in the scene moves except the ambience: thin steam rising slowly and continuously from the cup behind the tablet, and the warm light changing almost imperceptibly across the wood. The tablet, the books and the cup are perfectly still for the whole shot.
+Nothing in the scene moves except the ambience: thin steam rising slowly and continuously from the cup behind the tablet, and the warm light changing almost imperceptibly across the wood. The tablet and the cup are perfectly still for the whole shot.
 
 LIGHTING
 Warm late afternoon light coming in low from one side and bounced back soft from the front, so the scene is warm but nothing casts a hard shadow and there is no glare anywhere on the screen. Low contrast, cosy, calm.
@@ -260,14 +271,18 @@ SCREEN
 The screen is one flat, even, matte light grey, completely blank and uniform from edge to edge. No interface, no icons, no text, no numbers, no charts, no logo, no wallpaper, no glow, no reflection of the room, no fingerprints, no smudges. It never flickers and never changes brightness.
 
 BOOKS
-The books are plain hardcovers in muted colours, closed and stacked flat. Their covers and spines carry no readable text, no titles, no author names, no logos: only soft blurred marks where lettering would be.
+The books on the shelf carry no readable text, no titles, no author names, no logos: only soft blurred marks where lettering would be.
 
 STYLE
 Photoreal cinematography, true to life colours, fine grain, warm and calm, like a quiet corner at the end of the day.
 
 POSITIVE LOCKS
-The tablet stays very large in frame for the whole shot and keeps exactly the same position, size, angle and shape in every frame, and its screen stays one flat even grey the whole time. The four corners of the screen stay exactly where they are and all four stay visible and unobstructed: nothing overlaps them, nothing leans in front of them. There is only one tablet in frame. The steam is thin and light, never a cloud. No hands, no arms, no people, no reflections of people, no cat, no candle, no fire. Vertical 9:16.
+The tablet stays perfectly frontal and very large in frame for the whole shot, and keeps exactly the same position, size, angle and shape in every frame. Its screen stays one flat even grey the whole time and its four corners stay exactly where they are, all four visible and unobstructed: nothing overlaps them and nothing leans in front of them. Only the flat face of the tablet is ever visible, never its side and never its thickness. There is only one tablet in frame. The steam is thin and light, never a cloud. No hands, no arms, no people, no reflections of people, no cat, no candle, no fire. Vertical 9:16.
 ```
+
+Se esta também errar, o caminho é parar de gastar: `tablet-de-frente.mp4`
+já está em `cenarios/`, com a tela em 71% da largura e a máscara pronta,
+e faz o serviço.
 
 ## A variação da noite, se quiser duas
 
