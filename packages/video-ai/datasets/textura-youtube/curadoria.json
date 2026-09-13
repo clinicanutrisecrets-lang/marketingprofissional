@@ -1,0 +1,12 @@
+{
+  "_como_usar": "Recortes SEM legenda queimada dos shorts de YouTube que a Aline mandou em 13/09 (canais de terceiros). São 360x640, abaixo do 480x832 do treino: o preparo amplia e o resultado sai mais macio que o original. Por isso este dataset é SEPARADO do receitas: treinar o LoRA v1 só com o receitas, e só depois comparar com uma v2 que inclua estes. Mesmo formato do curadoria.json do receitas.",
+  "muffins-de-ovo-forma-close-topo.mp4": {
+    "legenda": "forma de metal escura com doze muffins de ovo dourados com brócolis, tomate e queijo derretido, close aproximando na textura esponjosa, pano xadrez vermelho e branco ao lado, vista de cima, luz natural difusa"
+  },
+  "fritata-brocolis-fatia-mao-close.mp4": {
+    "legenda": "fatias de fritata de brócolis com queijo gratinado dourado sobre prato branco, mão levantando uma fatia mostrando o miolo macio com pedaços de brócolis, close extremo na textura, luz quente suave, fundo claro desfocado"
+  },
+  "torta-massa-folhada-fatia-recheio-carne-close.mp4": {
+    "legenda": "fatia de torta de massa folhada dourada e crocante mostrando o recheio de carne moída com pimentão vermelho, close extremo na textura das camadas da massa, bancada de mármore branco desfocada, luz natural lateral"
+  }
+}

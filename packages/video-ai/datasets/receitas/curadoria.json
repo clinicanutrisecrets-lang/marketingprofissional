@@ -39,5 +39,20 @@
   "rosquinhas-assadas-quebra-miolo-coador.mp4": {
     "legenda": "mão segurando uma rosquinha assada dourada e partindo ao meio mostrando o miolo macio amarelo, outras rosquinhas no prato, coador de café de cerâmica e caneca com borda azul tiffany desfocados ao fundo, plantas verdes, luz natural de dia, close com movimento de mão",
     "inicio_seg": 13.5
+  },
+  "ia-lentilhas-panela-ferro-colher-vapor.mp4": {
+    "legenda": "mãos segurando uma panela de ferro preta e mexendo lentilhas cozidas com colher de pau, vapor subindo, tampa de ferro ao lado, bancada de madeira escura com janela de luz natural ao fundo, luz lateral quente, close em 45 graus, câmera parada",
+    "inicio_seg": 0.5,
+    "_origem": "clipe gerado por IA (Higgsfield), enviado pela Aline em 13/09 como referência de vapor e textura; não é foto dela"
+  },
+  "ia-limao-espremido-panela-vapor-sol.mp4": {
+    "legenda": "mão espremendo meio limão siciliano sobre uma panela de inox com vapor, gotas de suco caindo, sol dourado de fim de tarde entrando pela janela, fogão preto e bancada de madeira clara desfocados, close em ângulo baixo, câmera parada",
+    "inicio_seg": 3,
+    "_origem": "clipe gerado por IA (Higgsfield); os 3 primeiros segundos são outra cena (mão desligando o fogão) e ficam de fora, senão o clipe teria um corte no meio"
+  },
+  "ia-espinafre-legumes-frigideira-vapor.mp4": {
+    "legenda": "frigideira antiaderente com folhas de espinafre fresco sobre cubos de cenoura, cebola roxa, pimentão amarelo e abobrinha, vapor leve subindo, mesa de madeira escura ao fundo, luz natural suave, close em 45 graus, câmera parada com movimento mínimo",
+    "inicio_seg": 2.5,
+    "_origem": "clipe gerado por IA (Higgsfield), 10 s; o preparo corta 5 s a partir de 2,5 s"
   }
 }
