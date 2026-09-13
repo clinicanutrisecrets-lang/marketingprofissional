@@ -163,9 +163,15 @@ Três formatos, que a Aline escolhe por peça:
 
 ## Aula longa (30–60 min): `.github/workflows/filtro-aula.yml`
 
-**Medido em 13/09**, 4 núcleos: 600 quadros de 720x1280 em **77 s** — ou seja,
-o filtro roda a cerca de **4× o tempo do vídeo**. Uma aula de 1 hora são ~4
-horas de processamento num núcleo-quádruplo.
+**Medido em 13/09**, 4 núcleos, 150 quadros (5 s de vídeo):
+
+| resolução | tempo | custo | aula de 1 h |
+|---|---|---|---|
+| 720x1280  | 17 s | **3,4× o tempo do vídeo** | ~3 h 25 min |
+| 1080x1920 | 40 s | **8× o tempo do vídeo**   | ~8 h |
+
+🔴 **A resolução mais que dobra a conta.** Gravar em 1080 custa 2,3× o que custa
+gravar em 720 — vale escolher isso ANTES de gravar, não depois.
 
 Por isso a aula não passa pelo `filtro-video.yml` (timeout de 90 min, pensado
 pra reel de 1 min). O `filtro-aula.yml` **corta a aula em pedaços de 5 min que
