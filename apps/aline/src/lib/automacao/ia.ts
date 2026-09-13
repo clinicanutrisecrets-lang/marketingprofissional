@@ -12,6 +12,7 @@
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/scripts";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
 import type { PerfilInstagram } from "@/lib/instagram/credenciais";
+import { blocoRespeitoAoProfissional } from "./conduta-de-terceiro";
 
 /** Modelo barato pro agradecimento (uma frase, centenas por dia). */
 export const CLAUDE_MODEL_RAPIDO = "claude-haiku-4-5-20251001";
@@ -24,7 +25,8 @@ REGRAS INEGOCIÁVEIS:
 - NUNCA prescreva dose, suplemento ou conduta individual. Isso é da consulta.
 - NUNCA invente estudo, número ou resultado.
 - Sem hashtags, sem travessão (—), sem emoji em excesso (no máximo um).
-- Nunca prometa cura, resultado ou prazo.`;
+- Nunca prometa cura, resultado ou prazo.
+- NUNCA contradiga, corrija nem avalie a conduta de outro profissional de saúde. Quem acompanha a pessoa conhece o caso dela; você não. Isso vale mesmo quando você acha que a conduta está errada.`;
 
 function vozDoPerfil(perfil: Pick<PerfilInstagram, "nome" | "instagram_handle" | "tom" | "instrucoes_ia" | "regras_especiais">): string {
   return [
@@ -62,7 +64,8 @@ ${params.orientacoes ? `\n${params.orientacoes}\n` : ""}
 ${REGRAS_COMUNS}
 FORMATO: uma ou duas frases, no máximo 220 caracteres. Só o texto da resposta, sem aspas.
 Se o comentário for uma pergunta clínica individual (exame, dose, remédio, "posso tomar"), NÃO responda a pergunta: agradeça e diga que responde melhor no direct.
-Se for elogio ou reação, agradeça citando algo do comentário. Se for pergunta geral sobre o tema, responda em uma frase útil e convide pra ver mais.`;
+Se for elogio ou reação, agradeça citando algo do comentário. Se for pergunta geral sobre o tema, responda em uma frase útil e convide pra ver mais.
+${blocoRespeitoAoProfissional(params.comentario)}`;
 
   const user = [
     params.legendaDoPost ? `Legenda do post (contexto): ${params.legendaDoPost.slice(0, 400)}` : "",
@@ -118,6 +121,7 @@ Nesses casos a "resposta" deve ser curta, acolhedora, sem tratar o caso, e pode 
 FORMATO DE SAÍDA: JSON puro, sem markdown:
 {"resposta": "<texto da DM, até 600 caracteres, parágrafos curtos>", "encaminhar": true|false, "motivo": "<uma frase, só se encaminhar>"}
 
+${blocoRespeitoAoProfissional(params.pergunta)}
 ${params.contextoScanner.disponivel && params.contextoScanner.blocos
     ? `BASE DO SCANNER:\n${params.contextoScanner.blocos.slice(0, 6000)}`
     : "BASE DO SCANNER: (nenhum registro encontrado para esta pergunta)"}`;
