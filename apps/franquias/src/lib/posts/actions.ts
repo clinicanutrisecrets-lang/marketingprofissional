@@ -2,7 +2,11 @@
 
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { gerarMinhaSemana, gerarPostsDaSemana } from "@/lib/geracao/semanal";
+import {
+  gerarMinhaSemana,
+  gerarPostsDaSemana,
+  type ResultadoGeracaoSemana,
+} from "@/lib/geracao/semanal";
 
 async function getFranqueadaDoUser() {
   const supabase = createClient();
@@ -126,7 +130,7 @@ export async function cancelarPost(postId: string): Promise<{ ok: boolean; erro?
 /**
  * Dispara geração manual da semana (ação da nutri pelo dashboard).
  */
-export async function gerarSemanaManual() {
+export async function gerarSemanaManual(): Promise<ResultadoGeracaoSemana> {
   return gerarMinhaSemana();
 }
 

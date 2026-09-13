@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { marcarStatusSugestao } from "@/lib/conteudo/actions";
 import { urlEbookNoScanner } from "@/lib/scanner-url";
+import { baixarArquivo } from "@/lib/download-arquivo";
 
 export type Sugestao = {
   id: string;
@@ -32,33 +33,6 @@ const LABEL_TIPO: Record<Sugestao["tipo"], { label: string; cor: string }> = {
   reel: { label: "REEL", cor: "bg-rose-600" },
   story: { label: "STORIES", cor: "bg-amber-500" },
 };
-
-/**
- * Baixa de verdade — o atributo `download` do <a> só funciona same-origin, e
- * as artes moram no Storage do Supabase (outro domínio). O navegador ignorava
- * o `download` e, com target="_blank", ou abria a imagem numa aba ou era
- * barrado como popup: pra Juliana o botão simplesmente "não fazia nada"
- * (12/08). Buscando o arquivo e criando um blob local, o download acontece.
- */
-async function baixarArquivo(url: string, nome: string): Promise<boolean> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return false;
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = nome;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    // Revoga depois pra não cancelar o download em curso no Safari.
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
   const [copiado, setCopiado] = useState(false);
