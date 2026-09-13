@@ -11,10 +11,28 @@ vazia. O que muda é o HTML em `../telas/`.
 |---|---|---|
 | `tablet-em-pe.mp4` | tablet de frente, mesa clara, 5s, 720x1280 | retângulo, `(66,188)` `588x939` |
 | `monitor-na-mesa.mp4` | monitor na mesa do consultório, luz de janela, caneca com vapor, poltrona ao fundo, 6s, 720x1280 | trapézio, cantos em `telas.json` |
+| `dna-helice.mp4` | hélice de DNA dourada girando, fundo escuro, 6s, 720x1280 | não tem tela: é fecho de vídeo |
 
 As coordenadas estão em `telas.json`, já medidas. Não precisa achar de
 novo: a câmera é travada nos dois e a tela não anda um pixel do primeiro
 ao último quadro.
+
+## O fecho
+
+`dna-helice.mp4` não tem tela pra trocar: ele é o final. Seis segundos de
+hélice girando, que viram oito com `setpts=1.34*PTS` — no ritmo original
+o giro atropela a leitura da chamada. O texto por cima só fica legível
+com faixa escura atrás, porque a hélice é dourada e clara no meio do
+quadro; nos vídeos montados aqui a faixa vai de 0 a 760 e de 1380 a 1920,
+que é onde o texto senta e onde a hélice não está.
+
+```bash
+ffmpeg -i dna-helice.mp4 -vf "setpts=1.34*PTS,eq=brightness=-0.03:saturation=1.05,fps=24" \
+  -r 24 -an -c:v libx264 -crf 20 fecho.mp4
+```
+
+Pra emendar no fim de um vídeo, `fade` nos dois lados e `concat` — `xfade`
+erra a conta da duração quando as entradas têm base de tempo diferente.
 
 ## O que pode entrar aqui
 
