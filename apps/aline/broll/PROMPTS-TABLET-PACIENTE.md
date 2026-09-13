@@ -199,3 +199,77 @@ vinte, trinta segundos do mesmo cenário. O que muda ao longo do tempo é a
 tela, que rola sozinha, e é isso que o olho segue.
 
 Ou seja: um crédito de cenário, e o tempo que o roteiro pedir.
+
+
+---
+
+# Terceiro cenário: o tablet com chá e livros
+
+O que muda em relação ao primeiro tablet não é o aparelho, é a hora do
+dia. Mesa de madeira escura, luz quente de fim de tarde, pilha de livros
+ao lado e uma xícara de chá com vapor. Serve pra conteúdo de rotina,
+longevidade e sono, onde o consultório frio não combina.
+
+O vapor do chá é o que dá vida: é o único movimento do plano, e foi ele
+que salvou o clipe do monitor de parecer foto parada.
+
+```
+SCENE CONTEXT
+A tablet standing on a wooden table at the end of the afternoon, screen facing the camera, no people.
+
+LOCATION MAP
+A dark wooden table against a calm softly blurred room. The tablet sits upright in a slim matte stand, centred. To one side, a short stack of three hardcover books lying flat with a small green plant on top of them. To the other side, a plain ceramic cup of herbal tea with thin steam rising from it. Behind, a bookshelf far out of focus.
+
+FRAMING
+Vertical 9:16, the camera close to the tablet. The tablet is centred and fills the frame: its screen occupies at least 80 percent of the frame width, in the upper two thirds. The near edge of the table fills the lower part of the frame, uncluttered.
+
+GEOMETRY
+The tablet is shot straight on, its screen square and parallel to the camera, flat to the lens. It is not tilted, not angled, not turned, and there is no perspective distortion: the screen reads as a clean rectangle with straight edges and square corners.
+
+OPTICS
+50mm equivalent, shallow depth of field, the tablet screen in sharp focus and everything behind it falling off softly.
+
+CAMERA
+Completely static, locked off on a tripod. No pan, no tilt, no push in, no zoom, no handheld drift.
+
+ACTION
+Nothing in the scene moves except the ambience: thin steam rising slowly and continuously from the cup of tea, one leaf of the plant shifting very slightly, and the warm light changing almost imperceptibly across the wood. The tablet, the books and the cup are perfectly still for the whole shot.
+
+LIGHTING
+Warm late afternoon light coming in low from one side and bounced back soft from the front, so the scene is warm but nothing casts a hard shadow and there is no glare anywhere on the screen. Low contrast, cosy, calm.
+
+SCREEN
+The screen is one flat, even, matte light grey, completely blank and uniform from edge to edge. No interface, no icons, no text, no numbers, no charts, no logo, no wallpaper, no glow, no reflection of the room, no fingerprints, no smudges. It never flickers and never changes brightness.
+
+BOOKS
+The books are plain hardcovers in muted colours, closed and stacked flat. Their covers and spines carry no readable text, no titles, no author names, no logos: only soft blurred marks where lettering would be.
+
+STYLE
+Photoreal cinematography, true to life colours, fine grain, warm and calm, like a quiet corner at the end of the day.
+
+POSITIVE LOCKS
+The tablet keeps exactly the same position, size, angle and shape in every frame, and its screen stays one flat even grey the whole time. The four corners of the screen stay exactly where they are. The steam is thin and light, never a cloud. No hands, no arms, no people, no reflections of people, no cat, no candle, no fire. Vertical 9:16.
+```
+
+## A variação da noite, se quiser duas
+
+Sem gastar nada a mais, dá pra ter o mesmo canto em outra hora. Troque
+só o bloco `LIGHTING`:
+
+```
+LIGHTING
+Warm lamp light at night from a single soft source beside the table, bounced back gently from the front so nothing on the scene casts a hard shadow and there is no glare anywhere on the screen. The room behind is dim and calm. Low contrast, cosy.
+```
+
+## Por que o bloco dos livros existe
+
+Lombada de livro é texto, e texto é onde o gerador inventa. Sem a trava,
+ele escreve títulos tortos e nomes de autor que não existem, e isso
+aparece no primeiro quadro. Com ela, a lombada vira marca borrada, que é
+como a gente já lida com rótulo, tela e laudo em todo o resto.
+
+## Depois de gerar
+
+Manda o clipe que eu meço os cantos da tela e guardo em `cenarios/`, junto
+com os outros dois. Aí ele passa a servir a qualquer tela de `telas/`,
+para sempre, sem novo crédito.
