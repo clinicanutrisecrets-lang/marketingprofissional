@@ -1,0 +1,87 @@
+name: Filtro de Video
+
+# Worker de video: aplica o filtro de maquiagem (e, opcionalmente, troca o
+# cenario) num MP4 e sobe pro Supabase Storage. Mesmo desenho do render-reel:
+# disparado pela plataforma via workflow_dispatch, credenciais vem como inputs.
+#
+# Por que aqui e nao na Vercel: cada quadro custa de 0,6 s (so maquiagem) a
+# 2,5 s (com matting). Um video de 1 minuto sao 1.800 quadros — nao cabe no
+# tempo de uma funcao serverless.
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "URL do video de entrada (Storage assinado ou publico)"
+        required: true
+      destino_path:
+        description: "Caminho no bucket franqueadas-assets"
+        required: true
+      cenario_url:
+        description: "URL da foto de cenario (vazio = mantem o fundo original)"
+        required: false
+        default: ""
+      verde:
+        description: "true se o video foi gravado em fundo verde"
+        required: false
+        default: "false"
+      sem_maquiagem:
+        required: false
+        default: "false"
+      registro_id:
+        description: "id na tabela pra marcar pronto/erro"
+        required: false
+        default: ""
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  filtrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install -r packages/video-filtro/requirements.txt
+          bash packages/video-filtro/baixar-modelos.sh
+
+      - name: Baixar entrada
+        run: |
+          curl -sSfL -o /tmp/entrada.mp4 "${{ inputs.video_url }}"
+          if [ -n "${{ inputs.cenario_url }}" ]; then
+            curl -sSfL -o /tmp/cenario.png "${{ inputs.cenario_url }}"
+          fi
+
+      - name: Filtrar
+        env:
+          TRAB: "4"
+        run: |
+          ARGS=""
+          [ -n "${{ inputs.cenario_url }}" ] && ARGS="$ARGS --cenario /tmp/cenario.png"
+          [ "${{ inputs.verde }}" = "true" ] && ARGS="$ARGS --verde"
+          [ "${{ inputs.sem_maquiagem }}" = "true" ] && ARGS="$ARGS --sem-maquiagem"
+          python3 packages/video-filtro/engine/cli.py /tmp/entrada.mp4 /tmp/saida.mp4 $ARGS
+
+      - name: Upload pro Supabase Storage
+        run: |
+          curl -sf -X POST \
+            "$SB_URL/storage/v1/object/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer $SB_KEY" \
+            -H "Content-Type: video/mp4" \
+            -H "x-upsert: true" \
+            --data-binary @/tmp/saida.mp4
+          echo "enviado: ${{ inputs.destino_path }}"

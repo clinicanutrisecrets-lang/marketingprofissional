@@ -1,0 +1,3 @@
+engine/*.task
+engine/*.tflite
+engine/__pycache__/
