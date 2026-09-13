@@ -1,0 +1,233 @@
+<meta charset="utf-8">
+<!-- Plataforma do profissional: perfil genético do paciente.
+     1150 de largura, mesma razão da tela de exames: é o que deixa o
+     texto legível dentro do monitor num quadro 9:16.
+     Paciente fictícia. Nenhum dado aqui pertence a pessoa real. -->
+<style>
+  :root{
+    --tinta:#1B2733; --cinza:#6B7885; --linha:#E7ECEF; --pagina:#F7F9FA;
+    --teal:#0E8C92; --tealesc:#0A6B70; --roxo:#6B4FA8; --ambar:#E0912B;
+    --vermelho:#D0455C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);padding:16px 20px 26px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+
+  .abas{display:flex;gap:20px;border-bottom:1px solid var(--linha);
+        padding-bottom:11px;margin-bottom:16px;font-size:13.5px;color:#51606D}
+  .abas b{color:var(--teal);font-weight:700;border-bottom:2px solid var(--teal);
+          padding-bottom:11px;margin-bottom:-12px}
+
+  .cabeca{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .cabeca h1{font-size:22px;font-family:"EB Garamond",Georgia,serif;flex:1}
+  .cabeca small{font-size:12px;color:var(--cinza)}
+  .bt{border:1px solid var(--linha);background:#fff;border-radius:8px;
+      padding:7px 12px;font-size:12px;color:#41505E}
+  .bt.tq{border-color:#BEE3E4;background:#EAF6F6;color:var(--tealesc);font-weight:700}
+  .bt.rx{background:var(--roxo);border-color:var(--roxo);color:#fff;font-weight:700}
+  .bt.vd{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+
+  .painel{background:#fff;border:1px solid var(--linha);border-radius:12px;
+          padding:17px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+  .painel.rx:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+                    background:var(--roxo)}
+  .painel h2{font-size:16px;font-weight:700;margin-bottom:4px}
+  .painel h2 s{text-decoration:none;color:var(--teal);margin-right:6px}
+  .painel .sub{font-size:12.5px;color:var(--cinza);line-height:1.5;margin-bottom:13px}
+  .painel .sub b{color:#41505E}
+
+  .escolhas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .escolha{border:1px solid var(--linha);border-radius:10px;padding:12px 14px}
+  .escolha.on{border-color:var(--roxo);box-shadow:0 0 0 1px var(--roxo) inset}
+  .escolha h3{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .escolha h3 i{width:11px;height:11px;border-radius:50%;border:2px solid #C3CBD3;
+                display:block;flex:none}
+  .escolha.on h3 i{border-color:var(--roxo);background:var(--roxo);
+                   box-shadow:0 0 0 2px #fff inset}
+  .escolha p{font-size:11.5px;color:var(--cinza);margin-top:5px;line-height:1.45}
+
+  /* lista dos genes */
+  .gene{border-radius:10px;padding:12px 14px;margin-bottom:9px;display:flex;gap:12px}
+  .gene.cuidado{background:#FDF0F2;border:1px solid #F6D9DE}
+  .gene.atencao{background:#FEF9F0;border:1px solid #F5E4C8}
+  .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;
+     place-items:center;color:#fff;font-size:12px;font-weight:700}
+  .gene.cuidado .n{background:var(--vermelho)}
+  .gene.atencao .n{background:var(--ambar)}
+  .gene .cab{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:5px}
+  .gene .nome{font-size:15px;font-weight:700}
+  .gene .rs{font-family:"Liberation Mono",monospace;font-size:12px;color:#5A6672}
+  .tag{border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700}
+  .tag.gen{background:#FBE3E7;color:#9C2A3E}
+  .tag.gen.am{background:#FAECD2;color:#8A6416}
+  .tag.rot{background:#FBE3E7;color:#9C2A3E}
+  .tag.rot.am{background:#FAECD2;color:#8A6416}
+  .tag.q{background:#DFF3F1;color:#146B62}
+  .gene p{font-size:12.5px;color:#3E4B58;line-height:1.5}
+  .ligado{font-size:11.5px;color:var(--teal);margin-top:6px}
+
+  /* tabela de SNPs */
+  .snps h2{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .busca{display:flex;gap:10px;margin-bottom:14px}
+  .busca span{flex:1;border:1px solid var(--linha);border-radius:9px;padding:9px 12px;
+              font-size:12.5px;color:#9AA5B0}
+  .busca em{flex:none;border:1px solid var(--linha);border-radius:9px;padding:9px 14px;
+            font-size:12.5px;color:#5A6672;font-style:normal}
+  .cabgrade,.snp{display:grid;grid-template-columns:100px 106px 74px 92px 1fr 110px;
+                 gap:0 12px;align-items:start}
+  .cabgrade{font-size:10.5px;letter-spacing:1.1px;color:#8B96A1;padding:0 2px 8px}
+  .snp{border-top:1px solid var(--linha);padding:12px 2px;font-size:12px}
+  .snp .g{font-weight:700;font-size:13px}
+  .snp .v{font-family:"Liberation Mono",monospace;color:#41505E}
+  .risco{border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;
+         justify-self:start}
+  .risco.mod{background:#FAECD2;color:#8A6416}
+  .risco.baixo{background:#DFF3EC;color:#166B52}
+  .risco.alto{background:#FBE0E4;color:#9C2A3E}
+  .snp .d{color:#4A5764;line-height:1.5}
+  .snp .d u{text-decoration:none;color:var(--teal)}
+  .silenciar{justify-self:end;border:1px solid #DDD6EE;background:#F6F3FC;
+             color:var(--roxo);border-radius:8px;padding:6px 11px;font-size:11.5px;
+             font-weight:700}
+</style>
+
+<div class="abas">
+  <span>Consultas</span><b>Perfil Genético</b><span>Downloads</span>
+  <span>Atestados/Documentos</span><span>Pedidos de Exame</span>
+  <span>Contratos</span><span>Aplicativos</span><span>Relatório Vera</span>
+</div>
+
+<div class="cabeca">
+  <h1>Perfil Genético</h1>
+  <small>paciente fictícia</small>
+  <span class="bt tq">Visível para o paciente</span>
+  <span class="bt">Baixar PDF</span>
+  <span class="bt">Paciente vê: tudo</span>
+  <span class="bt rx">Como oferecer</span>
+  <span class="bt">Upload Teste</span>
+  <span class="bt vd">+ Adicionar SNP</span>
+</div>
+
+<div class="painel rx">
+  <h2>Versão dos textos genéticos pro paciente</h2>
+  <div class="sub">Ao disponibilizar pro paciente, você quer texto resumido (que já adapta automaticamente pra homem, mulher e criança) ou o "manual de instruções da vida" (versão completa, fixa, exclusiva do Consultório de Precisão)?</div>
+  <div class="escolhas">
+    <div class="escolha on">
+      <h3><i></i>Texto resumido</h3>
+      <p>Adapta automaticamente para homem, mulher ou criança.</p>
+    </div>
+    <div class="escolha">
+      <h3><i></i>Manual de instruções da vida</h3>
+      <p>Versão completa, fixa, exclusiva do Consultório de Precisão. Mesmo conteúdo independente de sexo/idade.</p>
+    </div>
+  </div>
+</div>
+
+<div class="painel">
+  <h2><s>✧</s>Top 10 genes pra abordar na consulta nutrigenética</h2>
+  <div class="sub">Genes de maior impacto, com os que <b>se relacionam ao que a paciente relatou no questionário</b> no topo. Foque neles na consulta.</div>
+
+  <div class="gene cuidado">
+    <span class="n">1</span>
+    <div>
+      <div class="cab"><span class="nome">COMT</span><span class="rs">rs4680</span>
+        <span class="tag gen">A/A</span><span class="tag rot">cuidado</span>
+        <span class="tag q">relaciona com a queixa</span></div>
+      <p>Este gene é responsável por degradar a dopamina (neurotransmissor do foco, motivação e prazer). Quando lento, mantém dopamina mais tempo ativa (mais foco e ansiedade); quando rápido, degrada rápido (menos foco e mais calma).</p>
+      <div class="ligado">Ligado a: humor/ansiedade, sono, cognição, apetite/doce, energia/fadiga, hormonal feminino, inflamação/dor, atenção/comportamento</div>
+    </div>
+  </div>
+
+  <div class="gene cuidado">
+    <span class="n">4</span>
+    <div>
+      <div class="cab"><span class="nome">IL6</span><span class="rs">rs1800795</span>
+        <span class="tag gen">G/G</span><span class="tag rot">cuidado</span>
+        <span class="tag q">relaciona com a queixa</span></div>
+      <p>Este gene regula outra importante via de inflamação. Quando alterado, pode gerar inflamação crônica, depressão, doenças cardiovasculares e osteoporose.</p>
+      <div class="ligado">Ligado a: humor/ansiedade, sono, cognição, apetite/doce, peso/metabólico, cardiometabólico, inflamação/dor</div>
+    </div>
+  </div>
+
+  <div class="gene atencao">
+    <span class="n">5</span>
+    <div>
+      <div class="cab"><span class="nome">PPARG</span><span class="rs">rs1801282</span>
+        <span class="tag gen am">C/G</span><span class="tag rot am">atenção</span>
+        <span class="tag q">relaciona com a queixa</span></div>
+      <p>O gene PPARG regula como seu corpo armazena gordura e responde à insulina. Quando alterado, pode aumentar a tendência ao acúmulo de gordura visceral, resistência insulínica e inflamação crônica de baixo grau, especialmente com dieta rica em gorduras saturadas.</p>
+      <div class="ligado">Ligado a: apetite/doce, energia/fadiga, intestino, peso/metabólico, cardiometabólico, inflamação/dor, desempenho físico/muscular</div>
+    </div>
+  </div>
+
+  <div class="gene atencao">
+    <span class="n">9</span>
+    <div>
+      <div class="cab"><span class="nome">PER2</span><span class="rs">rs934945</span>
+        <span class="tag gen am">G/A</span><span class="tag rot am">atenção</span>
+        <span class="tag q">relaciona com a queixa</span></div>
+      <p>O gene PER2 é um dos principais "relógios" do seu corpo: ele define o ritmo de quando você deve dormir, acordar, digerir, produzir hormônios e até queimar gordura. A variação rs934945 pode afetar a precisão desse relógio interno, fazendo com que alguns processos fiquem "fora de sincronia" com o mundo externo.</p>
+      <div class="ligado">Ligado a: humor/ansiedade, sono, apetite/doce, energia/fadiga, intestino, peso/metabólico, hormonal feminino</div>
+    </div>
+  </div>
+
+  <div class="gene atencao">
+    <span class="n">10</span>
+    <div>
+      <div class="cab"><span class="nome">APOE</span><span class="rs">rs7412</span>
+        <span class="tag gen am">C/T</span><span class="tag rot am">atenção</span>
+        <span class="tag q">relaciona com a queixa</span></div>
+      <p>O APOE funciona como um dos principais "transportadores" da fábrica do cérebro e do metabolismo, ajudando a movimentar colesterol e gorduras importantes para as células. Isso não significa que a pessoa desenvolverá doenças, mas indica maior importância de hábitos anti-inflamatórios, atividade física, sono adequado e alimentação equilibrada.</p>
+      <div class="ligado">Ligado a: humor/ansiedade, sono, cognição, apetite/doce, peso/metabólico, cardiometabólico, inflamação/dor</div>
+    </div>
+  </div>
+</div>
+
+<div class="painel snps">
+  <h2><s style="text-decoration:none;color:var(--teal)">✧</s>SNPs Registrados (101)</h2>
+  <div class="busca"><span>Buscar gene, rs ou descrição…</span><em>Todos os riscos ⌄</em></div>
+  <div class="cabgrade"><span>GENE</span><span>VARIANTE/SNP</span><span>GENÓTIPO</span>
+    <span>RISCO</span><span>DESCRIÇÃO</span><span></span></div>
+
+  <div class="snp">
+    <span class="g">CLOCK</span><span class="v">rs3749474</span><span class="v">G/G</span>
+    <span class="risco alto">alto</span>
+    <span class="d">Duas cópias do alelo de risco associadas à maior sensibilidade à crononutrição, com pior resposta metabólica ao consumo de carboidratos no período noturno. <u>Priorizar a distribuição dos carboidratos no café da manhã e almoço</u>, restringindo refeições ricas em carboidratos no jantar.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+
+  <div class="snp">
+    <span class="g">PPARG</span><span class="v">rs1801282</span><span class="v">C/G</span>
+    <span class="risco mod">moderado</span>
+    <span class="d">Heterozigoto (Pro/Ala): redução parcial da atividade do PPARγ; fenótipo metabólico moderado, fortemente modulado por estilo de vida. Conduta: controle de carga glicêmica, redução de gorduras saturadas no jantar e manejo do cortisol. Monitorar perfil lipídico e HOMA-IR.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+
+  <div class="snp">
+    <span class="g">TCF7L2</span><span class="v">rs7903146</span><span class="v">C/T</span>
+    <span class="risco mod">moderado</span>
+    <span class="d">Uma cópia do alelo de risco pode promover redução discreta da resposta às incretinas (GLP-1/GIP) e da secreção de insulina pós-prandial, principalmente diante de dietas com alta carga glicêmica. <u>Monitorar glicemia e HbA1c</u> conforme fatores de risco.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+
+  <div class="snp">
+    <span class="g">FADS1</span><span class="v">rs174547</span><span class="v">A/A</span>
+    <span class="risco baixo">baixo</span>
+    <span class="d">Eficiência de conversão de ALA em EPA/DHA preservada. Suplementação de ômega-3 não indicada de rotina. Ingestão dietética de ômega-6 moderada é tolerada sem impacto significativo na via das dessaturases.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+
+  <div class="snp">
+    <span class="g">BCMO1</span><span class="v">rs12934922</span><span class="v">A/A</span>
+    <span class="risco baixo">baixo</span>
+    <span class="d">Homozigoto normal: conversão de β-caroteno em retinol preservada. Manter orientação dietética padrão com fontes de carotenoides; não há necessidade de suplementação de retinol pré-formado para esta variante.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+
+  <div class="snp">
+    <span class="g">FTO</span><span class="v">rs9939609</span><span class="v">T/A</span>
+    <span class="risco mod">moderado</span>
+    <span class="d">Predisposição intermediária ao consumo hedônico de alimentos. Reforçar organização alimentar, ingestão adequada de proteínas e fibras, prática regular de atividade física e higiene do sono para reduzir a influência do ambiente alimentar.</span>
+    <span class="silenciar">Como silenciar</span>
+  </div>
+</div>

@@ -1,0 +1,260 @@
+<meta charset="utf-8">
+<!-- Plataforma do profissional: interpretação do exame de sangue.
+     Desenhada em 1150 de largura de propósito: é a largura que faz o
+     texto sair legível quando a página entra na tela do monitor num
+     quadro 9:16. A página é longa: a rolagem é o que dá vida ao clipe.
+
+     A paciente é fictícia. Nenhum dado aqui pertence a pessoa real. -->
+<style>
+  :root{
+    --tinta:#1B2733; --cinza:#6B7885; --linha:#E7ECEF; --pagina:#F4F7F8;
+    --teal:#0E8C92; --tealesc:#0A6B70; --ambar:#E0912B; --vermelho:#D0455C;
+    --verde:#25A06E; --laranja:#E07B2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);display:flex;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+
+  /* menu lateral */
+  aside{flex:none;width:186px;background:#fff;border-right:1px solid var(--linha);
+        padding:16px 0}
+  .marca{display:flex;gap:9px;align-items:center;padding:0 14px 12px}
+  .marca .bola{width:30px;height:30px;border-radius:50%;background:var(--teal);
+               flex:none;display:grid;place-items:center;color:#fff;font-size:11px;
+               font-weight:700;letter-spacing:-.3px}
+  .marca b{font-family:"EB Garamond",Georgia,serif;font-size:20px;line-height:1.05}
+  .plataforma{font-size:9px;letter-spacing:1.3px;color:var(--cinza);padding:0 14px 14px}
+  .secao{font-size:9px;letter-spacing:1.3px;color:#9AA5B0;padding:12px 14px 6px}
+  nav a{display:flex;gap:9px;align-items:center;padding:7px 14px;font-size:14px;
+        color:#41505E;text-decoration:none}
+  nav a.on{color:var(--tealesc);font-weight:700;background:#EAF6F6}
+  nav a i{width:15px;height:15px;border:1.6px solid currentColor;border-radius:4px;
+          opacity:.55;flex:none;display:block}
+
+  /* corpo */
+  main{flex:1;padding:18px 22px 26px}
+  .cabeca h1{font-size:24px;font-family:"EB Garamond",Georgia,serif}
+  .cabeca p{font-size:13px;color:var(--cinza);margin-bottom:16px}
+  .voltar{font-size:13px;color:var(--cinza);margin-bottom:10px}
+
+  .paciente{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .av{width:44px;height:44px;border-radius:50%;flex:none;display:grid;
+      place-items:center;color:#fff;font-size:15px;font-weight:700;
+      background:linear-gradient(135deg,#12A0A6,#0C6E86)}
+  .paciente h2{font-size:23px;letter-spacing:.3px}
+  .paciente small{display:block;font-size:13px;color:var(--cinza);margin-top:2px}
+  .aovivo{margin-left:auto;background:linear-gradient(90deg,#F08A2A,#E2622C);
+          color:#fff;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700}
+
+  .aviso{border:1px solid #F2DFC0;background:#FEF8EE;border-radius:10px;
+         padding:11px 14px;font-size:13px;color:#8A6416;margin-bottom:14px}
+  .aviso b{color:#6E4F12}
+
+  .abas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .aba{border:1px solid var(--linha);background:#fff;border-radius:9px;
+       padding:8px 13px;font-size:13px;color:#41505E}
+  .aba.on{border-color:var(--teal);color:var(--tealesc);font-weight:700}
+
+  h3.tit{font-size:19px;font-family:"EB Garamond",Georgia,serif;margin-bottom:12px}
+  .sub abas{}
+  .subabas{display:flex;gap:16px;margin-bottom:16px;font-size:13px;color:#5A6672}
+  .subabas b{background:#EAF6F6;color:var(--tealesc);border-radius:8px;
+             padding:7px 13px;font-weight:700}
+
+  .painel{background:#fff;border:1px solid var(--linha);border-radius:12px;
+          padding:18px;margin-bottom:16px}
+  .rot{font-size:12px;letter-spacing:1.4px;color:var(--tealesc);font-weight:700;
+       margin-bottom:13px}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .card{border:1px solid var(--linha);border-radius:11px;padding:13px 14px}
+  .card.at{border-color:#F0D9B4;background:#FFFCF6}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .card h4{font-size:14px;font-weight:700}
+  .card h4 s{text-decoration:none;color:var(--verde);margin-right:5px}
+  .card.at h4 s{color:var(--ambar)}
+  .card small{display:block;font-size:11px;color:var(--cinza);margin-top:1px}
+  .pill{flex:none;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:700;
+        background:#E7F6EF;color:#18795A}
+  .pill.am{background:#FBF0DA;color:#8A6416}
+  .card .valor{font-size:27px;font-weight:700;margin:8px 0 6px}
+  .card p{font-size:11.5px;color:#54616E;line-height:1.45}
+
+  /* marcadores */
+  .grade{display:grid;grid-template-columns:1fr 130px 220px 92px;gap:0 14px;
+         font-size:11px;letter-spacing:1.1px;color:#8B96A1;padding:0 4px 8px}
+  .marc{border-top:1px solid var(--linha);padding:14px 4px}
+  .marc .cab{display:grid;grid-template-columns:1fr 130px 220px 92px;gap:0 14px;
+             align-items:center}
+  .marc .nome{font-size:16px;font-weight:700;letter-spacing:.2px}
+  .marc .val{font-size:19px;font-weight:700}
+  .marc .val u{text-decoration:none;font-size:11px;color:var(--cinza);font-weight:400}
+  .marc .ref{font-size:11.5px;color:#5A6672;line-height:1.45}
+  .marc .ref b{color:var(--tealesc)}
+  .estado{justify-self:end;display:inline-flex;align-items:center;gap:6px;
+          border-radius:999px;padding:4px 11px;font-size:11px;font-weight:700}
+  .estado i{width:7px;height:7px;border-radius:50%;display:block}
+  .ok{background:#E7F6EF;color:#18795A} .ok i{background:var(--verde)}
+  .fora{background:#FCE9EC;color:#9C2A3E} .fora i{background:var(--vermelho)}
+  .at{background:#FBF0DA;color:#8A6416} .at i{background:var(--ambar)}
+
+  .nota{border-radius:9px;padding:9px 12px;font-size:12px;line-height:1.5;
+        margin-top:9px}
+  .nota.tq{background:#EDF8F8;color:#175C60;border:1px solid #D5EBEC}
+  .nota.am{background:#FEF8EE;color:#7E5C14;border:1px solid #F2DFC0}
+  .nota.vm{background:#FDEEF0;color:#93293C;border:1px solid #F4D3D8}
+  .nota.az{background:#EFF4FD;color:#2C4A80;border:1px solid #D8E2F4}
+  .corrido{font-size:11.5px;color:#65707C;line-height:1.55;margin-top:9px}
+</style>
+
+<aside>
+  <div class="marca"><span class="bola">SS</span><b>Scanner da<br>Saúde</b></div>
+  <div class="plataforma">PLATAFORMA DO PROFISSIONAL</div>
+  <div class="secao">VISÃO GERAL</div>
+  <nav>
+    <a><i></i>Dashboard</a>
+    <a><i></i>Meu Perfil</a>
+    <a class="on"><i></i>Pacientes</a>
+    <a><i></i>Central de Ajuda</a>
+    <a><i></i>Minha Biblioteca</a>
+    <a><i></i>Sala de Casos Clínicos</a>
+    <a><i></i>APPs</a>
+  </nav>
+  <div class="secao">GESTÃO</div>
+  <nav>
+    <a><i></i>Agenda</a>
+    <a><i></i>CRM</a>
+    <a><i></i>Conversas Sofia</a>
+    <a><i></i>Caixa de entrada</a>
+    <a><i></i>Questionários</a>
+    <a><i></i>Produtos</a>
+    <a><i></i>Contratos</a>
+  </nav>
+  <div class="secao">MARKETING</div>
+  <nav>
+    <a><i></i>E-book Isca</a>
+    <a><i></i>Landing Page</a>
+    <a><i></i>Funil</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="cabeca">
+    <h1>Dashboard</h1>
+    <p>Visão geral da sua plataforma</p>
+  </div>
+  <div class="voltar">← Voltar para paciente</div>
+
+  <div class="paciente">
+    <span class="av">AM</span>
+    <div>
+      <h2>ANA BEATRIZ MORAES</h2>
+      <small>Nova Consulta · tipo — 05/06/2026 · paciente fictícia</small>
+    </div>
+    <span class="aovivo">CÉREBRO: sua discussão de caso clínico ao vivo</span>
+  </div>
+
+  <div class="aviso"><b>Medicamentos em uso</b> — clique pra registrar antes de gerar</div>
+
+  <div class="abas">
+    <span class="aba">Questionários</span>
+    <span class="aba on">Exames</span>
+    <span class="aba">Epigenético</span>
+    <span class="aba">Antropometria</span>
+    <span class="aba">Prontuário / Anamnese</span>
+    <span class="aba">Gravação da Consulta</span>
+    <span class="aba">Análise Scanner</span>
+    <span class="aba">Cardápio</span>
+    <span class="aba">Receitas</span>
+    <span class="aba">Suplementos</span>
+    <span class="aba">Orientações</span>
+    <span class="aba">Plano Restauração</span>
+    <span class="aba">Metas</span>
+    <span class="aba">Cronograma Alta</span>
+    <span class="aba">Evolução</span>
+  </div>
+
+  <h3 class="tit">Exames da Consulta</h3>
+  <div class="subabas">
+    <b>Sangue</b><span>Urina</span><span>Microbiota intestinal</span>
+    <span>SIBO</span><span>Coprológico</span><span>Microbiota vaginal</span>
+  </div>
+
+  <div class="painel">
+    <div class="rot">RELAÇÕES ENTRE MARCADORES</div>
+    <div class="cards">
+      <div class="card">
+        <div class="top">
+          <div><h4><s>●</s>HOMA-IR</h4><small>Resistência à insulina</small></div>
+          <span class="pill">Boa sensibilidade</span>
+        </div>
+        <div class="valor">0.57</div>
+        <p>Boa sensibilidade à insulina, sem sinal de resistência. Manter padrão de baixa carga glicêmica.</p>
+      </div>
+      <div class="card">
+        <div class="top">
+          <div><h4><s>●</s>NLR (Neutrófilos / Linfócitos)</h4><small>Inflamação sistêmica</small></div>
+          <span class="pill">Normal</span>
+        </div>
+        <div class="valor">1.20</div>
+        <p>Tônus inflamatório baixo/normal.</p>
+      </div>
+      <div class="card at">
+        <div class="top">
+          <div><h4><s>●</s>PLR (Plaquetas / Linfócitos)</h4><small>Inflamação crônica / sinal pró-trombótico</small></div>
+          <span class="pill am">Atenção</span>
+        </div>
+        <div class="valor">167</div>
+        <p>Sinal inflamatório/pró-trombótico leve. Avaliar junto de NLR e PCR; reforçar ômega-3 e polifenóis.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="painel">
+    <h3 class="tit">Algoritmo Scanner (auto) extraiu 36 marcadores de Sangue</h3>
+    <div class="grade"><span>MARCADOR</span><span>VALOR</span><span>REFERÊNCIA</span><span></span></div>
+
+    <div class="marc">
+      <div class="cab">
+        <span class="nome">VITAMINA B12</span>
+        <span class="val">551 <u>pg/mL</u></span>
+        <span class="ref">Feminino: 114 a 890 pg/mL<br><b>Ideal Scanner: 450 – 800 pg/mL</b></span>
+        <span class="estado ok"><i></i>Ideal</span>
+      </div>
+      <div class="nota tq">✓ <b>Contexto deste paciente:</b> o ideal aqui é entre 500 e 900 pg/mL — humor e cognição. "Normal-baixo" (200–400) pode já ser deficiência funcional; confirmar com homocisteína e MMA em vez de confiar no corte de 200.</div>
+      <div class="corrido">A vitamina B12 é hidrossolúvel e essencial para a síntese de DNA, a maturação eritrocitária, o metabolismo da homocisteína, a formação da mielina e a produção energética celular. Na Fábrica da Saúde, representa a equipe responsável pela formação de novos funcionários e pela comunicação entre os setores.</div>
+    </div>
+
+    <div class="marc">
+      <div class="cab">
+        <span class="nome">VITAMINA D 25 HIDROXI</span>
+        <span class="val">27,1 <u>ng/mL</u></span>
+        <span class="ref">População geral: 20,0 a 60,0<br><b>Ideal Scanner: 40 – 60 ng/mL</b></span>
+        <span class="estado fora"><i></i>Fora</span>
+      </div>
+      <div class="nota am">⚠ <b>Contexto deste paciente:</b> o ideal aqui é entre 60 e 80 ng/mL — associação com humor, alvo mais alto.</div>
+      <div class="nota vm">↓ <b>Baixo (mulher):</b> vitamina D reduzida indica menor disponibilidade para saúde óssea, função muscular, imunidade e metabolismo. Na Fábrica da Saúde, a gerente dispõe de menos material de construção para manter a estrutura.</div>
+    </div>
+
+    <div class="marc">
+      <div class="cab">
+        <span class="nome">HEMÁCIAS</span>
+        <span class="val">4.84 <u>milhões/mm³</u></span>
+        <span class="ref">De 4.1 até 5.4 milhões/mm³<br><b>Ideal Scanner: 4.23 – 4.8 Tera/L</b></span>
+        <span class="estado at"><i></i>Atenção</span>
+      </div>
+      <div class="nota am">⚠ <b>Confira a unidade:</b> o laudo veio em milhões/mm³ e a referência está em Tera/L — não consegui converter com certeza, então o status pode não estar correto. Confira manualmente antes de usar.</div>
+      <div class="nota az">ℹ <b>Por quê:</b> dentro do que o laboratório considera normal, mas acima da faixa ideal do algoritmo. O ideal funcional é mais estreito que o do lab — por isso entra como ponto de atenção para acompanhar, não como alteração.</div>
+    </div>
+
+    <div class="marc">
+      <div class="cab">
+        <span class="nome">HEMOGLOBINA</span>
+        <span class="val">14.5 <u>g/dL</u></span>
+        <span class="ref">De 12.3 até 16 g/dL<br><b>12.5–14.7 g/dL (este paciente)</b></span>
+        <span class="estado ok"><i></i>Ideal</span>
+      </div>
+      <div class="nota tq">✓ <b>Referência para este paciente</b> (12.5–14.7 g/dL): ideal ajustado para feminino.</div>
+      <div class="corrido">A hemoglobina é uma proteína tetramérica rica em ferro, responsável pelo transporte de oxigênio dos pulmões aos tecidos. Deve ser interpretada junto com hematócrito, contagem de hemácias, VCM, HCM, ferro, ferritina, transferrina, B12 e folato.</div>
+    </div>
+  </div>
+</main>
