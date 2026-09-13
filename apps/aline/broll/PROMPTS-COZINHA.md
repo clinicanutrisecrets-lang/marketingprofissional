@@ -209,12 +209,158 @@ serve tanto de receita quanto de respiro no meio de assunto pesado.
 
 ---
 
+## 6. Suco de acerola, em três tomadas
+
+Fazer suco é uma sequência, não um plano. Pegar a fruta, bater e servir
+são três ações, e num clipe de 5 segundos o gerador não segura três: ele
+corta sozinho no meio e do outro lado a mão, a fruta e a quantidade de
+líquido voltam diferentes. Então são três gerações curtas que você
+emenda no corte. Cada uma dura o que uma ação dura de verdade.
+
+**A ordem que a cena obedece**, e que está escrita dentro dos prompts:
+acerola na tigela → cai no copo do liquidificador → água por cima →
+tampa fechada → bate → coa na peneira → cai no copo. Nada de bater sem
+tampa, nada de mão dentro do copo, nada de suco pronto aparecendo antes
+de bater.
+
+**Por que peneira.** Cada acerola tem três caroços duros. Quem faz de
+verdade dá pulsos curtos e coa: batido demais, o caroço quebra e amarga.
+Na imagem isso também resolve um problema, porque dá um terceiro plano
+com movimento em vez de só encher um copo.
+
+**A cor do suco é o detalhe que denuncia.** Suco de acerola não é
+vermelho sangue: a casca é vermelha mas a polpa é alaranjada, e batido
+com água dá um salmão alaranjado opaco, com espuma clara em cima. Se
+vier vinho ou roxo, o gerador foi buscar suco de uva ou de beterraba.
+
+**A fruta é o risco maior.** "Acerola" é palavra pouco vista pelo
+gerador, e o vizinho mais próximo que ele conhece é cereja. Por isso ela
+vem descrita pelo que é, como fiz com as ervas secas: dois centímetros,
+vermelho brilhante, três sulcos rasos de cima a baixo, sem cabinho. E
+vem a lista do que ela não é: cereja, cranberry, groselha, morango,
+tomate.
+
+Se você usar **acerola congelada**, que é o normal no Brasil, troque a
+frase da fruta por: *"They are frozen acerola cherries, a deeper dull
+red with a matte frosted surface and a light frost on the skin, firm and
+separate, straight from the freezer."*
+
+Nas três tomadas a blusa é a **mesma branca**, senão o corte não cola. E
+branco é o que faz o vermelho da fruta pular na imagem.
+
+### 6a. Pegando a acerola e pondo no liquidificador
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter making fresh acerola juice. A small white ceramic bowl of acerola cherries sits beside a clear glass blender jar that is already locked on its motor base, its lid off and resting on the counter. A clear glass jug of cold water stands next to it.
+
+ACTION
+She lifts the bowl with both hands and tips the acerola cherries into the open blender jar, the fruit tumbling in and settling at the bottom, then she sets the empty bowl down and pours cold water from the jug over the fruit until the jar is about one third full, her lips closed.
+
+EXPRESSION
+Her expression is concentrated and attentive, focused on what her hands are doing, eyes down on the jar, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the blender jar in the lower part of the frame with clear uncluttered space between her chin and the jar.
+
+WARDROBE
+A plain white long sleeved top in a soft fine knit. It is cut close to the body but never tight: it follows the shoulder line and skims the chest without clinging and without loose extra fabric. Long sleeves down to the wrists, a simple round or soft V neckline, one plain solid colour. Modern and young, the clothes a woman in her early thirties actually wears. Never oversized, never boxy, never billowing, never sleeveless, never a tank top, never a clinging ribbed knit. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the bowl and the water jug stay whole in her hands at all times. The fruit is acerola: small round red fruits about two centimetres across, the size of a large grape, deep glossy red with thin fragile skin, each one marked by three shallow vertical grooves so it reads as faintly three lobed, with a small dimple where the stalk was and no stem attached. They are never sweet cherries: no long thin stalk, no heart shape, no single deep crease down one side. They are never cranberries, never redcurrants on a string, never strawberries, never raspberries, never tomatoes, never apples. They lie loose in the bowl, not on a branch and not with leaves. The amount is about two handfuls, enough for one tall glass. The blender is an ordinary kitchen blender, a clear glass jar with a handle sitting locked on a plain motor base, and it is switched off and silent for this whole shot: the blades do not turn, the fruit stays whole and separate at the bottom of the jar, and there is no juice, no pulp and no red liquid anywhere in frame yet. The water is clear and colourless and falls as one steady stream. Nothing splashes out of the jar, nothing spills, the counter stays clean and dry. No ice, no sugar, no honey, no straw, no garnish. Nothing on any screen, paper, label or appliance is readable, no text, no numbers, no brand name and no logo. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+### 6b. O liquidificador batendo
+
+Se for gerar só uma das três, é esta. É a que lê como "fazendo suco"
+sozinha, e é onde a cor aparece.
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter blending fresh acerola juice. The clear glass blender jar is locked on its motor base with the lid closed on top, red acerola cherries and cold water inside it. The empty white bowl and the water jug stand to one side.
+
+ACTION
+She rests one hand flat on the closed lid and presses the button on the base with the other, and the blender runs: the fruit and water spin into a fast vortex and the clear water turns opaque and coloured while she watches the jar, her lips closed.
+
+EXPRESSION
+Her expression is concentrated and attentive, focused on the jar, eyes on the spinning liquid, lips together.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter and the blender jar in the lower part of the frame with clear uncluttered space between her chin and the jar.
+
+WARDROBE
+A plain white long sleeved top in a soft fine knit. It is cut close to the body but never tight: it follows the shoulder line and skims the chest without clinging and without loose extra fabric. Long sleeves down to the wrists, a simple round or soft V neckline, one plain solid colour. Modern and young, the clothes a woman in her early thirties actually wears. Never oversized, never boxy, never billowing, never sleeveless, never a tank top, never a clinging ribbed knit. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings. The fruit inside is acerola: small round red fruits about two centimetres across, the size of a large grape, deep glossy red with thin fragile skin, each one marked by three shallow vertical grooves so it reads as faintly three lobed, with a small dimple where the stalk was and no stem attached. They are never sweet cherries: no long thin stalk, no heart shape, no single deep crease down one side. They are never cranberries, never redcurrants, never strawberries, never raspberries, never tomatoes. The blender is an ordinary kitchen blender, a clear glass jar with a handle sitting locked on a plain motor base. The lid stays closed and locked for the whole shot and one of her hands rests flat on top of it the entire time: her hands never go inside the jar, and no spoon, spatula or utensil is inside the jar while it runs. The liquid spins in a visible vortex with a dip in the centre, the fruit breaking down as it turns, and the colour goes from clear water to an opaque salmon orange red, the colour of a ripe peach with a red blush: never deep crimson, never wine red, never purple, never brown, never bright pink. A thick pale pinkish foam builds up at the top of the jar. Nothing splashes out, nothing spills, the lid never lifts, the counter stays clean and dry. No ice, no sugar, no honey, no straw, no garnish. There is no second blender and no second jar in frame. Nothing on any screen, paper, label or appliance is readable, no text, no numbers, no brand name and no logo. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+### 6c. Coando e servindo no copo
+
+```
+SUBJECT
+A 30 year old nutritionist with glasses. Her skin is smooth, firm and luminous, one even tone from hairline to jaw, a fresh dewy finish on the cheekbones, the soft fine texture of a skincare campaign. Smooth forehead, smooth rested area around the eyes, smooth cheeks, firm defined jawline, smooth neck. Young adult skin in her early thirties. Her arms, wrists, hands, neck and shoulders are bare unmarked skin, with no tattoos and no body art of any kind.
+
+BODY
+Slim and toned for her age, upright posture, shoulders back and open, a long neck, upper arms lean and firm with taut skin, a neat well supported silhouette.
+
+SCENE
+She is at her kitchen counter finishing fresh acerola juice. She has lifted the clear glass blender jar off its base and holds it in one hand, and in the other she holds a small round fine mesh sieve over a tall empty clear glass on the counter. The empty motor base stands behind them.
+
+ACTION
+She pours the blended juice slowly from the jar through the fine mesh sieve into the tall glass, the juice running through while a little pulp and a few small hard seeds stay behind in the mesh, and she fills the glass about three quarters and stops, her lips closed.
+
+EXPRESSION
+Her expression is calm and serene, unhurried and at ease, eyes soft on the glass, a slight closed-lip smile.
+
+OPTICS
+85mm equivalent portrait lens, shallow depth of field, soft rendering.
+
+LIGHTING
+Soft diffused morning light, broad and frontal, so nothing on her face casts a hard shadow. Warm neutral grade, low contrast, the kitchen softly blurred behind her.
+
+FRAMING
+Medium shot, vertical 9:16, her head in the upper third with headroom above it, the counter, the sieve and the tall glass in the lower part of the frame with clear uncluttered space between her chin and the glass.
+
+WARDROBE
+A plain white long sleeved top in a soft fine knit. It is cut close to the body but never tight: it follows the shoulder line and skims the chest without clinging and without loose extra fabric. Long sleeves down to the wrists, a simple round or soft V neckline, one plain solid colour. Modern and young, the clothes a woman in her early thirties actually wears. Never oversized, never boxy, never billowing, never sleeveless, never a tank top, never a clinging ribbed knit. No apron. No jewellery beyond small plain stud earrings and at most one fine delicate chain. No pearls, no brooch, no large or ornate jewellery, no scarf, no floral print, no shoulder pads.
+
+LOCKS
+Her glasses, hair, face shape and clothing match the reference, and her hair keeps the same length and shape on both sides through the whole shot. Her skin is rendered clear and even in every single frame, younger and smoother than any texture in the reference image: no freckles, no sun spots, no age spots, no pigmentation patches, no fine lines, no wrinkles, no crow's feet, no nasolabial folds, no under eye shadows, no redness, no visible pores, no blemishes. She has no tattoos anywhere on her body: her arms, wrists, hands, fingers, neck, shoulders, chest, back and ankles are bare unmarked skin, no tattoo, no henna, no ink, no birthmark, no body art of any kind, in any frame. Her arms stay lean and toned with firm taut skin, never heavy, never sagging, no loose skin under the upper arm. Her posture stays upright and her silhouette firm and well supported in every frame. Her lips stay closed and still for the whole shot, she does not speak, no talking, no mouth movement, no dialogue. At most a slight closed-lip smile, never a wide smile, never laughing, teeth not visible. Natural blinks. Both hands are visible and anatomically correct, five fingers each, nails short and unpainted, no rings, and the blender jar and the sieve stay whole in her hands at all times. The juice is an opaque salmon orange red, the colour of a ripe peach with a red blush, with a pale pinkish foam on its surface: never deep crimson, never wine red, never purple, never brown, never bright pink, never clear or see through. It falls as one steady unbroken stream through the sieve. The sieve is small, round and fine meshed, and what stays in it is a little pale orange pulp and a few small pale hard seeds, nothing else. There is no whole fruit left anywhere in frame: no whole acerola in the jar, none on the counter, none in the glass. The tall glass is plain and clear, with no pattern and no colour, and it fills only to about three quarters. Nothing splashes out, nothing spills, the counter stays clean and dry. No ice, no sugar, no honey, no straw, no mint leaf, no fruit slice on the rim, no garnish of any kind. Nothing on any screen, paper, label or appliance is readable, no text, no numbers, no brand name and no logo. No other people in frame. Static framing, no zoom, no camera move.
+```
+
+---
+
 # Parte 2 — só comida, sem gastar crédito
 
 Sete refeições diferentes, quatro cenas cada. Vinte segundos por clipe,
 quatro blocos de montagem por clipe.
 
-## 6. Ovos mexidos com espinafre e abacate
+## 7. Ovos mexidos com espinafre e abacate
 
 ```
 SCENE CONTEXT
@@ -256,7 +402,7 @@ The portion is modest, about two eggs. Only the pan, the spatula and the plate a
 
 ---
 
-## 7. Bowl de quinoa com grão-de-bico e ovo mole
+## 8. Bowl de quinoa com grão-de-bico e ovo mole
 
 ```
 SCENE CONTEXT
@@ -298,7 +444,7 @@ The bowl is filled about two thirds, never overflowing. Only the spoon is visibl
 
 ---
 
-## 8. Sopa de lentilha com couve e limão
+## 9. Sopa de lentilha com couve e limão
 
 ```
 SCENE CONTEXT
@@ -340,7 +486,7 @@ The amount of lemon juice is modest, a few drops, never a stream. Only the pot, 
 
 ---
 
-## 9. Frango grelhado com purê de couve-flor e cúrcuma
+## 10. Frango grelhado com purê de couve-flor e cúrcuma
 
 ```
 SCENE CONTEXT
@@ -382,7 +528,7 @@ The portion is modest, one chicken breast and two spoonfuls of purée. The chick
 
 ---
 
-## 10. Salada morna de beterraba assada, rúcula e nozes
+## 11. Salada morna de beterraba assada, rúcula e nozes
 
 ```
 SCENE CONTEXT
@@ -424,7 +570,7 @@ The walnuts are coarsely broken pieces, never whole nuts, about one tablespoon. 
 
 ---
 
-## 11. Iogurte natural com frutas vermelhas, chia e castanhas
+## 12. Iogurte natural com frutas vermelhas, chia e castanhas
 
 ```
 SCENE CONTEXT
@@ -466,7 +612,7 @@ The yoghurt is plain and white, no honey, no syrup, no sauce. The fruit is fresh
 
 ---
 
-## 12. Crucíferas salteadas com limão
+## 13. Crucíferas salteadas com limão
 
 A refeição mais alinhada com o que você fala: brócolis e couve-de-bruxelas
 com limão em cima, que é exatamente a cena da via do GST fechando com a
