@@ -11,6 +11,7 @@ vazia. O que muda é o HTML em `../telas/`.
 |---|---|---|
 | `tablet-em-pe.mp4` | tablet de frente, mesa clara, 5s, 720x1280 | retângulo, `(66,188)` `588x939` |
 | `monitor-na-mesa.mp4` | monitor na mesa do consultório, luz de janela, caneca com vapor, poltrona ao fundo, 6s, 720x1280 | trapézio, cantos em `telas.json` |
+| `tablet-frontal.mp4` | **o bom**: tablet de frente, enorme, estante ao fundo, 6s, 720x1280 | retângulo `(99,250)` `529x800` |
 | `tablet-de-frente.mp4` | tablet grande na mesa escura, luz de fim de tarde, livros e caneca, 6s, 720x1280 | trapézio + máscara, em `telas.json` |
 | `dna-helice.mp4` | hélice de DNA dourada girando, fundo escuro, 6s, 720x1280 | não tem tela: é fecho de vídeo |
 
@@ -18,7 +19,37 @@ As coordenadas estão em `telas.json`, já medidas. Não precisa achar de
 novo: a câmera é travada nos dois e a tela não anda um pixel do primeiro
 ao último quadro.
 
-## O tablet de frente, e a máscara que ele precisa
+## O tablet frontal, que é o que se usa
+
+`tablet-frontal.mp4` é o que a terceira tentativa de prompt entregou, e é
+o melhor cenário da pasta. Frontal de verdade: a tela é um retângulo
+limpo, `(99,250)` `529x800` em 720x1280, e nada tapa os cantos. Não
+precisa de `perspective` nem de máscara complicada — `scale` e `overlay`
+resolvem.
+
+Em 1080x1920 a tela fica em `(148,375)` `794x1200`, proporção 0.6613. É
+retrato, e as telas de `../telas/` foram desenhadas deitadas. Em vez de
+refazer cada uma, elas são renderizadas **mais estreitas**: o layout
+reflui, a página cresce em altura e a letra fica maior em relação à tela,
+sem mexer em nenhum `font-size`. As larguras escolhidas estão em
+`montar-video-tablet/`.
+
+Duas coisas que economizam muito tempo de render:
+
+- **Pré-escale a página** para 794px de largura antes de entrar no
+  ffmpeg. Com o PNG já na largura certa, o único cálculo por quadro é o
+  `crop` da rolagem. Fazendo `crop` e depois `scale` dentro do filtro,
+  são 1400 reescalas de imagem grande e o render leva dez vezes mais.
+- **Uma cena só, sem corte.** O tablet fica parado o vídeo inteiro e o
+  que muda é a página dentro dele, com `overlay=...:enable='between(t,a,b)'`.
+  É como um tablet se comporta de verdade, e não tem emenda pra disfarçar.
+
+O texto do vídeo mora fora da tela: sobra uma faixa de 340px em cima, na
+estante desfocada, e 345px embaixo, na mesa. Isso obriga **título de uma
+linha só** — duas não cabem junto com o chapéu, e diminuir a letra
+derrota o propósito de ter aumentado a tela.
+
+## O outro tablet, e a máscara que ele precisa
 
 `tablet-de-frente.mp4` é o clipe original recortado: na geração o tablet
 saía com 53% da largura do quadro, e uma tela densa nesse tamanho não se

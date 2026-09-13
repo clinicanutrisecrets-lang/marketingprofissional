@@ -1,0 +1,170 @@
+<meta charset="utf-8">
+<!-- Raciocínio clínico: como gene, exame, sintoma e rotina se cruzam até
+     virar conduta. É a tela da versão do vídeo feita para profissional,
+     não para paciente.
+
+     ATENÇÃO: os três casos abaixo são reconstrução, montados a partir
+     das outras telas desta pasta (CLOCK e ritmo circadiano, vitamina D
+     em 27,1, GST e crucífera com vitamina C) para que o vídeo inteiro
+     conte a mesma história. Paciente fictícia. Conferir com a tela real
+     do Scanner antes de publicar. -->
+<style>
+  :root{
+    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
+    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --verde:#2E8B6E;
+    --vermelho:#C8455A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);padding:26px 30px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
+       display:flex;flex-direction:column;gap:16px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:15px;
+          padding:22px 26px}
+  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
+
+  .topo{position:relative;overflow:hidden}
+  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+               background:var(--teal)}
+  .sobrancelha{font-size:18px;color:var(--cinza);margin-bottom:5px}
+  .topo h1{font-size:46px;line-height:1.05}
+  .topo .nota{font-size:17.5px;color:var(--cinza);margin-top:9px;
+              line-height:1.5;max-width:720px}
+  .topo .nota b{color:var(--tinta)}
+
+  .caso > h2{font-size:27px;display:flex;align-items:baseline;gap:11px;
+             margin-bottom:3px}
+  .caso > h2 span{font-size:15px;letter-spacing:1.6px;color:var(--cinza);
+                  font-weight:400;font-family:"Liberation Sans",Arial,sans-serif}
+  .caso > p.resumo{font-size:17px;color:var(--cinza);line-height:1.5;
+                   margin-bottom:16px}
+
+  .trilho{position:relative;padding-left:30px}
+  .trilho:before{content:"";position:absolute;left:8px;top:10px;bottom:16px;
+                 width:2px;background:var(--linha)}
+  .passo{position:relative;padding:11px 0}
+  .passo:before{content:"";position:absolute;left:-26px;top:18px;width:12px;
+                height:12px;border-radius:50%;background:#fff;
+                border:2.5px solid var(--cinza)}
+  .passo.g:before{border-color:var(--roxo)}
+  .passo.e:before{border-color:var(--teal)}
+  .passo.s:before{border-color:var(--vermelho)}
+  .passo.c:before{border-color:var(--verde);background:var(--verde)}
+  .rotulo{font-size:13.5px;letter-spacing:1.8px;color:var(--cinza);
+          margin-bottom:3px}
+  .passo.g .rotulo{color:var(--roxo)}
+  .passo.e .rotulo{color:var(--teal)}
+  .passo.s .rotulo{color:var(--vermelho)}
+  .passo.c .rotulo{color:var(--verde)}
+  .passo h3{font-size:21px;font-weight:700;line-height:1.3}
+  .passo p{font-size:16.5px;color:var(--cinza);line-height:1.5;margin-top:3px}
+  .passo.c{background:#F1F8F5;border:1px solid #D3E9DF;border-radius:11px;
+           padding:13px 16px;margin-top:6px}
+  .passo.c h3{color:#1A6B50}
+  .passo.c p{color:#2E6B57}
+
+  .fecho{background:#EDF7F7;border:1px solid #D5EBEC;border-radius:13px;
+         padding:18px 22px;font-size:19px;color:#175C60;line-height:1.5}
+  .fecho b{color:#0B4C50}
+  .rodape{font-size:14.5px;color:var(--cinza);line-height:1.5}
+</style>
+
+<div class="cartao topo">
+  <div class="sobrancelha">Raciocínio clínico · o que o laudo sozinho não diz</div>
+  <h1 class="serif">Como as camadas se cruzam</h1>
+  <div class="nota">Gene não é diagnóstico e exame não é conduta. O que vira
+    prescrição é o <b>cruzamento</b>: o polimorfismo diz a tendência, o
+    bioquímico diz onde ela está hoje, o sintoma diz se ela está se
+    expressando, e a rotina diz o que é possível fazer.</div>
+</div>
+
+<div class="cartao caso">
+  <h2 class="serif">Ritmo circadiano <span>CASO 1</span></h2>
+  <p class="resumo">Três queixas que chegaram separadas e são a mesma coisa.</p>
+  <div class="trilho">
+    <div class="passo g">
+      <div class="rotulo">GENE</div>
+      <h3>CLOCK · alelo AG, heterozigoto</h3>
+      <p>Tendência a fase atrasada e a pior tolerância a carboidrato no fim do dia.</p>
+    </div>
+    <div class="passo e">
+      <div class="rotulo">EXAME</div>
+      <h3>Vitamina D 27,1 ng/mL</h3>
+      <p>Dentro da referência do laboratório, abaixo do ideal funcional para este caso.</p>
+    </div>
+    <div class="passo s">
+      <div class="rotulo">SINTOMA</div>
+      <h3>Acorda cansada · queda à tarde · doce à noite</h3>
+      <p>O trio apareceu junto no questionário. Junto, ele deixa de ser três queixas.</p>
+    </div>
+    <div class="passo c">
+      <div class="rotulo">CONDUTA</div>
+      <h3>Carboidrato concentrado cedo, jantar leve, magnésio à noite</h3>
+      <p>E vitamina D diária com vitamina A, nunca dose alta semanal: o receptor precisa das duas.</p>
+    </div>
+  </div>
+</div>
+
+<div class="cartao caso">
+  <h2 class="serif">Detoxificação de fase II <span>CASO 2</span></h2>
+  <p class="resumo">Onde a orientação genérica perde a via no meio do caminho.</p>
+  <div class="trilho">
+    <div class="passo g">
+      <div class="rotulo">GENE</div>
+      <h3>GST · capacidade de conjugação reduzida</h3>
+      <p>A fase I abre, a fase II precisa dar conta. Aqui ela trabalha com margem menor.</p>
+    </div>
+    <div class="passo e">
+      <div class="rotulo">EXAME</div>
+      <h3>Marcador inflamatório no limite superior</h3>
+      <p>Inflamação de baixo grau, ainda sem repercussão clínica declarada.</p>
+    </div>
+    <div class="passo s">
+      <div class="rotulo">SINTOMA</div>
+      <h3>Inchaço depois das refeições · concentração oscilando</h3>
+      <p>Queixa vaga isolada, específica quando lida junto com as outras duas camadas.</p>
+    </div>
+    <div class="passo c">
+      <div class="rotulo">CONDUTA</div>
+      <h3>Crucífera e vitamina C na mesma refeição</h3>
+      <p>Limão espremido no brócolis na hora de comer. Separados, um abre o processo e o outro não fecha.</p>
+    </div>
+  </div>
+</div>
+
+<div class="cartao caso">
+  <h2 class="serif">Sinergia da suplementação <span>CASO 3</span></h2>
+  <p class="resumo">Por que cada item tem o motivo escrito do lado.</p>
+  <div class="trilho">
+    <div class="passo g">
+      <div class="rotulo">GENE</div>
+      <h3>Perfil de resposta a ômega-3</h3>
+      <p>Conversão menos eficiente, então a origem e a dose mudam.</p>
+    </div>
+    <div class="passo e">
+      <div class="rotulo">EXAME</div>
+      <h3>Relação ômega-6 / ômega-3 desfavorável</h3>
+      <p>O que o prato vem entregando, não o que o suplemento promete.</p>
+    </div>
+    <div class="passo s">
+      <div class="rotulo">ROTINA</div>
+      <h3>Turnos variados · pouca exposição ao sol</h3>
+      <p>A camada que decide o horário de tudo. Prescrição que ignora a rotina não é seguida.</p>
+    </div>
+    <div class="passo c">
+      <div class="rotulo">CONDUTA</div>
+      <h3>EPA e DHA no almoço, junto dos polifenóis da comida</h3>
+      <p>Mesma via. Separados no dia, rendem menos do que rendem juntos.</p>
+    </div>
+  </div>
+</div>
+
+<div class="fecho">
+  <b>É isso que o paciente recebe como "manual".</b> Do lado de cá, é
+  quatro camadas lidas na mesma página — e é por isso que duas pessoas com
+  o mesmo exame saem com dois planos diferentes.
+</div>
+
+<div class="cartao rodape">
+  Caso clínico ilustrativo, paciente fictícia. Condutas, doses e formas são
+  definidas individualmente e revistas a cada exame.
+</div>
