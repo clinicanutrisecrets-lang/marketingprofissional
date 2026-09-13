@@ -7,17 +7,54 @@
 python3 -c "import slides, dados; slides.render(dados.TODOS, destino='saida')"
 ```
 
-## 🔴 O destaque é VINHO, não rosa
+## 🔴 O destaque é ROXO — nem rosa, nem vinho
 
-A paleta da marca traz magenta `#D6336C`, e nos olhos da Aline ele lê como
-"rosão". Ela corrigiu isso duas vezes na mesma semana — primeiro no batom
-(12/09) e depois na arte (13/09: *"ainda tá vindo com o rosa que a gente já
-conversou"*).
+A paleta antiga trazia magenta `#D6336C`, que nos olhos da Aline lê como
+"rosão". Eu errei duas vezes aqui: primeiro mantive o rosa, depois troquei por
+vinho (`#9E2A4A`) achando que era a mesma correção do batom. **Não era.** Ela:
+*"lembra que a gente tinha falado que é roxo e não é rosa?"*
 
-O valor em uso é **`#9E2A4A`**. Trocar só o matiz não resolve: **o que separa
-vinho de rosa é a luminância**, então o valor novo precisa ser mais escuro, não
-só mais vermelho. O hex mora em `slides.MAG` e o `dados.py` importa de lá — duas
-cópias do mesmo hex divergem calado.
+O valor é **`#7B5EA7`** — o roxo de marca do Scanner da Saúde. Mora em
+`slides.ROXO`, e `dados.py` importa de lá: duas cópias do mesmo hex divergem
+calado.
+
+## 🔴 O verde é o da logo dela, e ele é CLARO
+
+Estava `#0E5959`, que é o dark teal de APOIO da paleta, não o "verdezinho" da
+marca. Ela: *"o verde não está muito escuro? achei que era o nosso verdezinho"*.
+
+Amostrado do PNG da logo, o tom dominante é `#00A8A8` — o valor em uso é
+**`#0AA8A8`**. Título em verde escuro lê como cinza-petróleo e ela não reconhece
+como sendo dela. `VERDE_TEXTO` (`#0A7A78`) existe só onde corpo pequeno precisa
+de contraste em fundo claro.
+
+## 🔴 A logo é o arquivo dela, e é uma POR PERFIL
+
+Era um SVG que eu desenhei de cabeça — uma gota com uma folha dentro. Ela
+reparou na hora: *"você botou essa gota aí com uma folha, não sei o que é"*.
+Marca não se aproxima: ou é o arquivo, ou não é a marca.
+
+E são **duas marcas**: `@nutri_secrets` usa o símbolo teal da Nutri Secrets,
+`@scannerdasaude` usa o losango do Scanner da Saúde. Carimbar a mesma nos três
+assina o post no nome do perfil errado. O perfil sai de `c["perfil"]` ou, na
+falta dele, do `arroba` do CTA.
+
+Cada marca tem variante **clara**, porque o slide de CTA tem fundo teal: a marca
+escura simplesmente some lá.
+
+⚠️ Os PNGs da Nutri Secrets que eu tenho (`logo-ns-*.png`) **estão cortados na
+borda direita** — é recorte, não arquivo original. Vale pedir o original pra ela.
+
+## 🔴 A frase de fecho ganha um retângulo
+
+Pedido dela: *"dá pra ter aquele retângulo atrás? só pra dar uma diferenciada da
+outra parte do texto"*. É `.sub`, `display:inline-block` **de propósito**: a
+caixa acompanha a frase, não a coluna inteira — faixa da largura toda leria como
+tarja, e tarja ela já recusou na legenda do vídeo.
+
+⚠️ E **sem cor inline no elemento**: o `style` do elemento vence a regra da
+folha, então pintar o texto com a cor do destaque (que virou o fundo da caixa)
+deixa roxo sobre roxo — retângulo aparece vazio, sem erro nenhum.
 
 ## 🔴 A capa tem um "soco"
 

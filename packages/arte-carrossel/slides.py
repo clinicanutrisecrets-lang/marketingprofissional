@@ -9,26 +9,58 @@ import json, pathlib, html, re
 from playwright.sync_api import sync_playwright
 
 CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
-TIFF, TEAL, CREME = "#0ABAB5", "#0E5959", "#F5E6D3"
+TIFF, TEAL, CREME = "#0AA8A8", "#0A7A78", "#F5E6D3"
 
-# 🔴 O DESTAQUE E VINHO, NAO ROSA (Aline, 13/09: "ainda ta vindo com o rosa que
-# a gente ja conversou"). E a MESMA correcao do batom em 12/09 — o magenta
-# #D6336C da paleta le como "rosao" nos olhos dela. Trocar so a cor nao basta:
-# o que separa vinho de rosa e a LUMINANCIA, entao o valor novo tem que ser
-# mais escuro, nao so mais vermelho.
-MAG = "#9E2A4A"
+# 🔴 O DESTAQUE E ROXO. NAO e rosa e NAO e vinho (Aline, 13/09: "lembra que a
+# gente tinha falado que e roxo e nao e rosa?"). O magenta #D6336C da paleta
+# antiga le como "rosao" pra ela, e o vinho que eu tentei antes nao era o que
+# ela pediu — o roxo e a cor de marca do Scanner da Saude.
+ROXO = "#7B5EA7"
+MAG = ROXO  # nome antigo mantido so pra nao quebrar quem importa
 
-LOGO = ('<svg class="logo" viewBox="0 0 100 100" fill="none">'
-        '<path d="M50 8C50 8 20 34 20 58a30 30 0 1 0 60 0C80 34 50 8 50 8Z" fill="{c}"/>'
-        '<path d="M50 30v46M50 52c0-8 7-14 15-16M50 62c0-7-6-12-13-14" stroke="{s}" '
-        'stroke-width="5" stroke-linecap="round"/></svg>')
+# 🔴 O VERDE E O DA LOGO DELA, e ele e CLARO. O #0E5959 que estava aqui e o
+# dark teal de apoio, nao o "verdezinho" da marca: amostrado do PNG da logo,
+# o tom dominante e #00A8A8. Titulo em verde escuro le como cinza-petroleo e
+# ela nao reconhece como sendo dela.
+VERDE = "#0AA8A8"
+VERDE_TEXTO = "#0A7A78"   # so onde o corpo pequeno precisa de contraste
+
+# 🔴 CADA PERFIL TEM A SUA MARCA. Dois destes carrosseis sao do
+# @scannerdasaude e um e do @nutri_secrets — carimbar a mesma logo nos tres
+# assina o post no nome do perfil errado.
+MARCAS = {
+    "@nutri_secrets":   {"escura": "logo-ns-simbolo.png",  "clara": "logo-ns-simbolo-claro.png"},
+    "@scannerdasaude":  {"escura": "marca-scanner.png",    "clara": "marca-scanner-clara.png"},
+}
+PERFIL_PADRAO = "@nutri_secrets"
+_CACHE_LOGO = {}
+
+
+def _logo(perfil: str, variante: str) -> str:
+    """A logo REAL da Nutri Secrets, em base64.
+
+    🔴 Era um SVG que eu desenhei de cabeca (uma gota com uma folha dentro) e
+    ela reparou na hora: "voce botou essa gota ai com uma folha, nao sei o que
+    e". Marca nao se aproxima — ou e o arquivo dela, ou nao e a marca.
+
+    A variante 'clara' existe porque o simbolo e TEAL: no slide de CTA, que tem
+    fundo teal, a logo escura simplesmente some.
+    """
+    chave = (perfil, variante)
+    if chave not in _CACHE_LOGO:
+        import base64
+        nome = MARCAS.get(perfil, MARCAS[PERFIL_PADRAO])[variante]
+        arq = pathlib.Path(__file__).resolve().parent.parent / "fontes" / nome
+        _CACHE_LOGO[chave] = base64.b64encode(arq.read_bytes()).decode()
+    return _CACHE_LOGO[chave]
 
 CSS = """
 *{box-sizing:border-box;margin:0}
 body{width:1080px;height:1080px;overflow:hidden;font-family:Lora,Georgia,serif}
 .s{width:1080px;height:1080px;padding:88px 80px;display:flex;flex-direction:column;
    justify-content:center;position:relative}
-.logo{position:absolute;top:48px;right:52px;width:80px;height:80px}
+.logo{position:absolute;top:46px;right:52px;height:96px;width:auto}
+.cta .logo{position:static;height:230px;width:auto;margin:0 auto 40px;display:block}
 .eyebrow{font-family:Montserrat,sans-serif;font-weight:700;font-size:27px;
    letter-spacing:.18em;text-transform:uppercase;margin-bottom:26px}
 h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:132px;line-height:1.14;
@@ -44,13 +76,19 @@ h2{font-family:Montserrat,sans-serif;font-weight:800;font-size:62px;line-height:
    margin-bottom:28px;text-wrap:balance}
 p{font-size:43px;line-height:1.42;margin-bottom:24px}
 p:last-child{margin-bottom:0}
-.sub{font-family:Montserrat,sans-serif;font-weight:600;font-size:46px;line-height:1.3;
-   margin-top:34px}
+/* 🔴 A FRASE DE FECHO GANHA UM RETANGULO (Aline, 13/09: "da pra ter aquele
+   retangulo atras? so pra dar uma diferenciada da outra parte do texto").
+   E `inline-block` de proposito: a caixa acompanha a frase, nao a coluna
+   inteira — faixa da largura do slide leria como tarja, e tarja ela ja
+   recusou na legenda do video. */
+.sub{display:inline-block;align-self:flex-start;
+   font-family:Montserrat,sans-serif;font-weight:700;font-size:44px;line-height:1.26;
+   margin-top:34px;padding:18px 26px;border-radius:14px;
+   background:var(--destaque);color:var(--sobre-destaque)}
 small{display:block;font-family:Montserrat,sans-serif;font-weight:500;font-size:24px;
    line-height:1.4;margin-top:30px;opacity:.72}
 b{font-weight:700}
 .cta{text-align:center}
-.cta .logo{position:static;width:190px;height:190px;margin:0 auto 40px}
 .cta p{font-family:Montserrat,sans-serif;font-weight:600;font-size:46px;line-height:1.42}
 .soco{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:176px;
    line-height:1.1;letter-spacing:.005em;text-transform:uppercase;margin-bottom:30px}
@@ -131,10 +169,11 @@ AJUSTAR = """() => {
 
 
 def _fundo(kind):
-    if kind == "capa":   return CREME, TEAL, MAG
-    if kind == "cta":    return TIFF, CREME, CREME
-    if kind == "tiff":   return "#EAF8F7", TEAL, MAG
-    return "#FFFFFF", "#14202a", MAG
+    """fundo, cor do titulo, cor do destaque."""
+    if kind == "capa":   return CREME, VERDE, ROXO
+    if kind == "cta":    return VERDE, CREME, CREME
+    if kind == "tiff":   return "#EAF8F7", VERDE_TEXTO, ROXO
+    return "#FFFFFF", VERDE_TEXTO, ROXO
 
 def render(carrosseis, destino="arte"):
     d = pathlib.Path(destino); d.mkdir(exist_ok=True)
@@ -143,10 +182,13 @@ def render(carrosseis, destino="arte"):
         b = pw.chromium.launch(executable_path=CHROME)
         pg = b.new_page(viewport={"width": 1080, "height": 1080}, device_scale_factor=1)
         for c in carrosseis:
+            perfil = c.get("perfil") or next(
+                (x.get("arroba") for x in c["slides"] if x.get("arroba")), PERFIL_PADRAO)
             for i, sl in enumerate(c["slides"], 1):
                 bg, fg, ac = _fundo(sl.get("fundo", "branco"))
-                logo = LOGO.format(c=ac if sl.get("fundo") != "cta" else CREME,
-                                   s=bg if sl.get("fundo") == "cta" else "#ffffff")
+                cta = sl.get("fundo") == "cta"
+                logo = (f'<img class="logo{" grande" if cta else ""}" '
+                        f'src="data:image/png;base64,{_logo(perfil, "clara" if cta else "escura")}" alt="">')
                 corpo = "".join(f"<p>{x}</p>" for x in sl.get("corpo", []))
                 eb = (f'<div class="eyebrow" style="color:{ac}">{html.escape(sl["eyebrow"])}</div>'
                       if sl.get("eyebrow") else "")
@@ -162,14 +204,18 @@ def render(carrosseis, destino="arte"):
                 if sl.get("soco"):
                     titulo = (f'<div class="soco" style="color:{fg}">{sl["soco"]}</div>'
                               f'<div class="gancho" style="color:{ac}">{tit}</div>')
-                sub = f'<div class="sub" style="color:{ac}">{sl["sub"]}</div>' if sl.get("sub") else ""
+                # 🔴 SEM cor inline aqui: o estilo do elemento vence a regra da
+                # folha, e pintar o texto com a cor do DESTAQUE (que virou o
+                # fundo do retangulo) deixa roxo sobre roxo — retangulo vazio.
+                sub = f'<div class="sub">{sl["sub"]}</div>' if sl.get("sub") else ""
                 fonte = f"<small>{sl['fonte']}</small>" if sl.get("fonte") else ""
                 arroba = f'<div class="arroba">{sl["arroba"]}</div>' if sl.get("arroba") else ""
                 klass = "s cta" if sl.get("fundo") == "cta" else "s"
                 pagina = (
                     '<!doctype html><meta charset="utf-8">'
                     f"<style>{_css()}</style>"
-                    f'<div class="{klass}" style="background:{bg};color:{fg}">'
+                    f'<div class="{klass}" style="background:{bg};color:{fg};'
+                    f'--destaque:{ac};--sobre-destaque:{CREME if not cta else VERDE}">'
                     f"{logo}{eb}{titulo}{corpo}{sub}{fonte}{arroba}</div>")
                 arq = d / f"{c['slug']}-{i:02d}.png"
                 pg.set_content(pagina)
