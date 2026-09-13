@@ -158,3 +158,42 @@ Três formatos, que a Aline escolhe por peça:
 - **C** — `soco` curto de 2–3 palavras em Anton + o gancho inteiro em
   Montserrat embaixo. É a proporção do perfil de referência, e é o que lê na
   miniatura da grade, onde a capa tem ~1/3 da largura.
+
+---
+
+## Aula longa (30–60 min): `.github/workflows/filtro-aula.yml`
+
+**Medido em 13/09**, 4 núcleos: 600 quadros de 720x1280 em **77 s** — ou seja,
+o filtro roda a cerca de **4× o tempo do vídeo**. Uma aula de 1 hora são ~4
+horas de processamento num núcleo-quádruplo.
+
+Por isso a aula não passa pelo `filtro-video.yml` (timeout de 90 min, pensado
+pra reel de 1 min). O `filtro-aula.yml` **corta a aula em pedaços de 5 min que
+rodam em paralelo**: 12 pedaços terminam juntos, em torno de 20 min de relógio.
+
+### 🔴 O corte também é a rede de segurança
+
+Pedido da Aline: *"quando são aula de meia hora, de uma hora, eu não quero
+correr o risco de gravar e depois não conseguir botar o filtro"*. Com
+`fail-fast: false`, um pedaço que falha não derruba os outros — só ele é
+refeito. Gravar uma hora e perder tudo por causa de um erro no minuto 52 deixa
+de ser possível.
+
+E o job `juntar` **confere a contagem antes de juntar**: sem isso, um pedaço
+que falhou vira aula com um buraco de 5 minutos no meio, e o arquivo final
+parece perfeitamente normal.
+
+### 🔴 O áudio sai UMA VEZ, do original inteiro
+
+Processar áudio por pedaço e juntar depois acumula desvio de sincronia. Num
+vídeo de uma hora isso vira labial fora do lugar no fim da aula. O vídeo é
+cortado com `-c copy` (corte em quadro-chave, nenhum quadro perdido nem
+recodificado), e no fim o áudio original é remuxado por cima.
+
+### 🔴 `segundos_teste` — use ANTES de gravar a aula toda
+
+O input `segundos_teste` processa só os primeiros N segundos. O caminho seguro é
+sempre o mesmo: grave **1 minuto de teste** na mesma luz, na mesma roupa e no
+mesmo enquadramento da aula, rode com `segundos_teste: 60`, olhe o resultado —
+e só então grave a hora inteira. É a única forma de eliminar de verdade o risco
+que ela levantou; nenhuma promessa minha substitui esse um minuto.
