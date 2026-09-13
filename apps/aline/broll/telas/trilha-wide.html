@@ -1,0 +1,74 @@
+<meta charset="utf-8">
+<!-- Sua trilha: a jornada consulta a consulta.
+     Arte do Consultório de Precisão, redesenhada em HTML. -->
+<style>
+  :root{ --tinta:#1B2733; --cinza:#5C6975; --teal:#1687A7; --verde:#21A179; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:#F7F9FB;padding:30px 40px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:50px;
+         margin-bottom:6px}
+  h1{font-family:"EB Garamond",Georgia,serif;font-size:50px;line-height:1.05;
+     font-weight:700;letter-spacing:-.5px}
+  header p{flex:none;width:430px;font-size:19px;line-height:1.5;color:#42505E}
+  .tres{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+  .c{border-radius:14px;padding:18px 20px}
+  .c.a{background:#E9F2F8;border:1px solid #CADEEA}
+  .c.b{background:#EDEFF1;border:1px solid #DCE1E5}
+  .c.v{background:#E9F7F1;border:1px solid #BFE7D7}
+  .c span{display:block;font-size:14px;letter-spacing:1.8px;font-weight:700;
+          margin-bottom:7px}
+  .c.a span{color:var(--teal)} .c.b span{color:#5E6B77} .c.v span{color:var(--verde)}
+  .c p{font-size:18px;line-height:1.5;color:#3C4854}
+</style>
+
+<header>
+  <h1>Sua trilha</h1>
+  <p>Hoje é o primeiro trecho do caminho. A cada consulta a gente sobe um degrau.</p>
+</header>
+
+<svg width="1070" height="352" viewBox="-75 -14 1220 366">
+  <path d="M20 285 C150 285 170 225 300 222 C430 219 430 150 560 148
+           C690 146 700 82 830 78 C920 75 980 52 1050 30"
+        fill="none" stroke="#E2E7EB" stroke-width="22" stroke-linecap="round"/>
+  <path d="M20 285 C150 285 170 225 300 222 C430 219 430 150 560 148
+           C690 146 700 82 830 78 C920 75 980 52 1050 30"
+        fill="none" stroke="#B9C4CD" stroke-width="2.4" stroke-dasharray="9 11"/>
+  <path d="M960 60 L1000 18 L1040 60" fill="none" stroke="#7FD1B0" stroke-width="4"
+        stroke-linecap="round"/>
+
+  <g font-family="Arial" text-anchor="middle">
+    <circle cx="120" cy="262" r="24" fill="#fff" stroke="#1687A7" stroke-width="3"/>
+    <g fill="none" stroke="#1687A7" stroke-width="2.6" stroke-linecap="round">
+      <path d="M110 268 C116 262 124 262 130 268 M113 259 C118 254 122 254 127 259"/>
+      <circle cx="120" cy="252" r="2.6" fill="#1687A7"/>
+    </g>
+    <text x="120" y="222" font-size="25" font-weight="700" fill="#1687A7">Teste com 300+ genes</text>
+    <text x="120" y="308" font-size="19" fill="#5C6975">o mapa inteiro já é seu</text>
+
+    <circle cx="390" cy="198" r="24" fill="#fff" stroke="#15607A" stroke-width="3"/>
+    <text x="390" y="206" font-size="20" font-weight="700" fill="#15607A">10</text>
+    <text x="390" y="158" font-size="25" font-weight="700" fill="#15607A">Hoje: seus 10 primeiros</text>
+    <text x="390" y="244" font-size="19" fill="#5C6975">os que falam com a sua queixa</text>
+
+    <circle cx="660" cy="124" r="24" fill="#fff" stroke="#15607A" stroke-width="3"/>
+    <g fill="none" stroke="#15607A" stroke-width="2.6" stroke-linecap="round">
+      <path d="M660 112 L660 124 L668 130"/>
+    </g>
+    <text x="660" y="84" font-size="25" font-weight="700" fill="#15607A">Próximas consultas</text>
+    <text x="660" y="170" font-size="19" fill="#5C6975">novos genes conforme sintomas e exames</text>
+
+    <circle cx="920" cy="62" r="24" fill="#fff" stroke="#21A179" stroke-width="3"/>
+    <path d="M920 74 C913 69 912 60 917 56 C917 59 919 61 921 60 C923 58 922 54 920 50
+             C927 54 930 61 928 66 C926 71 924 73 920 74"
+          fill="none" stroke="#21A179" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="920" y="24" font-size="27" font-weight="700" fill="#21A179">Longevidade</text>
+    <text x="920" y="108" font-size="19" fill="#5C6975">o horizonte da trilha</text>
+  </g>
+</svg>
+
+<div class="tres">
+  <div class="c a"><span>LAUDO VIVO</span><p>Seu laudo se atualiza sempre que a ciência avança.</p></div>
+  <div class="c b"><span>CONSULTA A CONSULTA</span><p>A gente aprofunda novos genes conforme seus sintomas e exames.</p></div>
+  <div class="c v"><span>DO SEU JEITO</span><p>A modulação do metabolismo cabe na sua rotina e precisa ser prazerosa.</p></div>
+</div>

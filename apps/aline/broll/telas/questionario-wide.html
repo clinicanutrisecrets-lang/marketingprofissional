@@ -1,0 +1,117 @@
+<meta charset="utf-8">
+<!-- Questionário de sintomas do paciente, no formato deitado do monitor.
+     Reconstrução na linguagem da área do paciente. Paciente fictícia,
+     respostas ilustrativas. -->
+<style>
+  :root{
+    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
+    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --verde:#2E8B6E;
+    --vermelho:#C8455A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:var(--pagina);padding:26px 30px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
+       display:flex;flex-direction:column;gap:15px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:15px;
+          padding:22px 26px}
+  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
+
+  .topo{position:relative;overflow:hidden;display:flex;align-items:flex-start;
+        justify-content:space-between;gap:30px}
+  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+               background:var(--roxo)}
+  .sobrancelha{font-size:18px;color:var(--cinza);margin-bottom:5px}
+  .topo h1{font-size:44px;line-height:1.05}
+  .topo p{font-size:17px;color:var(--cinza);margin-top:7px;max-width:640px;line-height:1.5}
+  .resumo{flex:none;text-align:right}
+  .resumo span{display:block;font-size:13px;letter-spacing:1.2px;color:var(--cinza)}
+  .resumo b{font-size:30px}
+
+  .linha{display:grid;grid-template-columns:230px 1fr 150px;gap:18px;
+         align-items:center;padding:15px 0;border-top:1px solid var(--linha)}
+  .linha:first-of-type{border-top:0}
+  .nome{font-size:22px;font-weight:700}
+  .nome small{display:block;font-size:15px;color:var(--cinza);font-weight:400;margin-top:2px}
+  .escala{display:flex;gap:8px}
+  .escala i{flex:1;height:12px;border-radius:6px;background:#EDF0F2;display:block}
+  .escala i.on{background:var(--ambar)}
+  .escala i.alto{background:var(--vermelho)}
+  .escala i.baixo{background:var(--verde)}
+  .grau{justify-self:end;border-radius:999px;padding:6px 14px;font-size:15px;
+        font-weight:700}
+  .g-alto{background:#FBE3E7;color:#9C2A3E}
+  .g-medio{background:#FAECD2;color:#8A6416}
+  .g-baixo{background:#DFF3EC;color:#166B52}
+
+  .marcadas{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+  .chip{border-radius:999px;padding:8px 16px;font-size:17px;font-weight:600;
+        background:#F3F0FA;color:#5B4593}
+  .chip.on{background:#FBE3E7;color:#9C2A3E}
+
+  .nota{background:#EDF7F7;border:1px solid #D5EBEC;border-radius:12px;
+        padding:16px 20px;font-size:18px;color:#175C60;line-height:1.5}
+  .nota b{color:#0B4C50}
+</style>
+
+<div class="cartao topo">
+  <div>
+    <div class="sobrancelha">Antes da consulta · respondido por você</div>
+    <h1 class="serif">Como você tem se sentido</h1>
+    <p>O que você marca aqui não fica no papel: entra no cruzamento com os seus exames e com os seus genes, e é isso que define a prioridade do seu plano.</p>
+  </div>
+  <div class="resumo"><span>RESPOSTAS</span><b>42</b></div>
+</div>
+
+<div class="cartao">
+  <div class="linha">
+    <div class="nome">Sono<small>qualidade e horário</small></div>
+    <div class="escala"><i class="alto"></i><i class="alto"></i><i class="alto"></i><i class="alto"></i><i></i></div>
+    <span class="grau g-alto">queixa alta</span>
+  </div>
+  <div class="linha">
+    <div class="nome">Energia<small>disposição ao longo do dia</small></div>
+    <div class="escala"><i class="alto"></i><i class="alto"></i><i class="alto"></i><i class="alto"></i><i></i></div>
+    <span class="grau g-alto">queixa alta</span>
+  </div>
+  <div class="linha">
+    <div class="nome">Intestino<small>frequência e desconforto</small></div>
+    <div class="escala"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <span class="grau g-medio">moderada</span>
+  </div>
+  <div class="linha">
+    <div class="nome">Humor e ansiedade<small>oscilação no dia</small></div>
+    <div class="escala"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <span class="grau g-medio">moderada</span>
+  </div>
+  <div class="linha">
+    <div class="nome">Vontade de doce<small>principalmente à noite</small></div>
+    <div class="escala"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <span class="grau g-alto">queixa alta</span>
+  </div>
+  <div class="linha">
+    <div class="nome">Dor e inflamação<small>articulação e músculo</small></div>
+    <div class="escala"><i class="baixo"></i><i class="baixo"></i><i></i><i></i><i></i></div>
+    <span class="grau g-baixo">leve</span>
+  </div>
+</div>
+
+<div class="cartao">
+  <div class="sobrancelha">O que você marcou em "acontece comigo"</div>
+  <div class="marcadas">
+    <span class="chip on">acordo cansada</span>
+    <span class="chip on">durmo tarde</span>
+    <span class="chip on">queda de energia à tarde</span>
+    <span class="chip on">vontade de doce à noite</span>
+    <span class="chip">inchaço depois das refeições</span>
+    <span class="chip">dificuldade de concentração</span>
+    <span class="chip">trabalho em turnos variados</span>
+    <span class="chip">pouca exposição ao sol</span>
+  </div>
+</div>
+
+<div class="nota">
+  <b>O que isso já está dizendo:</b> sono, energia e vontade de doce à noite
+  apareceram juntos. Esse trio conversa direto com o seu gene do relógio
+  biológico e com a sua vitamina D, que veio abaixo do ideal no exame. É por
+  aí que o seu plano começa.
+</div>

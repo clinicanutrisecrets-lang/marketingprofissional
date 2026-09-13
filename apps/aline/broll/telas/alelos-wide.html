@@ -1,0 +1,91 @@
+<meta charset="utf-8">
+<!-- O coração da leitura: cada gene tem dois alelos.
+     Arte do Consultório de Precisão, redesenhada em HTML pra caber na tela
+     do monitor e poder ser editada sem abrir ferramenta de design. -->
+<style>
+  :root{ --tinta:#1B2733; --cinza:#5C6975; --teal:#1687A7;
+         --verde:#21A179; --ambar:#E9A020; --vermelho:#E4574F; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:#F7F9FB;padding:30px 38px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+  .sobrancelha{font-size:15px;letter-spacing:2.6px;color:var(--teal);font-weight:700;
+               margin-bottom:8px}
+  h1{font-family:"EB Garamond",Georgia,serif;font-size:48px;line-height:1.05;
+     font-weight:700;margin-bottom:22px;letter-spacing:-.5px}
+  .tres{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .c{border-radius:16px;padding:20px 22px;min-height:430px;display:flex;
+     flex-direction:column}
+  .c.v{background:#E9F7F1;border:1px solid #BFE7D7}
+  .c.a{background:#FDF6E7;border:1px solid #F0DFB6}
+  .c.r{background:#FDEDEE;border:1px solid #F5CFD1}
+  .rot{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;
+       letter-spacing:1.4px;margin-bottom:8px}
+  .rot i{width:12px;height:12px;border-radius:50%;display:block}
+  .c.v .rot{color:var(--verde)} .c.v .rot i{background:var(--verde)}
+  .c.a .rot{color:var(--ambar)} .c.a .rot i{background:var(--ambar)}
+  .c.r .rot{color:var(--vermelho)} .c.r .rot i{background:var(--vermelho)}
+  .arte{flex:1;display:grid;place-items:center;padding:10px 0}
+  .c p{font-size:18px;line-height:1.55;color:#3C4854}
+  .c p b.v{color:var(--verde)} .c p b.a{color:var(--ambar)} .c p b.r{color:var(--vermelho)}
+  .rodape{margin-top:18px;background:#E8F2F8;border-radius:14px;padding:16px 22px;
+          font-size:20px;color:#2C3A47;display:flex;gap:11px;align-items:center}
+  .rodape i{width:11px;height:11px;border-radius:50%;background:var(--teal);flex:none}
+  .rodape b{color:var(--teal)}
+</style>
+
+<div class="sobrancelha">O CORAÇÃO DA LEITURA</div>
+<h1>Cada gene tem dois alelos. Um do pai. Um da mãe.</h1>
+
+<div class="tres">
+  <div class="c v">
+    <div class="rot"><i></i>DUAS PERNINHAS PROTETORAS</div>
+    <div class="arte">
+      <svg width="230" height="150" viewBox="0 0 230 150">
+        <g fill="none" stroke="#21A179" stroke-width="3.4" stroke-linecap="round">
+          <path d="M58 18 C30 45 86 75 58 105 C40 124 62 136 62 136"/>
+          <path d="M86 18 C114 45 58 75 86 105 C104 124 82 136 82 136"/>
+          <path d="M62 40 L82 40 M60 62 L84 62 M62 84 L82 84 M64 106 L80 106"/>
+          <path d="M162 20 L206 34 V78 C206 106 184 124 162 132 C140 124 118 106 118 78 V34 Z"/>
+          <path d="M142 74 L158 91 L186 60"/>
+        </g>
+      </svg>
+    </div>
+    <p><b class="v">Proteção maior, não é imunidade.</b> Precisa de muito desequilíbrio na fábrica pra esse gene virar problema.</p>
+  </div>
+
+  <div class="c a">
+    <div class="rot"><i></i>UMA DE CADA</div>
+    <div class="arte">
+      <svg width="230" height="150" viewBox="0 0 230 150">
+        <path d="M74 18 L112 76" stroke="#21A179" stroke-width="15" stroke-linecap="round" fill="none"/>
+        <path d="M156 18 L118 76" stroke="#E4574F" stroke-width="15" stroke-linecap="round" fill="none"/>
+        <path d="M115 76 L115 136" stroke="#9AA7B4" stroke-width="15" stroke-linecap="round" fill="none"/>
+        <path d="M78 24 L112 78 M152 24 L120 78" stroke="#4A5560" stroke-width="1.6"
+              stroke-dasharray="5 5" fill="none"/>
+        <circle cx="115" cy="72" r="13" fill="#fff" stroke="#2C3A47" stroke-width="2.6"/>
+        <path d="M115 85 L115 103 M106 94 L124 94" stroke="#2C3A47" stroke-width="2.6"
+              stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p>Uma bifurcação: alimentação, sono, exercício e emoções escolhem qual perninha se expressa. <b class="a">Aqui o estilo de vida decide</b>, é onde a epigenética atua.</p>
+  </div>
+
+  <div class="c r">
+    <div class="rot"><i></i>DUAS PERNINHAS DE ATENÇÃO</div>
+    <div class="arte">
+      <svg width="230" height="150" viewBox="0 0 230 150">
+        <g fill="none" stroke="#E4574F" stroke-width="3.2" stroke-linecap="round">
+          <path d="M70 52 A45 45 0 0 1 160 52 Z" fill="#fff"/>
+          <path d="M160 52 L196 44 L200 58 L162 62"/>
+          <path d="M92 52 A30 30 0 0 1 138 30 M115 52 L115 20"/>
+          <path d="M92 62 C120 84 110 96 92 116 M138 62 C110 84 120 96 138 116"/>
+          <path d="M96 76 L134 76 M92 96 L138 96 M96 114 L134 114"/>
+          <path d="M92 130 C120 122 110 130 138 130"/>
+        </g>
+      </svg>
+    </div>
+    <p>Aqui não basta "ser saudável": o capacete impede o gene de contar essa informação pro corpo. Existem <b class="r">alimentos e compostos específicos</b> pra silenciar cada gene, e isso é a nutrigenômica.</p>
+  </div>
+</div>
+
+<div class="rodape"><i></i><span>É a <b>combinação dos dois alelos</b> que define a conduta, e não o gene isolado.</span></div>

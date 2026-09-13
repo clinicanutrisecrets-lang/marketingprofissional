@@ -1,117 +1,132 @@
 <meta charset="utf-8">
-<!-- O prato da nutrigenômica: o que entra no prato e por quê.
-     Reconstrução na linguagem da área do paciente, feita pra caber na tela
-     do monitor. Se existir a arte oficial do Consultório de Precisão, ela
-     substitui esta. Paciente fictícia. -->
+<!-- O prato da saúde e da genética, na arte oficial do Consultório de
+     Precisão: o prato no centro e os oito convidados da mesa em volta.
+     Redesenhado em HTML pra caber na tela do monitor e poder ser editado
+     sem abrir ferramenta de design. -->
 <style>
   :root{
-    --tinta:#1D2733; --cinza:#6B7785; --linha:#E8ECEF; --pagina:#F6F8F9;
-    --teal:#0E7C86; --ambar:#D99A2B; --roxo:#6B4FA8; --verde:#2E8B6E;
-    --laranja:#D9772B; --vermelho:#C8455A;
+    --tinta:#1B2733; --cinza:#6B7885; --teal:#1687A7; --tealesc:#0E6E8C;
+    --vermelho:#D9433F;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{width:1150px;background:var(--pagina);padding:24px 28px;
-       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta);
-       display:flex;flex-direction:column;gap:14px}
-  .cartao{background:#fff;border:1px solid var(--linha);border-radius:15px;
-          padding:20px 24px}
-  .serif{font-family:"EB Garamond",Georgia,serif;font-weight:600}
-
-  .topo{position:relative;overflow:hidden}
-  .topo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
-               background:var(--teal)}
-  .sobrancelha{font-size:17px;color:var(--cinza);margin-bottom:4px}
-  .topo h1{font-size:42px;line-height:1.05}
-  .topo p{font-size:17px;color:var(--cinza);margin-top:6px;max-width:820px;line-height:1.5}
-
-  .entradas{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .entrada{background:#fff;border:1px solid var(--linha);border-radius:13px;
-           padding:14px 16px}
-  .entrada span{display:block;font-size:12px;letter-spacing:1.3px;color:var(--cinza);
-                margin-bottom:5px}
-  .entrada b{font-size:21px;display:block;margin-bottom:3px}
-  .entrada i{font-style:normal;font-size:15px;color:var(--cinza);line-height:1.4}
-
-  .meio{display:grid;grid-template-columns:520px 1fr;gap:18px;align-items:stretch}
-  .prato{display:grid;place-items:center;padding:10px}
-  .legenda .li{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--linha)}
-  .legenda .li:first-child{border-top:0}
-  .pto{flex:none;width:15px;height:15px;border-radius:50%;margin-top:5px}
-  .legenda h3{font-size:20px;font-weight:700}
-  .legenda p{font-size:15.5px;color:var(--cinza);line-height:1.45}
-
-  .saidas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .saida{border-radius:13px;padding:16px 18px}
-  .saida.hoje{background:#FEF8EE;border:1px solid #F2DFC0}
-  .saida.amanha{background:#EDF7F7;border:1px solid #D5EBEC}
-  .saida span{display:block;font-size:12px;letter-spacing:1.3px;margin-bottom:5px}
-  .saida.hoje span{color:#8A6416} .saida.amanha span{color:#175C60}
-  .saida b{font-size:24px;display:block;margin-bottom:4px}
-  .saida p{font-size:16px;color:#4A5764;line-height:1.45}
+  body{width:1150px;background:#fff;padding:34px 44px 26px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:50px}
+  .sobrancelha{font-size:15px;letter-spacing:2.6px;color:var(--teal);font-weight:700;
+               margin-bottom:8px}
+  h1{font-family:"EB Garamond",Georgia,serif;font-size:48px;line-height:1.05;
+     font-weight:700;letter-spacing:-.5px}
+  header p{flex:none;width:400px;font-size:18px;line-height:1.55;color:#42505E}
+  header p b{color:var(--tinta)}
+  .roda{display:grid;place-items:center;margin-top:6px}
 </style>
 
-<div class="cartao topo">
-  <div class="sobrancelha">Consulta de nutrigenômica</div>
-  <h1 class="serif">Por que o seu prato é assim, e não de outro jeito</h1>
-  <p>Cada grupo do prato entra por um motivo que é seu. Alimento não é só nutriente: ele conversa com os seus genes, ligando e silenciando o que já está escrito em você.</p>
-</div>
-
-<div class="entradas">
-  <div class="entrada"><span>ENTRA</span><b>Seus genes</b><i>o que o seu corpo faz bem e o que ele faz com esforço</i></div>
-  <div class="entrada"><span>ENTRA</span><b>Seus exames</b><i>o que está acontecendo agora, em valor ideal e não só de referência</i></div>
-  <div class="entrada"><span>ENTRA</span><b>Seus sintomas</b><i>o que você sente e me conta na consulta</i></div>
-  <div class="entrada"><span>ENTRA</span><b>Sua rotina</b><i>seu horário, seu sono, seu trabalho, o que cabe na sua vida</i></div>
-</div>
-
-<div class="cartao meio">
-  <div class="prato">
-    <svg width="470" height="470" viewBox="0 0 200 200">
-      <circle cx="100" cy="100" r="96" fill="#fff" stroke="#E3E8EB" stroke-width="1.5"/>
-      <!-- 5 setores -->
-      <path d="M100 100 L100 12 A88 88 0 0 1 183.7 71.8 Z" fill="#E6F3F4"/>
-      <path d="M100 100 L183.7 71.8 A88 88 0 0 1 151.7 173.7 Z" fill="#E9F5F0"/>
-      <path d="M100 100 L151.7 173.7 A88 88 0 0 1 48.3 173.7 Z" fill="#F3F0FA"/>
-      <path d="M100 100 L48.3 173.7 A88 88 0 0 1 16.3 71.8 Z" fill="#FCEFE3"/>
-      <path d="M100 100 L16.3 71.8 A88 88 0 0 1 100 12 Z" fill="#FBF3E3"/>
-      <g stroke="#fff" stroke-width="1.6">
-        <line x1="100" y1="100" x2="100" y2="12"/>
-        <line x1="100" y1="100" x2="183.7" y2="71.8"/>
-        <line x1="100" y1="100" x2="151.7" y2="173.7"/>
-        <line x1="100" y1="100" x2="48.3" y2="173.7"/>
-        <line x1="100" y1="100" x2="16.3" y2="71.8"/>
-      </g>
-      <circle cx="100" cy="100" r="34" fill="#fff" stroke="#E3E8EB" stroke-width="1.5"/>
-      <text x="100" y="95" text-anchor="middle" font-family="Georgia, serif"
-            font-size="15" fill="#1D2733">o seu</text>
-      <text x="100" y="112" text-anchor="middle" font-family="Georgia, serif"
-            font-size="18" fill="#0E7C86">prato</text>
-      <g font-family="Arial" font-size="8.5" fill="#41505E" text-anchor="middle">
-        <text x="142" y="45">proteína</text>
-        <text x="163" y="118">crucíferas</text>
-        <text x="100" y="176">coloridos</text>
-        <text x="37" y="118">gorduras boas</text>
-        <text x="58" y="45">carboidrato</text>
-      </g>
-    </svg>
+<header>
+  <div>
+    <div class="sobrancelha">VISÃO COMPLETA</div>
+    <h1>O prato da saúde e da genética</h1>
   </div>
+  <p>A genética é <b>um</b> dos convidados da mesa. O resultado vem do prato
+     completo, e o que você sente senta nessa mesa junto.</p>
+</header>
 
-  <div class="legenda">
-    <div class="li"><span class="pto" style="background:var(--teal)"></span>
-      <div><h3>Proteína de qualidade</h3><p>Matéria-prima de tudo: enzima, músculo, neurotransmissor, defesa.</p></div></div>
-    <div class="li"><span class="pto" style="background:var(--verde)"></span>
-      <div><h3>Crucíferas e folhas verde-escuras</h3><p>Abrem as vias que o seu corpo usa pra limpar o que sobra do metabolismo.</p></div></div>
-    <div class="li"><span class="pto" style="background:var(--roxo)"></span>
-      <div><h3>Alimentos coloridos</h3><p>Polifenóis e antocianinas: são eles que silenciam o gene que está falando alto demais.</p></div></div>
-    <div class="li"><span class="pto" style="background:var(--laranja)"></span>
-      <div><h3>Gorduras boas</h3><p>Membrana da célula, hormônio e controle da inflamação de baixo grau.</p></div></div>
-    <div class="li"><span class="pto" style="background:var(--ambar)"></span>
-      <div><h3>Carboidrato no seu horário</h3><p>Não é cortar: é colocar na hora em que o seu relógio biológico aproveita.</p></div></div>
-  </div>
-</div>
+<div class="roda">
+<svg width="1000" height="640" viewBox="0 0 1000 640">
+  <defs>
+    <style>
+      .rot{font-family:Arial, sans-serif;font-size:19px;fill:#2C3A47;text-anchor:middle}
+      .rot.dest{fill:var(--vermelho);font-weight:700}
+      .sub{font-family:Arial, sans-serif;font-size:15px;fill:#6B7885;text-anchor:middle}
+      .ic{fill:none;stroke:#1687A7;stroke-width:2.2;stroke-linecap:round;
+          stroke-linejoin:round}
+      .ic.vm{stroke:var(--vermelho)}
+      .ic.vd{stroke:#2AA37A}
+    </style>
+  </defs>
 
-<div class="saidas">
-  <div class="saida hoje"><span>PARA AGORA</span><b>As suas queixas de hoje</b>
-    <p>Cansaço, sono ruim, intestino, dor, oscilação de humor, dificuldade de peso.</p></div>
-  <div class="saida amanha"><span>PARA A VIDA TODA</span><b>Prevenção e longevidade</b>
-    <p>Reduzir o risco que está escrito nos seus genes antes que ele vire diagnóstico.</p></div>
+  <!-- anel e raios -->
+  <circle cx="500" cy="300" r="222" fill="none" stroke="#DCE7EC" stroke-width="1.4"/>
+  <g stroke="#C9D6DE" stroke-width="1.3" stroke-dasharray="5 7">
+    <line x1="500" y1="300" x2="500" y2="78"/>
+    <line x1="500" y1="300" x2="657" y2="143"/>
+    <line x1="500" y1="300" x2="722" y2="300"/>
+    <line x1="500" y1="300" x2="657" y2="457"/>
+    <line x1="500" y1="300" x2="500" y2="522"/>
+    <line x1="500" y1="300" x2="343" y2="457"/>
+    <line x1="500" y1="300" x2="278" y2="300"/>
+    <line x1="500" y1="300" x2="343" y2="143"/>
+  </g>
+
+  <!-- centro -->
+  <circle cx="500" cy="300" r="118" fill="#E3F1F7" stroke="#9FCDDE" stroke-width="1.6"/>
+  <circle cx="500" cy="272" r="21" fill="none" stroke="var(--teal)" stroke-width="3"/>
+  <circle cx="500" cy="272" r="9" fill="none" stroke="var(--teal)" stroke-width="3"/>
+  <text x="500" y="325" text-anchor="middle" font-family="Georgia, serif"
+        font-size="26" font-weight="700" fill="var(--tealesc)">Seu prato</text>
+
+  <!-- 1. hábitos alimentares, topo -->
+  <circle cx="500" cy="78" r="42" fill="#FDF6DC" stroke="#EBD98F" stroke-width="1.6"/>
+  <g class="ic" transform="translate(500,78)">
+    <path d="M-9 -13 L-9 -1 M-4 -13 L-4 -1 M-6.5 -1 L-6.5 13"/>
+    <path d="M8 -13 C11 -13 11 -4 8 -3 L8 13"/>
+  </g>
+  <text class="rot" x="500" y="146">Hábitos alimentares</text>
+
+  <!-- 2. nutrigenoma -->
+  <circle cx="657" cy="143" r="42" fill="#DCF0F7" stroke="#95CDE0" stroke-width="1.6"/>
+  <g class="ic" transform="translate(657,143)">
+    <path d="M-9 -12 C-3 -5 3 5 9 12 M9 -12 C3 -5 -3 5 -9 12"/>
+    <path d="M-7 -12 L7 -12 M-7 12 L7 12"/>
+  </g>
+  <text class="rot" x="657" y="211">Nutrigenoma</text>
+
+  <!-- 3. comportamento alimentar -->
+  <circle cx="722" cy="300" r="42" fill="#E4E9EC" stroke="#B8C4CC" stroke-width="1.6"/>
+  <g class="ic" transform="translate(722,300)" stroke="#4A6474">
+    <path d="M0 -13 C8 -13 12 -7 12 0 C12 8 6 13 0 13 C-6 13 -12 8 -12 0 C-12 -7 -8 -13 0 -13"/>
+    <path d="M0 -13 L0 13 M-6 -5 L6 -5 M-6 5 L6 5"/>
+  </g>
+  <text class="rot" x="722" y="368">Comportamento</text>
+  <text class="rot" x="722" y="392">alimentar</text>
+
+  <!-- 4. microbiota -->
+  <circle cx="657" cy="457" r="42" fill="#DEF4E9" stroke="#95D7B6" stroke-width="1.6"/>
+  <g class="ic vd" transform="translate(657,457)">
+    <circle cx="-6" cy="-6" r="4.5"/><circle cx="6" cy="-8" r="3.2"/>
+    <circle cx="7" cy="4" r="4.8"/><circle cx="-5" cy="7" r="3.6"/>
+  </g>
+  <text class="rot" x="657" y="525">Microbiota</text>
+
+  <!-- 5. emoções, estresse e sono -->
+  <circle cx="500" cy="522" r="42" fill="#FCE3E1" stroke="#EFA9A5" stroke-width="1.6"/>
+  <g class="ic vm" transform="translate(500,522)">
+    <path d="M0 12 C-14 2 -13 -9 -6 -11 C-2 -12 0 -9 0 -9 C0 -9 2 -12 6 -11 C13 -9 14 2 0 12"/>
+    <path d="M-9 -1 L-4 -1 L-1 -5 L2 3 L5 -1 L9 -1"/>
+  </g>
+  <text class="rot dest" x="500" y="590">Emoções, estresse e sono</text>
+  <text class="sub" x="500" y="614">o que você sente também dá ordem pro gene</text>
+
+  <!-- 6. metabolismo -->
+  <circle cx="343" cy="457" r="42" fill="#FDF6DC" stroke="#EBD98F" stroke-width="1.6"/>
+  <g class="ic" transform="translate(343,457)">
+    <path d="M0 13 C-9 8 -10 -2 -3 -7 C-3 -3 -1 -1 1 -2 C3 -4 2 -9 0 -13 C8 -9 11 -1 9 4 C7 9 4 12 0 13"/>
+  </g>
+  <text class="rot" x="343" y="525">Metabolismo</text>
+
+  <!-- 7. atividade física -->
+  <circle cx="278" cy="300" r="42" fill="#DCF0F7" stroke="#95CDE0" stroke-width="1.6"/>
+  <g class="ic" transform="translate(278,300)">
+    <path d="M-13 0 L-7 0 L-3 -10 L2 9 L6 0 L13 0"/>
+  </g>
+  <text class="rot" x="278" y="368">Atividade física</text>
+
+  <!-- 8. fenotipagem detalhada -->
+  <circle cx="343" cy="143" r="42" fill="#E4E9EC" stroke="#B8C4CC" stroke-width="1.6"/>
+  <g class="ic" transform="translate(343,143)" stroke="#4A6474">
+    <circle cx="-2" cy="-2" r="9"/>
+    <path d="M5 5 L12 12"/>
+  </g>
+  <text class="rot" x="343" y="211">Fenotipagem</text>
+  <text class="rot" x="343" y="235">detalhada</text>
+</svg>
 </div>

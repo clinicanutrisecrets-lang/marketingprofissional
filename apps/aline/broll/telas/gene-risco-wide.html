@@ -1,0 +1,79 @@
+<meta charset="utf-8">
+<!-- Chance, não destino: gene ativo x gene silenciado.
+     Arte do Consultório de Precisão, redesenhada em HTML. -->
+<style>
+  :root{ --tinta:#1B2733; --cinza:#5C6975; --teal:#1687A7; --laranja:#E8763C;
+         --lilas:#8C93B8; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1150px;background:#F7F9FB;padding:30px 40px;
+       font-family:"Liberation Sans",Arial,sans-serif;color:var(--tinta)}
+  .sobrancelha{font-size:15px;letter-spacing:2.6px;color:var(--teal);font-weight:700;
+               margin-bottom:8px}
+  h1{font-family:"EB Garamond",Georgia,serif;font-size:48px;line-height:1.05;
+     font-weight:700;margin-bottom:10px;letter-spacing:-.5px}
+  .cena{display:grid;place-items:center}
+  .estado{text-align:center;margin-top:-6px}
+  .estado b{font-size:23px}
+  .estado span{display:block;font-size:17px;color:var(--cinza);margin-top:3px}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  .cx{border-radius:14px;padding:18px 22px;font-size:18px;line-height:1.55}
+  .cx.azul{background:#E4F1F8;border:1px solid #C0DDEC;color:#26404F}
+  .cx.branca{background:#fff;border:1px solid #E2E8ED;color:#3C4854}
+  .cx b{color:var(--teal)}
+</style>
+
+<div class="sobrancelha">CHANCE, NÃO DESTINO</div>
+<h1>Gene de risco não é sentença</h1>
+
+<div class="cena">
+<svg width="980" height="430" viewBox="0 0 980 430">
+  <circle cx="215" cy="190" r="140" fill="#FBEADF"/>
+  <circle cx="765" cy="190" r="140" fill="#ECEDF4"/>
+
+  <!-- DNA ativo -->
+  <g fill="none" stroke="#E8763C" stroke-width="5" stroke-linecap="round">
+    <path d="M180 108 C240 140 180 190 240 222 C300 254 240 300 180 300"/>
+    <path d="M250 108 C190 140 250 190 190 222 C130 254 190 300 250 300"/>
+    <path d="M192 130 L238 130 M188 168 L242 168 M192 206 L238 206 M188 244 L242 244 M196 282 L234 282"/>
+    <circle cx="215" cy="60" r="20" fill="#FBD9C4"/>
+    <path d="M205 76 L225 76 M209 85 L221 85"/>
+    <path d="M215 24 L215 12 M243 36 L251 27 M187 36 L179 27 M256 62 L268 62 M174 62 L162 62"/>
+  </g>
+
+  <!-- DNA silenciado, com a tampa -->
+  <g fill="none" stroke="#9AA3C0" stroke-width="5" stroke-linecap="round">
+    <path d="M730 128 C790 158 730 205 790 235 C850 265 790 306 730 306"/>
+    <path d="M800 128 C740 158 800 205 740 235 C680 265 740 306 800 306"/>
+    <path d="M742 148 L788 148 M738 184 L792 184 M742 220 L788 220 M738 256 L792 256 M746 290 L784 290"/>
+    <path d="M660 112 A105 105 0 0 1 870 112 Z" fill="#fff"/>
+    <path d="M870 112 L920 100 L926 116 L872 124"/>
+    <path d="M765 112 L765 62" />
+    <circle cx="765" cy="46" r="18" fill="#fff"/>
+  </g>
+
+  <!-- meio -->
+  <text x="490" y="150" text-anchor="middle" font-family="Arial" font-size="25"
+        font-weight="700" fill="#1687A7">alimentação · sono · movimento · emoções</text>
+  <g stroke="#1687A7" stroke-width="5" fill="none" stroke-linecap="round">
+    <path d="M400 195 L580 195"/>
+    <path d="M418 181 L400 195 L418 209"/>
+    <path d="M562 181 L580 195 L562 209"/>
+  </g>
+  <text x="490" y="240" text-anchor="middle" font-family="Arial" font-size="20"
+        fill="#5C6975">é o estilo de vida que move o interruptor</text>
+
+  <text x="215" y="372" text-anchor="middle" font-family="Arial" font-size="25"
+        font-weight="700" fill="#C24A2E">gene ativo</text>
+  <text x="215" y="402" text-anchor="middle" font-family="Arial" font-size="19"
+        fill="#5C6975">a informação está sendo lida pelo corpo</text>
+  <text x="765" y="372" text-anchor="middle" font-family="Arial" font-size="25"
+        font-weight="700" fill="#5A6390">gene silenciado</text>
+  <text x="765" y="402" text-anchor="middle" font-family="Arial" font-size="19"
+        fill="#5C6975">a informação está guardada, não está sendo contada</text>
+</svg>
+</div>
+
+<div class="duas">
+  <div class="cx azul">Ter duas perninhas de risco significa uma <b>chance aumentada</b> daquele efeito, não que você obrigatoriamente vai apresentá-lo. O gene pode estar ativo ou silenciado.</div>
+  <div class="cx branca">É exatamente por isso que este acompanhamento existe: conhecer o gene é o primeiro passo pra trabalhar o silenciamento dele, com os alimentos e compostos certos pra você.</div>
+</div>
