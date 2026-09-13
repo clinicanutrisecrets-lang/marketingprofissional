@@ -35,6 +35,12 @@ confunde a peça com pele — e aí borra a mão e o colo. Por isso há um piso 
 
 ## Os dois caminhos de recorte
 
+🔴 **O padrão é o segundo (fundo comum), por decisão da Aline em 13/09.** Ela
+viu o teste do avatar do HeyGen em chroma e descartou. O caminho `--verde`
+continua no código porque funciona e é barato de manter, mas **não é o que ela
+usa** — não sugira "grava em verde" como solução numa sessão nova sem ela pedir.
+
+
 | | fundo verde (`--verde`) | fundo comum (padrão) |
 |---|---|---|
 | como | **calculado**: quanto de verde sobra sobre o maior dos outros canais | **estimado**: rede neural + matting |
