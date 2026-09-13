@@ -1,0 +1,42 @@
+{
+  "tablet-em-pe.mp4": {
+    "quadros": 121,
+    "fps": 24.0,
+    "largura": 720,
+    "altura": 1280,
+    "tela": {
+      "tipo": "retangulo",
+      "x": 66,
+      "y": 188,
+      "w": 588,
+      "h": 939
+    }
+  },
+  "monitor-na-mesa.mp4": {
+    "quadros": 145,
+    "fps": 24.0,
+    "largura": 720,
+    "altura": 1280,
+    "tela": {
+      "tipo": "trapezio",
+      "cantos_720x1280": [
+        [
+          68,
+          399
+        ],
+        [
+          661,
+          333
+        ],
+        [
+          650,
+          792
+        ],
+        [
+          52,
+          760
+        ]
+      ]
+    }
+  }
+}
