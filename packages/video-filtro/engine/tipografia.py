@@ -23,8 +23,15 @@ APOIO = os.path.join(DIR, "Montserrat-ExtraBold.ttf")  # linha de apoio, menor
 
 
 def _quebrar(d, texto, fonte, larg):
+    """Quebra em linhas. Espaco DURO (\u00a0) mantem as palavras juntas.
+
+    🔴 Split em espaco COMUM, nao `texto.split()` sem argumento: aquele trata
+    o espaco duro como separador tambem, e ai "vitamina C" quebra no meio e o
+    "C" fica sozinho abrindo a segunda linha. Serve pra tudo que nao pode
+    separar: "vitamina C", "10 mg", "COMT AA".
+    """
     linhas, atual = [], ""
-    for pal in texto.split():
+    for pal in [x for x in texto.split(" ") if x]:
         t = (atual + " " + pal).strip()
         if d.textlength(t, font=fonte) > larg and atual:
             linhas.append(atual); atual = pal

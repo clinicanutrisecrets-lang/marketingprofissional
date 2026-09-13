@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+# 🔴 TUDO NO @nutri_secrets POR ENQUANTO (Aline, 13/09). O app do
+# @scannerdasaude ainda depende da autorizacao da Meta, e o perfil da Nutri
+# Secrets ja esta pronto. Quando o Scanner abrir, o COMT e o do laudo voltam
+# pra la trocando so o campo "perfil" — a marca e a paleta acompanham sozinhas.
+# ⚠️ E a paleta do Scanner e OUTRA: o roxo aqui e da Nutri Secrets.
 from slides import MAG  # 🔴 uma cor so: duas copias do hex divergem calado
 M = lambda t: f'<b style="color:{MAG}">{t}</b>'
 
-COMT = {"slug":"comt-1709","slides":[
+COMT = {"slug":"comt-1709","perfil":"@nutri_secrets","slides":[
  {"soco":"Empolga<br>e desiste", "fundo":"capa","eyebrow":"nutrigenética na prática",
   "titulo":f'Você tem aquele paciente que {M("se empolga na segunda e desiste na quarta")}?',
   "sub":"Já investigou o gene da COMT?"},
@@ -33,9 +38,9 @@ COMT = {"slug":"comt-1709","slides":[
  {"fundo":"cta","corpo":["Você ajusta a conduta pelo COMT?",
    "Salva, que esse é pra voltar antes da próxima devolutiva.",
    "Conta nos comentários como você conduz o AA."],
-  "arroba":"@scannerdasaude"}]}
+  "arroba":"@nutri_secrets"}]}
 
-IL6 = {"slug":"il6-1909","slides":[
+IL6 = {"slug":"il6-1909","perfil":"@nutri_secrets","slides":[
  {"soco":"Cansada,<br>exame normal", "fundo":"capa","eyebrow":"o cansaço que não aparece",
   "titulo":f'Você vive cansada, o corpo pesado, e os exames {M("não deram nada")}?',
   "sub":"O seu DNA pode explicar. Vem comigo."},
@@ -68,7 +73,7 @@ IL6 = {"slug":"il6-1909","slides":[
    "Quer investigar a SUA história? Eu sou a Detetive da Saúde."],
   "arroba":"@nutri_secrets"}]}
 
-LAUDO = {"slug":"laudo-conduta-2409","slides":[
+LAUDO = {"slug":"laudo-conduta-2409","perfil":"@nutri_secrets","slides":[
  {"soco":"O laudo chegou.<br>E agora?", "fundo":"capa","eyebrow":"do laudo à conduta",
   "titulo":f'Você já pediu teste nutrigenético e {M("ficou perdida")} na hora de aplicar a conduta?',
   "sub":"O laudo diz o gene. Quem diz a conduta é você."},
@@ -102,6 +107,6 @@ LAUDO = {"slug":"laudo-conduta-2409","slides":[
  {"fundo":"cta","corpo":["Quer ver os quatro passos num caso real, do laudo à prescrição?",
    "Salva pra usar antes da próxima devolutiva.",
    "Em qual dos quatro você trava? Comenta o número."],
-  "arroba":"@scannerdasaude"}]}
+  "arroba":"@nutri_secrets"}]}
 
 TODOS = [COMT, IL6, LAUDO]
