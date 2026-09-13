@@ -11,11 +11,43 @@ vazia. O que muda é o HTML em `../telas/`.
 |---|---|---|
 | `tablet-em-pe.mp4` | tablet de frente, mesa clara, 5s, 720x1280 | retângulo, `(66,188)` `588x939` |
 | `monitor-na-mesa.mp4` | monitor na mesa do consultório, luz de janela, caneca com vapor, poltrona ao fundo, 6s, 720x1280 | trapézio, cantos em `telas.json` |
+| `tablet-de-frente.mp4` | tablet grande na mesa escura, luz de fim de tarde, livros e caneca, 6s, 720x1280 | trapézio + máscara, em `telas.json` |
 | `dna-helice.mp4` | hélice de DNA dourada girando, fundo escuro, 6s, 720x1280 | não tem tela: é fecho de vídeo |
 
 As coordenadas estão em `telas.json`, já medidas. Não precisa achar de
 novo: a câmera é travada nos dois e a tela não anda um pixel do primeiro
 ao último quadro.
+
+## O tablet de frente, e a máscara que ele precisa
+
+`tablet-de-frente.mp4` é o clipe original recortado: na geração o tablet
+saía com 53% da largura do quadro, e uma tela densa nesse tamanho não se
+lê no celular. O corte deixa a tela com 71%. Perde nitidez na madeira e
+no acabamento, mas a tela em si entra por cima em PNG e continua limpa,
+que é o que importa.
+
+Ele é o único dos três que **não pode ser composto só pelo trapézio**.
+Os livros tapam o canto de baixo à esquerda da tela e a caneca morde a
+direita; se você usar o quadrilátero cheio, a imagem passa por cima dos
+livros e a cena desmonta. Por isso vem com `mascara-tablet-frente.png`,
+que é a região visível da tela já recortada, medida por cor no próprio
+quadro: claro e sem saturação é tela, quente e saturado é livro ou
+caneca.
+
+```bash
+ffmpeg -i tablet-de-frente.mp4 -loop 1 -i tela.png -loop 1 -i mascara-tablet-frente.png \
+ -filter_complex "\
+[0:v]scale=1080:1920:flags=lanczos,fps=24[v];\
+[1:v]crop=2352:3449:0:'min(911,max(0,(t-0.8)*150))',scale=1080:1920:flags=lanczos,\
+perspective=211:379:975:398:80:1491:857:1544:sense=destination:interpolation=linear[p];\
+[2:v]format=gray[m];[p][m]alphamerge[s];[v][s]overlay=0:0:shortest=1[o]" \
+ -map "[o]" -an -r 24 -c:v libx264 -crf 20 saida.mp4
+```
+
+O `crop` tem proporção 0.682, que é a da tela depois da perspectiva, e
+não 9:16. Se você cortar em 9:16 a página sai espremida. E a página é
+renderizada com viewport de 1176px: mais estreito que isso, a letra
+cresce em relação à tela sem mexer em nenhum `font-size`.
 
 ## O fecho
 

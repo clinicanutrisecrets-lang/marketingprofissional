@@ -206,34 +206,52 @@ Ou seja: um crédito de cenário, e o tempo que o roteiro pedir.
 # Terceiro cenário: o tablet com chá e livros
 
 O que muda em relação ao primeiro tablet não é o aparelho, é a hora do
-dia. Mesa de madeira escura, luz quente de fim de tarde, pilha de livros
-ao lado e uma xícara de chá com vapor. Serve pra conteúdo de rotina,
-longevidade e sono, onde o consultório frio não combina.
+dia. Mesa de madeira escura, luz quente de fim de tarde, livros e uma
+xícara de chá com vapor. Serve pra conteúdo de rotina, longevidade e
+sono, onde o consultório frio não combina.
 
 O vapor do chá é o que dá vida: é o único movimento do plano, e foi ele
 que salvou o clipe do monitor de parecer foto parada.
 
+## Por que a primeira geração saiu com o tablet pequeno
+
+O prompt já pedia "pelo menos 80 por cento da largura do quadro" e veio
+53. Não adianta subir o número: o problema não era o número, era o que
+estava escrito duas linhas acima. O `LOCATION MAP` punha os livros de um
+lado e a xícara do outro, e três objetos lado a lado num quadro 9:16 só
+cabem se a câmera andar pra trás. Composição ganha de porcentagem, toda
+vez.
+
+A correção é tirar a concorrência, não apertar a ordem: **tudo vai pra
+trás do tablet**. Livro, xícara e prateleira ficam atrás, menores e
+desfocados, e na frente não fica nada.
+
+Junto vai um teste que o gerador consegue conferir sozinho, que é melhor
+que um número solto: *"a tela sozinha é mais alta do que o quadro é
+largo"*. Numa tela 3:4 ocupando 80% da largura isso é verdade, e é uma
+afirmação que ou bate ou não bate.
+
 ```
 SCENE CONTEXT
-A tablet standing on a wooden table at the end of the afternoon, screen facing the camera, no people.
-
-LOCATION MAP
-A dark wooden table against a calm softly blurred room. The tablet sits upright in a slim matte stand, centred. To one side, a short stack of three hardcover books lying flat with a small green plant on top of them. To the other side, a plain ceramic cup of herbal tea with thin steam rising from it. Behind, a bookshelf far out of focus.
+A close product shot of one single tablet standing on a wooden table at the end of the afternoon, the camera very close to it, its screen facing the camera, no people.
 
 FRAMING
-Vertical 9:16, the camera close to the tablet. The tablet is centred and fills the frame: its screen occupies at least 80 percent of the frame width, in the upper two thirds. The near edge of the table fills the lower part of the frame, uncluttered.
+Vertical 9:16. The tablet is the entire subject of this shot and it is very large in frame: its screen alone is wider than three quarters of the frame width, and the screen alone is taller than the frame is wide. The screen runs from near the top of the picture to near the bottom, centred. The camera sits about thirty centimetres from the screen, at the height of the middle of the screen. Nothing at all stands between the camera and the tablet: the only thing in the foreground is the bare near edge of the table.
+
+LOCATION MAP
+The tablet stands upright and alone in a slim matte stand on a dark wooden table, dead centre, and it is the closest object to the camera. Everything else sits behind it and further away: a bookshelf along the back wall, far out of focus; a short stack of hardcover books lying flat on the table well behind the tablet and to one side, partly hidden behind it; a plain ceramic cup of herbal tea also behind the tablet, on the other side, with thin steam rising above it. The books, the cup and the shelf are each much smaller in frame than the tablet, all softly out of focus, and none of them ever comes forward of the tablet or crosses in front of its screen.
 
 GEOMETRY
 The tablet is shot straight on, its screen square and parallel to the camera, flat to the lens. It is not tilted, not angled, not turned, and there is no perspective distortion: the screen reads as a clean rectangle with straight edges and square corners.
 
 OPTICS
-50mm equivalent, shallow depth of field, the tablet screen in sharp focus and everything behind it falling off softly.
+50mm equivalent, shallow depth of field, the tablet screen in sharp focus edge to edge and everything behind it falling off softly.
 
 CAMERA
 Completely static, locked off on a tripod. No pan, no tilt, no push in, no zoom, no handheld drift.
 
 ACTION
-Nothing in the scene moves except the ambience: thin steam rising slowly and continuously from the cup of tea, one leaf of the plant shifting very slightly, and the warm light changing almost imperceptibly across the wood. The tablet, the books and the cup are perfectly still for the whole shot.
+Nothing in the scene moves except the ambience: thin steam rising slowly and continuously from the cup behind the tablet, and the warm light changing almost imperceptibly across the wood. The tablet, the books and the cup are perfectly still for the whole shot.
 
 LIGHTING
 Warm late afternoon light coming in low from one side and bounced back soft from the front, so the scene is warm but nothing casts a hard shadow and there is no glare anywhere on the screen. Low contrast, cosy, calm.
@@ -248,7 +266,7 @@ STYLE
 Photoreal cinematography, true to life colours, fine grain, warm and calm, like a quiet corner at the end of the day.
 
 POSITIVE LOCKS
-The tablet keeps exactly the same position, size, angle and shape in every frame, and its screen stays one flat even grey the whole time. The four corners of the screen stay exactly where they are. The steam is thin and light, never a cloud. No hands, no arms, no people, no reflections of people, no cat, no candle, no fire. Vertical 9:16.
+The tablet stays very large in frame for the whole shot and keeps exactly the same position, size, angle and shape in every frame, and its screen stays one flat even grey the whole time. The four corners of the screen stay exactly where they are and all four stay visible and unobstructed: nothing overlaps them, nothing leans in front of them. There is only one tablet in frame. The steam is thin and light, never a cloud. No hands, no arms, no people, no reflections of people, no cat, no candle, no fire. Vertical 9:16.
 ```
 
 ## A variação da noite, se quiser duas
@@ -271,5 +289,10 @@ como a gente já lida com rótulo, tela e laudo em todo o resto.
 ## Depois de gerar
 
 Manda o clipe que eu meço os cantos da tela e guardo em `cenarios/`, junto
-com os outros dois. Aí ele passa a servir a qualquer tela de `telas/`,
-para sempre, sem novo crédito.
+com os outros. Aí ele passa a servir a qualquer tela de `telas/`, para
+sempre, sem novo crédito.
+
+A primeira geração deste cenário já está lá, recortada, como
+`tablet-de-frente.mp4`. Ela vem com máscara em vez de só trapézio, porque
+os livros e a caneca ficaram na frente e tapam os cantos de baixo da
+tela: o porquê e a receita estão no `README.md` de `cenarios/`.

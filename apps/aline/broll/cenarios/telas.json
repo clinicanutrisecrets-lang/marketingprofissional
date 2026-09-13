@@ -38,5 +38,53 @@
         ]
       ]
     }
+  },
+  "tablet-de-frente.mp4": {
+    "quadros": 145,
+    "fps": 24.0,
+    "largura": 720,
+    "altura": 1280,
+    "tela": {
+      "tipo": "trapezio",
+      "ordem": "TL, TR, BL, BR",
+      "cantos_1080x1920": [
+        [
+          211,
+          379
+        ],
+        [
+          975,
+          398
+        ],
+        [
+          80,
+          1491
+        ],
+        [
+          857,
+          1544
+        ]
+      ],
+      "cantos_720x1280": [
+        [
+          141,
+          253
+        ],
+        [
+          650,
+          265
+        ],
+        [
+          53,
+          994
+        ],
+        [
+          571,
+          1029
+        ]
+      ],
+      "mascara": "mascara-tablet-frente.png",
+      "obs": "os livros e a caneca tapam os cantos de baixo da tela; a mascara ja tem esse recorte, use ela e nao so o trapezio"
+    }
   }
 }
