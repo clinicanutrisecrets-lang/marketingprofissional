@@ -98,6 +98,7 @@ p:last-child{margin-bottom:0}
       parece torto. `balance` divide as linhas por peso em vez de encher a
       primeira ate o fim — e o que evita a orfa de uma palavra so. */
    text-align:center;text-wrap:balance}
+.fecho{margin-top:22px;font-size:38px}
 small{display:block;font-family:Montserrat,sans-serif;font-weight:500;font-size:26px;
    line-height:1.4;margin-top:30px;opacity:.72}
 b{font-weight:800}
@@ -185,7 +186,11 @@ def _fundo(kind):
     """fundo, cor do titulo, cor do destaque."""
     if kind == "capa":   return CREME, VERDE, ROXO
     if kind == "cta":    return VERDE, CREME, CREME
-    if kind == "tiff":   return "#EAF8F7", VERDE_TEXTO, ROXO
+    # 🔴 OS FUNDOS SE REVEZAM, mas dentro da paleta e sem subir o contraste:
+    # o carrossel e denso, entao quem chama atencao e a LETRA e o destaque, nao
+    # o fundo. Tres tons quietos bastam pra nao parecer oito telas iguais.
+    if kind == "tiff":   return "#E2F4F3", VERDE_TEXTO, ROXO
+    if kind == "creme":  return "#FBF3E9", VERDE_TEXTO, ROXO
     return "#FFFFFF", VERDE_TEXTO, ROXO
 
 def render(carrosseis, destino="arte"):
@@ -221,6 +226,13 @@ def render(carrosseis, destino="arte"):
                 # folha, e pintar o texto com a cor do DESTAQUE (que virou o
                 # fundo do retangulo) deixa roxo sobre roxo — retangulo vazio.
                 sub = f'<div class="sub">{sl["sub"]}</div>' if sl.get("sub") else ""
+                # 🔴 O FECHO E A MESMA CAIXA DA CAPA. A frase de conclusao do
+                # slide ("quem so usa a primeira porta…") pedia o mesmo
+                # destaque — reusar `.sub` mantem um device so no carrossel
+                # inteiro; criar uma caixa parecida e diferente e o caminho
+                # pra duas coisas que quase combinam.
+                if sl.get("fecho"):
+                    sub = f'<div class="sub fecho">{sl["fecho"]}</div>' + sub
                 fonte = f"<small>{sl['fonte']}</small>" if sl.get("fonte") else ""
                 arroba = f'<div class="arroba">{sl["arroba"]}</div>' if sl.get("arroba") else ""
                 klass = "s cta" if sl.get("fundo") == "cta" else "s"

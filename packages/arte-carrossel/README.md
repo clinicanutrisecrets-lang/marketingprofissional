@@ -121,3 +121,25 @@ compreensão. **O que unifica é a família e a escala**, não o tamanho:
 - título do slide (`h2`): Anton caixa alta, 82px (a capa vai de 104 a 176)
 - corpo (`p`): Montserrat 500, 46px — era serifa em 43px
 - destaque (`b`): Montserrat 800 em roxo
+
+## O `fecho`: a caixa também no miolo
+
+`sl["fecho"]` põe a frase de conclusão do slide dentro da **mesma caixa roxa da
+capa** (reusa `.sub`, só menor). Pedido da Aline olhando o "Quem só usa a
+primeira porta…": aquela linha é a conclusão, e estava com o mesmo peso das
+três definições acima dela.
+
+🔴 **Reusar `.sub` é a decisão, não um atalho.** Uma caixa parecida-mas-diferente
+para o miolo daria duas coisas que quase combinam, que é pior do que não ter
+nenhuma. Um device só, no carrossel inteiro.
+
+## Os fundos se revezam, dentro da paleta
+
+Era branco em quase todo slide. A rotação agora é
+**branco → verde clarinho (#E2F4F3) → creme (#FBF3E9)**, com a capa no creme
+forte e o CTA no verde cheio.
+
+🔴 **Sem subir o contraste.** O carrossel é denso: quem chama atenção é a LETRA
+e o destaque roxo, não o fundo. Fundo forte por slide brigaria com o texto e
+cansaria antes do CTA. Três tons quietos bastam pra não parecer oito telas
+iguais.
