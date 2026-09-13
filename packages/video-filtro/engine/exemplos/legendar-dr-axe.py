@@ -21,9 +21,22 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 PRINCIPAL = "A fruta que você deveria consumir todos os dias"
 PUBLICO = "Se você sofre com dor crônica, inflamação e doenças autoimunes"
 
+# 🔴 A LINHA DE PUBLICO SO ENTRA NO SEGUNDO CLIPE. O video e a emenda de dois
+# clipes (o primeiro acaba em 9,05 s). Deixar as duas frases juntas desde o
+# comeco entrega tudo de uma vez; segurar a segunda ate a virada da cena da
+# tempo pra pessoa ler a primeira, e a propria troca de cena marca a entrada.
 ENTRA_PRINCIPAL = 0.7      # segundos
-ENTRA_PUBLICO = 2.4
+ENTRA_PUBLICO = 9.4        # logo depois do corte entre os dois clipes
+CORTE_ENTRE_CLIPES = 9.05
 CENTRO = 0.50              # onde o bloco fica na altura da tela
+
+# 🔴 A TARJA DA LINHA DE PUBLICO E VERDE, NAO PRETA. Pedido dela: "um
+# pouquinho daquela transparencia, mas ao inves de preto, o Tiffany da Nutri
+# Secrets". Fica TRANSLUCIDA de proposito — da pra ver a cena atraves dela —,
+# mas com alfa alto o bastante pro branco continuar legivel por cima: o fundo
+# ali e a blusa branca e o marmore, e verde claro demais sobre claro some.
+TARJA = (10, 168, 168, 214)   # #0AA8A8 a 84%
+TARJA_RAIO = 18
 FADE = 8                   # quadros
 
 
@@ -49,9 +62,16 @@ def montar(W, H):
                topo=topo / H, espaco=0.005, entrelinha=1.14)
 
     cam2 = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    y2 = topo + alt1 + vao
+    larg2 = max(d.textlength(l, font=f2) + 0.012 * px2 * max(0, len(l) - 1) for l in l2)
+    pad_x, pad_y = int(px2 * 0.62), int(px2 * 0.34)
+    ImageDraw.Draw(cam2, "RGBA").rounded_rectangle(
+        [((W - larg2) / 2 - pad_x, y2 - pad_y),
+         ((W + larg2) / 2 + pad_x, y2 + alt2 + pad_y * 0.7)],
+        radius=TARJA_RAIO, fill=TARJA)
     T.escrever(cam2, PUBLICO, caminho=T.APOIO, ocupa=0.78, max_linhas=3,
-               topo=(topo + alt1 + vao) / H, espaco=0.012, entrelinha=1.26,
-               sombra=0.22)
+               topo=y2 / H, espaco=0.012, entrelinha=1.26,
+               contorno=None, sombra=0.0)
     return [(ENTRA_PRINCIPAL, np.asarray(cam1).astype(np.float32)),
             (ENTRA_PUBLICO, np.asarray(cam2).astype(np.float32))]
 

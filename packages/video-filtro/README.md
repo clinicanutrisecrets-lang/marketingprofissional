@@ -236,3 +236,22 @@ A de público entra ~1,7 s depois da principal, pra dar uma batida.
 ⚠️ O número ("17x mais vitamina C") **não vai pra tela** — ela cortou: *"vitamina
 C é muito batido, isso pode ser parte do conteúdo da legenda, mas não a frase
 do meio do vídeo"*. A tela desperta; a legenda informa.
+
+### A tarja da linha de público é VERDE, e translúcida
+
+Pedido dela: *"um pouquinho daquela transparência, mas ao invés de preto, o
+Tiffany da Nutri Secrets"*. `TARJA = (10, 168, 168, 214)` — o verde da marca a
+84%.
+
+🔴 **Translúcida sim, clara não.** O fundo ali é blusa branca e mármore: verde
+com alfa baixo sobre claro vira um pastel e o texto branco some. 84% ainda
+deixa a cena aparecer através, que é o efeito que ela pediu, e mantém o branco
+legível. Com a tarja, o texto perde o contorno e a sombra — os três juntos
+viram sujeira.
+
+### A segunda linha entra no SEGUNDO clipe
+
+O vídeo é a emenda de dois clipes (o primeiro acaba em 9,05 s). A linha de
+público entra em **9,4 s**, logo depois do corte. Duas frases juntas desde o
+começo entregam tudo de uma vez; segurar a segunda dá tempo de ler a primeira,
+e a própria troca de cena marca a entrada, sem precisar de animação.
