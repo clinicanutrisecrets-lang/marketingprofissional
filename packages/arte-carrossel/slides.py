@@ -24,8 +24,6 @@ LOGO = ('<svg class="logo" viewBox="0 0 100 100" fill="none">'
         'stroke-width="5" stroke-linecap="round"/></svg>')
 
 CSS = """
-@font-face{font-family:Anton;font-style:normal;font-weight:400;
-  src:url(data:font/ttf;base64,__ANTON__) format("truetype")}
 *{box-sizing:border-box;margin:0}
 body{width:1080px;height:1080px;overflow:hidden;font-family:Lora,Georgia,serif}
 .s{width:1080px;height:1080px;padding:88px 80px;display:flex;flex-direction:column;
@@ -61,16 +59,75 @@ b{font-weight:700}
 .arroba{font-family:Montserrat,sans-serif;font-weight:800;font-size:44px;margin-top:38px}
 """
 
-def _css():
-    """CSS com o Anton EMBUTIDO.
+FACES = [
+    ("Anton", 400, "normal", "Anton.ttf"),
+    ("Montserrat", 500, "normal", "Montserrat-500.ttf"),
+    ("Montserrat", 600, "normal", "Montserrat-600.ttf"),
+    ("Montserrat", 700, "normal", "Montserrat-700.ttf"),
+    ("Montserrat", 800, "normal", "Montserrat-800.ttf"),
+    ("Lora", 400, "normal", "Lora-400.ttf"),
+    ("Lora", 600, "normal", "Lora-600.ttf"),
+]
 
-    🔴 Embutido, nunca por URL: o Chromium renderiza `set_content` sem base URL,
-    entao caminho relativo vira fonte faltando — e o fallback silencioso e que o
-    titulo sai em Impact/sans no PNG, e so se descobre olhando a arte pronta.
+_CACHE_FACES = None
+
+
+def _faces() -> str:
+    """Todas as fontes EMBUTIDAS em base64. Zero rede durante o render.
+
+    🔴 Embutido, nunca por URL. Dois motivos, os dois ja custaram tempo:
+    (a) o Chromium renderiza `set_content` sem base URL, entao caminho relativo
+        vira fonte faltando — e o fallback e SILENCIOSO: o titulo sai em
+        Impact/sans no PNG e so se descobre olhando a arte pronta;
+    (b) com <link> pro Google Fonts o render passa a depender da rede. Numa
+        sessao com a saida bloqueada, cada slide ficava parado esperando
+        fonts.googleapis.com e os 22 slides nao terminavam.
     """
-    import base64
-    ttf = pathlib.Path(__file__).resolve().parent.parent / "fontes" / "Anton.ttf"
-    return CSS.replace("__ANTON__", base64.b64encode(ttf.read_bytes()).decode())
+    global _CACHE_FACES
+    if _CACHE_FACES is None:
+        import base64
+        dir_ = pathlib.Path(__file__).resolve().parent.parent / "fontes"
+        partes = []
+        for fam, peso, estilo, arq in FACES:
+            b64 = base64.b64encode((dir_ / arq).read_bytes()).decode()
+            partes.append(
+                f"@font-face{{font-family:{fam};font-weight:{peso};font-style:{estilo};"
+                f'src:url(data:font/ttf;base64,{b64}) format("truetype")}}')
+        _CACHE_FACES = "\n".join(partes)
+    return _CACHE_FACES
+
+
+def _css():
+    return _faces() + CSS
+
+
+# 🔴 O TITULO ENCOLHE ATE CABER — a mesma regra da legenda do video: a
+# proporcao e fixa, o CORPO e que sai do texto. Sem isso o slide tem altura
+# fixa (1080) com `overflow:hidden` e `justify-content:center`, entao titulo
+# comprido vaza PELOS DOIS LADOS: some a sobrancelha em cima e o CTA embaixo,
+# sem erro nenhum — o PNG simplesmente sai cortado.
+AJUSTAR = """() => {
+  const s = document.querySelector('.s');
+  if (!s) return;
+  const alvo = s.querySelector('.soco') || s.querySelector('h1') || s.querySelector('h2');
+  if (!alvo) return;
+  const antes = s.style.justifyContent;
+  s.style.justifyContent = 'flex-start';   // pra altura do conteudo ser medivel
+  let px = parseFloat(getComputedStyle(alvo).fontSize);
+  const piso = 54;
+  while (s.scrollHeight > s.clientHeight && px > piso) {
+    px -= 4;
+    alvo.style.fontSize = px + 'px';
+  }
+  // se mesmo no piso nao coube, o corpo do texto e que cede
+  if (s.scrollHeight > s.clientHeight) {
+    for (const el of s.querySelectorAll('p, .gancho, .sub')) {
+      const q = parseFloat(getComputedStyle(el).fontSize);
+      el.style.fontSize = Math.max(28, q * 0.86) + 'px';
+    }
+  }
+  s.style.justifyContent = antes;
+}"""
 
 
 def _fundo(kind):
@@ -111,14 +168,13 @@ def render(carrosseis, destino="arte"):
                 klass = "s cta" if sl.get("fundo") == "cta" else "s"
                 pagina = (
                     '<!doctype html><meta charset="utf-8">'
-                    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
-                    'family=Montserrat:wght@500;600;700;800&family=Lora:wght@400;600&display=swap">'
                     f"<style>{_css()}</style>"
                     f'<div class="{klass}" style="background:{bg};color:{fg}">'
                     f"{logo}{eb}{titulo}{corpo}{sub}{fonte}{arroba}</div>")
                 arq = d / f"{c['slug']}-{i:02d}.png"
                 pg.set_content(pagina)
-                pg.wait_for_timeout(700)
+                pg.wait_for_timeout(250)
+                pg.evaluate(AJUSTAR)
                 pg.screenshot(path=str(arq))
                 feitos.append(str(arq))
         b.close()

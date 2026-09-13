@@ -43,3 +43,23 @@ acento de uma linha encosta na letra da linha de cima — e isso só aparece na
 frase certa, nunca no teste.
 
 A letra grande é a mesma do vídeo: ver `packages/video-filtro/engine/tipografia.py`.
+
+## 🔴 O título encolhe até caber
+
+O slide tem altura fixa (1080) com `overflow:hidden` e `justify-content:center`.
+Título comprido não gera erro nenhum: ele **vaza pelos dois lados** e o PNG sai
+com a sobrancelha cortada em cima e o CTA cortado embaixo. Aconteceu com
+"EXAME NORMAL, CORPO CANSADO", que em Anton 176px dá três linhas.
+
+`AJUSTAR` roda no navegador depois de montar a página: mede a altura real do
+conteúdo (com `justify-content:flex-start`, senão o transbordo de cima não
+entra na conta), encolhe o título de 4 em 4 px até caber, e só no último caso
+mexe no corpo. É a mesma regra da legenda do vídeo — a proporção é fixa, o
+corpo é que sai do texto.
+
+## 🔴 Zero rede durante o render
+
+Todas as fontes vão embutidas em base64 (`FACES` + `_faces()`), não por `<link>`
+pro Google Fonts. Com o link, numa sessão com a saída de rede bloqueada, cada
+slide ficava parado esperando `fonts.googleapis.com` e os 22 slides não
+terminavam. Sem rede: **21 segundos** pros 22.

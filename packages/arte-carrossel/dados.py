@@ -36,7 +36,7 @@ COMT = {"slug":"comt-1709","slides":[
   "arroba":"@scannerdasaude"}]}
 
 IL6 = {"slug":"il6-1909","slides":[
- {"soco":"Exame normal,<br>corpo cansado", "fundo":"capa","eyebrow":"o cansaço que não aparece",
+ {"soco":"Cansada,<br>exame normal", "fundo":"capa","eyebrow":"o cansaço que não aparece",
   "titulo":f'Você vive cansada, o corpo pesado, e os exames {M("não deram nada")}?',
   "sub":"O seu DNA pode explicar. Vem comigo."},
  {"fundo":"branco","eyebrow":"você reconhece isso?",
