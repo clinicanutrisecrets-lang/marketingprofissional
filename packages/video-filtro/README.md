@@ -203,3 +203,36 @@ sempre o mesmo: grave **1 minuto de teste** na mesma luz, na mesma roupa e no
 mesmo enquadramento da aula, rode com `segundos_teste: 60`, olhe o resultado —
 e só então grave a hora inteira. É a única forma de eliminar de verdade o risco
 que ela levantou; nenhuma promessa minha substitui esse um minuto.
+
+---
+
+## 🔴 Vídeo do Higgsfield NÃO leva filtro
+
+A Aline (13/09): *"os vídeos que eu já estou te mandando não é pra aplicar
+filtro, eles já estão com filtro, já estou bonitinha neles."*
+
+O filtro de maquiagem é pro que **ela grava** — webcam, celular, aula com
+teleprompter. O que vem do Higgsfield já chega tratado; passar o filtro por
+cima é retrabalho e soma dois tratamentos na mesma imagem.
+
+Regra prática: **a origem decide.** Gravou ela → filtro. Veio gerado → só
+legenda e montagem.
+
+## A chamada na tela é EMPILHADA, não sequencial
+
+Correção dela na mesma conversa. A versão anterior alternava duas frases
+grandes no rodapé e ela vetou: *"colocou embaixo e quase não dá pra ver"* — ali
+o texto disputa com o balcão e com o liquidificador.
+
+O desenho aprovado é um bloco só, **centrado na altura da tela**:
+
+- **frase principal** em Anton caixa alta, no meio: "A fruta que você deveria
+  consumir todos os dias";
+- **linha de público** logo abaixo, em corpo bem menor (metade da principal):
+  "Se você sofre com dor crônica, inflamação e doenças autoimunes".
+
+A de público entra ~1,7 s depois da principal, pra dar uma batida.
+
+⚠️ O número ("17x mais vitamina C") **não vai pra tela** — ela cortou: *"vitamina
+C é muito batido, isso pode ser parte do conteúdo da legenda, mas não a frase
+do meio do vídeo"*. A tela desperta; a legenda informa.

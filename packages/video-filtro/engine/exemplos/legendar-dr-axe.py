@@ -1,56 +1,73 @@
 # -*- coding: utf-8 -*-
-"""Poe as DUAS frases do formato Dr. Axe por cima do b-roll.
+"""Poe a chamada do formato Dr. Axe por cima do b-roll.
 
-🔴 O formato e: b-roll sem fala, musica, e DUAS frases na tela — a primeira
-desperta a curiosidade, a segunda diz pra quem e. O conteudo inteiro vai na
-legenda do post, e o resto vai por direct pra quem comentar a palavra.
+🔴 NAO APLICAR O FILTRO NOS VIDEOS DO HIGGSFIELD. Eles ja chegam tratados — a
+Aline: "eles ja estao com filtro, ja estou bonitinha neles". O filtro de
+maquiagem e pro que ELA grava (webcam, celular). Passar por cima do que ja veio
+pronto e retrabalho, e ainda soma dois tratamentos na mesma imagem.
 
-🔴 As frases entram e saem com FADE. Texto que aparece e some de estalo num
-video de 24 quadros por segundo pisca; 8 quadros de transicao resolvem.
+🔴 A COMPOSICAO E EMPILHADA, NAO SEQUENCIAL. Nao sao duas frases que se
+revezam: e UMA frase no meio da tela, com a linha de publico MENOR logo abaixo.
+Foi correcao dela depois de ver a versao anterior — o texto grande no rodape
+"quase nao da pra ver", porque disputa com o balcao e com o liquidificador.
 """
-import sys, os, subprocess, numpy as np, imageio_ffmpeg
+import sys, os, subprocess, re, numpy as np, imageio_ffmpeg
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from PIL import Image
+from PIL import Image, ImageDraw
 import tipografia as T
 
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 
-# 🔴 DUAS LINHAS, NAO TRES, E BEM EMBAIXO. Com tres linhas o bloco sobe ate o
-# meio do quadro e tapa a acao — justamente a fruta entrando no liquidificador,
-# que e o motivo do video existir. A frase cede espaco pra imagem, nunca o
-# contrario.
-# 🔴 A FRASE DA TELA E GANCHO, NAO INFORMACAO. A primeira versao dizia "17x
-# mais vitamina C que a laranja" e a Aline cortou: "vitamina C e muito batido,
-# isso pode ser parte do conteudo da LEGENDA, mas nao a frase do meio do
-# video". O formato do Dr. Axe e outro: (1) curiosidade — "a fruta que eu como
-# todo dia" —, (2) pra quem e. Numero vai pra legenda; a tela desperta.
-FRASES = [
-    (0.7, 10.6, "A fruta que eu como todo dia"),
-    (11.2, 22.6, "Se você vive com dor e inflamação, é essa"),
-]
-FADE = 8  # quadros
+PRINCIPAL = "A fruta que você deveria consumir todos os dias"
+PUBLICO = "Se você sofre com dor crônica, inflamação e doenças autoimunes"
+
+ENTRA_PRINCIPAL = 0.7      # segundos
+ENTRA_PUBLICO = 2.4
+CENTRO = 0.50              # onde o bloco fica na altura da tela
+FADE = 8                   # quadros
 
 
-def peso(i, fps, ini, fim):
-    a, b = ini * fps, fim * fps
-    if i < a - FADE or i > b + FADE: return 0.0
-    if i < a:  return (i - (a - FADE)) / FADE
-    if i > b:  return 1.0 - (i - b) / FADE
+def montar(W, H):
+    """Desenha a chamada inteira numa camada transparente, centrada.
+
+    Devolve duas camadas: a principal e a de publico, pra cada uma poder
+    entrar na sua hora sem mexer na posicao da outra.
+    """
+    base = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(base)
+
+    px1, f1, l1 = T.ajustar(d, PRINCIPAL.upper(), T.TITULO, W * 0.80, 3, teto=int(H * 0.16))
+    px2, f2, l2 = T.ajustar(d, PUBLICO.upper(), T.APOIO, W * 0.78, 3, teto=int(px1 * 0.50))
+
+    alt1 = int(px1 * 1.14) * len(l1)
+    alt2 = int(px2 * 1.26) * len(l2)
+    vao = int(px1 * 0.42)
+    topo = int(H * CENTRO - (alt1 + vao + alt2) / 2)
+
+    cam1 = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    T.escrever(cam1, PRINCIPAL, ocupa=0.80, max_linhas=3,
+               topo=topo / H, espaco=0.005, entrelinha=1.14)
+
+    cam2 = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    T.escrever(cam2, PUBLICO, caminho=T.APOIO, ocupa=0.78, max_linhas=3,
+               topo=(topo + alt1 + vao) / H, espaco=0.012, entrelinha=1.26,
+               sombra=0.22)
+    return [(ENTRA_PRINCIPAL, np.asarray(cam1).astype(np.float32)),
+            (ENTRA_PUBLICO, np.asarray(cam2).astype(np.float32))]
+
+
+def peso(i, fps, entra):
+    a = entra * fps
+    if i < a - FADE: return 0.0
+    if i < a: return (i - (a - FADE)) / FADE
     return 1.0
 
 
 def main(entrada, saida):
     r = subprocess.run([FF, "-i", entrada], capture_output=True, text=True).stderr
-    import re
     W, H = map(int, re.search(r"(\d{2,5})x(\d{2,5})", r).groups())
     fps = float(re.search(r"(\d+(?:\.\d+)?) fps", r).group(1))
-
-    # pre-desenha cada frase UMA vez, com fundo transparente
-    camadas = []
-    for ini, fim, txt in FRASES:
-        im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        T.escrever(im, txt, ocupa=0.90, max_linhas=2, baixo=0.06, espaco=0.005)
-        camadas.append((ini, fim, np.asarray(im).astype(np.float32)))
+    camadas = montar(W, H)
 
     ent = subprocess.Popen([FF, "-i", entrada, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -60,14 +77,13 @@ def main(entrada, saida):
                             "-c:v", "libx264", "-crf", "17", "-pix_fmt", "yuv420p",
                             "-c:a", "aac", "-b:a", "192k", "-shortest", saida],
                            stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    n = W * H * 3
-    i = 0
+    n, i = W * H * 3, 0
     while True:
         b = ent.stdout.read(n)
         if len(b) < n: break
         q = np.frombuffer(b, np.uint8).reshape(H, W, 3).astype(np.float32)
-        for ini, fim, cam in camadas:
-            p = peso(i, fps, ini, fim)
+        for entra, cam in camadas:
+            p = peso(i, fps, entra)
             if p <= 0: continue
             a = (cam[..., 3:4] / 255.0) * p
             q = q * (1 - a) + cam[..., :3] * a
