@@ -103,3 +103,58 @@ peça a foto da sala **vazia**.
 
 ⚠️ **Fundo desfocado piora.** Sem micro-contraste, vira borrão liso atrás de
 uma pessoa cheia de textura. `desfoque_fundo=0` é o padrão.
+
+---
+
+## A letra grande (vídeo e capa) — `engine/tipografia.py`
+
+Pedido da Aline (13/09), olhando o perfil do Flávio Passos: *"esse tipo de
+letra, essa fonte que eu falo pra você — olha o tamanho, e a fonte, e a
+proporção no vídeo e nas capas"*.
+
+**Fonte: Anton** (`engine/fontes/Anton.ttf`), caixa alta, branco com contorno
+preto. Apoio: Montserrat ExtraBold. É a MESMA letra no vídeo e na capa do
+carrossel — era isso que ela estava apontando, consistência entre as duas
+superfícies.
+
+### 🔴 O corpo é DERIVADO do texto, nunca fixo
+
+Era `px=54` fixo. Lá no perfil dele a palavra ocupa sempre a mesma fatia da
+tela: palavra curta sai gigante, frase longa quebra em duas linhas e ocupa a
+mesma largura. Com corpo fixo, frase curta sai pequena e frase longa vaza —
+a letra lê como legenda de streaming, não como capa.
+
+`ajustar()` faz busca binária pelo maior corpo em que o texto cabe em
+`max_linhas` preenchendo `ocupa` da largura (padrão 0.86–0.88).
+
+### 🔴 Entrelinha 1.14, não 0.98/1.06
+
+Em português a caixa alta carrega acento (NÃO, VOCÊ, GENÉTICA) e o circunflexo
+sobe ACIMA da altura das maiúsculas. Com a entrelinha que o inglês aguenta, o
+acento de uma linha encosta na letra da linha de cima — e isso só aparece na
+frase certa, nunca no teste com texto sem acento.
+
+### 🔴 Contorno, nunca tarja
+
+A Aline recusou tarja atrás do texto. O contorno é desenhado em círculo
+(`passos` posições ao redor), não nas 8 direções — em corpo grande as 8
+direções deixam serrilha nos cantos diagonais.
+
+### 🔴 Anton já É o peso
+
+Não tem negrito nem itálico. Pedir `bold` nele faz o Chromium simular
+engordando o traço, o que borra a contra-forma em corpo grande.
+
+### 🔴 Na capa do carrossel a fonte vai EMBUTIDA em base64
+
+O Chromium renderiza `set_content` sem base URL, então caminho relativo vira
+fonte faltando — e o fallback é silencioso: o título sai em Impact/sans no PNG
+e só se descobre olhando a arte pronta.
+
+### Estrutura de capa
+
+Três formatos, que a Aline escolhe por peça:
+- **B** — o gancho inteiro em Anton (fica com 3–4 linhas em gancho longo);
+- **C** — `soco` curto de 2–3 palavras em Anton + o gancho inteiro em
+  Montserrat embaixo. É a proporção do perfil de referência, e é o que lê na
+  miniatura da grade, onde a capa tem ~1/3 da largura.
