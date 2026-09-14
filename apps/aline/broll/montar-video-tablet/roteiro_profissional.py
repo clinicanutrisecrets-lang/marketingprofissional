@@ -41,13 +41,13 @@ ev += [chapeu(44.2, 51.0, "A GENÉTICA NO CONJUNTO"),
        legenda(44.6, 50.9, "sono, microbiota e estresse\\Nsentam na mesma mesa", 72)]
 
 # 6: a trilha
-ev += [chapeu(51.2, 58.8, "O ACOMPANHAMENTO"),
-       titulo(51.3, 58.8, "NÃO É LAUDO, É TRILHA", fs=70),
+ev += [chapeu(51.2, 58.8, "O ACOMPANHAMENTO", y=80),
+       titulo(51.3, 58.8, "CUIDADO CONTÍNUO\\NAO PACIENTE", fs=66, y=236),
        legenda(51.6, 58.6, "o laudo se atualiza,\\Na conduta se revisa", 76)]
 
 fecho(ev, DNA, FIM,
       "NUTRIÇÃO TERAPÊUTICA E NUTRIGENÔMICA",
-      "quatro camadas lidas\\Nna mesma página",
+      "correlação de excelência\\Npara uma consulta de precisão",
       chamada="DO GENE\\NÀ CONDUTA")
 
 escrever(ev, sys.argv[1] if len(sys.argv) > 1 else "profissional.ass")

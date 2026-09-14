@@ -21,7 +21,7 @@ ROTEIRO = [
     ("prato-nutrigenomico",   15.5, 20.0, 0.0,   0),
     ("suplementacao-wide",    20.0, 26.0, 0.6,  26),
     ("genetica-tablet",       26.0, 38.5, 4.5,  16),
-    ("scanner-genetica-wide", 38.5, 46.5, 0.6, 135),
+    ("ritmo-circadiano",       38.5, 46.5, 0.8,  42),
     ("trilha-wide",           46.5, 59.0, 1.0,   6),
 ]
 

@@ -20,6 +20,19 @@
           margin-bottom:7px}
   .c.a span{color:var(--teal)} .c.b span{color:#5E6B77} .c.v span{color:var(--verde)}
   .c p{font-size:18px;line-height:1.5;color:#3C4854}
+
+  /* Retrato, pra tela de tablet. Sem isto o SVG de 1070px transborda e a
+     trilha sai cortada pela metade, e as tres caixas viram colunas de uma
+     palavra. Nao mexe no formato deitado, que e o usado no monitor. */
+  @media (max-width:900px){
+    body{width:auto;padding:26px 28px}
+    header{flex-direction:column;gap:10px;margin-bottom:14px}
+    header p{width:auto;flex:initial}
+    h1{font-size:44px}
+    svg{width:100%;height:auto;display:block}
+    .tres{grid-template-columns:1fr;gap:13px;margin-top:20px}
+    .c{padding:16px 18px}
+  }
 </style>
 
 <header>

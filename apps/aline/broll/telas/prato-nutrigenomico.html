@@ -19,6 +19,16 @@
   header p{flex:none;width:400px;font-size:18px;line-height:1.55;color:#42505E}
   header p b{color:var(--tinta)}
   .roda{display:grid;place-items:center;margin-top:6px}
+
+  /* Retrato, pra tela de tablet. Sem isto o SVG de 1000px transborda e
+     metade da roda fica fora do quadro. Nao mexe no formato deitado. */
+  @media (max-width:900px){
+    body{width:auto;padding:26px 28px}
+    header{flex-direction:column;gap:12px}
+    header p{width:auto;flex:initial}
+    h1{font-size:42px}
+    .roda svg{width:100%;height:auto;display:block}
+  }
 </style>
 
 <header>
@@ -31,7 +41,10 @@
 </header>
 
 <div class="roda">
-<svg width="1000" height="640" viewBox="0 0 1000 640">
+<!-- viewBox apertado no desenho: a roda ocupa de x 198 a 802 e de y 28 a
+     628, e os 200px de margem vazia de cada lado faziam a roda encolher
+     à metade quando o SVG escala pra largura da tela do tablet. -->
+<svg width="604" height="600" viewBox="198 28 604 600">
   <defs>
     <style>
       .rot{font-family:Arial, sans-serif;font-size:19px;fill:#2C3A47;text-anchor:middle}
