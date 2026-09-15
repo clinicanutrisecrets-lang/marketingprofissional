@@ -255,3 +255,27 @@ O vídeo é a emenda de dois clipes (o primeiro acaba em 9,05 s). A linha de
 público entra em **9,4 s**, logo depois do corte. Duas frases juntas desde o
 começo entregam tudo de uma vez; segurar a segunda dá tempo de ler a primeira,
 e a própria troca de cena marca a entrada, sem precisar de animação.
+
+### O terceiro tempo LIMPA a tela
+
+Na hora em que o suco cai no copo, as duas primeiras frases saem e entra **uma
+linha curta** que manda pra legenda: *"O jeito de tomar muda tudo. Eu conto na
+legenda."*
+
+🔴 **Sai, não soma.** Empilhar a terceira embaixo das outras duas poria três
+blocos em cima do copo, que é a imagem mais bonita do vídeo. E a régua do
+formato é uma ideia por vez.
+
+🔴 **A chamada abre uma curiosidade que a legenda FECHA.** "Leia a legenda" sem
+motivo ninguém obedece; "tem um detalhe na hora de tomar" a pessoa quer saber.
+A legenda entrega mesmo (a vitamina C oxida, é de bater e beber) — promessa que
+a legenda não paga treina a pessoa a ignorar a próxima.
+
+⚠️ **Nada de credencial na tela.** As duas primeiras frases falam do
+ESPECTADOR; uma terceira falando da nutricionista troca o sujeito no fim e
+perde o fio. Autoridade vive na legenda e na bio, onde quem já se interessou vai
+procurar.
+
+⚠️ Armadilha de código: no laço das camadas, a variável de saída **não pode se
+chamar `sai`** — o processo de saída do ffmpeg já se chama assim, e o
+sombreamento só estoura no primeiro quadro.

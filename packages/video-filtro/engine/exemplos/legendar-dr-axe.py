@@ -28,6 +28,14 @@ PUBLICO = "Se você sofre com dor crônica, inflamação e doenças autoimunes"
 ENTRA_PRINCIPAL = 0.7      # segundos
 ENTRA_PUBLICO = 9.4        # logo depois do corte entre os dois clipes
 CORTE_ENTRE_CLIPES = 9.05
+
+# 🔴 O TERCEIRO TEMPO LIMPA A TELA. Na hora em que o suco cai no copo, as duas
+# primeiras frases saem e entra UMA linha curta que manda pra legenda. Somar a
+# terceira embaixo das outras duas empilharia tres blocos em cima do copo, que
+# e a imagem mais bonita do video.
+SAI_PRIMEIRAS = 16.8
+ENTRA_CHAMADA = 17.3
+CHAMADA = "O jeito de tomar muda tudo. Eu conto na legenda."
 CENTRO = 0.50              # onde o bloco fica na altura da tela
 
 # 🔴 A TARJA DA LINHA DE PUBLICO E VERDE, NAO PRETA. Pedido dela: "um
@@ -72,15 +80,34 @@ def montar(W, H):
     T.escrever(cam2, PUBLICO, caminho=T.APOIO, ocupa=0.78, max_linhas=3,
                topo=y2 / H, espaco=0.012, entrelinha=1.26,
                contorno=None, sombra=0.0)
-    return [(ENTRA_PRINCIPAL, np.asarray(cam1).astype(np.float32)),
-            (ENTRA_PUBLICO, np.asarray(cam2).astype(np.float32))]
+    # a chamada final, sozinha no meio da tela
+    cam3 = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d3 = ImageDraw.Draw(cam3)
+    px3, f3, l3 = T.ajustar(d3, CHAMADA.upper(), T.APOIO, W * 0.80, 3, teto=int(H * 0.075))
+    alt3 = int(px3 * 1.26) * len(l3)
+    y3 = int(H * CENTRO - alt3 / 2)
+    larg3 = max(d3.textlength(l, font=f3) + 0.012 * px3 * max(0, len(l) - 1) for l in l3)
+    px_, py_ = int(px3 * 0.62), int(px3 * 0.34)
+    ImageDraw.Draw(cam3, "RGBA").rounded_rectangle(
+        [((W - larg3) / 2 - px_, y3 - py_), ((W + larg3) / 2 + px_, y3 + alt3 + py_ * 0.7)],
+        radius=TARJA_RAIO, fill=TARJA)
+    T.escrever(cam3, CHAMADA, caminho=T.APOIO, ocupa=0.80, max_linhas=3,
+               topo=y3 / H, espaco=0.012, entrelinha=1.26, contorno=None, sombra=0.0)
+
+    return [(ENTRA_PRINCIPAL, SAI_PRIMEIRAS, np.asarray(cam1).astype(np.float32)),
+            (ENTRA_PUBLICO, SAI_PRIMEIRAS, np.asarray(cam2).astype(np.float32)),
+            (ENTRA_CHAMADA, None, np.asarray(cam3).astype(np.float32))]
 
 
-def peso(i, fps, entra):
+def peso(i, fps, entra, sai=None):
     a = entra * fps
     if i < a - FADE: return 0.0
-    if i < a: return (i - (a - FADE)) / FADE
-    return 1.0
+    p = 1.0 if i >= a else (i - (a - FADE)) / FADE
+    if sai is not None:
+        b = sai * fps
+        if i > b + FADE: return 0.0
+        if i > b: p = min(p, 1.0 - (i - b) / FADE)
+    return max(0.0, p)
 
 
 def main(entrada, saida):
@@ -102,8 +129,10 @@ def main(entrada, saida):
         b = ent.stdout.read(n)
         if len(b) < n: break
         q = np.frombuffer(b, np.uint8).reshape(H, W, 3).astype(np.float32)
-        for entra, cam in camadas:
-            p = peso(i, fps, entra)
+        # ⚠️ nada de chamar de `sai`: o processo de saida do ffmpeg ja se chama
+        # assim, e o laco o sombreava — o erro so aparecia no PRIMEIRO quadro.
+        for entra, ate, cam in camadas:
+            p = peso(i, fps, entra, ate)
             if p <= 0: continue
             a = (cam[..., 3:4] / 255.0) * p
             q = q * (1 - a) + cam[..., :3] * a
