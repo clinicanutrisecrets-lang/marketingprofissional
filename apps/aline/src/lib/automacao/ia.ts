@@ -208,3 +208,59 @@ Responda SÓ o número da opção (1 a ${rotulos.length}). Se a resposta não co
     return null;
   }
 }
+
+/* ── Entender o pedido sem a palavra-chave ────────────────────────────── */
+
+/**
+ * A pessoa escreveu um texto que NÃO casou nenhuma palavra-chave. Ela está
+ * pedindo algum dos materiais mesmo assim?
+ *
+ * 🔴 Esta função existe por causa de um problema REAL relatado pela Aline
+ * sobre o ManyChat (16/09/2026): *"se a pessoa não clica no botão... ela
+ * conversa, ela não apertou só o botão. Ela quis discursar sobre. E aí eu
+ * tive que manualmente mandar pra ela."*
+ *
+ * 🔴 ELA É CONSERVADORA DE PROPÓSITO. Entregar o material errado pra quem não
+ * pediu é pior que não entregar: queima a lead E o perfil. O prompt manda
+ * responder 0 em qualquer dúvida, e devolver null é o caminho normal — a
+ * pessoa segue pro agradecimento/resposta de sempre, como hoje.
+ *
+ * Recebe as descrições prontas (`descreverRegra`) pra ficar pura de Supabase.
+ * Devolve o ÍNDICE na lista recebida, ou null.
+ */
+export async function escolherRegraPorIntencao(
+  texto: string,
+  descricoes: string[],
+): Promise<number | null> {
+  if (!texto.trim() || descricoes.length === 0) return null;
+  const claude = createClaude();
+  try {
+    const msg = await claude.messages.create({
+      model: CLAUDE_MODEL_RAPIDO,
+      max_tokens: 10,
+      temperature: 0,
+      system: `A pessoa escreveu no Instagram de uma nutricionista. O perfil entrega materiais automaticamente quando alguém digita uma palavra-chave, mas esta pessoa escreveu com as palavras dela.
+
+Diga se esta mensagem é de alguém que QUER receber um desses materiais, mesmo sem ter digitado a palavra-chave e mesmo tendo escrito um texto longo em vez do comando. Contar o próprio caso e pedir ajuda sobre o assunto do material CONTA como querer.
+
+Responda SÓ o número do material (1 a ${descricoes.length}). Responda 0 se:
+- a mensagem não tem relação com nenhum material;
+- a pessoa está criticando, discordando ou reclamando do assunto, em vez de pedir ajuda;
+- é elogio, emoji, saudação ou comentário solto, sem pedido;
+- serviria pra mais de um material e não dá pra saber qual;
+- você tem qualquer dúvida. Na dúvida, responda 0.`,
+      messages: [
+        {
+          role: "user",
+          content: `Materiais:\n${descricoes.map((d, i) => `${i + 1}. ${d}`).join("\n")}\n\nMensagem da pessoa: "${texto.slice(0, 600)}"`,
+        },
+      ],
+    });
+    const n = Number(textoDaResposta(msg).match(/\d+/)?.[0] ?? "0");
+    return n >= 1 && n <= descricoes.length ? n - 1 : null;
+  } catch (e) {
+    // Falha do modelo nunca pode travar o evento: segue o fluxo de hoje.
+    console.error("[automacao/ia] escolher regra por intenção falhou:", (e as Error).message);
+    return null;
+  }
+}

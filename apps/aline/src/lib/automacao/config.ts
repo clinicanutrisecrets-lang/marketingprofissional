@@ -7,6 +7,13 @@ export type AutomacaoConfig = {
   agradecer_comentarios: boolean;
   /** Responde DM sem regra consultando a base do Scanner. */
   responder_dm_scanner: boolean;
+  /**
+   * Entrega o material quando a pessoa PEDE com as palavras dela, sem digitar
+   * a palavra-chave. 🔴 Nasce LIGADA: é o defeito do ManyChat que motivou a
+   * troca, e desligada por omissão ela voltaria calada. `false` explícito
+   * desliga e volta ao casamento por palavra exata.
+   */
+  entender_pedido_sem_palavra: boolean;
   /** Resposta pública quando o comentário é pergunta clínica individual. */
   texto_convite_direct: string;
   /** Texto enviado na DM quando o robô decide passar pra uma pessoa. */
@@ -28,6 +35,7 @@ export type AutomacaoConfig = {
 export const CONFIG_PADRAO: AutomacaoConfig = {
   agradecer_comentarios: false,
   responder_dm_scanner: false,
+  entender_pedido_sem_palavra: true,
   texto_convite_direct: "Obrigada pela pergunta! Isso depende do seu caso, então te respondo melhor no direct. Me chama lá 💬",
   texto_encaminhar_humano: "Obrigada pela mensagem! Alguém da equipe continua essa conversa com você em breve.",
   nao_responder_usernames: [],
@@ -60,6 +68,8 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
   return {
     agradecer_comentarios: c.agradecer_comentarios === true,
     responder_dm_scanner: c.responder_dm_scanner === true,
+    // Ligada por omissão: só `false` explícito desliga.
+    entender_pedido_sem_palavra: c.entender_pedido_sem_palavra !== false,
     texto_convite_direct: textoOuPadrao(c.texto_convite_direct, CONFIG_PADRAO.texto_convite_direct),
     texto_encaminhar_humano: textoOuPadrao(c.texto_encaminhar_humano, CONFIG_PADRAO.texto_encaminhar_humano),
     nao_responder_usernames: usernames,

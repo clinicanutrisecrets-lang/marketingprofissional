@@ -23,7 +23,7 @@ import {
 } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
-import { classificarOpcaoPorTexto, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import {
   casarOpcao,
   ehDaPropriaConta,
@@ -36,6 +36,8 @@ import {
   preencherTexto,
   PREFIXO_PASSO,
   selecionarRegra,
+  candidatasPorIntencao,
+  descreverRegra,
   type EventoInstagram,
   type Gatilho,
   type Opcao,
@@ -50,6 +52,8 @@ export type ResumoProcessamento = {
   ignorados: number;
   duplicados: number;
   regras: number;
+  /** Regras entregues porque a IA entendeu o pedido sem a palavra-chave. */
+  regrasPorIntencao: number;
   opcoes: number;
   agradecimentos: number;
   respostasDm: number;
@@ -73,7 +77,7 @@ const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
+    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
@@ -165,11 +169,28 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       }
 
       const jaAplicadas = await regrasJaAplicadas(contato.id);
-      const regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+      let regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+      let porIntencao = false;
+
+      // ── Rede embaixo da palavra-chave ──
+      // A pessoa escreveu com as palavras dela em vez de digitar o comando.
+      // Só roda depois que a palavra-chave não pegou nada: quem digitou
+      // "GLP1" continua tendo a resposta instantânea e previsível de sempre.
+      if (!regra && config.entender_pedido_sem_palavra && ev.texto.trim() && !ev.texto.startsWith("[") && !pareceSpam(ev.texto)) {
+        const candidatas = candidatasPorIntencao({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+        if (candidatas.length > 0) {
+          const i = await escolherRegraPorIntencao(ev.texto, candidatas.map(descreverRegra));
+          if (i != null) {
+            regra = candidatas[i];
+            porIntencao = true;
+          }
+        }
+      }
 
       if (regra) {
-        await executarRegra({ perfil, cred, contato, ev, regra, vars });
-        resumo.regras++;
+        await executarRegra({ perfil, cred, contato, ev, regra, vars, porIntencao });
+        if (porIntencao) resumo.regrasPorIntencao++;
+        else resumo.regras++;
         continue;
       }
 
@@ -401,15 +422,19 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   async function executarRegra(p: {
     perfil: PerfilInstagram; cred: Credenciais; contato: Contato; ev: EventoInstagram; regra: Regra;
     vars: { nome?: string | null; username?: string | null };
+    /** true quando a palavra-chave não pegou e a IA entendeu o pedido. */
+    porIntencao?: boolean;
   }) {
     const { perfil, cred, contato, ev, regra, vars } = p;
+    // Origem distinta pra ela auditar no painel o que a palavra-chave perdeu.
+    const origemRegra = p.porIntencao ? "regra_por_intencao" : "regra";
     const ehComentario = ev.tipo === "comentario";
     const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
     if (ehComentario && regra.resposta_publica && ev.commentId) {
       const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
       await responderComentario(cred, ev.commentId, texto);
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
     }
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
@@ -423,7 +448,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       } else {
         await enviarDm(cred, ev.igsid, texto);
       }
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.
