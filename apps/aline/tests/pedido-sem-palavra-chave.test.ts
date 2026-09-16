@@ -17,6 +17,8 @@ import assert from "node:assert/strict";
 import {
   candidatasPorIntencao,
   casaPalavraChave,
+  casarOpcao,
+  PREFIXO_PAYLOAD_OPCAO,
   descreverRegra,
   selecionarRegra,
   type Regra,
@@ -135,4 +137,57 @@ test("a rede independe das chaves gerais: funciona com tudo desligado", () => {
   assert.equal(c.agradecer_comentarios, false);
   assert.equal(c.responder_dm_scanner, false);
   assert.equal(c.entender_pedido_sem_palavra, true);
+});
+
+/* ── O caso Maísa (print do ManyChat, 16/09/2026) ───────────────────────── */
+
+/**
+ * O fluxo perguntou "você é nutricionista?" esperando um CLIQUE. Ela
+ * respondeu por escrito, o ManyChat não entendeu, e ela passou a adivinhar a
+ * senha: "Nutri.maisantos" → "nutrimaisantos" → "Nutri_secrets" → "Não
+ * chegou". A Aline mandou o protocolo na mão.
+ *
+ * Aqui ficam travados os rótulos REAIS da regra GLP1 e as frases REAIS dela.
+ */
+
+const ROTULOS_GLP1 = ["Outro profissional", "Sim, sou nutri", "Não, sou paciente"];
+const ULTIMAS = { regra_id: "r-glp1", rotulos: ROTULOS_GLP1 };
+const RESPOSTA_MAISA = "Sou nutricionista a 9 anos formação pelo IESB Brasília df";
+
+test("🔴 a resposta escrita da Maísa NÃO casa botão: é por isso que precisa do classificador", () => {
+  assert.equal(casarOpcao({ texto: RESPOSTA_MAISA }, ULTIMAS), null);
+});
+
+test("o '9 anos' da frase dela não pode ser lido como 'opção 9'", () => {
+  // O casamento por número é a string INTEIRA; um 9 no meio da frase não conta.
+  assert.equal(casarOpcao({ texto: RESPOSTA_MAISA }, ULTIMAS), null);
+  assert.deepEqual(casarOpcao({ texto: "2" }, ULTIMAS), { regraId: "r-glp1", indice: 1 });
+  assert.equal(casarOpcao({ texto: "9" }, ULTIMAS), null); // fora da lista de 3
+});
+
+test("as três tentativas de adivinhar a senha não casam botão nenhum", () => {
+  for (const chute of ["Nutri.maisantos", "nutrimaisantos", "Nutri_secrets"]) {
+    assert.equal(casarOpcao({ texto: chute }, ULTIMAS), null, chute);
+  }
+});
+
+test("quem clica no botão continua no caminho instantâneo", () => {
+  const r = casarOpcao({ texto: "", payload: `${PREFIXO_PAYLOAD_OPCAO}r-glp1:1` }, ULTIMAS);
+  assert.deepEqual(r, { regraId: "r-glp1", indice: 1 });
+});
+
+test("digitar o rótulo exato também casa, sem gastar modelo", () => {
+  assert.deepEqual(casarOpcao({ texto: "sim, sou nutri" }, ULTIMAS), { regraId: "r-glp1", indice: 1 });
+});
+
+test("🔴 regra já entregue não sai de novo: os chutes dela não viram 4 cópias", () => {
+  // As 5 regras da conta são uma_vez_por_contato. Depois da primeira entrega,
+  // a rede de intenção não pode reenviar a cada mensagem que ela mandar.
+  const r = regra({ uma_vez_por_contato: true, gatilho: "dm" });
+  const jaFoi = new Set(["r-glp1"]);
+  for (const chute of ["Nutri.maisantos", "nutrimaisantos", "Nutri_secrets", "Não chegou"]) {
+    const ev = { gatilho: "dm" as const, texto: chute };
+    assert.equal(selecionarRegra(ev, [r], jaFoi), null, chute);
+    assert.deepEqual(candidatasPorIntencao(ev, [r], jaFoi), [], chute);
+  }
 });
