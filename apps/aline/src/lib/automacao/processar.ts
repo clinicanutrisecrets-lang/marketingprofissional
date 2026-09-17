@@ -21,7 +21,7 @@ import {
   credenciaisDoPerfil,
   type PerfilInstagram,
 } from "@/lib/instagram/credenciais";
-import { blocoOrientacoesDaDona, lerConfig, normalizarUsername } from "./config";
+import { blocoOrientacoesDaDona, lerConfig, normalizarNome, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
 import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import {
@@ -128,8 +128,14 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const gatilho = ev.tipo as Gatilho;
 
       // Família, equipe, amigas: o robô não responde (regra nem chave geral).
+      // Casa por @ E por nome: a Aline lembra das pessoas pelo nome, e o @
+      // quase nunca se parece com ele (Carolina Schneider = @nina_por_ai).
       const usernameContato = normalizarUsername(contato.username ?? ev.username ?? "");
-      if (usernameContato && config.nao_responder_usernames.includes(usernameContato)) { resumo.ignorados++; continue; }
+      const nomeContato = normalizarNome(contato.nome ?? "");
+      const bloqueado =
+        (usernameContato && config.nao_responder_usernames.includes(usernameContato)) ||
+        (nomeContato && config.nao_responder_nomes.includes(nomeContato));
+      if (bloqueado) { resumo.ignorados++; continue; }
 
       // Áudio no direct → texto (AssemblyAI). Sem transcrição, segue como "[audio]".
       if (gatilho === "dm" && (!ev.texto || ev.texto.startsWith("["))) {

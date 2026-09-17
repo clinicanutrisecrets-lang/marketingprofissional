@@ -20,6 +20,18 @@ export type AutomacaoConfig = {
   texto_encaminhar_humano: string;
   /** Usernames (sem @) que o robô nunca responde: família, equipe, amigas. */
   nao_responder_usernames: string[];
+  /**
+   * NOMES de exibição que o robô nunca responde.
+   *
+   * 🔴 Existe porque a Aline lembra das pessoas pelo NOME, não pelo @ — e os
+   * dois quase nunca se parecem: "Carolina Schneider" é @nina_por_ai, "Lais
+   * Pereira" é @_laispl. Exigir o @ de memória deixaria família de fora da
+   * trava, que é o pior erro que este robô pode cometer.
+   *
+   * Casa por nome COMPLETO normalizado (sem acento, sem caixa), nunca por
+   * pedaço: "Ana" bloquearia meia base.
+   */
+  nao_responder_nomes: string[];
   /** Como a dona do perfil fala — mapeado das legendas e respostas dela, e editado por ela. */
   voz: string;
   /** O que dizer quando pedem orientação ou prescrição (ética), nas palavras dela. */
@@ -39,6 +51,7 @@ export const CONFIG_PADRAO: AutomacaoConfig = {
   texto_convite_direct: "Obrigada pela pergunta! Isso depende do seu caso, então te respondo melhor no direct. Me chama lá 💬",
   texto_encaminhar_humano: "Obrigada pela mensagem! Alguém da equipe continua essa conversa com você em breve.",
   nao_responder_usernames: [],
+  nao_responder_nomes: [],
   voz: "",
   instrucoes_etica: "",
   direcionamentos: [],
@@ -54,10 +67,24 @@ export function normalizarUsername(u: string): string {
   return u.trim().replace(/^@/, "").toLowerCase();
 }
 
+/** Nome de exibição comparável: sem acento, sem caixa, espaço único. */
+export function normalizarNome(n: string): string {
+  return (n ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 export function lerConfig(bruto: unknown): AutomacaoConfig {
   const c = (bruto ?? {}) as Partial<Record<keyof AutomacaoConfig, unknown>>;
   const usernames = Array.isArray(c.nao_responder_usernames)
     ? c.nao_responder_usernames.filter((u): u is string => typeof u === "string").map(normalizarUsername).filter(Boolean)
+    : [];
+  const nomes = Array.isArray(c.nao_responder_nomes)
+    ? c.nao_responder_nomes.filter((n): n is string => typeof n === "string").map(normalizarNome).filter(Boolean)
     : [];
   const direcionamentos = Array.isArray(c.direcionamentos)
     ? c.direcionamentos
@@ -73,6 +100,7 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
     texto_convite_direct: textoOuPadrao(c.texto_convite_direct, CONFIG_PADRAO.texto_convite_direct),
     texto_encaminhar_humano: textoOuPadrao(c.texto_encaminhar_humano, CONFIG_PADRAO.texto_encaminhar_humano),
     nao_responder_usernames: usernames,
+    nao_responder_nomes: nomes,
     voz: typeof c.voz === "string" ? c.voz.trim() : "",
     instrucoes_etica: typeof c.instrucoes_etica === "string" ? c.instrucoes_etica.trim() : "",
     direcionamentos,
