@@ -322,6 +322,58 @@ export function pareceSpam(texto: string): boolean {
   return false;
 }
 
+/**
+ * Quem está VENDENDO pra ela, não pedindo ajuda.
+ *
+ * 🔴 Pedido da Aline (20/09/2026): *"o que não precisa responder é esse povo
+ * que vem com propaganda de coisa de imóvel ou que quer fazer parceria com a
+ * parte de lançamentos, de marketing, de edição de vídeos."*
+ *
+ * A assinatura é sempre a mesma: a pessoa se apresenta, elogia o perfil e
+ * oferece um SERVIÇO. Não é lead, é prospecção.
+ *
+ * Errar aqui é barato de um lado e caro do outro, então a régua é assimétrica:
+ * falso positivo = o robô fica calado e ela lê a mensagem como sempre leu;
+ * falso negativo = o robô conversa com vendedor. Por isso pega o vocabulário
+ * do OFÍCIO (tráfego pago, social media, edição de vídeo, imóvel), que nutri
+ * e paciente não usam ao pedir ajuda.
+ *
+ * ⚠️ NÃO barra regra por palavra-chave: quem comenta "GLP1" recebe o material
+ * mesmo que também venda alguma coisa. Isto governa só o que o robô decide
+ * responder por conta própria.
+ */
+const OFICIOS_QUE_ABORDAM = [
+  "trafego pago", "gestor de trafego", "gestao de trafego", "gestora de trafego",
+  "social media", "midias sociais", "gestao de redes", "gestor de redes",
+  "edicao de video", "editor de video", "editora de video", "videomaker",
+  "lancamento digital", "gestor de lancamento", "coproducao", "co producao",
+  "imovel", "imoveis", "imobiliaria", "consorcio", "financiamento",
+  "investimento", "day trade", "renda extra", "marketing digital",
+  "designer grafico", "criacao de site", "copywriter", "assessoria de imprensa",
+  "aumentar seu faturamento", "escalar seu negocio", "captar mais clientes",
+];
+
+/** Frases de abordagem fria: sozinhas não bastam, somam com o ofício. */
+const ABORDAGEM_FRIA = [
+  "gostei do seu perfil", "conheci seu trabalho", "estava conhecendo",
+  "podemos conversar", "tem 30 minutos", "30 minutos",
+  "me chamo", "meu nome e", "trabalho com", "te mostrar como",
+  "faz sentido para o seu negocio", "fechar uma parceria", "proposta comercial",
+];
+
+export function pareceAbordagemComercial(texto: string): boolean {
+  const t = normalizarTexto(texto);
+  if (!t) return false;
+  // Ofício explícito já basta: ninguém pede ajuda de nutrição citando
+  // "gestor de tráfego" ou "consórcio".
+  if (OFICIOS_QUE_ABORDAM.some((o) => t.includes(o))) return true;
+  // "Parceria" é ambígua (nutri também propõe parceria), então só conta
+  // acompanhada de abordagem fria.
+  const falaEmParceria = /(^|[^\p{L}])parceri/u.test(t);
+  if (falaEmParceria && ABORDAGEM_FRIA.some((f) => t.includes(f))) return true;
+  return false;
+}
+
 /* ── Botões (respostas rápidas) ────────────────────────────────────────── */
 
 export const PREFIXO_PAYLOAD_OPCAO = "opc:";
