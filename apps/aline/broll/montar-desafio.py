@@ -190,6 +190,7 @@ def linhas_do_bloco(bloco):
 def legenda(blocos, y, destaques, limite):
     """Karaokê: um evento por palavra, a do instante acesa em tiffany."""
     fora = []
+    fim_anterior = 0.0
     for b, bloco in enumerate(blocos):
         palavras = [w["p"] for w in bloco]
         grande = any(re.sub(r"\W", "", p).lower() in destaques for p in palavras)
@@ -200,7 +201,10 @@ def legenda(blocos, y, destaques, limite):
         proximo = blocos[b + 1][0]["t"] if b + 1 < len(blocos) else limite
         fim_bloco = min(bloco[-1]["f"] + 0.12, proximo - 0.02, limite)
         for k, w in enumerate(bloco):
-            de = w["t"] if k else max(0, w["t"] - 0.06)
+            # a primeira palavra entra 60ms antes pra não parecer atrasada,
+            # mas nunca antes do bloco anterior sair: era isso que ainda
+            # empilhava duas legendas quando a fala emendava
+            de = w["t"] if k else max(0, w["t"] - 0.06, fim_anterior + 0.01)
             ate = bloco[k + 1]["t"] if k + 1 < len(bloco) else fim_bloco
             if ate - de < 0.08:
                 ate = de + 0.08
@@ -216,6 +220,7 @@ def legenda(blocos, y, destaques, limite):
             tags = (f"{{\\an5\\pos({W//2},{y})\\fs{tam}\\bord5\\blur6"
                     f"\\c{BRANCO}{entrada}}}")
             fora.append(evento(de, ate, "Legenda", tags + "\\N".join(corpo)))
+        fim_anterior = fim_bloco
     return fora
 
 
