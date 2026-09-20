@@ -1,0 +1,69 @@
+{
+  "video": "video/v4338.mov",
+  "transcricao": "au4338.json",
+  "saida": "saida/desafio-ficou-pra-tras.mp4",
+  "duracao": 190.53,
+  "cortes": [
+    [
+      138.05,
+      138.66
+    ]
+  ],
+  "chapeu": "NUTRICIONISTA",
+  "titulo": "VOCÊ FICOU\nPRA TRÁS?",
+  "tam_titulo": 100,
+  "y_titulo": 245,
+  "y_regua": 385,
+  "recorte": [
+    720,
+    707,
+    0,
+    200
+  ],
+  "topo": 470,
+  "y_legenda": 1650,
+  "destaques": [
+    "nenhum",
+    "unânime",
+    "baixa",
+    "conduta",
+    "autonomia",
+    "desafio",
+    "sozinho",
+    "fazer"
+  ],
+  "frases": [
+    [
+      "constório",
+      "consultório"
+    ],
+    [
+      "me ajuda para montar",
+      "minha ajuda para montar"
+    ],
+    [
+      "com o histórico de precisão",
+      "Meu Consultório de Precisão"
+    ],
+    [
+      "descorrelacionar sintomas",
+      "e correlacionar sintomas"
+    ],
+    [
+      "pacientes que verem",
+      "pacientes que vierem"
+    ],
+    [
+      "seis dias de segunda sábado",
+      "seis dias, de segunda a sábado"
+    ]
+  ],
+  "cartao": {
+    "segundos": 5.0,
+    "chapeu": "DESAFIO DE 6 DIAS",
+    "linha1": "VEM PARA\nO DESAFIO",
+    "linha2": "MEU CONSULTÓRIO\nDE PRECISÃO",
+    "tam2": 74,
+    "abaixo": "clique no link abaixo"
+  }
+}

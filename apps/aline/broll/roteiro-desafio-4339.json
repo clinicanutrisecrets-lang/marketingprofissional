@@ -1,0 +1,80 @@
+{
+  "video": "video/v4339.mov",
+  "transcricao": "au4339.json",
+  "saida": "saida/desafio-paciente-chegou.mp4",
+  "duracao": 179.73,
+  "cortes": [],
+  "chapeu": "NUTRICIONISTA",
+  "titulo": "O PACIENTE\nJÁ CHEGOU",
+  "tam_titulo": 100,
+  "y_titulo": 245,
+  "y_regua": 385,
+  "recorte": [
+    720,
+    707,
+    0,
+    200
+  ],
+  "topo": 470,
+  "y_legenda": 1650,
+  "destaques": [
+    "bilhões",
+    "paciente",
+    "conduta",
+    "excelência",
+    "frustrados",
+    "desafio",
+    "manual",
+    "revoltada"
+  ],
+  "frases": [
+    [
+      "que são noutros",
+      "que são nutris"
+    ],
+    [
+      "conteste noutro e genético",
+      "com teste nutrigenético"
+    ],
+    [
+      "o mercado de noutro e genética",
+      "o mercado de nutrigenética"
+    ],
+    [
+      "teste noutro e genético",
+      "teste nutrigenético"
+    ],
+    [
+      "tudo sobre saudade",
+      "tudo sobre saúde"
+    ],
+    [
+      "o ministro de paciente",
+      "o perfil de paciente"
+    ],
+    [
+      "Mas eles se levam",
+      "Mas eles até levam"
+    ],
+    [
+      "eles guardem a gaveta",
+      "eles guardam na gaveta"
+    ],
+    [
+      "decorar a nome de genes",
+      "decorar o nome dos genes"
+    ],
+    [
+      "as erradas",
+      "às vezes erradas"
+    ]
+  ],
+  "cartao": {
+    "segundos": 5.0,
+    "chapeu": "DESAFIO DE 6 DIAS",
+    "linha1": "VEM PARA\nO DESAFIO",
+    "linha2": "MEU CONSULTÓRIO\nDE PRECISÃO",
+    "tam2": 74,
+    "abaixo": "clique no link abaixo"
+  }
+}
