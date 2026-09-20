@@ -1,0 +1,6 @@
+numpy
+pillow
+opencv-contrib-python-headless
+mediapipe
+pymatting
+imageio-ffmpeg

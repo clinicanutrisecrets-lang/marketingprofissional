@@ -323,7 +323,14 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
                     <div className="mb-0.5 flex flex-wrap gap-2 text-xs text-aline-text/60">
                       <span>{m.direcao === "saida" ? "→ robô" : "← " + (c?.username ? `@${c.username}` : c?.nome ?? "pessoa")}</span>
                       <span>· {m.canal}</span>
-                      {m.origem && <span>· {m.origem}</span>}
+                      {m.origem === "regra_por_intencao" ? (
+                        // A palavra-chave teria perdido esta. É o que ela precisa ver.
+                        <span className="rounded-full bg-emerald-100 px-2 font-medium text-emerald-800">
+                          · entendeu o pedido sem a palavra-chave
+                        </span>
+                      ) : (
+                        m.origem && <span>· {m.origem.replace(/_/g, " ")}</span>
+                      )}
                       <span>· {quando(m.criado_em)}</span>
                     </div>
                     <div className="whitespace-pre-wrap">{m.texto ?? <em className="text-aline-text/50">(sem texto)</em>}</div>

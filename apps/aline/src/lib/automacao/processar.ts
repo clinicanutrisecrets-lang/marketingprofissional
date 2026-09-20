@@ -21,9 +21,9 @@ import {
   credenciaisDoPerfil,
   type PerfilInstagram,
 } from "@/lib/instagram/credenciais";
-import { blocoOrientacoesDaDona, lerConfig, normalizarUsername } from "./config";
+import { blocoOrientacoesDaDona, lerConfig, normalizarNome, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
-import { classificarOpcaoPorTexto, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
 import {
   casarOpcao,
   ehDaPropriaConta,
@@ -32,10 +32,13 @@ import {
   opcoesComoTexto,
   pareceClinico,
   pareceSpam,
+  pareceAbordagemComercial,
   payloadDaOpcao,
   preencherTexto,
   PREFIXO_PASSO,
   selecionarRegra,
+  candidatasPorIntencao,
+  descreverRegra,
   type EventoInstagram,
   type Gatilho,
   type Opcao,
@@ -50,6 +53,8 @@ export type ResumoProcessamento = {
   ignorados: number;
   duplicados: number;
   regras: number;
+  /** Regras entregues porque a IA entendeu o pedido sem a palavra-chave. */
+  regrasPorIntencao: number;
   opcoes: number;
   agradecimentos: number;
   respostasDm: number;
@@ -73,7 +78,7 @@ const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
+    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
@@ -124,8 +129,14 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const gatilho = ev.tipo as Gatilho;
 
       // Família, equipe, amigas: o robô não responde (regra nem chave geral).
+      // Casa por @ E por nome: a Aline lembra das pessoas pelo nome, e o @
+      // quase nunca se parece com ele (Carolina Schneider = @nina_por_ai).
       const usernameContato = normalizarUsername(contato.username ?? ev.username ?? "");
-      if (usernameContato && config.nao_responder_usernames.includes(usernameContato)) { resumo.ignorados++; continue; }
+      const nomeContato = normalizarNome(contato.nome ?? "");
+      const bloqueado =
+        (usernameContato && config.nao_responder_usernames.includes(usernameContato)) ||
+        (nomeContato && config.nao_responder_nomes.includes(nomeContato));
+      if (bloqueado) { resumo.ignorados++; continue; }
 
       // Áudio no direct → texto (AssemblyAI). Sem transcrição, segue como "[audio]".
       if (gatilho === "dm" && (!ev.texto || ev.texto.startsWith("["))) {
@@ -165,17 +176,34 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       }
 
       const jaAplicadas = await regrasJaAplicadas(contato.id);
-      const regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+      let regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+      let porIntencao = false;
+
+      // ── Rede embaixo da palavra-chave ──
+      // A pessoa escreveu com as palavras dela em vez de digitar o comando.
+      // Só roda depois que a palavra-chave não pegou nada: quem digitou
+      // "GLP1" continua tendo a resposta instantânea e previsível de sempre.
+      if (!regra && config.entender_pedido_sem_palavra && ev.texto.trim() && !ev.texto.startsWith("[") && !pareceSpam(ev.texto) && !pareceAbordagemComercial(ev.texto)) {
+        const candidatas = candidatasPorIntencao({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+        if (candidatas.length > 0) {
+          const i = await escolherRegraPorIntencao(ev.texto, candidatas.map(descreverRegra));
+          if (i != null) {
+            regra = candidatas[i];
+            porIntencao = true;
+          }
+        }
+      }
 
       if (regra) {
-        await executarRegra({ perfil, cred, contato, ev, regra, vars });
-        resumo.regras++;
+        await executarRegra({ perfil, cred, contato, ev, regra, vars, porIntencao });
+        if (porIntencao) resumo.regrasPorIntencao++;
+        else resumo.regras++;
         continue;
       }
 
       // ── Sem regra: chaves gerais ──
       if (gatilho === "comentario") {
-        if (!config.agradecer_comentarios || pareceSpam(ev.texto) || ev.parentCommentId) { resumo.ignorados++; continue; }
+        if (!config.agradecer_comentarios || pareceSpam(ev.texto) || pareceAbordagemComercial(ev.texto) || ev.parentCommentId) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
         let texto: string | null;
         let origem: string;
@@ -197,7 +225,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
       if (gatilho === "dm") {
         const textoPessoa = ev.texto.trim();
-        if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[")) { resumo.ignorados++; continue; }
+        if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa)) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
         const [historico, contexto] = await Promise.all([historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa)]);
         const resp = await responderDmComScanner({
@@ -401,15 +429,19 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   async function executarRegra(p: {
     perfil: PerfilInstagram; cred: Credenciais; contato: Contato; ev: EventoInstagram; regra: Regra;
     vars: { nome?: string | null; username?: string | null };
+    /** true quando a palavra-chave não pegou e a IA entendeu o pedido. */
+    porIntencao?: boolean;
   }) {
     const { perfil, cred, contato, ev, regra, vars } = p;
+    // Origem distinta pra ela auditar no painel o que a palavra-chave perdeu.
+    const origemRegra = p.porIntencao ? "regra_por_intencao" : "regra";
     const ehComentario = ev.tipo === "comentario";
     const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
     if (ehComentario && regra.resposta_publica && ev.commentId) {
       const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
       await responderComentario(cred, ev.commentId, texto);
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
     }
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
@@ -423,7 +455,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       } else {
         await enviarDm(cred, ev.igsid, texto);
       }
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: "regra", regraId: regra.id, mediaId: ev.mediaId });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.

@@ -1,0 +1,188 @@
+name: Filtro de Aula (video longo)
+
+# Worker pra AULA: 30 a 60 minutos de gravacao.
+#
+# 🔴 POR QUE ESTE E SEPARADO DO `filtro-video.yml`: o filtro roda a cerca de
+# 4x o tempo do video (medido: 600 quadros de 720x1280 em 77 s, 4 nucleos).
+# Uma aula de 1 hora sao ~4 horas de processamento — passa do timeout de 90
+# min daquele workflow E do limite de 6 h de um job do GitHub fica no limite.
+# Aqui a aula e CORTADA em pedacos que rodam EM PARALELO: 12 pedacos de 5 min
+# terminam junto, em torno de 20 min de relogio.
+#
+# 🔴 E o corte tambem e a rede de seguranca: se um pedaco falhar, os outros
+# ficam prontos e so ele e refeito. Gravar uma hora e perder tudo por causa de
+# um erro no minuto 52 era exatamente o risco que a Aline levantou.
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "URL do video da aula (link assinado do Storage, Drive direto, etc)"
+        required: true
+      destino_path:
+        description: "Caminho no bucket franqueadas-assets"
+        required: true
+      segundos_teste:
+        description: "So os primeiros N segundos (0 = aula inteira). USE ISTO ANTES DE GRAVAR A AULA TODA."
+        required: false
+        default: "0"
+      minutos_por_parte:
+        required: false
+        default: "5"
+      cenario_url:
+        description: "Foto de cenario (vazio = mantem o fundo da gravacao)"
+        required: false
+        default: ""
+      verde:
+        required: false
+        default: "false"
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  dividir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      partes: ${{ steps.corte.outputs.partes }}
+      quantas: ${{ steps.corte.outputs.quantas }}
+    steps:
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+
+      - name: Baixar a aula
+        run: curl -sSfL -o /tmp/aula.mp4 "${{ inputs.video_url }}"
+
+      - id: corte
+        name: Cortar em pedacos (video) e separar o audio
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/partes
+          CORTE=""
+          if [ "${{ inputs.segundos_teste }}" != "0" ]; then
+            CORTE="-t ${{ inputs.segundos_teste }}"
+          fi
+          # 🔴 -c copy corta no quadro-chave: nenhum quadro e perdido nem
+          # recodificado, entao juntar de volta devolve o video original.
+          ffmpeg -hide_banner -loglevel error -i /tmp/aula.mp4 $CORTE \
+            -map 0:v -c copy -f segment \
+            -segment_time $(( ${{ inputs.minutos_por_parte }} * 60 )) \
+            -reset_timestamps 1 /tmp/partes/parte%03d.mp4
+          # 🔴 O AUDIO SAI UMA VEZ SO, do original inteiro. Processar audio por
+          # pedaco e depois juntar acumula desvio de sincronia — num video de
+          # uma hora isso vira labial fora do lugar no fim da aula.
+          ffmpeg -hide_banner -loglevel error -i /tmp/aula.mp4 $CORTE \
+            -vn -c:a aac -b:a 192k /tmp/partes/audio.m4a
+          ls /tmp/partes
+          N=$(ls /tmp/partes/parte*.mp4 | wc -l)
+          echo "quantas=$N" >> "$GITHUB_OUTPUT"
+          echo "partes=$(ls /tmp/partes/parte*.mp4 | xargs -n1 basename | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: partes-cruas
+          path: /tmp/partes
+          retention-days: 1
+
+  filtrar:
+    needs: dividir
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false          # um pedaco ruim nao derruba os outros
+      max-parallel: 8
+      matrix:
+        parte: ${{ fromJson(needs.dividir.outputs.partes) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install -r packages/video-filtro/requirements.txt
+          bash packages/video-filtro/baixar-modelos.sh
+
+      - uses: actions/download-artifact@v4
+        with: { name: partes-cruas, path: /tmp/partes }
+
+      - name: Baixar cenario
+        if: inputs.cenario_url != ''
+        run: curl -sSfL -o /tmp/cenario.png "${{ inputs.cenario_url }}"
+
+      - name: Filtrar ${{ matrix.parte }}
+        env:
+          TRAB: "4"
+        run: |
+          set -euo pipefail
+          ARGS=""
+          [ -n "${{ inputs.cenario_url }}" ] && ARGS="$ARGS --cenario /tmp/cenario.png"
+          [ "${{ inputs.verde }}" = "true" ] && ARGS="$ARGS --verde"
+          mkdir -p /tmp/prontas
+          python3 packages/video-filtro/engine/cli.py \
+            "/tmp/partes/${{ matrix.parte }}" "/tmp/prontas/${{ matrix.parte }}" $ARGS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pronta-${{ matrix.parte }}
+          path: /tmp/prontas/${{ matrix.parte }}
+          retention-days: 1
+
+  juntar:
+    needs: [dividir, filtrar]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+    steps:
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+
+      - uses: actions/download-artifact@v4
+        with: { name: partes-cruas, path: /tmp/cruas }
+      - uses: actions/download-artifact@v4
+        with: { pattern: pronta-*, path: /tmp/prontas, merge-multiple: true }
+
+      - name: Conferir que nao faltou pedaco
+        run: |
+          set -euo pipefail
+          ESPERADO=${{ needs.dividir.outputs.quantas }}
+          TEM=$(ls /tmp/prontas/parte*.mp4 2>/dev/null | wc -l)
+          echo "esperado $ESPERADO, pronto $TEM"
+          # 🔴 Sem esta conferencia, um pedaco que falhou vira aula com um
+          # buraco de 5 minutos no meio — e o arquivo final parece normal.
+          [ "$TEM" = "$ESPERADO" ] || { echo "faltou pedaco, nao vou juntar"; exit 1; }
+
+      - name: Juntar e devolver o audio
+        run: |
+          set -euo pipefail
+          for f in $(ls /tmp/prontas/parte*.mp4 | sort); do
+            echo "file '$f'" >> /tmp/lista.txt
+          done
+          ffmpeg -hide_banner -loglevel error -f concat -safe 0 -i /tmp/lista.txt -c copy /tmp/video.mp4
+          ffmpeg -hide_banner -loglevel error -i /tmp/video.mp4 -i /tmp/cruas/audio.m4a \
+            -map 0:v -map 1:a -c:v copy -c:a copy -shortest /tmp/final.mp4
+          ffprobe -v error -show_entries format=duration -of csv=p=0 /tmp/final.mp4
+
+      - name: Upload pro Supabase Storage
+        run: |
+          curl -sf -X POST \
+            "$SB_URL/storage/v1/object/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer $SB_KEY" \
+            -H "Content-Type: video/mp4" \
+            -H "x-upsert: true" \
+            --data-binary @/tmp/final.mp4
+          echo "enviado: ${{ inputs.destino_path }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aula-filtrada
+          path: /tmp/final.mp4
+          retention-days: 7

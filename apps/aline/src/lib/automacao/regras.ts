@@ -145,6 +145,49 @@ export function selecionarRegra(
   return candidatas[0];
 }
 
+/* ── Rede embaixo da palavra-chave ─────────────────────────────────────── */
+
+/**
+ * As regras que teriam entregue material, mas foram descartadas SÓ porque a
+ * pessoa não digitou a palavra-chave.
+ *
+ * 🔴 É o defeito do ManyChat, e o nosso tinha igual: quem escreve
+ * "eu tomo aquela injeção pra emagrecer e tô enjoada, tem material?" não diz
+ * "GLP1", não casa regra nenhuma, e o material nunca sai. Pior que o ManyChat,
+ * porque aqui a pessoa ainda recebe um agradecimento simpático e some — a
+ * Aline nem fica sabendo que perdeu a lead.
+ *
+ * Esta função devolve os candidatos; quem decide é `escolherRegraPorIntencao`
+ * (ia.ts). A palavra-chave continua vindo PRIMEIRO: é instantânea, de graça e
+ * previsível. Isto é a rede embaixo, não a substituição.
+ */
+export function candidatasPorIntencao(
+  evento: { gatilho: Gatilho; texto: string; mediaId?: string | null },
+  regras: Regra[],
+  jaAplicadasNoContato: ReadonlySet<string> = new Set(),
+): Regra[] {
+  return regras
+    .filter((r) => r.ativa && r.gatilho === evento.gatilho)
+    .filter((r) => r.media_ids.length === 0 || (evento.mediaId != null && r.media_ids.includes(evento.mediaId)))
+    .filter((r) => !(r.uma_vez_por_contato && jaAplicadasNoContato.has(r.id)))
+    // Regra SEM palavra-chave casa tudo, então já foi vista em selecionarRegra.
+    .filter((r) => r.palavras_chave.length > 0)
+    // E aqui só entra quem a palavra-chave NÃO pegou.
+    .filter((r) => !casaPalavraChave(evento.texto, r.palavras_chave))
+    // Sem texto não há intenção a ler.
+    .filter(() => normalizarTexto(evento.texto).length > 0)
+    .sort((a, b) => a.prioridade - b.prioridade);
+}
+
+/**
+ * Uma linha por regra, pro classificador saber O QUE cada uma entrega.
+ * Sem coluna nova no banco: o nome mais o começo da resposta já descrevem.
+ */
+export function descreverRegra(r: Regra): string {
+  const entrega = (r.resposta_privada ?? r.resposta_publica ?? "").replace(/\s+/g, " ").trim();
+  return entrega ? `${r.nome} — entrega: "${entrega.slice(0, 160)}"` : r.nome;
+}
+
 /* ── Janela de 24h da Meta ─────────────────────────────────────────────── */
 
 export const JANELA_24H_MS = 24 * 60 * 60 * 1000;
@@ -276,6 +319,58 @@ export function pareceSpam(texto: string): boolean {
   const semMencoes = t.replace(/@[\w.]+/g, "").trim();
   if (!semMencoes) return true;
   if (/https?:\/\//.test(t) && /(seguidores|ganhe|renda|crypto|bitcoin|promocao)/.test(t)) return true;
+  return false;
+}
+
+/**
+ * Quem está VENDENDO pra ela, não pedindo ajuda.
+ *
+ * 🔴 Pedido da Aline (20/09/2026): *"o que não precisa responder é esse povo
+ * que vem com propaganda de coisa de imóvel ou que quer fazer parceria com a
+ * parte de lançamentos, de marketing, de edição de vídeos."*
+ *
+ * A assinatura é sempre a mesma: a pessoa se apresenta, elogia o perfil e
+ * oferece um SERVIÇO. Não é lead, é prospecção.
+ *
+ * Errar aqui é barato de um lado e caro do outro, então a régua é assimétrica:
+ * falso positivo = o robô fica calado e ela lê a mensagem como sempre leu;
+ * falso negativo = o robô conversa com vendedor. Por isso pega o vocabulário
+ * do OFÍCIO (tráfego pago, social media, edição de vídeo, imóvel), que nutri
+ * e paciente não usam ao pedir ajuda.
+ *
+ * ⚠️ NÃO barra regra por palavra-chave: quem comenta "GLP1" recebe o material
+ * mesmo que também venda alguma coisa. Isto governa só o que o robô decide
+ * responder por conta própria.
+ */
+const OFICIOS_QUE_ABORDAM = [
+  "trafego pago", "gestor de trafego", "gestao de trafego", "gestora de trafego",
+  "social media", "midias sociais", "gestao de redes", "gestor de redes",
+  "edicao de video", "editor de video", "editora de video", "videomaker",
+  "lancamento digital", "gestor de lancamento", "coproducao", "co producao",
+  "imovel", "imoveis", "imobiliaria", "consorcio", "financiamento",
+  "investimento", "day trade", "renda extra", "marketing digital",
+  "designer grafico", "criacao de site", "copywriter", "assessoria de imprensa",
+  "aumentar seu faturamento", "escalar seu negocio", "captar mais clientes",
+];
+
+/** Frases de abordagem fria: sozinhas não bastam, somam com o ofício. */
+const ABORDAGEM_FRIA = [
+  "gostei do seu perfil", "conheci seu trabalho", "estava conhecendo",
+  "podemos conversar", "tem 30 minutos", "30 minutos",
+  "me chamo", "meu nome e", "trabalho com", "te mostrar como",
+  "faz sentido para o seu negocio", "fechar uma parceria", "proposta comercial",
+];
+
+export function pareceAbordagemComercial(texto: string): boolean {
+  const t = normalizarTexto(texto);
+  if (!t) return false;
+  // Ofício explícito já basta: ninguém pede ajuda de nutrição citando
+  // "gestor de tráfego" ou "consórcio".
+  if (OFICIOS_QUE_ABORDAM.some((o) => t.includes(o))) return true;
+  // "Parceria" é ambígua (nutri também propõe parceria), então só conta
+  // acompanhada de abordagem fria.
+  const falaEmParceria = /(^|[^\p{L}])parceri/u.test(t);
+  if (falaEmParceria && ABORDAGEM_FRIA.some((f) => t.includes(f))) return true;
   return false;
 }
 

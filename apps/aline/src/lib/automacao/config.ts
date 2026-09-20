@@ -7,12 +7,31 @@ export type AutomacaoConfig = {
   agradecer_comentarios: boolean;
   /** Responde DM sem regra consultando a base do Scanner. */
   responder_dm_scanner: boolean;
+  /**
+   * Entrega o material quando a pessoa PEDE com as palavras dela, sem digitar
+   * a palavra-chave. 🔴 Nasce LIGADA: é o defeito do ManyChat que motivou a
+   * troca, e desligada por omissão ela voltaria calada. `false` explícito
+   * desliga e volta ao casamento por palavra exata.
+   */
+  entender_pedido_sem_palavra: boolean;
   /** Resposta pública quando o comentário é pergunta clínica individual. */
   texto_convite_direct: string;
   /** Texto enviado na DM quando o robô decide passar pra uma pessoa. */
   texto_encaminhar_humano: string;
   /** Usernames (sem @) que o robô nunca responde: família, equipe, amigas. */
   nao_responder_usernames: string[];
+  /**
+   * NOMES de exibição que o robô nunca responde.
+   *
+   * 🔴 Existe porque a Aline lembra das pessoas pelo NOME, não pelo @ — e os
+   * dois quase nunca se parecem: "Carolina Schneider" é @nina_por_ai, "Lais
+   * Pereira" é @_laispl. Exigir o @ de memória deixaria família de fora da
+   * trava, que é o pior erro que este robô pode cometer.
+   *
+   * Casa por nome COMPLETO normalizado (sem acento, sem caixa), nunca por
+   * pedaço: "Ana" bloquearia meia base.
+   */
+  nao_responder_nomes: string[];
   /** Como a dona do perfil fala — mapeado das legendas e respostas dela, e editado por ela. */
   voz: string;
   /** O que dizer quando pedem orientação ou prescrição (ética), nas palavras dela. */
@@ -28,9 +47,11 @@ export type AutomacaoConfig = {
 export const CONFIG_PADRAO: AutomacaoConfig = {
   agradecer_comentarios: false,
   responder_dm_scanner: false,
+  entender_pedido_sem_palavra: true,
   texto_convite_direct: "Obrigada pela pergunta! Isso depende do seu caso, então te respondo melhor no direct. Me chama lá 💬",
   texto_encaminhar_humano: "Obrigada pela mensagem! Alguém da equipe continua essa conversa com você em breve.",
   nao_responder_usernames: [],
+  nao_responder_nomes: [],
   voz: "",
   instrucoes_etica: "",
   direcionamentos: [],
@@ -46,10 +67,24 @@ export function normalizarUsername(u: string): string {
   return u.trim().replace(/^@/, "").toLowerCase();
 }
 
+/** Nome de exibição comparável: sem acento, sem caixa, espaço único. */
+export function normalizarNome(n: string): string {
+  return (n ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 export function lerConfig(bruto: unknown): AutomacaoConfig {
   const c = (bruto ?? {}) as Partial<Record<keyof AutomacaoConfig, unknown>>;
   const usernames = Array.isArray(c.nao_responder_usernames)
     ? c.nao_responder_usernames.filter((u): u is string => typeof u === "string").map(normalizarUsername).filter(Boolean)
+    : [];
+  const nomes = Array.isArray(c.nao_responder_nomes)
+    ? c.nao_responder_nomes.filter((n): n is string => typeof n === "string").map(normalizarNome).filter(Boolean)
     : [];
   const direcionamentos = Array.isArray(c.direcionamentos)
     ? c.direcionamentos
@@ -60,9 +95,12 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
   return {
     agradecer_comentarios: c.agradecer_comentarios === true,
     responder_dm_scanner: c.responder_dm_scanner === true,
+    // Ligada por omissão: só `false` explícito desliga.
+    entender_pedido_sem_palavra: c.entender_pedido_sem_palavra !== false,
     texto_convite_direct: textoOuPadrao(c.texto_convite_direct, CONFIG_PADRAO.texto_convite_direct),
     texto_encaminhar_humano: textoOuPadrao(c.texto_encaminhar_humano, CONFIG_PADRAO.texto_encaminhar_humano),
     nao_responder_usernames: usernames,
+    nao_responder_nomes: nomes,
     voz: typeof c.voz === "string" ? c.voz.trim() : "",
     instrucoes_etica: typeof c.instrucoes_etica === "string" ? c.instrucoes_etica.trim() : "",
     direcionamentos,
