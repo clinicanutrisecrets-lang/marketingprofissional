@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@scanner/ui"],
   typescript: {
     ignoreBuildErrors: true,
   },

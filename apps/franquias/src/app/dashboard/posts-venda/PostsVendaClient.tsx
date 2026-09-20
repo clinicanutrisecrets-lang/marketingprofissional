@@ -31,13 +31,19 @@ const TIPOS: Array<{ valor: TipoPost; label: string }> = [
 export function PostsVendaClient(props: {
   produtosIniciais: ProdutoScannerLista[];
   temVinculo: boolean;
+  /** scanner_produto_id vindo da Esteira do Scanner — pré-seleciona o primeiro produto que casa. */
+  produtoInicialScannerId?: string | null;
 }) {
   const [produtos, setProdutos] = useState(props.produtosIniciais);
   const [sincronizando, setSincronizando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  const [produtoAtivo, setProdutoAtivo] = useState<ProdutoScannerLista | null>(null);
+  const [produtoAtivo, setProdutoAtivo] = useState<ProdutoScannerLista | null>(() =>
+    props.produtoInicialScannerId
+      ? props.produtosIniciais.find((p) => p.scanner_produto_id === props.produtoInicialScannerId) ?? null
+      : null,
+  );
   const [tipo, setTipo] = useState<TipoPost>("feed_imagem");
   const [incluirPreco, setIncluirPreco] = useState(true);
   // O MESMO produto muda de copy conforme quem lê. "Consciente do produto" é

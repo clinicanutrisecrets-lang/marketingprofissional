@@ -1,5 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ICP_TICKET_ALTO_NUTRI_PREMIUM, ICP_EXCLUSOES_META, ICP_INTERESSES_META } from "./_icp";
 import {
@@ -190,7 +190,7 @@ export async function gerarCopyAnuncio(
   ].join("\n");
 
   const inicio = Date.now();
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
 
   let responseText: string;
   let usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number };

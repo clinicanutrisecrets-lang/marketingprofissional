@@ -1,8 +1,7 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/server";
 import { FRAMEWORK_DONALD_MILLER_SB7, FRAMEWORKS_MATRIZ_USO, COMPLIANCE_CFN_2026_RESUMO } from "./_frameworks";
-import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 const MODEL = "claude-sonnet-4-5";
@@ -115,7 +114,7 @@ export async function executarStorytelling(
   const userMsg = `Dados:\n${JSON.stringify(params.input, null, 2)}\n\nEntregue o JSON conforme schema do modo ${params.modo}.`;
 
   const inicio = Date.now();
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
 
   let responseText: string;
   let usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number };

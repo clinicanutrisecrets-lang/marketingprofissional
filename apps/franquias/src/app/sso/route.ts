@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
+import { EMBED_COOKIE, EMBED_COOKIE_MAX_AGE, destinoSeguro, pediuEmbed } from "@/lib/embed/destino";
 
 export const dynamic = "force-dynamic";
+// 🔴 Sem cache de fetch NESTA rota, dito duas vezes de propósito (11/09/2026):
+// `force-dynamic` não desliga o Data Cache do Next 14, e o magic link cacheado
+// foi o que derrubou o SSO (ver lib/supabase/server.ts). O client já sai com
+// `cache: "no-store"`; esta linha garante que nenhum fetch novo aqui volte a
+// guardar resposta, mesmo que alguém troque o client.
+export const fetchCache = "force-no-store";
 
 /**
  * GET /sso?token=<jwt>
@@ -31,9 +39,20 @@ export const dynamic = "force-dynamic";
  *   4. Cria a sessão via magic link server-side (generateLink + verifyOtp):
  *      o link nunca é enviado por e-mail, é consumido aqui.
  *   5. Manda pro /dashboard (onboarding pronto) ou /onboarding (a completar).
+ *
+ * Parâmetros opcionais (embed dentro do Scanner, 09/09/2026):
+ *   • `next=/dashboard/...` — abre direto numa tela (a esteira do Scanner
+ *     manda pra "Posts de venda" já no produto; o e-book, pro Estúdio).
+ *     Só caminho interno passa (`destinoSeguro`); o resto cai no /dashboard.
+ *     Onboarding incompleto SEMPRE vence o `next`: não adianta abrir Posts de
+ *     venda de quem ainda não tem perfil.
+ *   • `embed=1` — grava o cookie que faz o layout esconder barra lateral,
+ *     Sair e rodapé, porque o Scanner já desenha a moldura em volta.
  */
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
+  const next = destinoSeguro(req.nextUrl.searchParams.get("next"));
+  const embed = pediuEmbed(req.nextUrl.searchParams.get("embed"));
   if (!token) {
     console.error("[sso] chegou em /sso sem token na URL");
     return NextResponse.redirect(new URL("/login?erro=sso_token_ausente", req.url));
@@ -176,20 +195,53 @@ export async function GET(req: NextRequest) {
 
   // ── 6. Abre a sessão com o hash obtido no passo 3 ──
   const supabase = createClient();
-  const { error: otpErr } = await supabase.auth.verifyOtp({
+  let { error: otpErr } = await supabase.auth.verifyOtp({
     type: "magiclink",
     token_hash: tokenHash,
   });
   if (otpErr) {
-    console.error("[sso] verifyOtp falhou:", otpErr.message);
-    return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    // Segunda chance com hash NOVO. Um hash que "não existe" é hash já
+    // consumido ou vencido — nunca é motivo pra trancar a nutri do lado de
+    // fora, porque quem chega aqui já se autenticou no Scanner. Foi assim que
+    // o cache de fetch (ver lib/supabase/server.ts) virou "Marketing fora do
+    // ar" por um mês: o hash velho falhava e a rota desistia na primeira.
+    console.warn("[sso] verifyOtp falhou, tentando com hash novo:", otpErr.message);
+    const { data: novo, error: novoErr } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: emailToken,
+    });
+    const novoHash = novo?.properties?.hashed_token;
+    if (novoErr || !novoHash) {
+      console.error("[sso] generateLink (2ª tentativa) falhou:", novoErr?.message);
+      return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    }
+    ({ error: otpErr } = await supabase.auth.verifyOtp({
+      type: "magiclink",
+      token_hash: novoHash,
+    }));
+    if (otpErr) {
+      console.error("[sso] verifyOtp falhou de novo:", otpErr.message);
+      return NextResponse.redirect(new URL("/login?erro=sso_login", req.url));
+    }
   }
 
   // redirect() do next/navigation (não NextResponse.redirect) é o padrão
   // documentado do Supabase SSR depois de verifyOtp: garante que os cookies
   // de sessão gravados pelo client vão junto na resposta. Ele lança uma
   // exceção de controle do Next — por isso fica FORA de qualquer try/catch.
-  const destino = franq.onboarding_completo ? "/dashboard" : "/onboarding";
+  if (embed) {
+    cookies().set(EMBED_COOKIE, "1", {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: EMBED_COOKIE_MAX_AGE,
+    });
+  } else if (cookies().get(EMBED_COOKIE)) {
+    // Entrou pelo SSO "normal" (aba própria): garante a tela completa, com menu.
+    cookies().set(EMBED_COOKIE, "", { path: "/", maxAge: 0 });
+  }
+
+  const destino = franq.onboarding_completo ? (next ?? "/dashboard") : "/onboarding";
   redirect(destino);
 }
 

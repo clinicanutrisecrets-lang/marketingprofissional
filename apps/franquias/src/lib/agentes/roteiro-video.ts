@@ -1,6 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
-import { REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
+import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
 export type RoteiroVideoInput = {
@@ -74,7 +73,7 @@ Saída: APENAS JSON válido conforme o schema pedido.
 `.trim();
 
 export async function gerarRoteiroVideo(params: RoteiroVideoInput): Promise<RoteiroVideoResult> {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  const anthropic = createClaude();
 
   const userMsg = `
 Nutri: ${params.franqueada.nome_completo}

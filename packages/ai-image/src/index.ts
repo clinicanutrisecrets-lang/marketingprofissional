@@ -3,16 +3,22 @@ import { gerarImagemOpenAI } from "./providers/openai";
 import { gerarImagemGemini } from "./providers/gemini";
 import { aplicarOverlayTexto } from "./overlay";
 import { renderCard } from "./cardDesigner";
-import { sugerirIlustracao } from "./lineArt";
 import { DIMENSOES_POR_TIPO, ESTILO_CAPA_PADRAO, type EstiloCapa } from "./types";
 import type { RenderRequest, RenderResult } from "./types";
 
 export * from "./types";
 export { buildPrompt } from "./promptBuilder";
 export { renderCard } from "./cardDesigner";
-export { ILUSTRACOES_DISPONIVEIS, sugerirIlustracao, type IlustracaoId } from "./lineArt";
+export { renderCardDetalhado } from "./cardDesigner";
+export {
+  normalizarFotoLugar,
+  normalizarFotoTamanho,
+  planejarFoto,
+  resolverLugar,
+  AVISO_LAYOUT_SEM_FOTO,
+} from "./fotoLayout";
 export { renderReceita } from "./cardDesigner";
-export type { CardInput, CardLayout } from "./cardDesigner";
+export type { CardInput, CardLayout, CardResultado } from "./cardDesigner";
 
 export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> {
   const inicio = Date.now();
@@ -183,15 +189,6 @@ export async function renderCarrossel(params: {
         brand: params.brand,
         conteudo,
         schemeIndex,
-        // Ícone temático por slide, escolhido pelo texto DAQUELE slide.
-        // Antes o carrossel gerado automaticamente não repassava nada e
-        // saía sem ilustração nenhuma. Capa e CTA seguem tipográficos.
-        ilustracao:
-          ehCapa || ehUltimo
-            ? undefined
-            : sugerirIlustracao(
-                `${conteudo.headline ?? ""} ${conteudo.corpo ?? ""} ${conteudo.subtitle ?? ""}`,
-              ),
       });
       resultados.push({
         buffer,

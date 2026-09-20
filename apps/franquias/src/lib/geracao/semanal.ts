@@ -32,6 +32,7 @@ import {
   CUSTO_CREATOMATE_RENDER_USD,
 } from "@/lib/custos/log";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
+import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 
 const MODELO_CLAUDE_DEFAULT = "claude-sonnet-4-5";
@@ -45,10 +46,18 @@ const MODELO_CLAUDE_DEFAULT = "claude-sonnet-4-5";
  *
  * Chamada: semanalmente via cron (a partir de 2ª feira 06:00), ou manualmente pelo admin.
  */
+export type ResultadoGeracaoSemana = {
+  ok: boolean;
+  total?: number;
+  erro?: string;
+  /** Preenchido quando a semana pedida já está montada (não é falha). */
+  jaExiste?: { semanaRef: string; status: string | null; posts: number };
+};
+
 export async function gerarPostsDaSemana(
   franqueadaId: string,
   semanaRef: string,
-): Promise<{ ok: boolean; total?: number; erro?: string }> {
+): Promise<ResultadoGeracaoSemana> {
   const admin = createAdminClient();
 
   // 1. Busca franqueada
@@ -78,10 +87,36 @@ export async function gerarPostsDaSemana(
     .maybeSingle();
 
   if (aprovExistente && (aprovExistente as { status?: string }).status !== "recusada") {
-    return {
-      ok: false,
-      erro: `Já existe aprovação pra essa semana (status: ${(aprovExistente as { status?: string }).status})`,
-    };
+    const existente = aprovExistente as { id: string; status?: string };
+    // 🔴 Conta os posts DE VERDADE. A coluna `total_posts` fica em 0 em quase
+    // toda linha, e a linha da aprovação nasce ANTES dos posts — então uma
+    // geração que falhou no meio deixa uma aprovação sem post nenhum, e era
+    // ela que travava a semana pra sempre: a tela mostrava o estado vazio e
+    // todo clique em "montar a semana" voltava "já existe aprovação" (caso da
+    // Juliana, carcaça de 17/08 bloqueando desde o onboarding dela).
+    const { count: postsExistentes } = await admin
+      .from("posts_agendados")
+      .select("id", { count: "exact", head: true })
+      .eq("aprovacao_semanal_id", existente.id);
+
+    if ((postsExistentes ?? 0) > 0) {
+      return {
+        ok: false,
+        erro: mensagemSemanaJaMontada({
+          semanaRef,
+          status: existente.status ?? null,
+          posts: postsExistentes ?? 0,
+        }),
+        jaExiste: {
+          semanaRef,
+          status: existente.status ?? null,
+          posts: postsExistentes ?? 0,
+        },
+      };
+    }
+
+    // Aprovação vazia é resíduo, não semana: sai da frente e a geração segue.
+    await admin.from("aprovacoes_semanais").delete().eq("id", existente.id);
   }
 
   // 3. Cria registro de aprovação
@@ -459,7 +494,7 @@ export async function gerarPostsDaSemana(
 /**
  * Dispara geração pra franqueada do usuário logado (ação do admin).
  */
-export async function gerarMinhaSemana(semanaRef?: string) {
+export async function gerarMinhaSemana(semanaRef?: string): Promise<ResultadoGeracaoSemana> {
   const supabase = createClient();
   const {
     data: { user },

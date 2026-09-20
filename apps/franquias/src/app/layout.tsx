@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { RecuperacaoRedirect } from "./RecuperacaoRedirect";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.scannerdasaude.com"),
@@ -25,8 +26,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
+        <RecuperacaoRedirect />
         {children}
-        <footer className="border-t border-brand-text/5 bg-white py-4 px-6 text-center text-xs text-brand-text/40">
+        <footer id="rodape-app" className="border-t border-brand-text/5 bg-white py-4 px-6 text-center text-xs text-brand-text/40">
           <div>© {new Date().getFullYear()} Scanner da Saúde · Clínica Nutri Secrets LTDA</div>
           <div className="mt-1">
             <a href="/privacidade" className="hover:underline">Privacidade</a>

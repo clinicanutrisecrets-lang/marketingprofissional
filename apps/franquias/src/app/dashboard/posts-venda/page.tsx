@@ -11,7 +11,16 @@ export const dynamic = "force-dynamic";
  * Tratamentos (cache produtos_scanner) e gera post de venda por produto,
  * com descrição, preço e link REAIS de checkout.
  */
-export default async function PostsVendaPage() {
+export default async function PostsVendaPage(props: {
+  searchParams?: { produto?: string | string[] };
+}) {
+  // `?produto=<scanner_produto_id>`: a Esteira do Scanner manda pra cá com o
+  // degrau já escolhido ("Ver posts de venda deste produto"). Sem o param,
+  // a tela abre como sempre, sem nada selecionado.
+  const produtoParam = props.searchParams?.produto;
+  const produtoInicialScannerId =
+    (Array.isArray(produtoParam) ? produtoParam[0] : produtoParam)?.trim() || null;
+
   const supabase = createClient();
   const {
     data: { user },
@@ -42,6 +51,7 @@ export default async function PostsVendaPage() {
             <PostsVendaClient
               produtosIniciais={resultado.produtos}
               temVinculo={resultado.temVinculo}
+              produtoInicialScannerId={produtoInicialScannerId}
             />
           ) : (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">

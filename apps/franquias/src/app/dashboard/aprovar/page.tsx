@@ -1,11 +1,25 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  aprovacaoFechada,
+  escolherAprovacao,
+  publicacaoAutomaticaLigada,
+  semanasVisiveis,
+  type AprovacaoCandidata,
+} from "@/lib/aprovacao/semana";
 import { AprovacaoView } from "./AprovacaoView";
 
 export const dynamic = "force-dynamic";
 
-export default async function AprovarPage() {
+/** Quantas semanas atrás a nutri pode reabrir pelos chips do topo. */
+const SEMANAS_NO_HISTORICO = 8;
+
+export default async function AprovarPage({
+  searchParams,
+}: {
+  searchParams?: { semana?: string };
+}) {
   const supabase = createClient();
   const {
     data: { user },
@@ -14,32 +28,70 @@ export default async function AprovarPage() {
 
   const { data: franqueada } = await supabase
     .from("franqueadas")
-    .select("id, nome_comercial, aprovacao_modo")
+    .select(
+      "id, nome_comercial, aprovacao_modo, instagram_conta_id, instagram_access_token, instagram_token_expiry, publer_profile_id",
+    )
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
   if (!franqueada) redirect("/onboarding");
-  const f = franqueada as { id: string; nome_comercial: string | null; aprovacao_modo: string | null };
+  const f = franqueada as Record<string, unknown>;
 
-  // Busca aprovação mais recente
-  const { data: aprovacao } = await supabase
+  // 🔴 Busca TODOS os status, não só os pendentes: a semana que a nutri já
+  // aprovou também mora aqui (ver lib/aprovacao/semana.ts). Antes o filtro era
+  // `.in('status', ['aguardando','aprovada_com_edicoes'])` e aprovar fazia a
+  // semana desaparecer do app inteiro.
+  const { data: aprovacoes, error: errAprov } = await supabase
     .from("aprovacoes_semanais")
-    .select("*")
-    .eq("franqueada_id", f.id)
-    .in("status", ["aguardando", "aprovada_com_edicoes"])
+    .select("id, semana_ref, status, deadline, aprovada_em")
+    .eq("franqueada_id", f.id as string)
     .order("semana_ref", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(SEMANAS_NO_HISTORICO);
 
-  const aprovacaoRow = aprovacao as Record<string, unknown> | null;
+  const linhas = (aprovacoes ?? []) as Array<Record<string, unknown>>;
 
-  // Busca posts da aprovação
+  // Contagem de posts POR APROVAÇÃO, numa consulta. A coluna `total_posts` não
+  // serve: ela fica em 0 em quase toda linha (medido 13/09/2026), e é por ela
+  // que uma aprovação sem post nenhum passava por semana de verdade.
+  let porAprovacao = new Map<string, number>();
+  if (linhas.length > 0) {
+    const { data: postsIds } = await supabase
+      .from("posts_agendados")
+      .select("id, aprovacao_semanal_id")
+      .eq("franqueada_id", f.id as string)
+      .in(
+        "aprovacao_semanal_id",
+        linhas.map((l) => l.id as string),
+      );
+    for (const p of (postsIds ?? []) as Array<{ aprovacao_semanal_id: string | null }>) {
+      const k = p.aprovacao_semanal_id;
+      if (k) porAprovacao.set(k, (porAprovacao.get(k) ?? 0) + 1);
+    }
+  }
+
+  const candidatas: Array<AprovacaoCandidata & Record<string, unknown>> = linhas.map((l) => ({
+    ...l,
+    id: l.id as string,
+    semana_ref: l.semana_ref as string,
+    status: (l.status as string) ?? null,
+    posts: porAprovacao.get(l.id as string) ?? 0,
+  }));
+
+  const escolhida = escolherAprovacao(candidatas, searchParams?.semana ?? null);
+  const historico = semanasVisiveis(candidatas).map((c) => ({
+    id: c.id,
+    semana_ref: c.semana_ref,
+    status: c.status,
+    posts: c.posts,
+    fechada: aprovacaoFechada(c.status),
+  }));
+
   let posts: Array<Record<string, unknown>> = [];
-  if (aprovacaoRow) {
+  if (escolhida) {
     const { data: postsData } = await supabase
       .from("posts_agendados")
       .select("*")
-      .eq("aprovacao_semanal_id", aprovacaoRow.id)
+      .eq("aprovacao_semanal_id", escolhida.id)
       .order("data_hora_agendada", { ascending: true });
     posts = (postsData ?? []) as Array<Record<string, unknown>>;
   }
@@ -57,14 +109,30 @@ export default async function AprovarPage() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">Aprovação semanal</h1>
           <p className="text-sm text-brand-text/60">
-            Revise os posts da semana e aprove tudo de uma vez.
+            Revise os posts da semana, aprove quando estiver do seu gosto e baixe
+            tudo aqui pra postar no seu Instagram.
           </p>
         </header>
 
+        {errAprov && (
+          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            Erro ao carregar as suas semanas. Recarregue a página: nenhum post
+            foi perdido.
+          </div>
+        )}
+
         <AprovacaoView
-          franqueadaId={f.id}
-          aprovacao={aprovacaoRow}
+          franqueadaId={f.id as string}
+          aprovacao={escolhida as Record<string, unknown> | null}
           posts={posts}
+          fechada={aprovacaoFechada(escolhida?.status)}
+          historico={historico}
+          publicacaoAutomatica={publicacaoAutomaticaLigada({
+            instagram_conta_id: f.instagram_conta_id as string | null,
+            instagram_access_token: f.instagram_access_token as string | null,
+            instagram_token_expiry: f.instagram_token_expiry as string | null,
+            publer_profile_id: f.publer_profile_id as string | null,
+          })}
         />
       </div>
     </main>
