@@ -12,25 +12,50 @@ karaokê palavra a palavra embaixo, assinatura no rodapé.
 Monta com `montar-desafio.py roteiro.json`. A transcrição vem do
 faster-whisper (`small`, `int8`, `word_timestamps=True`).
 
-## O que a chamada diz, e o que ela não diz
+## A tela final
+
+Os dois terminam na mesma tela, `telas/desafio-fim.html`, renderizada a
+1080x1920 e entrando por cima do vídeo com meio segundo de fade. Ela
+existe porque quatro linhas de ASS não davam conta: o da cozinha termina
+no meio da frase ("...ainda está bem ali inseguro de como"), e mesmo o
+outro, que tem chamada falada, não pode depender de a pessoa ouvir até o
+fim.
+
+O que está escrito nela **sai da fala dela nos dois vídeos**, nada é
+promessa inventada: os seis dias de segunda a sábado, o paciente real que
+pode ser ela mesma, exame e sintoma e genética e estilo de vida na mesma
+página, dieta e suplementação com a justificativa do lado, marketing
+ético e posicionamento, e o "não é protocolo, é autonomia".
 
 ```
-DESAFIO DE 6 DIAS
+6 DIAS · DE SEGUNDA A SÁBADO
+Meu consultório de precisão
+   1  Um paciente real, do começo ao fim
+   2  Exame, sintoma, genética e estilo de vida na mesma página
+   3  Dieta e suplementação, cada parte com a justificativa
+   4  Marketing ético, comunicação e posicionamento
+Não é para ser protocolo. É para você ter autonomia.
 VEM PARA O DESAFIO
-MEU CONSULTÓRIO DE PRECISÃO
 clique no link abaixo
+@NUTRI_SECRETS
 ```
+
+No JSON é `"cartao": {"segundos": 6.5, "imagem": "tela-desafio-fim.png"}`.
+Com imagem, o ASS não escreve nada no fim: quem manda é o PNG. Sem
+imagem, o script volta a desenhar a chamada em quatro linhas, que serve
+pra teste rápido.
 
 **A palavra "gratuito" não entra em texto nenhum.** Nem no título, nem na
-legenda, nem no cartão.
+legenda, nem na tela final.
 
 No vídeo do escritório ela fala "o meu software que eu vou liberar
 gratuito durante o desafio" aos 2:18. Texto a gente controla, áudio não —
 então a palavra é **cortada do vídeo**, com imagem e som juntos, em
 `"cortes": [[138.05, 138.66]]`. São 0,6 segundo; a frase fica "o meu
 software que eu vou liberar durante o desafio" e o corte passa como um
-corte seco comum, que é o que esse formato tem de sobra. A transcrição é
-reancorada sozinha, senão toda a legenda depois do corte ficaria adiantada.
+corte seco comum. Conferido transcrevendo o resultado. A transcrição é
+reancorada sozinha, senão toda a legenda depois do corte ficaria
+adiantada.
 
 ## O enquadramento
 

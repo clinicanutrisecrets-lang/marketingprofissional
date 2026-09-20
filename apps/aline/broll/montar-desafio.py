@@ -328,11 +328,16 @@ def main():
                    f"\\c{TIFFANY}",
                    escapa(cfg.get("rodape", "@nutri_secrets"))))
 
-    if cfg.get("cartao"):
+    # "imagem" no cartão = uma tela desenhada em HTML, com mais coisa do
+    # que cabe em quatro linhas de ASS. Quando tem imagem, o ASS não
+    # escreve nada no fim: quem manda é o PNG.
+    tela_fim = cfg.get("cartao", {}).get("imagem")
+    if cfg.get("cartao") and not tela_fim:
         ass += cartao(dur_fala + 0.15, dur, cfg["cartao"])
-        ass.append(evento(dur_fala + 0.6, dur, "Chapeu",
-                          f"{{\\an5\\pos({W//2},1720)\\fs34\\fsp8\\fad(400,0)"
-                          f"\\c{TIFFANY}}}{escapa(cfg.get('rodape', '@nutri_secrets'))}"))
+        if not tela_fim:
+            ass.append(evento(dur_fala + 0.6, dur, "Chapeu",
+                              f"{{\\an5\\pos({W//2},1720)\\fs34\\fsp8\\fad(400,0)"
+                              f"\\c{TIFFANY}}}{escapa(cfg.get('rodape', '@nutri_secrets'))}"))
 
     tmp = Path(tempfile.mkdtemp())
     arq_ass = tmp / "desafio.ass"
@@ -380,9 +385,18 @@ def main():
               f"eof_action=pass:enable='between(t,{de},{ate})'[base{n+1}];")
         anterior = f"[base{n+1}]"
 
+    v += f"{anterior}subtitles={arq_ass}:fontsdir=/usr/share/fonts[leg];"
+    if tela_fim:
+        n_tela = 1 + len(cfg.get("insertos", []))
+        v += (f"[{n_tela}:v]scale={W}:{H},format=rgba,"
+              f"setpts=PTS-STARTPTS+{dur_fala}/TB,"
+              f"fade=t=in:st={dur_fala}:d=0.45:alpha=1[tela];"
+              f"[leg][tela]overlay=0:0:enable='gte(t,{dur_fala})'[leg2];")
+        ultimo = "[leg2]"
+    else:
+        ultimo = "[leg]"
     v += (
-        f"{anterior}subtitles={arq_ass}:fontsdir=/usr/share/fonts,"
-        f"format=yuv420p[fim];"
+        f"{ultimo}format=yuv420p[fim];"
         # o cartão final é silêncio: a fala acaba antes do vídeo
         f"{entrada_a}apad=pad_dur={dur_cartao + 0.3}[som]"
     )
@@ -392,6 +406,8 @@ def main():
     entradas = ["-i", str(origem)]
     for ins in cfg.get("insertos", []):
         entradas += ["-i", str(ins["clipe"])]
+    if tela_fim:
+        entradas += ["-loop", "1", "-i", str(base / tela_fim)]
     subprocess.run(
         ["ffmpeg", "-v", "error", "-stats", "-y", *entradas,
          "-filter_complex", v, "-map", "[fim]", "-map", "[som]",
