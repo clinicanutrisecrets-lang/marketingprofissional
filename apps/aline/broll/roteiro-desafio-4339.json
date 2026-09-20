@@ -6,9 +6,9 @@
   "cortes": [],
   "chapeu": "NUTRICIONISTA",
   "titulo": "O PACIENTE\nJÁ CHEGOU",
-  "tam_titulo": 100,
-  "y_titulo": 245,
-  "y_regua": 385,
+  "tam_titulo": 96,
+  "y_titulo": 248,
+  "y_regua": 390,
   "recorte": [
     720,
     707,
@@ -16,7 +16,7 @@
     200
   ],
   "topo": 470,
-  "y_legenda": 1650,
+  "y_legenda": 1620,
   "destaques": [
     "bilhões",
     "paciente",
@@ -76,5 +76,7 @@
     "linha2": "MEU CONSULTÓRIO\nDE PRECISÃO",
     "tam2": 74,
     "abaixo": "clique no link abaixo"
-  }
+  },
+  "modo": "cheio",
+  "y_chapeu": 138
 }

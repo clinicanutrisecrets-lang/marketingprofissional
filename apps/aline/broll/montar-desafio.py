@@ -175,6 +175,21 @@ def evento(de, ate, estilo, texto, layer=0):
     return f"Dialogue: {layer},{hhmmss(de)},{hhmmss(ate)},{estilo},,0,0,0,,{texto}\n"
 
 
+def com_halo(de, ate, estilo, tags, texto, cru=None, layer=0):
+    """Duas camadas: halo preto borrado atras, letra colorida na frente.
+
+    No modo de tela cheia nao existe faixa de marca atras do texto, entao
+    a legibilidade tem que vir da propria letra. Halo e nao retangulo
+    porque o escuro segue a forma da letra e a cena continua aparecendo.
+
+    `cru` e o mesmo texto sem as marcas de cor do karaoke: o halo tem que
+    ser preto inteiro, senao a palavra acesa vaza tiffany por tras."""
+    return (evento(de, ate, estilo,
+                   f"{{{tags}\\c{SOMBRA}\\3c{SOMBRA}\\bord28\\blur18\\alpha&H1E&}}"
+                   + (cru if cru is not None else texto), layer)
+            + evento(de, ate, estilo, f"{{{tags}}}" + texto, layer + 1))
+
+
 def linhas_do_bloco(bloco):
     linhas, atual = [], []
     for w in bloco:
@@ -187,7 +202,7 @@ def linhas_do_bloco(bloco):
     return linhas
 
 
-def legenda(blocos, y, destaques, limite):
+def legenda(blocos, y, destaques, limite, halo=False):
     """Karaokê: um evento por palavra, a do instante acesa em tiffany."""
     fora = []
     fim_anterior = 0.0
@@ -208,18 +223,25 @@ def legenda(blocos, y, destaques, limite):
             ate = bloco[k + 1]["t"] if k + 1 < len(bloco) else fim_bloco
             if ate - de < 0.08:
                 ate = de + 0.08
-            corpo, n = [], 0
+            corpo, cru, n = [], [], 0
             for linha in linhas:
-                peca = []
+                peca, simples = [], []
                 for p in linha:
                     peca.append(f"{{\\c{TIFFANY}}}{escapa(p)}{{\\c{BRANCO}}}"
                                 if n == k else escapa(p))
+                    simples.append(escapa(p))
                     n += 1
                 corpo.append(" ".join(peca))
+                cru.append(" ".join(simples))
             entrada = "\\fscx88\\fscy88\\t(0,110,\\fscx100\\fscy100)" if k == 0 else ""
-            tags = (f"{{\\an5\\pos({W//2},{y})\\fs{tam}\\bord5\\blur6"
-                    f"\\c{BRANCO}{entrada}}}")
-            fora.append(evento(de, ate, "Legenda", tags + "\\N".join(corpo)))
+            tags = (f"\\an5\\pos({W//2},{y})\\fs{tam}\\bord5\\blur6"
+                    f"\\c{BRANCO}{entrada}")
+            if halo:
+                fora.append(com_halo(de, ate, "Legenda", tags,
+                                     "\\N".join(corpo), "\\N".join(cru), layer=2))
+            else:
+                fora.append(evento(de, ate, "Legenda",
+                                   "{" + tags + "}" + "\\N".join(corpo)))
         fim_anterior = fim_bloco
     return fora
 
@@ -261,33 +283,50 @@ def main():
     dur_cartao = cfg.get("cartao", {}).get("segundos", 4.5)
     dur = dur_fala + dur_cartao
 
-    rec = cfg.get("recorte", [720, 707, 0, 200])     # w, h, x, y na origem
-    alt_faixa = round(W * rec[1] / rec[0])
-    topo = cfg.get("topo", 430)
+    if cfg.get("modo", "cheio") == "cheio":
+        # o quadro inteiro do celular, sem cortar nada
+        rec, alt_faixa, topo = None, H, 0
+    else:
+        rec = cfg.get("recorte", [720, 707, 0, 200])     # w, h, x, y na origem
+        alt_faixa = round(W * rec[1] / rec[0])
+        topo = cfg.get("topo", 430)
 
     ass = [cabecalho()]
 
+    # Tela cheia: o vídeo ocupa os 1080x1920 e o texto mora por cima dele,
+    # com halo. Faixa: o vídeo vira uma tira no meio e o texto mora no
+    # fundo de marca, sem halo. O primeiro mostra o vídeo inteiro, que é o
+    # que ela pediu; o segundo dá mais respiro ao texto.
+    cheio = cfg.get("modo", "cheio") == "cheio"
+    halo = cheio
+
+    def por(de, ate, estilo, tags, texto):
+        return (com_halo(de, ate, estilo, tags, texto)
+                if halo else evento(de, ate, estilo, "{" + tags + "}" + texto))
+
     # título fixo: quem chega no meio do anúncio precisa saber do que se trata
-    ass.append(evento(0, dur_fala, "Chapeu",
-                      f"{{\\an5\\pos({W//2},150)\\fad(300,300)}}{escapa(cfg['chapeu'])}"))
-    ass.append(evento(0, dur_fala, "Titulo",
-                      f"{{\\an5\\pos({W//2},{cfg.get('y_titulo', 250)})\\fad(300,300)"
-                      f"\\fs{cfg.get('tam_titulo', 92)}\\c{BRANCO}}}"
-                      f"{escapa(cfg['titulo'])}"))
+    ass.append(por(0, dur_fala, "Chapeu",
+                   f"\\an5\\pos({W//2},{cfg.get('y_chapeu', 150)})\\fad(300,300)",
+                   escapa(cfg["chapeu"])))
+    ass.append(por(0, dur_fala, "Titulo",
+                   f"\\an5\\pos({W//2},{cfg.get('y_titulo', 250)})\\fad(300,300)"
+                   f"\\fs{cfg.get('tam_titulo', 92)}\\c{BRANCO}",
+                   escapa(cfg["titulo"])))
     larg = 260
     ass.append(evento(0, dur_fala, "Desenho",
                       f"{{\\an7\\pos({(W-larg)//2},{cfg.get('y_regua', 370)})"
-                      f"\\fad(300,300)\\c{TIFFANY}\\p1}}"
+                      f"\\fad(300,300)\\c{TIFFANY}\\bord4\\3c{SOMBRA}\\p1}}"
                       f"m 0 0 l {larg} 0 l {larg} 6 l 0 6{{\\p0}}"))
 
     blocos = [b for b in blocos_de(palavras, cfg.get("correcoes", {}))
               if b[0]["t"] < dur_fala]
     ass += legenda(blocos, cfg.get("y_legenda", 1640),
-                   {p.lower() for p in cfg.get("destaques", [])}, dur_fala)
+                   {p.lower() for p in cfg.get("destaques", [])}, dur_fala, halo)
 
-    ass.append(evento(0, dur_fala, "Chapeu",
-                      f"{{\\an5\\pos({W//2},1862)\\fs34\\fsp8\\fad(400,300)"
-                      f"\\c{TIFFANY}}}{escapa(cfg.get('rodape', '@nutri_secrets'))}"))
+    ass.append(por(0, dur_fala, "Chapeu",
+                   f"\\an5\\pos({W//2},1862)\\fs34\\fsp8\\fad(400,300)"
+                   f"\\c{TIFFANY}",
+                   escapa(cfg.get("rodape", "@nutri_secrets"))))
 
     if cfg.get("cartao"):
         ass += cartao(dur_fala + 0.15, dur, cfg["cartao"])
@@ -316,8 +355,9 @@ def main():
         v = ""
         entrada_v, entrada_a = "[0:v]", "[0:a]"
 
+    corte_v = (f"crop={rec[0]}:{rec[1]}:{rec[2]}:{rec[3]}," if rec else "")
     v += (
-        f"{entrada_v}crop={rec[0]}:{rec[1]}:{rec[2]}:{rec[3]},"
+        f"{entrada_v}{corte_v}"
         f"scale={W}:{alt_faixa}:flags=lanczos,setsar=1,fps=30[faixa];"
         f"color=c={FUNDO}:s={W}x{H}:r=30:d={dur}[bg];"
         f"[bg][faixa]overlay=0:{topo}:eof_action=pass[base0];"
@@ -333,7 +373,7 @@ def main():
         # aparece nas laterais do B-roll, que é mais estreito que a faixa
         v += (f"{anterior}drawbox=x=0:y={topo}:w={W}:h={alt_faixa}:"
               f"color={FUNDO}@1:t=fill:enable='between(t,{de},{ate})'[tapa{n}];")
-        larg_ins = cfg.get("largura_inserto", 596)
+        larg_ins = cfg.get("largura_inserto", W if rec is None else 596)
         v += (f"[{n+1}:v]scale={larg_ins}:{alt_faixa}:flags=lanczos,setsar=1,fps=30,"
               f"setpts=PTS-STARTPTS+{de}/TB[ins{n}];"
               f"[tapa{n}][ins{n}]overlay={(W - larg_ins)//2}:{topo}:"

@@ -34,22 +34,22 @@ reancorada sozinha, senão toda a legenda depois do corte ficaria adiantada.
 
 ## O enquadramento
 
-O vídeo do celular é 9:16 e enche o quadro. Se ficar assim não sobra
-lugar pro texto, e texto por cima do rosto durante três minutos cansa.
-Então ele vira uma faixa quase quadrada no meio:
+O padrão é `"modo": "cheio"`: o vídeo do celular é 9:16 e ocupa os
+1080x1920 inteiros, sem cortar nada. O texto mora por cima, e a
+legibilidade vem de halo — a mesma frase desenhada duas vezes, a de trás
+preta com `bord28 blur18`. Halo e não retângulo porque o escuro segue a
+forma da letra e a cena continua aparecendo por baixo.
 
-```
-recorte 720x707 a partir de y=200   →   faixa 1080x1060 em y=470
-```
+Existe também `"modo": "faixa"`, que encolhe o vídeo pra uma tira quase
+quadrada no meio (`recorte 720x707 a partir de y=200`, faixa `1080x1060`
+em `y=470`) e põe o texto no fundo de marca, sem halo. Dá mais respiro ao
+texto, mas corta o alto do quadro e a barriga — **ela não quis**, e com
+razão: o enquadramento dela já é fechado, cortar de novo aperta.
 
-O `y=200` não é chute: o rosto dela ocupa de y≈230 a y≈820 nos 1280 de
-altura nos dois vídeos. Cortando de 200 a 907 sobra ar em cima da cabeça
-e o queixo não encosta na borda. Testar com três quadros espalhados pelo
-vídeo antes de renderizar é o que evita descobrir o corte errado depois de
-meia hora de render.
-
-Sobra faixa de marca de 0 a 470 (chapéu, título, régua) e de 1530 a 1920
-(karaokê e assinatura).
+Se um dia voltar a usar o modo faixa, o `y=200` não é chute: o rosto dela
+ocupa de y≈230 a y≈820 nos 1280 de altura nos dois vídeos. Testar com três
+quadros espalhados antes de renderizar é o que evita descobrir o corte
+errado depois de meia hora de render.
 
 ## Insertos
 
