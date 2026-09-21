@@ -153,7 +153,7 @@ export function BibliotecaVideos({
             <div className="mb-3 text-4xl">🎥</div>
             <p className="text-sm text-slate-500">
               Nenhum vídeo seu ainda. Suba os seus acima
-              {acervo.length > 0 ? " — o acervo compartilhado já está disponível pra IA usar." : "."}
+              {acervo.length > 0 ? " — o acervo compartilhado já está disponível pro Scanner usar." : "."}
             </p>
           </div>
         ) : (
@@ -226,7 +226,7 @@ function CamposMeta({
           className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm"
         />
         <p className="mt-1 text-xs text-slate-500">
-          Quanto melhor a descrição e as tags, melhor a IA escolhe este clipe pra
+          Quanto melhor a descrição e as tags, melhor o Scanner escolhe este clipe pra
           ilustrar o momento certo da fala nos cortes automáticos.
         </p>
       </div>
@@ -242,7 +242,7 @@ function CamposMeta({
               className="text-xs font-medium hover:underline disabled:opacity-60"
               style={{ color: corPrimaria }}
             >
-              {sugerindo ? "Pensando..." : "✨ Sugerir com IA"}
+              {sugerindo ? "Pensando..." : "Sugerir descrição"}
             </button>
           )}
         </div>
@@ -392,7 +392,7 @@ function FormUpload({
             Salvar no <strong>acervo compartilhado</strong> (clipe coringa)
             <span className="block text-xs text-slate-500">
               Fica disponível pra todos os perfis e franqueadas, e pro corte com
-              IA. Use pra cena genérica; o que for específico deste perfil deixe
+              Scanner. Use pra cena genérica; o que for específico deste perfil deixe
               desmarcado.
             </span>
           </span>
@@ -544,7 +544,7 @@ function ListaAcervo({ videos }: { videos: VideoBiblioteca[] }) {
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <p className="mb-4 text-sm text-slate-600">
-        Clipes coringa mantidos pela equipe, disponíveis pra todo mundo. A IA já
+        Clipes coringa mantidos pela equipe, disponíveis pra todo mundo. O Scanner já
         usa nos cortes automáticos quando combinam com a fala. Não dá pra editar
         aqui: se faltar algo, peça pra equipe adicionar.
       </p>

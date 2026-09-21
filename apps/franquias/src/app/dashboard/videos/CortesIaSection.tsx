@@ -4,26 +4,58 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { CorteIa } from "@/lib/corte/actions";
+import { FILTROS } from "@/lib/corte/opcoes";
+import { EnviarDoCelular } from "./EnviarDoCelular";
 
 /**
  * Lista das gravações enviadas pra edição automática (teste fechado — só
  * aparece pra quem está em CORTE_IA_EMAILS). Enquanto houver corte em
  * andamento, a página se atualiza sozinha a cada 20 s.
+ *
+ * 🔴 Nada de "IA" nem estrelinha nos rótulos (regra 1 do projeto): na
+ * interface é "algoritmo Scanner" ou simplesmente o que a coisa faz.
  */
 
-/** Worker passou muito do prazo (~5 min): mostrar como falha, não como espera. */
+/**
+ * Worker passou muito do prazo: mostrar como falha, não como espera eterna.
+ * Com filtro de imagem o processamento é bem mais longo (cada quadro passa
+ * pelo motor), então o prazo acompanha a escolha — senão um corte que está
+ * indo bem apareceria como "não ficou pronto".
+ */
 const LIMITE_MS = 25 * 60 * 1000;
+const LIMITE_FILTRO_MS = 95 * 60 * 1000;
 function travou(c: CorteIa): boolean {
   if (c.status !== "enviado" && c.status !== "processando") return false;
   const t = new Date(c.criado_em).getTime();
-  return Number.isFinite(t) && Date.now() - t > LIMITE_MS;
+  const teto = c.filtro && c.filtro !== "nenhum" ? LIMITE_FILTRO_MS : LIMITE_MS;
+  return Number.isFinite(t) && Date.now() - t > teto;
 }
 
 const ETAPA: Record<string, string> = {
-  transcrevendo: "🎧 transcrevendo",
-  planejando: "🧠 planejando cortes e legendas",
-  renderizando: "🎞️ renderizando",
+  transcrevendo: "🎧 ouvindo o que você falou",
+  limpando: "✂️ tirando as pausas",
+  planejando: "🧠 escolhendo cortes e legendas",
+  filtrando: "💄 aplicando o filtro (esta é a parte demorada)",
+  renderizando: "🎞️ montando o vídeo",
 };
+
+/** Uma linha dizendo o que a edição tirou. Sem número ela não sabe o que houve. */
+function resumoLimpeza(c: CorteIa): string | null {
+  const l = c.limpeza;
+  if (!l) return null;
+  const partes: string[] = [];
+  if (l.aviso) partes.push(l.aviso);
+  else if (l.removidos?.length) {
+    const tipos = [...new Set(l.removidos.map((r) => r.motivo))].join(", ");
+    partes.push(
+      `cortei ${Math.round(l.seg_removidos ?? 0)}s em ${l.removidos.length} ponto${
+        l.removidos.length > 1 ? "s" : ""
+      } (${tipos})`,
+    );
+  }
+  if (l.aviso_filtro) partes.push(l.aviso_filtro);
+  return partes.length ? partes.join(" · ") : null;
+}
 
 export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
   const router = useRouter();
@@ -42,15 +74,17 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-brand-text">
-            ✨ Cortes com IA{" "}
+            🎬 Edição automática{" "}
             <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
               teste
             </span>
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
-            Grave até 1 minuto no teleprompter e clique em &quot;Editar com IA&quot;: a
-            gravação volta em 9:16 com legendas dinâmicas, palavra-chave por
-            trecho e b-roll da sua biblioteca. Pronto em uns 3 a 5 minutos.
+            Grave no teleprompter (ou mande um vídeo do celular) e clique em
+            &quot;Editar automaticamente&quot;: o Scanner tira as pausas e os
+            recomeços, devolve em 9:16 com legenda, palavra-chave por trecho e
+            imagens de apoio. Você escolhe o filtro e o estilo da legenda antes
+            de mandar.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -68,6 +102,8 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
           </Link>
         </div>
       </div>
+
+      <EnviarDoCelular />
 
       {cortes.length === 0 ? (
         <p className="mt-4 text-sm text-brand-text/50">Nenhuma gravação enviada ainda.</p>
@@ -88,7 +124,14 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
+                  {c.filtro && c.filtro !== "nenhum"
+                    ? ` · filtro ${FILTROS.find((f) => f.id === c.filtro)?.rotulo ?? c.filtro}`
+                    : ""}
+                  {c.origem_tipo === "upload" ? " · do celular" : ""}
                 </p>
+                {resumoLimpeza(c) && (
+                  <p className="mt-0.5 text-xs text-brand-text/45">{resumoLimpeza(c)}</p>
+                )}
               </div>
               {c.status === "pronto" && c.url ? (
                 <div className="flex items-center gap-2">
