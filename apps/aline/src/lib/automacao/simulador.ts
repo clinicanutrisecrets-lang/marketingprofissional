@@ -8,8 +8,19 @@
 import { createAlineClient } from "@/lib/supabase/server";
 import { carregarPerfilPorSlug } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig } from "./config";
-import { gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
-import { pareceClinico, pareceSpam, preencherTexto, selecionarRegra, variantesDe, type Gatilho, type Regra } from "./regras";
+import { escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import {
+  candidatasPorIntencao,
+  descreverRegra,
+  pareceAbordagemComercial,
+  pareceClinico,
+  pareceSpam,
+  preencherTexto,
+  selecionarRegra,
+  variantesDe,
+  type Gatilho,
+  type Regra,
+} from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 
 export type ResultadoSimulacao = {
@@ -40,7 +51,32 @@ export async function simularEvento(params: {
     .eq("perfil_id", perfil.id)
     .eq("ativa", true);
   const regras = (data ?? []) as Regra[];
-  const regra = selecionarRegra({ gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId }, regras);
+  let regra = selecionarRegra({ gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId }, regras);
+
+  // Vendedor: o robô não conversa (vale antes de qualquer chave geral).
+  const ehVendedor = pareceAbordagemComercial(params.texto);
+
+  // A rede embaixo da palavra-chave, igual ao caminho real. Sem ela o
+  // simulador diria "nada casou" justamente nos casos que o robô atende.
+  if (!regra && config.entender_pedido_sem_palavra && params.texto.trim() && !pareceSpam(params.texto) && !ehVendedor) {
+    const candidatas = candidatasPorIntencao(
+      { gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId },
+      regras,
+    );
+    if (candidatas.length > 0) {
+      const i = await escolherRegraPorIntencao(params.texto, candidatas.map(descreverRegra));
+      if (i != null) {
+        regra = candidatas[i];
+        avisos.push("A palavra-chave NÃO casou. Quem entendeu o pedido foi a leitura de intenção.");
+      } else {
+        avisos.push(`A palavra-chave não casou, e a leitura de intenção não achou material pra este texto (olhou ${candidatas.length}).`);
+      }
+    }
+  }
+
+  if (ehVendedor) {
+    return { regra: null, acoes: ["Nada: parece alguém vendendo um serviço pra você (tráfego, vídeo, imóvel, parceria)."], avisos };
+  }
 
   if (regra) {
     if (params.gatilho === "comentario" && regra.resposta_publica) {
