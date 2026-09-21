@@ -27,15 +27,26 @@ on:
       anthropic_key:
         required: false
         default: ""
+      pexels_key:
+        description: "banco de imagem pro b-roll, quando a biblioteca está vazia"
+        required: false
+        default: ""
+      filtro:
+        description: "nenhum | pele | completo (decide se instala o motor de filtro)"
+        required: false
+        default: "nenhum"
 
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # O filtro custa de 0,6 a 2,5 s por quadro e o upload do celular pode ter
+    # 3 minutos. Sem filtro o corte fecha em 3 a 5 min; com filtro, bem mais.
+    timeout-minutes: 90
     env:
       SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
       SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
       ANTHROPIC_API_KEY: ${{ inputs.anthropic_key != '' && inputs.anthropic_key || secrets.ANTHROPIC_API_KEY }}
+      PEXELS_API_KEY: ${{ inputs.pexels_key != '' && inputs.pexels_key || secrets.PEXELS_API_KEY }}
       WHISPER_MODEL: small
     steps:
       - uses: actions/checkout@v4
@@ -54,6 +65,14 @@ jobs:
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
           pip install -q faster-whisper anthropic fonttools requests
+
+      # Só quando a nutri pediu filtro: são centenas de MB (mediapipe, torch)
+      # e a maioria dos cortes não usa.
+      - name: Instalar o motor de filtro
+        if: inputs.filtro != '' && inputs.filtro != 'nenhum'
+        run: |
+          pip install -q -r packages/video-filtro/requirements.txt
+          bash packages/video-filtro/baixar-modelos.sh
 
       - name: Processar corte
         run: |

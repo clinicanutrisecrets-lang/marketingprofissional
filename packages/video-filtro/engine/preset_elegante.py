@@ -39,17 +39,34 @@ ELEGANTE = dict(
 )
 
 def aplicar_quadro(im, pts=None, p=None):
+    """Um quadro. Forca 0 PULA a etapa (e o preset 'pele' e exatamente isso).
+
+    Matematicamente forca=0 ja seria identidade, mas cada etapa monta mascara
+    do rosto e isso custa caro por quadro. Pular e o mesmo resultado, so que
+    sem pagar.
+
+    ⚠️ asa_delineador, subir_delineador e levantar_delineador estao no preset e
+    NAO sao repassados aqui — o delineador roda com os defaults de maquiagem.py
+    (asa 0.44, subir 0.32, levantar 0.30). Fica assim de proposito: foi COM os
+    defaults que ela aprovou o visual em 12/09. Passar os valores do dict
+    mudaria o tracado que ela ja validou; se um dia for pra usar, e teste com
+    ela olhando, nao correcao silenciosa.
+    """
     p = p or ELEGANTE
     out = F.aplicar(im, cabelo_contraste=p["cabelo_contraste"],
                     cabelo_profundidade=p["cabelo_profundidade"],
                     limpeza=p["limpeza"], nitidez=p["nitidez"])
     if pts is None: return out
-    out = M.delineador(out, pts, forca=p["forca_delineador"])
-    out = M.batom(out, pts, cor=p["cor_batom"], forca=p["forca_batom"],
-                   escurecer=p.get("escurecer_batom", 0.0))
+    if p.get("forca_delineador", 0) > 0:
+        out = M.delineador(out, pts, forca=p["forca_delineador"])
+    if p.get("forca_batom", 0) > 0:
+        out = M.batom(out, pts, cor=p["cor_batom"], forca=p["forca_batom"],
+                      escurecer=p.get("escurecer_batom", 0.0))
     # dentes por ULTIMO: o batom escurece a borda do labio e melhora o contorno
     # da abertura da boca, entao a mascara do dente sai mais limpa depois dele
-    return M.dentes(out, pts, forca=p.get("forca_dentes", 0.55))
+    if p.get("forca_dentes", 0) > 0:
+        out = M.dentes(out, pts, forca=p["forca_dentes"])
+    return out
 
 def _media(hist):
     """Media movel dos pontos do rosto. Sem ela o batom TREME: a deteccao

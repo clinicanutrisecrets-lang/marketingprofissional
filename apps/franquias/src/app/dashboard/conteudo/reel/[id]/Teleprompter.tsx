@@ -6,6 +6,15 @@ import { marcarStatusSugestao } from "@/lib/conteudo/actions";
 import { createClient } from "@/lib/supabase/client";
 import { prepararUploadCorteAction, criarCorteAction } from "@/lib/corte/actions";
 import { CORTE_MAX_SEG } from "@/lib/corte/constantes";
+import {
+  ESTILOS_LEGENDA,
+  ESTILO_PADRAO,
+  FILTROS,
+  FILTRO_PADRAO,
+  estimativaMinutos,
+  type EstiloLegendaId,
+  type FiltroId,
+} from "@/lib/corte/opcoes";
 
 /**
  * Teleprompter com gravação: câmera frontal ao fundo, roteiro rolando por
@@ -15,6 +24,12 @@ import { CORTE_MAX_SEG } from "@/lib/corte/constantes";
  * Com `corteIa` ligado (teste fechado, ver lib/corte/gate.ts) a gravação tem
  * teto de 60 s com cronômetro e, ao terminar, pode ser enviada pra edição
  * automática (legendas, palavras-chave e b-roll) — ver lib/corte/actions.ts.
+ *
+ * A faixa de filtro fica embaixo da câmera, como no Instagram (pedido da
+ * Aline, 21/09/2026). 🔴 O que ela NÃO faz é prévia ao vivo: o filtro roda
+ * depois, no worker. A tela diz isso em uma linha em vez de fingir um efeito
+ * que não é o que vai sair — prévia que não bate com o resultado é pior que
+ * prévia nenhuma.
  */
 export function Teleprompter(props: {
   sugestaoId: string;
@@ -44,6 +59,9 @@ export function Teleprompter(props: {
   const [segundos, setSegundos] = useState(0);
   const [enviando, setEnviando] = useState(false);
   const [enviadoMsg, setEnviadoMsg] = useState<string | null>(null);
+  const [filtro, setFiltro] = useState<FiltroId>(FILTRO_PADRAO);
+  const [estilo, setEstilo] = useState<EstiloLegendaId>(ESTILO_PADRAO);
+  const [abrirAjustes, setAbrirAjustes] = useState(false);
   const limiteSeg = props.corteIa ? CORTE_MAX_SEG : null;
 
   // Liga a câmera frontal
@@ -166,6 +184,9 @@ export function Teleprompter(props: {
         duracaoSeg: segundos,
         tema: props.tema,
         sugestaoId: props.sugestaoId || undefined,
+        filtro,
+        estiloLegenda: estilo,
+        origemTipo: "teleprompter",
       });
       if (!r.ok) throw new Error(r.msg);
       setEnviadoMsg(r.msg);
@@ -231,6 +252,72 @@ export function Teleprompter(props: {
         <button onClick={() => setEspelhado((e) => !e)} className="rounded bg-white/10 px-2 text-sm" title="Espelhar texto">🪞</button>
       </div>
 
+      {/* Faixa de filtro, embaixo da câmera (como no Instagram) */}
+      {props.corteIa && !gravando && (
+        <div className="absolute inset-x-0 bottom-[104px] px-3">
+          <div className="mx-auto max-w-xl rounded-2xl bg-black/70 px-3 py-2 backdrop-blur">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <span className="shrink-0 text-[11px] uppercase tracking-wide text-white/50">
+                Filtro
+              </span>
+              {FILTROS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFiltro(f.id)}
+                  title={f.ajuda}
+                  aria-pressed={filtro === f.id}
+                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                    filtro === f.id
+                      ? "bg-amber-400 text-black"
+                      : "bg-white/10 text-white hover:bg-white/20"
+                  }`}
+                >
+                  {f.rotulo}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setAbrirAjustes((v) => !v)}
+                className="ml-auto shrink-0 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white"
+              >
+                Legenda: {ESTILOS_LEGENDA.find((e) => e.id === estilo)?.rotulo}
+              </button>
+            </div>
+
+            {abrirAjustes && (
+              <div className="mt-2 flex flex-wrap gap-2 border-t border-white/10 pt-2">
+                {ESTILOS_LEGENDA.map((e) => (
+                  <button
+                    key={e.id}
+                    type="button"
+                    onClick={() => {
+                      setEstilo(e.id);
+                      setAbrirAjustes(false);
+                    }}
+                    title={e.ajuda}
+                    aria-pressed={estilo === e.id}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                      estilo === e.id
+                        ? "bg-white text-black"
+                        : "bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                  >
+                    {e.rotulo}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <p className="mt-1 text-[11px] leading-snug text-white/50">
+              {filtro === "nenhum"
+                ? "A imagem sai como a câmera gravou."
+                : `${FILTROS.find((f) => f.id === filtro)?.ajuda} O efeito não aparece aqui na prévia: ele entra na edição, e por isso o vídeo demora mais (uns ${estimativaMinutos(segundos || 60, filtro)[0]} a ${estimativaMinutos(segundos || 60, filtro)[1]} min).`}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Controles inferiores */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-black/70 px-4 py-4">
         {erro && <p className="text-center text-xs text-amber-300">{erro}</p>}
@@ -243,7 +330,7 @@ export function Teleprompter(props: {
                 disabled={enviando}
                 className="rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-bold text-black disabled:opacity-60"
               >
-                {enviando ? "⏫ Enviando..." : "✨ Editar com IA"}
+                {enviando ? "⏫ Enviando..." : "🎬 Editar automaticamente"}
               </button>
             )}
             {enviadoMsg && (
@@ -319,7 +406,7 @@ export function Teleprompter(props: {
         {enviadoMsg && <p className="text-center text-xs text-emerald-300">{enviadoMsg}</p>}
         {props.corteIa && !gravando && !videoUrl && (
           <p className="text-center text-[11px] text-amber-200/80">
-            ✨ Corte com IA ligado: a gravação para sozinha em {mmss(CORTE_MAX_SEG)} e sai editada
+            🎬 Edição automática ligada: a gravação para sozinha em {mmss(CORTE_MAX_SEG)} e sai editada
             com legendas e b-roll.
           </p>
         )}

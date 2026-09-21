@@ -1,6 +1,7 @@
 # @scanner/corte-ia
 
-Gravação do teleprompter (até 60 s) → reel 9:16 editado, sem editor.
+Gravação do teleprompter (até 60 s) **ou vídeo do celular (até 3 min)** →
+reel 9:16 editado, sem editor.
 
 Fluxo completo:
 
@@ -11,12 +12,46 @@ Fluxo completo:
 2. **Worker** (`pipeline.py`, GitHub Actions):
    - normaliza o vídeo (fps fixo, MP4)
    - transcreve local com faster-whisper (timestamp por palavra)
+   - **limpa** (`limpeza.py` + `recorte.py`): tira pausa morta, falsa partida
+     e hesitação, e remapeia a transcrição pro novo tempo
    - pede o **plano** pro Claude: capa, palavra-chave por trecho, b-roll do
      catálogo (`videos_franqueada` da nutri + `acervo_videos`, o acervo
      compartilhado com o Studio Aline) e correções de termos técnicos
-   - renderiza (`render.py`) e sobe o MP4 pro bucket `franqueadas-assets`
+   - sem b-roll no catálogo, busca no banco de imagem (`broll_pexels.py`)
+   - **filtra** a imagem, se a nutri pediu (`packages/video-filtro`)
+   - renderiza (`render.py`) no **estilo de legenda** escolhido e sobe o MP4
+     pro bucket `franqueadas-assets`
    - marca `pronto` ou `erro` na tabela
 3. **App**: a aba Vídeos lista os cortes com status e se atualiza sozinha.
+
+## Limpeza da gravação (`limpeza.py`)
+
+Tira pausa, "ãã" e frase recomeçada. **A transcrição propõe, o áudio
+confirma**: buraco no reconhecimento não é prova de silêncio, então todo corte
+de pausa é a interseção entre o buraco e o silêncio medido no áudio
+(`ffmpeg silencedetect`). Sem essa medição o módulo fica desconfiado.
+
+As travas estão escritas no topo do arquivo e provadas em `test_limpeza.py`
+(as três principais foram conferidas **vermelhas** sem o conserto). Resumo:
+corte sempre cai em silêncio; primeira e última palavra nunca somem; remoção
+de FALA tem teto próprio; estourou o teto, não corta nada e diz por quê.
+
+## Filtro e estilo de legenda
+
+A nutri escolhe na hora de gravar (faixa embaixo da câmera, como no Instagram):
+
+| filtro | o que faz |
+|---|---|
+| `nenhum` | imagem como a câmera gravou |
+| `pele` | pele, cabelo e dentes. Não desenha nada no rosto: serve pra qualquer pessoa |
+| `completo` | o de cima + batom vinho e delineador levantado (o olho de gatinho) |
+
+🔴 **Não há prévia ao vivo.** O filtro roda no worker, depois. A tela diz isso
+em vez de fingir um efeito que não é o que vai sair.
+
+Estilos de legenda em `legenda_estilos.py` (`classica`, `editorial`,
+`impacto`). A `classica` é o default e o fallback, e `golden/classica.ass`
+prova que ela saiu byte a byte igual à versão anterior a esta mudança.
 
 ## Regras de conteúdo
 
@@ -69,3 +104,9 @@ Teste fechado: só e-mails em `CORTE_IA_EMAILS` (padrão: conta da Aline).
 `CORTE_IA_EMAILS=*` abre pra todas. `CORTE_BROLL_FRANQUEADA_ID` aponta a
 franqueada dona da biblioteca de coringas compartilhada (ver
 `docs/broll-coringas.md`).
+
+⚠️ Em 21/09/2026 o acervo de b-roll estava **vazio** (zero linha nas três
+tabelas) e o worker **nunca tinha rodado uma vez**. Enquanto os clipes da
+Aline não sobem, `PEXELS_API_KEY` é o que garante retomada no vídeo;
+`scripts/seed-acervo-broll.py` enche o acervo a partir do documento dos 40
+coringas.

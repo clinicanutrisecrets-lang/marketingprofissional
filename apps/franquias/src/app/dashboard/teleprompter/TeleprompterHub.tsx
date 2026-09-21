@@ -73,7 +73,7 @@ export function TeleprompterHub({
               : "bg-white text-brand-text/70 ring-1 ring-brand-text/15"
           }`}
         >
-          ✨ Roteiros da semana ({roteiros.length})
+          📅 Roteiros da semana ({roteiros.length})
         </button>
         <button
           onClick={() => setModo("livre")}
@@ -98,7 +98,7 @@ export function TeleprompterHub({
               href="/dashboard/conteudo"
               className="mt-4 inline-block rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
             >
-              ✨ Gerar sugestões da semana
+              📝 Gerar sugestões da semana
             </Link>
           </div>
         ) : (

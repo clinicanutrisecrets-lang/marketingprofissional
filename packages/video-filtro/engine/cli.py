@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """Aplica o filtro (e opcionalmente troca o cenario) num video.
 
-  python3 cli.py entrada.mp4 saida.mp4 [--cenario foto.png] [--preset elegante]
-                 [--verde] [--sem-maquiagem]
+  python3 cli.py entrada.mp4 saida.mp4 [--cenario foto.png]
+                 [--preset pele|completo|nenhum] [--verde]
+
+  --preset pele      so pele, cabelo e dentes (serve pra qualquer pessoa)
+  --preset completo  o de cima + batom e olho de gatinho (o da Aline)
+  --preset nenhum    nao filtra (util pra so trocar o cenario)
 
 Duas formas de recortar, e a diferenca importa:
   --verde   fundo verde/chroma: o recorte e CALCULADO (rapido e perfeito)
@@ -16,12 +20,19 @@ def main():
     p.add_argument("entrada"); p.add_argument("saida")
     p.add_argument("--cenario", default=None, help="foto de fundo (PNG/JPG)")
     p.add_argument("--verde", action="store_true", help="o video foi gravado em chroma")
-    p.add_argument("--sem-maquiagem", action="store_true")
+    p.add_argument("--preset", default="completo",
+                   help="pele | completo | nenhum (ver presets.py)")
+    p.add_argument("--sem-maquiagem", action="store_true",
+                   help="atalho antigo, equivale a --preset pele")
     p.add_argument("--trabalhadores", type=int, default=int(os.environ.get("TRAB", "3")))
     a = p.parse_args()
 
-    import preset_elegante as P
-    preset = None if a.sem_maquiagem else P.ELEGANTE
+    import presets as PR
+    nome = "pele" if a.sem_maquiagem else a.preset
+    preset = PR.por_nome(nome)
+    if preset is None and nome not in ("nenhum", ""):
+        print(f"filtro '{nome}' nao existe; seguindo sem filtro", flush=True)
+    print(f"filtro: {PR.ROTULOS.get(nome, nome)}", flush=True)
 
     if a.verde:
         import render_verde
