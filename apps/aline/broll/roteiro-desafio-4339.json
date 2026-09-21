@@ -16,15 +16,22 @@
     200
   ],
   "topo": 470,
-  "y_legenda": 1620,
+  "y_legenda": 1680,
   "destaques": [
+    "autonomia",
     "bilhões",
-    "paciente",
+    "bioativos",
     "conduta",
+    "crescendo",
+    "desafio",
     "excelência",
     "frustrados",
-    "desafio",
+    "gaveta",
+    "indicaria",
+    "interpretar",
     "manual",
+    "paciente",
+    "prático",
     "revoltada"
   ],
   "frases": [
@@ -70,13 +77,11 @@
     ]
   ],
   "cartao": {
-    "segundos": 5.0,
-    "chapeu": "DESAFIO DE 6 DIAS",
-    "linha1": "VEM PARA\nO DESAFIO",
-    "linha2": "MEU CONSULTÓRIO\nDE PRECISÃO",
-    "tam2": 74,
-    "abaixo": "clique no link abaixo"
+    "segundos": 6.5,
+    "imagem": "tela-desafio-fim.png"
   },
   "modo": "cheio",
-  "y_chapeu": 138
+  "y_chapeu": 138,
+  "tam_legenda": 94,
+  "tam_destaque": 150
 }

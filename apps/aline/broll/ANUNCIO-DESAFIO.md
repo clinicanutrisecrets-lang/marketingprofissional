@@ -57,6 +57,26 @@ corte seco comum. Conferido transcrevendo o resultado. A transcrição é
 reancorada sozinha, senão toda a legenda depois do corte ficaria
 adiantada.
 
+## Onde a legenda mora
+
+A legenda é ancorada pelo **rodapé** (`\an2`), não pelo centro: `y_legenda`
+é a base do bloco e o texto cresce pra cima. É o que deixa a palavra de
+destaque ser bem maior sem invadir o rosto.
+
+O limite não é chute. Com uma régua desenhada em cima de quadros
+espalhados pelos dois vídeos, o queixo dela desce até **y≈1300** nos
+momentos em que se inclina pra frente. Com a base em `1680`, o pior caso
+— destaque de duas linhas a 150 — começa em 1320. Passa raspando de
+propósito: mais alto invade, mais baixo cola no rodapé.
+
+Destaque é 150 contra 94 do normal, e entra com mais salto
+(`fscx80 → 100` em 140ms contra `88 → 100` em 110ms). Escrever maior sem
+o salto parece erro de tamanho; com o salto parece batida.
+
+A lista de `destaques` é o que decide quais blocos crescem. Ela precisa
+ter palavra suficiente pra o efeito aparecer: com oito palavras em três
+minutos quase não se nota, com quinze vira ritmo.
+
 ## O enquadramento
 
 O padrão é `"modo": "cheio"`: o vídeo do celular é 9:16 e ocupa os

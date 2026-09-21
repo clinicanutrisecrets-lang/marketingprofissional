@@ -21,16 +21,24 @@
     200
   ],
   "topo": 470,
-  "y_legenda": 1620,
+  "y_legenda": 1680,
   "destaques": [
-    "nenhum",
-    "unânime",
+    "aplicado",
+    "atrasada",
+    "autonomia",
     "baixa",
     "conduta",
-    "autonomia",
+    "confiança",
     "desafio",
+    "fazer",
+    "justificativa",
+    "mercado",
+    "nenhum",
+    "passo",
+    "precisão",
+    "real",
     "sozinho",
-    "fazer"
+    "unânime"
   ],
   "frases": [
     [
@@ -59,13 +67,11 @@
     ]
   ],
   "cartao": {
-    "segundos": 5.0,
-    "chapeu": "DESAFIO DE 6 DIAS",
-    "linha1": "VEM PARA\nO DESAFIO",
-    "linha2": "MEU CONSULTÓRIO\nDE PRECISÃO",
-    "tam2": 74,
-    "abaixo": "clique no link abaixo"
+    "segundos": 6.5,
+    "imagem": "tela-desafio-fim-escopo.png"
   },
   "modo": "cheio",
-  "y_chapeu": 138
+  "y_chapeu": 138,
+  "tam_legenda": 94,
+  "tam_destaque": 150
 }

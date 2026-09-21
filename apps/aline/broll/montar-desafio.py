@@ -202,14 +202,21 @@ def linhas_do_bloco(bloco):
     return linhas
 
 
-def legenda(blocos, y, destaques, limite, halo=False):
-    """Karaokê: um evento por palavra, a do instante acesa em tiffany."""
+def legenda(blocos, y, destaques, limite, halo=False, tam_normal=92,
+            tam_destaque=136):
+    """Karaokê: um evento por palavra, a do instante acesa em tiffany.
+
+    `y` é a **base** do bloco, não o centro: o texto é ancorado pelo
+    rodapé (`\\an2`) e cresce pra cima. É o que deixa a palavra de
+    destaque ser bem maior sem invadir o rosto — medido nos dois vídeos,
+    o queixo dela desce até y≈1300, então a base em 1680 dá folga mesmo
+    no pior caso, que é destaque de duas linhas."""
     fora = []
     fim_anterior = 0.0
     for b, bloco in enumerate(blocos):
         palavras = [w["p"] for w in bloco]
         grande = any(re.sub(r"\W", "", p).lower() in destaques for p in palavras)
-        tam = 118 if grande else 88
+        tam = tam_destaque if grande else tam_normal
         linhas = linhas_do_bloco(bloco)
         # o bloco não pode sobrar por cima do próximo: era o que empilhava
         # duas legendas na mesma linha no anúncio da formação
@@ -233,8 +240,14 @@ def legenda(blocos, y, destaques, limite, halo=False):
                     n += 1
                 corpo.append(" ".join(peca))
                 cru.append(" ".join(simples))
-            entrada = "\\fscx88\\fscy88\\t(0,110,\\fscx100\\fscy100)" if k == 0 else ""
-            tags = (f"\\an5\\pos({W//2},{y})\\fs{tam}\\bord5\\blur6"
+            if k == 0:
+                # destaque entra com mais salto: é o que faz a palavra
+                # grande parecer batida e não só escrita maior
+                e = 80 if grande else 88
+                entrada = f"\\fscx{e}\\fscy{e}\\t(0,{140 if grande else 110},\\fscx100\\fscy100)"
+            else:
+                entrada = ""
+            tags = (f"\\an2\\pos({W//2},{y})\\fs{tam}\\bord5\\blur6"
                     f"\\c{BRANCO}{entrada}")
             if halo:
                 fora.append(com_halo(de, ate, "Legenda", tags,
@@ -320,8 +333,9 @@ def main():
 
     blocos = [b for b in blocos_de(palavras, cfg.get("correcoes", {}))
               if b[0]["t"] < dur_fala]
-    ass += legenda(blocos, cfg.get("y_legenda", 1640),
-                   {p.lower() for p in cfg.get("destaques", [])}, dur_fala, halo)
+    ass += legenda(blocos, cfg.get("y_legenda", 1680),
+                   {p.lower() for p in cfg.get("destaques", [])}, dur_fala, halo,
+                   cfg.get("tam_legenda", 92), cfg.get("tam_destaque", 136))
 
     ass.append(por(0, dur_fala, "Chapeu",
                    f"\\an5\\pos({W//2},1862)\\fs34\\fsp8\\fad(400,300)"
