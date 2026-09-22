@@ -48,6 +48,7 @@ import {
 } from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
+import { decidirAposAcusacao, contatoJaAcusou, TAG_ACUSACAO } from "./acusacao";
 
 export type ResumoProcessamento = {
   eventos: number;
@@ -221,6 +222,18 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         await executarRegra({ perfil, cred, contato, ev, regra, vars, porIntencao });
         if (porIntencao) resumo.regrasPorIntencao++;
         else resumo.regras++;
+        continue;
+      }
+
+      // ── Quem já recebeu a resposta de acusação e voltou ──
+      // 🔴 Decisão da Aline (22/09/2026): responde UMA vez, e se a pessoa
+      // rebater, o robô cala e avisa ela. Vem depois das regras de propósito:
+      // quem acusou ontem pode pedir o material hoje, e material é texto
+      // fixo, não discussão.
+      const apos = decidirAposAcusacao({ tags: contato.tags, regraDisparou: false });
+      if (apos.acao === "calar_e_avisar") {
+        await marcarPrecisaHumano(contato.id, apos.motivo);
+        resumo.encaminhados++;
         continue;
       }
 
@@ -523,6 +536,14 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     }
   }
 
+  /** Põe o contato na fila dela, sem escrever nada pra pessoa. */
+  async function marcarPrecisaHumano(contatoId: string, motivo: string) {
+    await aline
+      .from("ig_contatos")
+      .update({ precisa_humano: true, precisa_humano_motivo: motivo })
+      .eq("id", contatoId);
+  }
+
   async function executarRegra(p: {
     perfil: PerfilInstagram; cred: Credenciais; contato: Contato; ev: EventoInstagram; regra: Regra;
     vars: { nome?: string | null; username?: string | null };
@@ -560,6 +581,11 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: ehComentario ? "comentario" : "dm", texto: null, origem: "regra_sem_texto", regraId: regra.id });
     }
     await aplicarTags(contato, regra.tags_adicionar);
+    // Acusação respondida: ela precisa SABER, mesmo tendo sido automática.
+    // Sem isto a única resposta pública a um ataque sairia sem ninguém ver.
+    if (contatoJaAcusou(regra.tags_adicionar)) {
+      await marcarPrecisaHumano(contato.id, "respondi a uma acusação em público, confira o tom");
+    }
     if (regra.sequencia_id) {
       // Sequência é DM: só entra na janela de 24h (comentário não abre janela;
       // a resposta privada abre quando a pessoa responder).
