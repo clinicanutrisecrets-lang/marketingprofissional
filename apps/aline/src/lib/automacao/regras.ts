@@ -365,12 +365,47 @@ const ABORDAGEM_FRIA = [
   "faz sentido para o seu negocio", "fechar uma parceria", "proposta comercial",
 ];
 
-export function pareceAbordagemComercial(texto: string): boolean {
+/** `termo` aparece como palavra inteira em `texto` (já normalizados). */
+function palavraInteira(texto: string, termo: string): boolean {
+  return new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegex(termo)}(?![\\p{L}\\p{N}])`, "u").test(texto);
+}
+
+/** Nome e @ comparáveis: separador vira espaço, pra "trafego.pago" casar. */
+function identidadeComparavel(identidade?: IdentidadeDeQuemEscreve): { comEspaco: string; colado: string } {
+  const cru = [identidade?.nome ?? "", identidade?.username ?? ""].join(" ");
+  const comEspaco = normalizarTexto(cru.replace(/[._\-|/\\]+/g, " ")).replace(/\s+/g, " ");
+  const colado = normalizarTexto(cru).replace(/[^\p{L}\p{N}]+/gu, "");
+  return { comEspaco, colado };
+}
+
+/** Quem escreveu, pra ler o ofício que está no NOME e não na mensagem. */
+export type IdentidadeDeQuemEscreve = { nome?: string | null; username?: string | null };
+
+export function pareceAbordagemComercial(texto: string, identidade?: IdentidadeDeQuemEscreve): boolean {
   const t = normalizarTexto(texto);
-  if (!t) return false;
   // Ofício explícito já basta: ninguém pede ajuda de nutrição citando
   // "gestor de tráfego" ou "consórcio".
-  if (OFICIOS_QUE_ABORDAM.some((o) => t.includes(o))) return true;
+  if (t && OFICIOS_QUE_ABORDAM.some((o) => t.includes(o))) return true;
+
+  // 🔴 O ofício costuma estar no NOME DO PERFIL, não na mensagem. O caso que
+  // escapou (20/09/2026) foi o João Pedro: o nome dele é "João Pedro |
+  // Tráfego Pago" e a mensagem em si não tinha nenhuma das palavras. Quem
+  // pendura o ofício no nome está anunciando, não pedindo ajuda.
+  const id = identidadeComparavel(identidade);
+  if (id.comEspaco || id.colado) {
+    for (const o of OFICIOS_QUE_ABORDAM) {
+      // ⚠️ PALAVRA INTEIRA, nunca pedaço: nome é curto, e `includes` solto
+      // casava "imovel" dentro de "mariaimovelinda". Num nome próprio isso
+      // vira gente de verdade sem resposta.
+      if (id.comEspaco && palavraInteira(id.comEspaco, o)) return true;
+      // Grudado ("trafegopago") só pra termo longo: aqui não há fronteira
+      // pra usar, então o comprimento é a única proteção contra acaso.
+      const colado = o.replace(/\s+/g, "");
+      if (colado.length >= 8 && id.colado.includes(colado)) return true;
+    }
+  }
+
+  if (!t) return false;
   // "Parceria" é ambígua (nutri também propõe parceria), então só conta
   // acompanhada de abordagem fria.
   const falaEmParceria = /(^|[^\p{L}])parceri/u.test(t);

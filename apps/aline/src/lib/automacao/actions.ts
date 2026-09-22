@@ -214,6 +214,8 @@ export async function simularRobo(slug: string, _prev: EstadoSimulacao, form: Fo
       gatilho: gatilho as "comentario" | "dm" | "story_reply" | "story_mention",
       texto: textoEv,
       mediaId: texto(form.get("media_id")),
+      nome: texto(form.get("nome_de_quem_escreve")),
+      username: texto(form.get("username_de_quem_escreve")),
     });
     return { resultado };
   } catch (e) {

@@ -38,6 +38,19 @@ export function SimuladorRobo({ slug, cor }: { slug: string; cor: string }) {
           placeholder="ID do post (opcional, só comentário)"
           className="rounded-lg border border-aline-text/15 bg-white px-3 py-2 text-sm"
         />
+        {/* O ofício de quem vende costuma estar no NOME do perfil, não na
+            mensagem ("João Pedro | Tráfego Pago"). Sem este campo, o
+            simulador nunca reproduziria esse caso. */}
+        <input
+          name="nome_de_quem_escreve"
+          placeholder="Nome do perfil de quem escreveu (opcional)"
+          className="rounded-lg border border-aline-text/15 bg-white px-3 py-2 text-sm"
+        />
+        <input
+          name="username_de_quem_escreve"
+          placeholder="@ de quem escreveu (opcional)"
+          className="rounded-lg border border-aline-text/15 bg-white px-3 py-2 text-sm"
+        />
         <Botao cor={cor} />
       </form>
 

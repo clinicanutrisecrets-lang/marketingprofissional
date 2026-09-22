@@ -13,6 +13,7 @@ import { createClaude, CLAUDE_MODEL } from "@/lib/claude/scripts";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
 import type { PerfilInstagram } from "@/lib/instagram/credenciais";
 import { blocoRespeitoAoProfissional } from "./conduta-de-terceiro";
+import { limparContatosInventados } from "./contato-inventado";
 
 /** Modelo barato pro agradecimento (uma frase, centenas por dia). */
 export const CLAUDE_MODEL_RAPIDO = "claude-haiku-4-5-20251001";
@@ -24,6 +25,10 @@ REGRAS INEGOCIÁVEIS:
 - NUNCA estabeleça diagnóstico nem cite nome de doença como conclusão. Fale por processo funcional (inflamação, resistência à insulina, saúde intestinal, equilíbrio hormonal, etc.).
 - NUNCA prescreva dose, suplemento ou conduta individual. Isso é da consulta.
 - NUNCA invente estudo, número ou resultado.
+- NUNCA invente forma de contato. E-mail, telefone, WhatsApp, link, endereço e nome de
+  pessoa só podem sair do que está escrito acima. Se não estiver escrito, não existe:
+  diga que a equipe responde por aqui mesmo. Um contato inventado manda a pessoa para o
+  vazio e ela conclui que ninguém respondeu.
 - Sem hashtags, sem travessão (—), sem emoji em excesso (no máximo um).
 - Nunca prometa cura, resultado ou prazo.
 - NUNCA contradiga, corrija nem avalie a conduta de outro profissional de saúde. Quem acompanha a pessoa conhece o caso dela; você não. Isso vale mesmo quando você acha que a conduta está errada.`;
@@ -82,7 +87,8 @@ ${blocoRespeitoAoProfissional(params.comentario)}`;
       system,
       messages: [{ role: "user", content: user }],
     });
-    const texto = semTravessoes(textoDaResposta(msg)).replace(/^["“”']+|["“”']+$/g, "").trim();
+    const bruto = semTravessoes(textoDaResposta(msg)).replace(/^["“”']+|["“”']+$/g, "").trim();
+    const texto = semContatoInventado(bruto, [system, user].join("\n"), "agradecimento");
     return texto ? texto.slice(0, 300) : null;
   } catch (e) {
     console.error("[automacao/ia] agradecimento falhou:", (e as Error).message);
@@ -143,6 +149,9 @@ ${params.contextoScanner.disponivel && params.contextoScanner.blocos
     .filter(Boolean)
     .join("\n\n");
 
+  // Tudo que o modelo teve na mão. Contato fora disto é invenção.
+  const contextoDoModelo = [system, user].join("\n");
+
   try {
     const msg = await claude.messages.create({
       model: CLAUDE_MODEL,
@@ -155,10 +164,10 @@ ${params.contextoScanner.disponivel && params.contextoScanner.blocos
     const json = extrairJson(bruto);
     if (!json) {
       // Modelo escreveu prosa em vez de JSON: usa a prosa, sem encaminhar.
-      const texto = semTravessoes(bruto).slice(0, 900);
+      const texto = semContatoInventado(semTravessoes(bruto), contextoDoModelo, "dm").slice(0, 900);
       return texto ? { texto, encaminhar: false } : null;
     }
-    const texto = semTravessoes(String(json.resposta ?? "")).trim().slice(0, 900);
+    const texto = semContatoInventado(semTravessoes(String(json.resposta ?? "")).trim(), contextoDoModelo, "dm").slice(0, 900);
     const encaminhar = json.encaminhar === true;
     return {
       texto: texto || (encaminhar ? params.textoEncaminharHumano : ""),
@@ -169,6 +178,21 @@ ${params.contextoScanner.disponivel && params.contextoScanner.blocos
     console.error("[automacao/ia] resposta de DM falhou:", (e as Error).message);
     return null;
   }
+}
+
+/**
+ * Última peneira antes de o texto sair: contato que o modelo inventou não vai
+ * pra pessoa. Só remove o contato — a frase em volta costuma estar certa.
+ */
+function semContatoInventado(texto: string, contexto: string, onde: string): string {
+  const { texto: limpo, removidos } = limparContatosInventados(texto, contexto);
+  if (removidos.length > 0) {
+    console.warn(
+      `[automacao/ia] contato inventado removido (${onde}):`,
+      removidos.map((r) => `${r.tipo}=${r.valor}`).join(", "),
+    );
+  }
+  return limpo;
 }
 
 function extrairJson(texto: string): Record<string, unknown> | null {

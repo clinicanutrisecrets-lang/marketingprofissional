@@ -35,13 +35,17 @@ export async function simularEvento(params: {
   texto: string;
   mediaId?: string | null;
   nome?: string | null;
+  username?: string | null;
 }): Promise<ResultadoSimulacao> {
   const perfil = await carregarPerfilPorSlug(params.slug);
   if (!perfil) return { regra: null, acoes: [], avisos: ["Perfil não encontrado"] };
   const aline = createAlineClient();
   const config = lerConfig(perfil.automacao_config);
   const orientacoes = blocoOrientacoesDaDona(config);
-  const vars = { nome: params.nome ?? "Maria Teste", username: "maria.teste" };
+  const vars = { nome: params.nome ?? "Maria Teste", username: params.username ?? "maria.teste" };
+  // Mesma identidade que o caminho real usa: o ofício do vendedor costuma
+  // estar no NOME do perfil, não na mensagem.
+  const quemEscreve = { nome: params.nome, username: params.username };
   const acoes: string[] = [];
   const avisos: string[] = [];
 
@@ -54,7 +58,7 @@ export async function simularEvento(params: {
   let regra = selecionarRegra({ gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId }, regras);
 
   // Vendedor: o robô não conversa (vale antes de qualquer chave geral).
-  const ehVendedor = pareceAbordagemComercial(params.texto);
+  const ehVendedor = pareceAbordagemComercial(params.texto, quemEscreve);
 
   // A rede embaixo da palavra-chave, igual ao caminho real. Sem ela o
   // simulador diria "nada casou" justamente nos casos que o robô atende.
@@ -136,6 +140,14 @@ export async function simularEvento(params: {
   }
 
   if (params.gatilho === "dm") {
+    // 🔴 Mesma ordem do caminho real: o coração VENCE a IA que escreve.
+    if (config.reagir_com_coracao) {
+      return {
+        regra: null,
+        acoes: ["Reage com ♥️ na mensagem dela. Não escreve nada — você decide se responde."],
+        avisos: [...avisos, "O modo coração está ligado. Enquanto ele estiver, o robô nunca escreve no direct por conta própria."],
+      };
+    }
     if (!config.responder_dm_scanner) return { regra: null, acoes: ["Nada: nenhuma regra casou e a chave 'responder direct' está desligada."], avisos };
     const contexto = await buscarConhecimentoScanner(params.texto);
     if (!contexto.disponivel) avisos.push("Base do Scanner indisponível nesta simulação (segredo ou rede). A resposta saiu sem ela.");
