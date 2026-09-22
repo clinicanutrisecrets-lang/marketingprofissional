@@ -10,6 +10,8 @@
  * - cta           (texto do botão)
  */
 
+import { semLink } from "@/lib/criativo/texto-arte";
+
 const BASE_URL = "https://api.bannerbear.com/v2";
 
 export type PlaceholderMod =
@@ -71,6 +73,9 @@ export async function pollImage(uid: string): Promise<ImageResponse> {
 
 /**
  * Helper: dado os dados da nutri + conteúdo do post, monta as modifications.
+ *
+ * 🔴 Texto daqui vira pixel na arte, então passa por `semLink` (Aline,
+ * 22/09/2026: link só na legenda, nunca na imagem).
  */
 export function buildModifications(params: {
   headline: string;
@@ -81,10 +86,12 @@ export function buildModifications(params: {
   foto_nutri_url?: string;
 }): PlaceholderMod[] {
   const mods: PlaceholderMod[] = [
-    { name: "headline", text: params.headline },
+    { name: "headline", text: semLink(params.headline) },
   ];
-  if (params.subtitle) mods.push({ name: "subtitle", text: params.subtitle });
-  if (params.cta) mods.push({ name: "cta", text: params.cta });
+  const sub = semLink(params.subtitle);
+  const cta = semLink(params.cta);
+  if (sub) mods.push({ name: "subtitle", text: sub });
+  if (cta) mods.push({ name: "cta", text: cta });
   if (params.cor_primaria_hex) mods.push({ name: "cor_primaria", color: params.cor_primaria_hex });
   if (params.logo_url) mods.push({ name: "logo", image_url: params.logo_url });
   if (params.foto_nutri_url) mods.push({ name: "foto_nutri", image_url: params.foto_nutri_url });

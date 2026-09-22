@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { CorteIa } from "@/lib/corte/actions";
+import { excluirCorteAction, type CorteIa } from "@/lib/corte/actions";
 import { FILTROS } from "@/lib/corte/opcoes";
 import { EnviarDoCelular } from "./EnviarDoCelular";
 
@@ -59,6 +59,22 @@ function resumoLimpeza(c: CorteIa): string | null {
 
 export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
   const router = useRouter();
+  const [apagando, setApagando] = useState<string | null>(null);
+  const [erroApagar, setErroApagar] = useState<string | null>(null);
+
+  async function apagar(c: CorteIa) {
+    // Confirmação é obrigatória: a lista some da tela e não volta.
+    if (!window.confirm(`Apagar "${c.tema}"? Some da lista e não dá pra desfazer.`)) return;
+    setErroApagar(null);
+    setApagando(c.id);
+    const r = await excluirCorteAction(c.id);
+    setApagando(null);
+    // 🔴 Recusa vira texto na tela, nunca botão que não faz nada: a gravação
+    // em andamento não pode ser apagada, e a nutri precisa saber por quê.
+    if (!r.ok) setErroApagar(r.erro ?? "Não consegui apagar.");
+    else router.refresh();
+  }
+
   const emAndamento = cortes.some(
     (c) => (c.status === "enviado" || c.status === "processando") && !travou(c),
   );
@@ -105,6 +121,10 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
 
       <EnviarDoCelular />
 
+      {erroApagar && (
+        <p className="mt-3 text-sm text-red-700">{erroApagar}</p>
+      )}
+
       {cortes.length === 0 ? (
         <p className="mt-4 text-sm text-brand-text/50">Nenhuma gravação enviada ainda.</p>
       ) : (
@@ -150,18 +170,25 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
                   >
                     ⬇️ Baixar MP4
                   </a>
+                  <BotaoApagar corte={c} apagando={apagando === c.id} onApagar={apagar} />
                 </div>
               ) : c.status === "erro" ? (
-                <span
-                  title={c.erro_msg ?? undefined}
-                  className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"
-                >
-                  erro — grave de novo{c.erro_msg ? ` (${c.erro_msg.slice(0, 60)})` : ""}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    title={c.erro_msg ?? undefined}
+                    className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"
+                  >
+                    erro — grave de novo{c.erro_msg ? ` (${c.erro_msg.slice(0, 60)})` : ""}
+                  </span>
+                  <BotaoApagar corte={c} apagando={apagando === c.id} onApagar={apagar} />
+                </div>
               ) : travou(c) ? (
-                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                  não ficou pronto — grave de novo
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                    não ficou pronto — grave de novo
+                  </span>
+                  <BotaoApagar corte={c} apagando={apagando === c.id} onApagar={apagar} />
+                </div>
               ) : (
                 <span className="animate-pulse rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
                   {ETAPA[c.etapa ?? ""] ?? "⏳ na fila"}
@@ -172,5 +199,29 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
         </ul>
       )}
     </section>
+  );
+}
+
+/** Lixeira. Some durante a exclusão pra não aceitar dois cliques. */
+function BotaoApagar({
+  corte,
+  apagando,
+  onApagar,
+}: {
+  corte: CorteIa;
+  apagando: boolean;
+  onApagar: (c: CorteIa) => void | Promise<void>;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => void onApagar(corte)}
+      disabled={apagando}
+      title="Apagar esta gravação"
+      aria-label={`Apagar ${corte.tema}`}
+      className="rounded-lg bg-white px-2.5 py-1.5 text-xs text-brand-text/60 ring-1 ring-brand-text/10 hover:text-red-700 hover:ring-red-200 disabled:opacity-50"
+    >
+      {apagando ? "…" : "🗑"}
+    </button>
   );
 }

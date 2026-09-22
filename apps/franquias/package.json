@@ -8,7 +8,7 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/lib/embed/destino.test.ts src/lib/aprovacao/semana.test.ts src/lib/corte/opcoes.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/embed/destino.test.ts src/lib/aprovacao/semana.test.ts src/lib/corte/opcoes.test.ts src/lib/criativo/criativo.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

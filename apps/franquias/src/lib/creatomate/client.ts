@@ -10,6 +10,8 @@
  * - Auto-captions (sincronizadas com áudio falado)
  */
 
+import { semLink } from "@/lib/criativo/texto-arte";
+
 const BASE = "https://api.creatomate.com/v1";
 
 function getApiKey(): string {
@@ -80,7 +82,7 @@ export async function getRenderStatus(renderId: string): Promise<RenderResponse>
 export async function pollUntilReady(
   renderId: string,
   options: { maxTentativas?: number; intervaloMs?: number } = {},
-): Promise<{ url: string; thumbnail?: string; duration?: number }> {
+): Promise<{ url: string; thumbnail?: string; duration?: number; outputFormat?: string }> {
   const max = options.maxTentativas ?? 30;
   const intervalo = options.intervaloMs ?? 5_000;
 
@@ -91,6 +93,11 @@ export async function pollUntilReady(
         url: r.url,
         thumbnail: r.snapshot_url,
         duration: r.duration,
+        // 🔴 O formato tem que subir junto: quem chama decide entre o campo
+        // da imagem e o do vídeo por ele. Engolir isto aqui foi o que deixou
+        // a decisão nas mãos do tipo PEDIDO, e um MP4 acabou gravado como
+        // arte de carrossel (Juliana, 08/09/2026).
+        outputFormat: r.output_format,
       };
     }
     if (r.status === "failed") {
@@ -103,6 +110,11 @@ export async function pollUntilReady(
 
 /**
  * Helper: dada nutri + post, monta modifications padronizadas.
+ */
+/**
+ * 🔴 Todo texto daqui vira PIXEL na arte. Link em imagem do Instagram não é
+ * clicável e a Aline proibiu (22/09/2026): link só na legenda. Por isso cada
+ * campo de texto passa por `semLink` antes de virar modification.
  */
 export function montarModifications(params: {
   headline: string;
@@ -117,10 +129,16 @@ export function montarModifications(params: {
   avatar_video_url?: string;
 }): RenderModification {
   const mods: RenderModification = {};
-  if (params.headline) mods["headline"] = params.headline;
-  if (params.subtitle) mods["subtitle"] = params.subtitle;
-  if (params.cta) mods["cta"] = params.cta;
-  if (params.copy_legenda) mods["caption_text"] = params.copy_legenda;
+  const h = semLink(params.headline);
+  const sub = semLink(params.subtitle);
+  const cta = semLink(params.cta);
+  if (h) mods["headline"] = h;
+  if (sub) mods["subtitle"] = sub;
+  if (cta) mods["cta"] = cta;
+  // `caption_text` é legenda desenhada DENTRO do vídeo (auto-caption), então
+  // também é arte — e também perde o link.
+  const legenda = semLink(params.copy_legenda);
+  if (legenda) mods["caption_text"] = legenda;
   if (params.cor_primaria) mods["cor_primaria"] = params.cor_primaria;
   if (params.cor_secundaria) mods["cor_secundaria"] = params.cor_secundaria;
   if (params.logo_url) mods["logo"] = params.logo_url;

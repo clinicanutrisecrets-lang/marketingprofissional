@@ -206,3 +206,58 @@ export async function listarCortesAction(): Promise<CorteIa[]> {
     .limit(12);
   return (data ?? []) as CorteIa[];
 }
+
+/**
+ * Apaga uma gravação da lista.
+ *
+ * Pedido da Aline (22/09/2026): "tem que ter botão para apagar os vídeos ou
+ * coisas ali que deram um erro, que não queira deixar visível". Sem isso a
+ * tentativa que falhou fica pra sempre no meio das que deram certo, e a nutri
+ * não tem como limpar.
+ *
+ * 🔴 Só a DONA apaga (o `.eq("franqueada_id")` é o que garante), e só o que
+ * já terminou: apagar uma gravação `enviado`/`processando` deixaria o worker
+ * escrevendo numa linha que não existe mais, e a nutri sem o vídeo que ainda
+ * ia ficar pronto. Nesses dois casos a resposta diz o que esperar.
+ */
+export async function excluirCorteAction(
+  corteId: string,
+): Promise<{ ok: boolean; erro?: string }> {
+  const f = await franqueadaLiberada();
+  if (!f) return { ok: false, erro: "Não autenticado" };
+
+  const supabase = createClient();
+  const { data: corte } = await supabase
+    .from("cortes_ia")
+    .select("id, status, criado_em")
+    .eq("id", corteId)
+    .eq("franqueada_id", f.id)
+    .maybeSingle();
+
+  if (!corte) return { ok: false, erro: "Gravação não encontrada." };
+
+  const status = (corte as { status: string }).status;
+  const emAndamento = status === "enviado" || status === "processando";
+  if (emAndamento) {
+    // Passou MUITO do prazo (o mesmo teto da tela, com filtro): aí não vem
+    // mais, e travar a exclusão só deixaria lixo permanente na lista.
+    const inicio = new Date((corte as { criado_em: string }).criado_em).getTime();
+    const travou = Number.isFinite(inicio) && Date.now() - inicio > 95 * 60 * 1000;
+    if (!travou) {
+      return {
+        ok: false,
+        erro: "Esta gravação ainda está sendo editada. Espere ela terminar (ou dar erro) pra apagar.",
+      };
+    }
+  }
+
+  const { error } = await supabase
+    .from("cortes_ia")
+    .delete()
+    .eq("id", corteId)
+    .eq("franqueada_id", f.id);
+
+  if (error) return { ok: false, erro: error.message };
+  revalidatePath("/dashboard/videos");
+  return { ok: true };
+}

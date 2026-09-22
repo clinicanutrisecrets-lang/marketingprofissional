@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { corteIaLiberadoPara } from "@/lib/corte/gate";
@@ -41,5 +42,11 @@ export default async function TeleprompterPage() {
       gravado: r.status === "gravado",
     })) as RoteiroSemana[];
 
-  return <TeleprompterHub roteiros={roteiros} corteIa={corteIa} />;
+  // 🔴 O Hub lê `?texto=` com useSearchParams, e no App Router isso exige
+  // um limite de Suspense — sem ele o build quebra na prerenderização.
+  return (
+    <Suspense fallback={null}>
+      <TeleprompterHub roteiros={roteiros} corteIa={corteIa} />
+    </Suspense>
+  );
 }
