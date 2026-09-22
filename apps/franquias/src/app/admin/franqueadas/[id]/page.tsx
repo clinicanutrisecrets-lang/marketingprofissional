@@ -4,6 +4,8 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { FichaEditor } from "./FichaEditor";
 import { ArquivosSection } from "./ArquivosSection";
+import { GerarSemanaBlock } from "./GerarSemanaBlock";
+import { semanasParaRemontar } from "@/lib/geracao/fila-semanal";
 
 export const dynamic = "force-dynamic";
 
@@ -95,6 +97,7 @@ export default async function FranqueadaPage({ params }: PageProps) {
           </div>
 
           <div className="space-y-4">
+            <GerarSemanaBlock franqueadaId={id} semanas={semanasParaRemontar()} />
             <ArquivosSection arquivos={arquivos ?? []} />
             <TimelineBlock f={f} />
             <NotaAdmin franqueadaId={id} notaInicial={(f.nota_interna_admin as string) ?? ""} />
