@@ -5,6 +5,9 @@ import { ReelAnimadoSection, type ReelAnimado } from "../conteudo/ReelAnimadoSec
 import { corteIaLiberadoPara } from "@/lib/corte/gate";
 import { listarCortesAction } from "@/lib/corte/actions";
 import { CortesIaSection } from "./CortesIaSection";
+import { VideoCurtoSection, type ClipeEscolhivel } from "./VideoCurtoSection";
+import { listarBiblioteca } from "@/lib/videos/actions";
+import { listarAcervo } from "@/lib/videos/acervo";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +26,18 @@ export default async function VideosHubPage() {
   if (!franqueada) redirect("/onboarding");
   const corteIa = corteIaLiberadoPara((franqueada as { email: string | null }).email);
   const cortes = corteIa ? await listarCortesAction() : [];
+  // Clipes pro vídeo curto com frase. Só carrega pra quem tem o recurso —
+  // são duas consultas que não servem pra mais nada nesta tela.
+  const [bibBruta, acervoBruto] = corteIa
+    ? await Promise.all([listarBiblioteca(), listarAcervo()])
+    : [[], []];
+  const paraClipe = (v: Record<string, unknown>): ClipeEscolhivel => ({
+    id: String(v.id),
+    titulo: String(v.titulo ?? "Clipe"),
+    thumbnail_url: (v.thumbnail_url as string | null) ?? null,
+  });
+  const biblioteca = (bibBruta as Array<Record<string, unknown>>).map(paraClipe);
+  const acervo = (acervoBruto as Array<Record<string, unknown>>).map(paraClipe);
 
   const { data: reelsData } = await supabase
     .from("reels_animados")
@@ -90,6 +105,8 @@ export default async function VideosHubPage() {
           </span>
         </Link>
       </div>
+
+      {corteIa && <VideoCurtoSection biblioteca={biblioteca} acervo={acervo} />}
 
       {corteIa && <CortesIaSection cortes={cortes} />}
 

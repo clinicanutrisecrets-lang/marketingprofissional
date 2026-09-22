@@ -3,6 +3,9 @@
 Worker do "corte com IA" (roda no GitHub Actions, ver
 .github/workflows/render-corte.yml).
 
+  0. `modo='clipe_frase'`: não há fala nenhuma. O worker baixa um clipe da
+     biblioteca e escreve a frase por cima (clipe_frase.py), pulando os
+     passos 2 e 3 -- não existe transcrição pra planejar.
   1. lê a linha em `cortes_ia` e baixa a gravação bruta (bucket videos-biblioteca)
   2. transcreve local (faster-whisper) com timestamp por palavra
   3. pede o PLANO pro Claude: capa, palavra-chave por trecho, b-roll da
@@ -22,6 +25,7 @@ import render  # noqa: E402
 import limpeza  # noqa: E402
 import recorte  # noqa: E402
 import broll_pexels  # noqa: E402
+import clipe_frase  # noqa: E402
 
 SB_URL = os.environ["SB_URL"].rstrip("/")
 SB_KEY = os.environ["SB_KEY"]
@@ -208,9 +212,48 @@ def catalogo_broll(franqueada_id, compartilhada_id):
     return [r for r in rows if r.get("url")]
 
 
+# ------------------------------------------------- vídeo curto com frase
+def url_do_clipe(clipe_id, origem, franqueada_id):
+    """A URL do clipe, resolvida AQUI e conferida.
+
+    🔴 A tela manda o ID, nunca o endereço. Baixar a URL que o cliente
+    mandasse transformaria o worker em buscador de qualquer endereço da
+    internet. E o clipe da biblioteca só vale se for DELA.
+    """
+    if origem == "acervo":
+        rows = rest_get("acervo_videos", {"id": f"eq.{clipe_id}", "ativo": "eq.true", "select": "url", "limit": "1"})
+    else:
+        rows = rest_get("videos_franqueada", {"id": f"eq.{clipe_id}",
+                                              "franqueada_id": f"eq.{franqueada_id}",
+                                              "select": "url", "limit": "1"})
+    if not rows or not rows[0].get("url"):
+        raise RuntimeError("o clipe escolhido não está mais na sua biblioteca")
+    return rows[0]["url"]
+
+
+def processar_clipe_frase(corte_id, row, handle, work):
+    patch(corte_id, status="processando", etapa="baixando", erro_msg=None)
+    url = url_do_clipe(row["clipe_video_id"], (row.get("clipe_origem") or "biblioteca"), row["franqueada_id"])
+    bruto = os.path.join(work, "clipe.mp4")
+    baixar_url(url, bruto)
+    limpo = os.path.join(work, "in.mp4")
+    normalizar(bruto, limpo)
+
+    patch(corte_id, etapa="renderizando")
+    saida = os.path.join(work, "clipe-frase.mp4")
+    info = clipe_frase.render_clipe_frase(
+        limpo, row.get("frase") or "", saida, os.path.join(work, "fonts"),
+        handle=handle, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"))
+    path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
+    url_saida = subir_mp4(path, saida)
+    patch(corte_id, status="pronto", etapa=None, path=path, url=url_saida, duracao_seg=info["duracao"])
+    print("pronto", path, info)
+
+
 # ---------------------------------------------------------------- main
 def processar(corte_id, broll_franqueada_id):
-    patch(corte_id, status="processando", etapa="transcrevendo", erro_msg=None)
+    # A etapa só é anunciada DEPOIS de saber o modo: dizer "transcrevendo"
+    # num vídeo que não tem fala é a tela mentindo pra quem está esperando.
     row = rest_get("cortes_ia", {"id": f"eq.{corte_id}", "select": "*"})[0]
     fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nicho_principal"})[0]
     handle = fr.get("instagram_handle") or ""
@@ -218,6 +261,12 @@ def processar(corte_id, broll_franqueada_id):
     handle = handle or "@scannerdasaude"
 
     work = tempfile.mkdtemp(prefix="corte-")
+
+    # Clipe com frase não tem fala: outro caminho inteiro.
+    if (row.get("modo") or "fala") == "clipe_frase":
+        return processar_clipe_frase(corte_id, row, handle, work)
+
+    patch(corte_id, status="processando", etapa="transcrevendo", erro_msg=None)
     bruto = os.path.join(work, "bruto" + os.path.splitext(row["origem_path"])[1])
     limpo = os.path.join(work, "in.mp4")
     baixar_objeto(BUCKET_ORIGEM, row["origem_path"], bruto)

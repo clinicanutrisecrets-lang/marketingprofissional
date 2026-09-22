@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
 import { destinoDoRender, formatoPedido, tipoDoRender } from "./destino.ts";
 import { ctaDoSlide, semLink, temLink, textoDeArte } from "./texto-arte.ts";
+import { FONTES, FONTE_PADRAO, normalizarFonte } from "./fontes.ts";
+// Importa direto do motor de arte: `estiloFonte.ts` só tem um `import type`,
+// que o strip-types apaga — nada de sharp/opentype entra no teste.
+import {
+  ESTILOS_FONTE,
+  resolverFamiliaTitulo,
+} from "../../../../../packages/ai-image/src/estiloFonte.ts";
 
 const RAIZ = join(import.meta.dirname, "../../../../..");
 const ler = (p: string) => readFileSync(join(RAIZ, p), "utf8");
@@ -183,5 +190,98 @@ test("todo texto de arte passa pelo filtro de link, nas três portas", () => {
       ler(arq).includes("semLink") || ler(arq).includes("textoDeArte"),
       `${arq} põe texto em imagem e não filtra link`,
     );
+  }
+});
+
+// ─────────────────────── as três fontes do título ───────────────────────
+
+test("os três estilos são aceitos e o resto é recusado", () => {
+  assert.equal(normalizarFonte("classica"), "classica");
+  assert.equal(normalizarFonte("Impacto"), "impacto");
+  assert.equal(normalizarFonte(" leve "), "leve");
+  assert.equal(normalizarFonte("comic sans"), undefined);
+  assert.equal(normalizarFonte(""), undefined);
+  assert.equal(normalizarFonte(null), undefined);
+  assert.equal(normalizarFonte(undefined), undefined);
+});
+
+test("REGRESSÃO: sem escolha, cada layout fica com a família de sempre", () => {
+  // É esta linha que faz toda arte anterior sair byte a byte igual. Se ela
+  // passar a devolver um padrão próprio, a capa (Montserrat 900) e o editorial
+  // (Playfair) mudam de cara sem ninguém ter pedido.
+  assert.equal(resolverFamiliaTitulo(undefined, "serif"), "serif");
+  assert.equal(resolverFamiliaTitulo(undefined, "sans-black"), "sans-black");
+});
+
+test("cada estilo manda numa família de verdade", () => {
+  assert.equal(resolverFamiliaTitulo("classica", "sans-black"), "serif");
+  assert.equal(resolverFamiliaTitulo("impacto", "serif"), "sans-black");
+  assert.equal(resolverFamiliaTitulo("leve", "serif"), "sans");
+});
+
+test("o catálogo da tela não oferece estilo que o motor não conhece", () => {
+  // Oferecer um id a mais faria o motor cair no padrão do layout em silêncio:
+  // ela clicaria numa fonte e a arte sairia na de sempre.
+  for (const f of FONTES) {
+    assert.ok(
+      (ESTILOS_FONTE as readonly string[]).includes(f.id),
+      `estilo "${f.id}" existe na tela e não no motor de arte`,
+    );
+  }
+  assert.equal(FONTES.length, 3, "a Aline pediu três opções");
+  assert.ok(FONTES.some((f) => f.id === FONTE_PADRAO));
+});
+
+test("a amostra de cada chip existe como arquivo vetorizado", () => {
+  // A amostra é desenhada com a fonte de verdade (scripts/gerar-amostras-fonte.mjs).
+  // Faltando o arquivo, o chip vira um quadrado vazio e ela escolhe no escuro.
+  for (const f of FONTES) {
+    const caminho = join(RAIZ, "apps/franquias/public", f.amostra);
+    assert.ok(existsSync(caminho), `falta a amostra ${f.amostra}`);
+    const svg = readFileSync(caminho, "utf8");
+    assert.match(svg, /<path /, `a amostra ${f.amostra} não tem glifo vetorizado`);
+    assert.doesNotMatch(
+      svg,
+      /font-family/,
+      `a amostra ${f.amostra} depende de fonte do navegador — mentiria sobre a letra do card`,
+    );
+  }
+});
+
+test("LIGAÇÃO: a rota lê a fonte do formulário e passa nos dois caminhos de render", () => {
+  const rota = ler("apps/franquias/src/app/api/conteudo/render-card/route.ts");
+  assert.match(rota, /normalizarFonte\(form\.get\("fonte"\)\)/);
+  // Um para o carrossel, um para o card único — esquecer um deixa metade das
+  // artes ignorando a escolha dela.
+  assert.equal((rota.match(/^\s*fonte,$/gm) ?? []).length, 2);
+});
+
+test("LIGAÇÃO: o editor manda a fonte escolhida e mostra as três amostras", () => {
+  const tela = ler("apps/franquias/src/app/dashboard/conteudo/editor/EditorArte.tsx");
+  assert.match(tela, /fd\.set\("fonte", fonte\)/);
+  assert.match(tela, /FONTES\.map/);
+  assert.match(tela, /src=\{f\.amostra\}/);
+});
+
+test("LIGAÇÃO: todo layout de card recebe a família do título", () => {
+  // Layout que não recebe `fonteTitulo` fica preso na fonte de sempre: ela
+  // escolhe, gera, e nada muda naquele tipo de arte.
+  const motor = ler("packages/ai-image/src/cardDesigner.ts");
+  for (const fn of [
+    "renderPilha",
+    "renderConteudo",
+    "renderCitacao",
+    "renderLista",
+    "renderCapa",
+    "renderEditorial",
+  ]) {
+    const i = motor.indexOf(`async function ${fn}(params: {`);
+    assert.ok(i > 0, `não achei ${fn}`);
+    // Ancora no DESTRUCTURING, não no corpo: a chamada a `blocoTitulo` mais
+    // abaixo ainda cita `fonteTitulo` mesmo quando a função deixou de recebê-lo
+    // — olhar o corpo inteiro passaria verde com o parâmetro fora da assinatura.
+    const destruct = motor.slice(i).match(/const \{[^}]*\} = params;/);
+    assert.ok(destruct, `não achei o destructuring de ${fn}`);
+    assert.match(destruct[0], /fonteTitulo/, `${fn} não recebe a família do título`);
   }
 });

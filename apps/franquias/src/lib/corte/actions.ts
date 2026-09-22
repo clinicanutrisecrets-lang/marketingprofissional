@@ -5,6 +5,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { corteIaLiberadoPara } from "./gate";
 import { CORTE_MAX_SEG } from "./constantes";
 import { estiloValido, filtroValido, UPLOAD_MAX_SEG, type FiltroId } from "./opcoes";
+import { avaliarFrase, duracaoFinal, origemValida } from "./video-curto";
 
 /**
  * Cortes com IA: a gravação do teleprompter (até 60 s) vira um reel editado
@@ -260,4 +261,99 @@ export async function excluirCorteAction(
   if (error) return { ok: false, erro: error.message };
   revalidatePath("/dashboard/videos");
   return { ok: true };
+}
+
+/**
+ * Vídeo curto: clipe da biblioteca + frase escrita em cima, sem fala.
+ *
+ * 🔴 SÓ O ID DO CLIPE VIAJA. A URL é resolvida no worker, que confere se o
+ * vídeo é da biblioteca DELA (ou do acervo compartilhado). Se a tela
+ * mandasse o endereço, o worker baixaria qualquer coisa que alguém pedisse.
+ * Aqui a conferência acontece de novo, antes de gastar uma rodada.
+ */
+export async function criarVideoCurtoAction(params: {
+  clipeId: string;
+  origem?: string;
+  frase: string;
+  segundos?: number;
+  estiloLegenda?: string;
+}): Promise<{ ok: boolean; msg: string; id?: string }> {
+  const f = await franqueadaLiberada();
+  if (!f) return { ok: false, msg: "recurso não liberado pra esta conta" };
+
+  const avaliada = avaliarFrase(params.frase);
+  if (!avaliada.ok) return { ok: false, msg: avaliada.msg };
+
+  const origem = origemValida(params.origem);
+  const admin = createAdminClient();
+
+  // O clipe precisa existir E ser dela (ou do acervo ativo). Sem isto, um id
+  // qualquer mandaria o worker rodar 3 minutos pra falhar no fim.
+  const tabela = origem === "acervo" ? "acervo_videos" : "videos_franqueada";
+  let consulta = admin.from(tabela).select("id, titulo, duracao_seg").eq("id", params.clipeId);
+  consulta = origem === "acervo" ? consulta.eq("ativo", true) : consulta.eq("franqueada_id", f.id);
+  const { data: clipe } = await consulta.maybeSingle();
+  if (!clipe) return { ok: false, msg: "esse clipe não está na sua biblioteca" };
+  const c = clipe as { titulo: string | null; duracao_seg: number | null };
+
+  const token = process.env.GITHUB_ACTIONS_TOKEN || process.env.GITHUB_TOKEN;
+  if (!token) {
+    return { ok: false, msg: "Worker de vídeo ainda não configurado (falta GITHUB_ACTIONS_TOKEN na Vercel)." };
+  }
+
+  const { data: row, error: insErr } = await admin
+    .from("cortes_ia")
+    .insert({
+      franqueada_id: f.id,
+      modo: "clipe_frase",
+      frase: avaliada.frase,
+      clipe_video_id: params.clipeId,
+      clipe_origem: origem,
+      // O tema é o rótulo da lista de vídeos; a frase é o conteúdo.
+      tema: c.titulo?.trim() || "Vídeo curto",
+      duracao_seg: duracaoFinal(params.segundos, c.duracao_seg),
+      estilo_legenda: estiloValido(params.estiloLegenda),
+      origem_tipo: "biblioteca",
+    } as never)
+    .select("id")
+    .single();
+  if (insErr || !row) return { ok: false, msg: `falha ao registrar o vídeo: ${insErr?.message ?? "?"}` };
+  const corteId = (row as { id: string }).id;
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${REPO}/actions/workflows/render-corte.yml/dispatches`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ref: process.env.CORTE_IA_WORKFLOW_REF || "main",
+        inputs: {
+          corte_id: corteId,
+          broll_franqueada_id: "",
+          supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+          supabase_key: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+          anthropic_key: process.env.ANTHROPIC_API_KEY ?? "",
+          pexels_key: "",
+          // Vídeo curto não passa por filtro de rosto: não há rosto.
+          filtro: "nenhum",
+        },
+      }),
+    },
+  );
+
+  if (!resp.ok) {
+    const corpo = await resp.text();
+    await admin
+      .from("cortes_ia")
+      .update({ status: "erro", erro_msg: `dispatch ${resp.status}: ${corpo.slice(0, 200)}` } as never)
+      .eq("id", corteId);
+    return { ok: false, msg: `falha ao disparar o worker (${resp.status})` };
+  }
+
+  revalidatePath("/dashboard/videos");
+  return { ok: true, id: corteId, msg: "Vídeo curto na fila! Fica pronto em 1 a 2 minutos aqui embaixo." };
 }

@@ -19,6 +19,12 @@ export {
 } from "./fotoLayout";
 export { renderReceita } from "./cardDesigner";
 export type { CardInput, CardLayout, CardResultado } from "./cardDesigner";
+export {
+  ESTILOS_FONTE,
+  normalizarEstiloFonte,
+  resolverFamiliaTitulo,
+  type EstiloFonte,
+} from "./estiloFonte";
 
 export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> {
   const inicio = Date.now();

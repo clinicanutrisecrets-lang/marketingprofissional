@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { FONTES, FONTE_PADRAO, type IdFonte } from "@/lib/criativo/fontes";
+
 const ESQUEMAS = [
   { valor: 0, nome: "Profundo", desc: "fundo na cor da marca" },
   { valor: 1, nome: "Creme", desc: "fundo claro, título na marca" },
@@ -73,6 +75,11 @@ export function EditorArte(props: {
   const [itens, setItens] = useState("");
   const [fotoLugar, setFotoLugar] = useState("topo");
   const [fotoTamanho, setFotoTamanho] = useState("media");
+  const [fonte, setFonte] = useState<IdFonte>(FONTE_PADRAO);
+  // Com que fonte o preview na tela foi gerado. Trocar a fonte depois de
+  // gerar deixaria a arte antiga na tela parecendo a nova — e a escolha da
+  // fonte existe justamente pra comparar.
+  const [fontePreview, setFontePreview] = useState<IdFonte | null>(null);
   // Motivo pelo qual a foto encolheu, não coube ou não entrou — vem do render
   const [avisoFoto, setAvisoFoto] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
@@ -101,6 +108,7 @@ export function EditorArte(props: {
     fd.set("itens", itens);
     fd.set("fotoLugar", fotoLugar);
     fd.set("fotoTamanho", fotoTamanho);
+    fd.set("fonte", fonte);
     fd.set("slides", slidesTexto);
     fd.set("fotoCarrossel", fotoCarrossel);
     if (usarCorCustom) fd.set("corFundo", corFundo);
@@ -124,6 +132,7 @@ export function EditorArte(props: {
         const j = (await res.json().catch(() => null)) as { erro?: string } | null;
         throw new Error(j?.erro ?? `erro ${res.status}`);
       }
+      setFontePreview(fonte);
       if (layout === "carrossel") {
         const j = (await res.json()) as { slides?: string[]; avisoFoto?: string | null };
         setPreviewSlides(j.slides ?? []);
@@ -451,6 +460,43 @@ export function EditorArte(props: {
           </div>
         )}
 
+        <Campo label="Fonte do título">
+          <div className="grid grid-cols-3 gap-2">
+            {FONTES.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFonte(f.id)}
+                title={f.desc}
+                className={`flex flex-col items-center gap-1 rounded-xl bg-white px-2 py-3 ring-2 transition ${
+                  fonte === f.id ? "ring-brand-primary" : "ring-black/10 hover:ring-brand-primary/30"
+                }`}
+              >
+                {/* Amostra vetorizada com a MESMA fonte que desenha o card —
+                    em CSS o navegador cairia numa serifada qualquer e ela
+                    escolheria olhando uma letra que não é a que sai. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={f.amostra} alt={f.nome} className="h-10 w-auto max-w-full object-contain" />
+                <span
+                  className={`text-[11px] font-semibold ${fonte === f.id ? "text-brand-primary" : "text-brand-text/60"}`}
+                >
+                  {f.nome}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-[11px] text-brand-text/40">
+            {FONTES.find((f) => f.id === fonte)?.desc} · vale para o título; o texto de apoio
+            continua na fonte de leitura.
+          </p>
+          {fontePreview && fontePreview !== fonte && (
+            <p className="mt-1 text-[11px] font-semibold text-amber-700">
+              A arte ao lado ainda está em {FONTES.find((f) => f.id === fontePreview)?.nome}. Toque
+              em “Gerar preview” pra ver nesta fonte.
+            </p>
+          )}
+        </Campo>
+
         <div className="grid grid-cols-2 gap-4">
           <Campo label="Estilo de cor">
             <div className="flex flex-col gap-1.5">
@@ -516,7 +562,7 @@ export function EditorArte(props: {
           disabled={gerando}
           className="w-full rounded-xl bg-brand-primary px-5 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
         >
-          {gerando ? "Gerando..." : "✨ Gerar preview"}
+          {gerando ? "Gerando..." : "Gerar preview"}
         </button>
       </div>
 
