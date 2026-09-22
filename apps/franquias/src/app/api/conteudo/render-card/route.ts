@@ -8,6 +8,7 @@ import {
   type ConteudoPeca,
   type Dimensoes,
 } from "@scanner/ai-image";
+import { ctaDoSlide, semLink, temLink } from "@/lib/criativo/texto-arte";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -61,12 +62,23 @@ export async function POST(request: Request) {
   const logoUrlOnboarding = (logoRow as { url_storage?: string } | null)?.url_storage;
 
   const form = await request.formData();
-  const headline = String(form.get("headline") ?? "").trim();
+  const headline = semLink(String(form.get("headline") ?? ""));
   if (!headline) return NextResponse.json({ erro: "headline obrigatório" }, { status: 400 });
 
-  const eyebrow = String(form.get("eyebrow") ?? "").trim();
-  const subtitle = String(form.get("subtitle") ?? "").trim();
-  const cta = String(form.get("cta") ?? "").trim();
+  const eyebrow = semLink(String(form.get("eyebrow") ?? ""));
+  const subtitle = semLink(String(form.get("subtitle") ?? ""));
+  const cta = semLink(String(form.get("cta") ?? ""));
+  // 🔴 Link nunca vira pixel (Aline, 22/09/2026): no Instagram o link escrito
+  // na arte não é clicável. Ele sai daqui e a tela avisa, em vez de sumir com
+  // o endereço em silêncio e a nutri publicar achando que está lá.
+  const removeuLink = [
+    String(form.get("headline") ?? ""),
+    String(form.get("eyebrow") ?? ""),
+    String(form.get("subtitle") ?? ""),
+    String(form.get("cta") ?? ""),
+    String(form.get("itens") ?? ""),
+    String(form.get("slides") ?? ""),
+  ].some(temLink);
   const formato = String(form.get("formato") ?? "feed");
   const esquema = Number(form.get("esquema") ?? -1);
 
@@ -101,7 +113,7 @@ export async function POST(request: Request) {
   const fotoLugar = normalizarFotoLugar(String(form.get("fotoLugar") ?? ""));
   const fotoTamanho = normalizarFotoTamanho(String(form.get("fotoTamanho") ?? ""));
 
-  const itens = String(form.get("itens") ?? "").trim();
+  const itens = semLink(String(form.get("itens") ?? ""));
   const layoutRaw = String(form.get("layout") ?? "auto");
   let layout: CardLayout;
   if (layoutRaw === "citacao") layout = "citacao";
@@ -127,17 +139,30 @@ export async function POST(request: Request) {
   if (layoutRaw === "carrossel") {
     const blocos = String(form.get("slides") ?? "")
       .split(/\n\s*---\s*\n/)
-      .map((b) => b.trim())
+      .map((b) => semLink(b))
       .filter(Boolean)
       .slice(0, 8);
+    // 🔴 A CAPA NÃO LEVA CTA (Aline, 22/09/2026). Ela é o slide que para o
+    // scroll; convite de ação ali queima o espaço mais caro do carrossel — e
+    // o CTA ainda aparecia DUAS vezes, porque o último slide já é o dele.
     const conteudos: ConteudoPeca[] = [
-      { headline, eyebrow, subtitle, cta },
+      { headline, eyebrow, subtitle },
       ...blocos.map((b) => {
         const [primeira, ...resto] = b.split("\n");
         return { headline: (primeira ?? "").trim(), corpo: resto.join("\n").trim(), eyebrow };
       }),
     ];
     if (cta) conteudos.push({ headline: cta, eyebrow, subtitle: "" });
+
+    // Quem decide em que slide o CTA aparece é a lib, não este arquivo: a
+    // mesma régua vale pro Creatomate e pro Bannerbear, e três cópias dela
+    // divergiriam caladas. Aqui ela é aplicada slide a slide — a capa recebe
+    // "" e some com o convite, o último recebe o texto.
+    const total = conteudos.length;
+    for (let i = 0; i < total; i++) {
+      const doSlide = ctaDoSlide({ cta, indice: i, total });
+      conteudos[i] = { ...conteudos[i]!, cta: doSlide || undefined };
+    }
 
     try {
       const buffers: Buffer[] = [];
@@ -193,12 +218,13 @@ export async function POST(request: Request) {
             params: { layout: "carrossel", formato: "retrato", headline: `${headline} (slide ${i + 1}/${buffers.length})` },
           } as never);
         }
-        return NextResponse.json({ ok: true, urls, avisoFoto });
+        return NextResponse.json({ ok: true, urls, avisoFoto, removeuLink });
       }
 
       return NextResponse.json({
         ok: true,
         avisoFoto,
+        removeuLink,
         slides: buffers.map((b) => `data:image/png;base64,${b.toString("base64")}`),
       });
     } catch (e) {

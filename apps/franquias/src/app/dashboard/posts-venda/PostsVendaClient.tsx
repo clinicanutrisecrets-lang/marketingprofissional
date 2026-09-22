@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import type { TipoPost } from "@/lib/claude/prompts";
 import {
   NIVEIS_CONSCIENCIA,
@@ -13,6 +13,8 @@ import {
   type ProdutoScannerLista,
 } from "@/lib/produtos/actions";
 import { criarPostManual } from "@/lib/posts/manual";
+import { uploadArquivo } from "@/lib/arquivos/actions";
+import { avaliarImagem } from "@/lib/criativo/imagem-upload";
 
 type PostGerado = {
   headline: string;
@@ -21,12 +23,24 @@ type PostGerado = {
   copy_cta: string;
   hashtags: string[];
   slides?: string[];
+  roteiro?: string;
+  stories?: string[];
 };
 
+// Reels e stories entraram em 22/09/2026 (Aline): o nível de consciência
+// muda o que se fala do MESMO produto, e vídeo é onde a nutri mais vende —
+// não fazia sentido a esteira parar em feed e carrossel.
 const TIPOS: Array<{ valor: TipoPost; label: string }> = [
   { valor: "feed_imagem", label: "Post de feed" },
   { valor: "feed_carrossel", label: "Carrossel" },
+  { valor: "reels", label: "Roteiro de reels" },
+  { valor: "stories", label: "Roteiro de stories" },
 ];
+
+/** Reels e stories saem como roteiro falado, não como arte. */
+function ehRoteiro(t: TipoPost): boolean {
+  return t === "reels" || t === "stories";
+}
 
 export function PostsVendaClient(props: {
   produtosIniciais: ProdutoScannerLista[];
@@ -53,7 +67,13 @@ export function PostsVendaClient(props: {
   const [gerando, setGerando] = useState(false);
   const [post, setPost] = useState<PostGerado | null>(null);
 
-  const [urlImagem, setUrlImagem] = useState("");
+  // 🔴 ANEXO, não URL (Aline, 22/09/2026): "ninguém nunca põe um URL, é
+  // sempre subir o arquivo do computador". O campo de link era o mesmo erro
+  // da logo no Tratamentos (09/09) — quem tem a imagem tem o ARQUIVO.
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [erroArquivo, setErroArquivo] = useState<string | null>(null);
+  const [subindo, setSubindo] = useState(false);
+  const inputArquivo = useRef<HTMLInputElement>(null);
   const [agendando, startAgendar] = useTransition();
   const [agendado, setAgendado] = useState(false); // "salvo"
   const [copiado, setCopiado] = useState<string | null>(null);
@@ -100,24 +120,53 @@ export function PostsVendaClient(props: {
   // Salva sem data: publicação automática depende da aprovação do app na
   // Meta, que ainda não saiu. Pedir data e dizer "agendar" prometeria o que
   // o sistema não faz — a nutri copia a legenda e publica no Instagram dela.
+  function escolher(f: File | null) {
+    setErroArquivo(null);
+    setArquivo(null);
+    if (!f) return;
+    const v = avaliarImagem({ name: f.name, type: f.type, size: f.size });
+    if (!v.ok) {
+      setErroArquivo(v.erro);
+      return;
+    }
+    setArquivo(f);
+  }
+
   function salvar() {
     if (!post) return;
     setErro(null);
-    const imagem = urlImagem.trim();
     startAgendar(async () => {
+      let imagem: string | undefined;
+      if (arquivo) {
+        setSubindo(true);
+        const fd = new FormData();
+        fd.set("file", arquivo);
+        fd.set("tipo", "outro");
+        const up = await uploadArquivo(fd);
+        setSubindo(false);
+        // 🔴 Falha do upload NÃO segue calada salvando o post sem imagem: a
+        // nutri anexou justamente porque quer a imagem junto.
+        if (!up.ok || !up.url) {
+          setErro(up.erro ?? "Não consegui subir a imagem. Tente de novo.");
+          return;
+        }
+        imagem = up.url;
+      }
       const r = await criarPostManual({
         tipo,
         copy_legenda: montarLegendaFinal(post),
         copy_cta: post.copy_cta,
         hashtags: post.hashtags,
         briefing_nutri: `Post de venda: ${produtoAtivo?.nome ?? ""}`,
-        url_imagem: imagem || undefined,
+        url_imagem: imagem,
         legenda_gerada_ia: true,
         angulo_copy: "divulgacao_produto",
         nivel_consciencia: consciencia,
       });
       if (r.ok) {
         setAgendado(true);
+        setArquivo(null);
+        if (inputArquivo.current) inputArquivo.current.value = "";
       } else {
         setErro(r.erro ?? "Não foi possível salvar.");
       }
@@ -279,6 +328,33 @@ export function PostsVendaClient(props: {
                   onCopiar={(v) => copiar(v, "slides")}
                 />
               )}
+              {post.roteiro && (
+                <CampoCopiavel
+                  rotulo="Roteiro do reels (o que você fala)"
+                  valor={post.roteiro}
+                  copiado={copiado === "roteiro"}
+                  onCopiar={(v) => copiar(v, "roteiro")}
+                />
+              )}
+              {post.stories && post.stories.length > 0 && (
+                <CampoCopiavel
+                  rotulo={`Sequência de stories (${post.stories.length})`}
+                  valor={post.stories.map((t, i) => `${i + 1}. ${t}`).join("\n\n")}
+                  copiado={copiado === "stories"}
+                  onCopiar={(v) => copiar(v, "stories")}
+                />
+              )}
+              {/* "Abrir já a câmera com o prompt" (Aline, 22/09/2026): o
+                  roteiro vai pro teleprompter pela URL, então ela sai daqui
+                  direto pra gravar, sem copiar e colar no meio. */}
+              {textoParaGravar(post) && (
+                <a
+                  href={`/dashboard/teleprompter?texto=${encodeURIComponent(textoParaGravar(post))}`}
+                  className="inline-block rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white hover:opacity-90"
+                >
+                  🎥 Abrir a câmera com este roteiro
+                </a>
+              )}
               <CampoCopiavel
                 rotulo="Legenda + hashtags"
                 valor={montarLegendaFinal(post)}
@@ -294,21 +370,35 @@ export function PostsVendaClient(props: {
 
               <div className="flex flex-wrap items-end gap-3 rounded-xl bg-brand-muted p-4">
                 <label className="min-w-[240px] flex-1 text-xs text-brand-text/70">
-                  URL da imagem (da sua galeria — opcional)
+                  Imagem do post (opcional)
                   <input
-                    type="url"
-                    placeholder="https://…"
-                    value={urlImagem}
-                    onChange={(e) => setUrlImagem(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-brand-text/15 bg-white px-3 py-2 text-sm"
+                    ref={inputArquivo}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => escolher(e.target.files?.[0] ?? null)}
+                    className="mt-1 block w-full text-sm text-brand-text/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-text file:ring-1 file:ring-brand-text/10"
                   />
+                  {arquivo && (
+                    <span className="mt-1 block text-[11px] text-brand-text/50">
+                      {arquivo.name} · {(arquivo.size / 1024 / 1024).toFixed(1)} MB
+                    </span>
+                  )}
+                  {erroArquivo && (
+                    <span className="mt-1 block text-[11px] text-red-700">{erroArquivo}</span>
+                  )}
                 </label>
                 <button
                   onClick={salvar}
                   disabled={agendando || agendado}
                   className="rounded-full bg-brand-text px-5 py-2 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
                 >
-                  {agendado ? "✓ Salvo" : agendando ? "Salvando…" : "Salvar post"}
+                  {agendado
+                    ? "✓ Salvo"
+                    : subindo
+                      ? "⏫ Subindo a imagem…"
+                      : agendando
+                        ? "Salvando…"
+                        : "Salvar post"}
                 </button>
                 <p className="basis-full text-[11px] text-brand-text/50">
                   O post fica salvo na sua biblioteca pra você copiar e publicar no seu
@@ -322,6 +412,17 @@ export function PostsVendaClient(props: {
       )}
     </div>
   );
+}
+
+/**
+ * O que o teleprompter vai rolar. Reels é o roteiro corrido; stories é a
+ * sequência, uma tela por linha. Post de imagem e carrossel não têm fala —
+ * devolve "" e o botão nem aparece.
+ */
+function textoParaGravar(post: PostGerado): string {
+  if (post.roteiro?.trim()) return post.roteiro.trim();
+  if (post.stories?.length) return post.stories.join("\n\n");
+  return "";
 }
 
 function montarLegendaFinal(post: PostGerado): string {

@@ -14,6 +14,7 @@ import {
   montarModifications as montarModsCreatomate,
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
+import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
 import { gerarEUploadImagem } from "@/lib/ai-image/render";
 import { escolherVideoParaPost } from "@/lib/videos/actions";
 import {
@@ -307,6 +308,10 @@ export async function gerarPostsDaSemana(
 
           const renders = await renderTemplate({
             templateId: ctmTemplateId,
+            // 🔴 Pedir o formato é o que evita o problema na origem: sem isso
+            // vale o padrão do template, e um template de vídeo configurado
+            // pro carrossel devolve MP4 sem ninguém pedir.
+            outputFormat: formatoPedido(item.tipo),
             modifications: montarModsCreatomate({
               headline: post.headline,
               subtitle: post.subtitle,
@@ -321,10 +326,26 @@ export async function gerarPostsDaSemana(
           });
           if (renders.length > 0) {
             const ready = await pollCreatomate(renders[0].id);
-            if (item.tipo === "reels") {
+            // 🔴 O campo sai do que o Creatomate DEVOLVEU, nunca do tipo que
+            // a gente pediu. Decidir pelo pedido foi o que gravou um MP4 em
+            // `url_imagem_final` e fez o carrossel da Juliana virar um vídeo
+            // de bicicleta (08/09/2026).
+            const destino = destinoDoRender(item.tipo, {
+              url: ready.url,
+              output_format: ready.outputFormat,
+              duration: ready.duration,
+            });
+            if (destino.ok && destino.campo === "video") {
               urlVideo = ready.url;
-            } else {
+            } else if (destino.ok) {
               urlImagem = ready.url;
+            } else {
+              // Recusado: o post segue pro Bannerbear (ou sem criativo). É de
+              // propósito — arte faltando a nutri vê; vídeo aleatório posando
+              // de arte, não.
+              console.warn(
+                `[geracao] criativo recusado (${item.tipo}): ${destino.motivo} — ${ready.url}`,
+              );
             }
             designId = renders[0].id;
             await logarCusto({
