@@ -377,7 +377,12 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const patch: Record<string, unknown> = { ultima_interacao_em: agora };
       if (ehDm) patch.ultima_msg_recebida_em = agora;
       if (!c.username && ev.username) patch.username = ev.username;
-      if (!c.nome && ehDm) {
+      // 🔴 Busca o nome TAMBÉM em comentário, não só em DM. O webhook de
+      // comentário entrega o @ mas não o nome, e a trava de vendedor lê o
+      // NOME DO PERFIL ("João Pedro | Tráfego Pago"). Sem isto, quem só
+      // comenta nunca tinha nome e a trava não tinha o que ler. Medido em
+      // 22/09/2026: 35 dos 90 contatos estavam sem nome, todos de comentário.
+      if (!c.nome) {
         const p = await obterPerfilUsuario(cred, ev.igsid);
         if (p.name) patch.nome = p.name;
         if (p.username && !c.username) patch.username = p.username;
@@ -388,7 +393,10 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
     let nome: string | null = null;
     let username: string | null = ev.username ?? null;
-    if (ehDm) {
+    {
+      // Vale pra comentário também: é onde o vendedor aparece, e é o nome
+      // dele que denuncia. Falha de rede aqui devolve vazio (a função
+      // engole o erro), então nunca trava a entrada do contato.
       const p = await obterPerfilUsuario(cred, ev.igsid);
       nome = p.name ?? null;
       username = username ?? p.username ?? null;
