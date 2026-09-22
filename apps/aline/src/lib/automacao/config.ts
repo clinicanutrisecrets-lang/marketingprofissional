@@ -14,6 +14,15 @@ export type AutomacaoConfig = {
    * desliga e volta ao casamento por palavra exata.
    */
   entender_pedido_sem_palavra: boolean;
+  /**
+   * Direct sem regra: em vez de escrever, o robô só REAGE com um coração.
+   *
+   * 🔴 Pedido da Aline em 22/09/2026, depois de o robô responder por cima de
+   * uma conversa pessoal dela: o coração avisa que ela viu, sem falar nada em
+   * nome dela, e ela decide se responde. Quando ligada, a IA não escreve
+   * direct nenhum -- esta chave VENCE responder_dm_scanner.
+   */
+  reagir_com_coracao: boolean;
   /** Resposta pública quando o comentário é pergunta clínica individual. */
   texto_convite_direct: string;
   /** Texto enviado na DM quando o robô decide passar pra uma pessoa. */
@@ -48,6 +57,7 @@ export const CONFIG_PADRAO: AutomacaoConfig = {
   agradecer_comentarios: false,
   responder_dm_scanner: false,
   entender_pedido_sem_palavra: true,
+  reagir_com_coracao: false,
   texto_convite_direct: "Obrigada pela pergunta! Isso depende do seu caso, então te respondo melhor no direct. Me chama lá 💬",
   texto_encaminhar_humano: "Obrigada pela mensagem! Alguém da equipe continua essa conversa com você em breve.",
   nao_responder_usernames: [],
@@ -97,6 +107,7 @@ export function lerConfig(bruto: unknown): AutomacaoConfig {
     responder_dm_scanner: c.responder_dm_scanner === true,
     // Ligada por omissão: só `false` explícito desliga.
     entender_pedido_sem_palavra: c.entender_pedido_sem_palavra !== false,
+    reagir_com_coracao: c.reagir_com_coracao === true,
     texto_convite_direct: textoOuPadrao(c.texto_convite_direct, CONFIG_PADRAO.texto_convite_direct),
     texto_encaminhar_humano: textoOuPadrao(c.texto_encaminhar_humano, CONFIG_PADRAO.texto_encaminhar_humano),
     nao_responder_usernames: usernames,

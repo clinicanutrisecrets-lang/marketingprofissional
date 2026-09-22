@@ -106,6 +106,31 @@ export async function enviarDm(
   });
 }
 
+/**
+ * Reage a uma mensagem que a pessoa mandou, com um coração.
+ *
+ * 🔴 Pedido da Aline (22/09/2026), depois do robô responder por cima de uma
+ * conversa pessoal dela: *"pode só curtir e mandar um coração, porque aí eu
+ * posso ver se quero responder manualmente."*
+ *
+ * A Meta só aceita "love" como reação enviada pela API, que é exatamente o
+ * coração. Curtir COMENTÁRIO não existe na API — só reagir a direct.
+ */
+export async function reagirMensagem(
+  cred: Credenciais,
+  igsid: string,
+  messageId: string,
+): Promise<void> {
+  await chamar(cred, `${cred.pathId}/messages`, {
+    method: "POST",
+    body: {
+      recipient: { id: igsid },
+      sender_action: "react",
+      payload: { message_id: messageId, reaction: "love" },
+    },
+  });
+}
+
 /** Resposta privada a um comentário (vira DM). Só UMA por comentário, em até 7 dias. */
 export async function respostaPrivadaComentario(
   cred: Credenciais,

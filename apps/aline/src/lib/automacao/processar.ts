@@ -11,6 +11,7 @@ import { createAlineClient } from "@/lib/supabase/server";
 import {
   enviarDm,
   obterPerfilUsuario,
+  reagirMensagem,
   responderComentario,
   respostaPrivadaComentario,
   type BotaoRapido,
@@ -57,6 +58,8 @@ export type ResumoProcessamento = {
   regrasPorIntencao: number;
   /** Mensagens que saíram da conta (robô ou a própria Aline). */
   ecos: number;
+  /** Direct que recebeu só um coração, sem texto. */
+  coracoes: number;
   opcoes: number;
   agradecimentos: number;
   respostasDm: number;
@@ -82,7 +85,7 @@ const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, ecos: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
+    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, ecos: 0, coracoes: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
@@ -241,6 +244,25 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
       if (gatilho === "dm") {
         const textoPessoa = ev.texto.trim();
+
+        // ── Modo coração ──
+        // 🔴 Em vez de falar em nome dela, o robô só avisa que viu. A Aline
+        // decide se responde. Esta chave VENCE a IA de propósito: o pedido
+        // nasceu de o robô ter escrito onde não devia (22/09/2026).
+        if (config.reagir_com_coracao) {
+          if (pareceAbordagemComercial(textoPessoa)) { resumo.ignorados++; continue; }
+          if (!ev.externalId) { resumo.ignorados++; continue; } // sem id não há o que reagir
+          try {
+            await reagirMensagem(cred, ev.igsid, ev.externalId);
+            await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: "♥️", origem: "coracao" });
+            resumo.coracoes++;
+          } catch (e) {
+            console.error("[automacao] falha ao reagir:", (e as Error).message);
+            resumo.erros++;
+          }
+          continue;
+        }
+
         if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa)) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
         const [historico, contexto] = await Promise.all([historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa)]);
