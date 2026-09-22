@@ -37,6 +37,23 @@ FRASE_MAX = 120
 
 MARGEM_X = 110
 
+#: Onde a faixa com a frase fica na altura do vídeo — 0 é o topo, 1 é o pé.
+#: Pedido da Aline (22/09/2026): "como se fosse o editor igual do Instagram,
+#: que é só eu mover para cima e para baixo". Antes era sempre o centro exato,
+#: que é justamente onde o assunto do clipe costuma estar.
+#:
+#: 🔴 É FRAÇÃO, NUNCA PIXEL: a tela desenha sobre uma miniatura de tamanho
+#: qualquer e aqui o vídeo é 1080x1920.
+POS_PADRAO = 0.5
+#: Folga maior embaixo por causa da assinatura (@handle), que mora no pé do
+#: vídeo: faixa por cima dela some com a assinatura.
+POS_MIN = 0.18
+POS_MAX = 0.82
+#: A faixa não passa daqui pra baixo: é onde mora a assinatura (@handle), no
+#: pé do vídeo. Vale como teto da BORDA de baixo da faixa, não do centro —
+#: frase de cinco linhas puxada pro pé engoliria a assinatura inteira.
+PISO_FAIXA = 0.906
+
 
 class FraseInvalida(ValueError):
     """A frase não serve — a tela precisa dizer o motivo, não gerar mudo."""
@@ -60,6 +77,22 @@ def duracao_final(pedida, duracao_clipe):
     d = DUR_PADRAO if not pedida else float(pedida)
     d = max(DUR_MIN, min(DUR_MAX, d))
     return round(min(d, max(0.5, duracao_clipe)), 2)
+
+
+def posicao_faixa(v):
+    """Posição válida da faixa. Valor ausente, texto ou fora da faixa vira o
+    centro de sempre — jogar fora um vídeo inteiro por causa de um número
+    seria pior que desenhar a frase no meio."""
+    # bool é int em Python: True viraria 1.0, que é o pé da tela.
+    if isinstance(v, bool):
+        return POS_PADRAO
+    try:
+        n = float(v)
+    except (TypeError, ValueError):
+        return POS_PADRAO
+    if n != n or n in (float("inf"), float("-inf")):
+        return POS_PADRAO
+    return round(min(POS_MAX, max(POS_MIN, n)), 3)
 
 
 def quebrar(frase, text_w, fs, largura):
@@ -95,7 +128,7 @@ def ajustar(frase, text_w, fs_inicial=118, max_linhas=5):
     return fs, quebrar(frase, text_w, fs, largura)
 
 
-def montar_ass(frase, dur, handle, rodape, text_w, estilo=None):
+def montar_ass(frase, dur, handle, rodape, text_w, estilo=None, pos=None):
     est = legenda_estilos.por_nome(estilo)
     texto = frase.upper() if est["caixa_alta"] else frase
     fs, linhas = ajustar(texto, text_w)
@@ -106,13 +139,24 @@ def montar_ass(frase, dur, handle, rodape, text_w, estilo=None):
     altura_bloco = int(len(linhas) * fs * 1.22)
     pad = 70
     faixa_h = altura_bloco + pad * 2
-    faixa_y = max(0, (H - faixa_h) // 2)
+    # A frase fica no ponto que ela escolheu e a faixa se centra nele. Com o
+    # padrão 0.5 as duas contas caem EXATAMENTE nos números de sempre (H é
+    # par, e `(faixa_h + 1) // 2` é o mesmo arredondamento do `(H - faixa_h)
+    # // 2` antigo) — mexer na posição não redesenha vídeo que já existe.
+    meia = (faixa_h + 1) // 2
+    centro = int(round(posicao_faixa(pos if pos is not None else POS_PADRAO) * H))
+    # A faixa ainda precisa caber inteira na tela — meia tarja saindo pela
+    # borda é pior que um centímetro fora do lugar pedido. 🔴 Quem é empurrado
+    # é o CENTRO, não só a tarja: mover a tarja sozinha deixaria a frase
+    # sobrando pra fora dela.
+    centro = max(meia, min(int(H * PISO_FAIXA) - faixa_h + meia, centro))
+    faixa_y = centro - meia
     faixa = (f"Dialogue: 0,{render.ts(0)},{render.ts(dur)},Fundo,,0,0,0,,"
              f"{{\\pos(0,{faixa_y})\\an7\\p1\\c&H000000&\\alpha&H4D&}}"
              f"m 0 0 l {W} 0 {W} {faixa_h} 0 {faixa_h}{{\\p0}}")
 
     frase_ev = (f"Dialogue: 1,{render.ts(0)},{render.ts(dur)},Frase,,0,0,0,,"
-                f"{{\\pos(540,{H // 2})\\fs{fs}\\fad(260,300)"
+                f"{{\\pos(540,{centro})\\fs{fs}\\fad(260,300)"
                 f"\\fscx94\\fscy94\\t(0,320,\\fscx100\\fscy100)}}{corpo}")
 
     tag = (f"Dialogue: 0,{render.ts(0)},{render.ts(dur)},Tag,,0,0,0,,"
@@ -142,7 +186,8 @@ def tem_audio(caminho):
 
 
 def render_clipe_frase(clipe, frase, out, fontsdir, handle="@nutri",
-                       rodape="Scanner da Saúde", segundos=None, estilo=None):
+                       rodape="Scanner da Saúde", segundos=None, estilo=None,
+                       pos=None):
     """Gera o MP4 9:16 com a frase por cima do clipe."""
     frase = normalizar_frase(frase)
     _, _, dur_clipe = render.probe(clipe)
@@ -152,7 +197,7 @@ def render_clipe_frase(clipe, frase, out, fontsdir, handle="@nutri",
     text_w = render.medidor(font)
     ass_path = os.path.join(os.path.dirname(out) or ".", "clipe.ass")
     with open(ass_path, "w", encoding="utf-8") as f:
-        f.write(montar_ass(frase, dur, handle, rodape, text_w, estilo))
+        f.write(montar_ass(frase, dur, handle, rodape, text_w, estilo, pos))
 
     # O clipe entra como o b-roll em retrato já entra no corte: fundo
     # desfocado + imagem centralizada. Clipe deitado sem isso vira duas

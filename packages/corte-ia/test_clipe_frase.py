@@ -115,6 +115,80 @@ def test_ass_escapa_chave():
     assert "{especial}" not in ass
 
 
+# ------------------------------------------------------------ posição
+def _faixa(ass):
+    """(topo, altura) da tarja e y do texto, lidos do ASS."""
+    import re
+    fy = int(re.search(r"\\pos\(0,(-?\d+)\)\\an7", ass).group(1))
+    fh = int(re.search(r"1080 (\d+) 0 \d+", ass).group(1))
+    y = int(re.search(r"\\pos\(540,(\d+)\)\\fs", ass).group(1))
+    return fy, fh, y
+
+
+def test_posicao_fora_da_faixa_vira_o_limite():
+    # Recusar jogaria fora um vídeo inteiro por causa de um número.
+    assert cf.posicao_faixa(0) == cf.POS_MIN
+    assert cf.posicao_faixa(1) == cf.POS_MAX
+    assert cf.posicao_faixa(-9) == cf.POS_MIN
+    assert cf.posicao_faixa(99) == cf.POS_MAX
+
+
+def test_posicao_sem_sentido_cai_no_centro():
+    for v in (None, "", "abc", float("nan"), float("inf"), [], True, False):
+        assert cf.posicao_faixa(v) == cf.POS_PADRAO, v
+
+
+def test_posicao_aceita_texto_do_banco():
+    # PostgREST devolve numeric como string: "0.300" tem que valer 0.3.
+    assert cf.posicao_faixa("0.300") == 0.3
+
+
+def test_REGRESSAO_o_padrao_e_o_centro_exato():
+    # Este número é o que faz o vídeo sair igual ao de antes da escolha
+    # existir. Mudar aqui redesenha vídeo que já está no ar.
+    ass = cf.montar_ass("O seu intestino fala", 8.0, "@x", "y", medidor_falso())
+    _, _, y = _faixa(ass)
+    assert y == cf.H // 2
+    assert cf.montar_ass("O seu intestino fala", 8.0, "@x", "y", medidor_falso(), None, 0.5) == ass
+    assert cf.montar_ass("O seu intestino fala", 8.0, "@x", "y", medidor_falso(), None, None) == ass
+
+
+def test_a_frase_e_a_tarja_andam_JUNTAS():
+    # Mover só a tarja deixaria a frase sobrando pra fora dela.
+    for pos in (0.18, 0.3, 0.5, 0.7, 0.82):
+        fy, fh, y = _faixa(cf.montar_ass("O seu intestino fala", 8.0, "@x", "y", medidor_falso(), None, pos))
+        assert fy <= y <= fy + fh, (pos, fy, fh, y)
+
+
+def test_REGRESSAO_a_tarja_nunca_sai_da_tela():
+    # Meia tarja saindo pela borda é pior que um centímetro fora do lugar.
+    # 🔴 O medidor tem que produzir a tarja MAIS ALTA possível (5 linhas em
+    # corpo cheio): com letra pequena a tarja cabe em qualquer posição e o
+    # teste passa verde sem olhar pra nada.
+    gordo = medidor_falso(26)
+    frase5 = "palavra " * 14
+    assert len(cf.ajustar(frase5, gordo)[1]) == 5, "o medidor precisa dar 5 linhas"
+    for frase, med in (("Oi", medidor_falso()), (frase5, gordo)):
+        for pos in (0.18, 0.5, 0.82):
+            fy, fh, y = _faixa(cf.montar_ass(frase, 8.0, "@x", "y", med, None, pos))
+            assert fy >= 0 and fy + fh <= cf.H, (frase[:10], pos, fy, fh)
+            assert fy <= y <= fy + fh, (frase[:10], pos, fy, fh, y)
+
+
+def test_REGRESSAO_a_tarja_nunca_cobre_a_assinatura():
+    # O @handle mora no pé do vídeo (y=1800). Tarja por cima dele some com a
+    # assinatura — e é ela que diz de quem é o vídeo.
+    for frase, med in (("Oi", medidor_falso()), ("palavra " * 14, medidor_falso(26))):
+        fy, fh, _ = _faixa(cf.montar_ass(frase, 8.0, "@x", "y", med, None, 0.82))
+        assert fy + fh <= int(cf.H * cf.PISO_FAIXA), (frase[:10], fy + fh)
+
+
+def test_posicao_move_de_verdade():
+    _, _, alto = _faixa(cf.montar_ass("Oi", 8.0, "@x", "y", medidor_falso(), None, 0.2))
+    _, _, baixo = _faixa(cf.montar_ass("Oi", 8.0, "@x", "y", medidor_falso(), None, 0.8))
+    assert alto < cf.H // 2 < baixo
+
+
 if __name__ == "__main__":
     falhas = 0
     for nome, fn in sorted(globals().items()):

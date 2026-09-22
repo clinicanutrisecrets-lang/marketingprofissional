@@ -1,9 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { criarVideoCurtoAction } from "@/lib/corte/actions";
 import { ESTILOS_LEGENDA, ESTILO_PADRAO } from "@/lib/corte/opcoes";
-import { avaliarFrase, DUR_MAX, DUR_MIN, DUR_PADRAO, FRASE_MAX } from "@/lib/corte/video-curto";
+import {
+  avaliarFrase,
+  posicaoComFaixaDentro,
+  DUR_MAX,
+  DUR_MIN,
+  DUR_PADRAO,
+  FRASE_MAX,
+  POS_PADRAO,
+} from "@/lib/corte/video-curto";
 
 /**
  * Vídeo curto: um clipe da biblioteca com a frase escrita em cima.
@@ -33,6 +41,13 @@ export function VideoCurtoSection({
   const [frase, setFrase] = useState("");
   const [segundos, setSegundos] = useState(DUR_PADRAO);
   const [estilo, setEstilo] = useState<string>(ESTILO_PADRAO);
+  // Altura da faixa no vídeo, em fração: 0 é o topo, 1 é o pé. Arrastar move
+  // isto. Fração e não pixel porque a miniatura aqui tem um tamanho e o
+  // vídeo lá tem outro (1080x1920).
+  const [pos, setPos] = useState(POS_PADRAO);
+  const palcoRef = useRef<HTMLDivElement>(null);
+  const faixaRef = useRef<HTMLDivElement>(null);
+  const [arrastando, setArrastando] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
 
@@ -47,6 +62,31 @@ export function VideoCurtoSection({
     [biblioteca, acervo],
   );
 
+  const clipeEscolhido = useMemo(
+    () => clipes.find(({ v }) => v.id === clipe?.id)?.v ?? null,
+    [clipes, clipe],
+  );
+
+  /** Onde o dedo/ponteiro está, virado em fração — e já parado onde o vídeo
+   *  vai parar (a faixa precisa caber e não cobrir a assinatura). */
+  const posDoPonteiro = useCallback((clientY: number) => {
+    const palco = palcoRef.current;
+    if (!palco) return POS_PADRAO;
+    const r = palco.getBoundingClientRect();
+    if (r.height <= 0) return POS_PADRAO;
+    const bruto = (clientY - r.top) / r.height;
+    const alturaFaixa = (faixaRef.current?.offsetHeight ?? 0) / r.height;
+    return posicaoComFaixaDentro(bruto, alturaFaixa);
+  }, []);
+
+  function aoArrastar(e: React.PointerEvent) {
+    // setPointerCapture: o dedo pode sair da miniatura no meio do arraste, e
+    // sem isto a faixa trava no caminho.
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    setArrastando(true);
+    setPos(posDoPonteiro(e.clientY));
+  }
+
   async function gerar() {
     if (!clipe || !avaliacao.ok || enviando) return;
     setEnviando(true);
@@ -58,6 +98,7 @@ export function VideoCurtoSection({
         frase,
         segundos,
         estiloLegenda: estilo,
+        posicao: pos,
       });
       setMsg({ ok: r.ok, texto: r.msg });
       if (r.ok) setFrase("");
@@ -146,10 +187,92 @@ export function VideoCurtoSection({
             </p>
           </div>
 
+          {clipe && (
+            <div className="mt-5">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-text/70">
+                3. Onde a frase fica
+              </label>
+              <p className="mb-2 text-[11px] text-brand-text/50">
+                Arraste a faixa para cima ou para baixo e solte onde ela não
+                cobrir o que importa no clipe.
+              </p>
+              <div className="flex items-start gap-4">
+                <div
+                  ref={palcoRef}
+                  onPointerMove={(e) => arrastando && setPos(posDoPonteiro(e.clientY))}
+                  onPointerUp={() => setArrastando(false)}
+                  onPointerCancel={() => setArrastando(false)}
+                  className="relative aspect-[9/16] w-40 shrink-0 select-none overflow-hidden rounded-xl bg-brand-muted"
+                >
+                  {clipeEscolhido?.thumbnail_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={clipeEscolhido.thumbnail_url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-3xl">
+                      🎞️
+                    </span>
+                  )}
+                  <div
+                    ref={faixaRef}
+                    onPointerDown={aoArrastar}
+                    style={{ top: `${pos * 100}%`, transform: "translateY(-50%)" }}
+                    className={`absolute inset-x-0 cursor-grab touch-none bg-black/50 px-2 py-2 text-center ${
+                      arrastando ? "cursor-grabbing ring-2 ring-white/70" : ""
+                    }`}
+                  >
+                    <span className="block break-words text-[10px] font-bold leading-tight text-white">
+                      {avaliacao.ok ? avaliacao.frase : "sua frase aparece aqui"}
+                    </span>
+                  </div>
+                  {/* O pé do vídeo é da assinatura (@handle): a faixa não
+                      entra aqui, nem na tela nem no vídeo. */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[9.4%] bg-gradient-to-t from-black/40 to-transparent" />
+                </div>
+                <div className="pt-1">
+                  <label className="mb-1 block text-[11px] text-brand-text/60">
+                    Ou use a barra
+                  </label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={pos}
+                    onChange={(e) => {
+                      const palco = palcoRef.current;
+                      const alturaFaixa =
+                        palco && palco.clientHeight > 0
+                          ? (faixaRef.current?.offsetHeight ?? 0) / palco.clientHeight
+                          : 0;
+                      setPos(posicaoComFaixaDentro(Number(e.target.value), alturaFaixa));
+                    }}
+                    aria-label="Altura da frase no vídeo"
+                    className="w-40"
+                  />
+                  <p className="mt-1 text-[11px] text-brand-text/50">
+                    {pos <= 0.34 ? "Em cima" : pos >= 0.66 ? "Embaixo" : "No meio"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setPos(POS_PADRAO)}
+                    className="mt-2 text-[11px] font-semibold text-brand-primary hover:underline"
+                  >
+                    Voltar pro meio
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-text/70">
-                3. Duração
+                4. Duração
               </label>
               <input
                 type="range"
@@ -166,7 +289,7 @@ export function VideoCurtoSection({
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-text/70">
-                4. Estilo da letra
+                5. Estilo da letra
               </label>
               <select
                 value={estilo}
