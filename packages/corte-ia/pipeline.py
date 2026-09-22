@@ -3,6 +3,9 @@
 Worker do "corte com IA" (roda no GitHub Actions, ver
 .github/workflows/render-corte.yml).
 
+  0. `modo='clipe_frase'`: não há fala nenhuma. O worker baixa um clipe da
+     biblioteca e escreve a frase por cima (clipe_frase.py), pulando os
+     passos 2 e 3 -- não existe transcrição pra planejar.
   1. lê a linha em `cortes_ia` e baixa a gravação bruta (bucket videos-biblioteca)
   2. transcreve local (faster-whisper) com timestamp por palavra
   3. pede o PLANO pro Claude: capa, palavra-chave por trecho, b-roll da
@@ -19,11 +22,16 @@ import anthropic
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import render  # noqa: E402
+import limpeza  # noqa: E402
+import recorte  # noqa: E402
+import broll_pexels  # noqa: E402
+import clipe_frase  # noqa: E402
 
 SB_URL = os.environ["SB_URL"].rstrip("/")
 SB_KEY = os.environ["SB_KEY"]
 MODEL = "claude-opus-5"
 BUCKET_ORIGEM = "videos-biblioteca"
+FILTRO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "video-filtro", "engine")
 BUCKET_SAIDA = "franqueadas-assets"
 HDR = {"Authorization": f"Bearer {SB_KEY}", "apikey": SB_KEY}
 
@@ -67,6 +75,32 @@ def subir_mp4(path, arquivo):
                       headers={**HDR, "Content-Type": "application/json"}, data=json.dumps({"expiresIn": 31536000}), timeout=60)
     r.raise_for_status()
     return f"{SB_URL}/storage/v1{r.json()['signedURL']}"
+
+
+def aplicar_filtro(entrada, saida, nome):
+    """Passa o vídeo pelo filtro de imagem (pele, ou pele + maquiagem).
+
+    Roda DEPOIS do recorte de propósito: o filtro custa de 0,6 a 2,5 s por
+    quadro, então cada segundo de pausa que a limpeza já tirou é um segundo
+    que ninguém paga aqui.
+
+    🔴 Falha no filtro NÃO derruba o corte: devolve o vídeo sem filtro e diz
+    por quê. O filtro é enfeite; o vídeo é a entrega.
+    """
+    if not nome or nome == "nenhum":
+        return entrada, None
+    sys.path.insert(0, os.path.abspath(FILTRO_DIR))
+    try:
+        import presets as PR
+        import preset_elegante as PE
+        cfg = PR.por_nome(nome)
+        if cfg is None:
+            return entrada, f"filtro '{nome}' não existe"
+        PE.aplicar_video(entrada, saida, cfg, progresso=True)
+        return saida, None
+    except Exception as e:  # dependência ausente, rosto não detectado, etc.
+        traceback.print_exc()
+        return entrada, f"o filtro não rodou ({str(e)[:120]}); entreguei sem ele"
 
 
 # ---------------------------------------------------------------- etapas
@@ -124,7 +158,7 @@ FORMATO EXATO:
 
 REGRAS:
 - capa: aparece só nos 2 primeiros segundos, junto com a promessa que a pessoa FALA. Ela reforça o que está sendo dito, nunca contextualiza nem dá "oi gente". capa.linha1: o assunto em até 14 caracteres (1 ou 2 palavras, vira o título gigante). capa.linha2: até 18 caracteres. capa.apoio: até 48 caracteres, sem ponto final. Quando a fala abrir com uma identidade ("cansada há mais de 2 anos"), a capa espelha essa identidade em vez do nome do mecanismo: identidade gera envio, assunto gera só salvamento.
-- secoes: cobrem o vídeo inteiro, de 0 até a duração, sem buracos e sem sobreposição. Entre 4 e 7 seções, cada uma com 5 a 15 segundos e uma palavra_chave de até 12 caracteres (1 palavra, no máximo 2) que resume o que está sendo dito naquele trecho. Corte as seções onde a fala muda de assunto, nunca no meio de uma frase.
+- secoes: cobrem o vídeo inteiro, de 0 até a duração, sem buracos e sem sobreposição. Cada seção tem de 5 a 15 segundos (a quantidade sai da duração: um vídeo de 30 s tem 3 ou 4 seções, um de 3 minutos tem uma dúzia) e uma palavra_chave de até 12 caracteres (1 palavra, no máximo 2) que resume o que está sendo dito naquele trecho. Corte as seções onde a fala muda de assunto, nunca no meio de uma frase.
 - broll: só ids que existem no catálogo recebido. O rosto falando é a base do vídeo e o b-roll é só CORTE DE RETOMADA, o que reseta a atenção: cada corte tem 2 a 3 segundos, nunca começa antes de 3.0 s, nunca invade os últimos 4 s (é onde fica a chamada pra ação), e entre dois cortes ficam ao menos 3 s de rosto. Total de b-roll no máximo 25% da duração. Escolha o clipe cujo conteúdo visual ilustra o que está sendo dito naquele momento (use titulo, descricao e tags). Se nada combinar de verdade, devolva lista vazia: b-roll ruim é pior que nenhum.
 - correcoes: só erros claros do reconhecimento de voz em termos técnicos (nomes de bactérias, genes, exames, nutrientes). "de" é a palavra exatamente como aparece na transcrição, "para" é a grafia correta. Nunca mude a fala em si.
 - Português do Brasil. Sem travessão em nenhum texto: use vírgula ou ponto.
@@ -144,7 +178,7 @@ def planejar(transcricao, catalogo, tema, nicho, dur):
                "catalogo_broll": [{"id": c["id"], "titulo": c.get("titulo"), "descricao": c.get("descricao"),
                                    "tags": c.get("tags"), "duracao_seg": c.get("duracao_seg")} for c in catalogo]}
     msg = client.messages.create(
-        model=MODEL, max_tokens=4000, system=SYSTEM_PLANO,
+        model=MODEL, max_tokens=8000, system=SYSTEM_PLANO,
         messages=[{"role": "user", "content": json.dumps(entrada, ensure_ascii=False)}],
     )
     if msg.stop_reason == "refusal":
@@ -178,9 +212,49 @@ def catalogo_broll(franqueada_id, compartilhada_id):
     return [r for r in rows if r.get("url")]
 
 
+# ------------------------------------------------- vídeo curto com frase
+def url_do_clipe(clipe_id, origem, franqueada_id):
+    """A URL do clipe, resolvida AQUI e conferida.
+
+    🔴 A tela manda o ID, nunca o endereço. Baixar a URL que o cliente
+    mandasse transformaria o worker em buscador de qualquer endereço da
+    internet. E o clipe da biblioteca só vale se for DELA.
+    """
+    if origem == "acervo":
+        rows = rest_get("acervo_videos", {"id": f"eq.{clipe_id}", "ativo": "eq.true", "select": "url", "limit": "1"})
+    else:
+        rows = rest_get("videos_franqueada", {"id": f"eq.{clipe_id}",
+                                              "franqueada_id": f"eq.{franqueada_id}",
+                                              "select": "url", "limit": "1"})
+    if not rows or not rows[0].get("url"):
+        raise RuntimeError("o clipe escolhido não está mais na sua biblioteca")
+    return rows[0]["url"]
+
+
+def processar_clipe_frase(corte_id, row, handle, work):
+    patch(corte_id, status="processando", etapa="baixando", erro_msg=None)
+    url = url_do_clipe(row["clipe_video_id"], (row.get("clipe_origem") or "biblioteca"), row["franqueada_id"])
+    bruto = os.path.join(work, "clipe.mp4")
+    baixar_url(url, bruto)
+    limpo = os.path.join(work, "in.mp4")
+    normalizar(bruto, limpo)
+
+    patch(corte_id, etapa="renderizando")
+    saida = os.path.join(work, "clipe-frase.mp4")
+    info = clipe_frase.render_clipe_frase(
+        limpo, row.get("frase") or "", saida, os.path.join(work, "fonts"),
+        handle=handle, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"),
+        pos=row.get("frase_pos"))
+    path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
+    url_saida = subir_mp4(path, saida)
+    patch(corte_id, status="pronto", etapa=None, path=path, url=url_saida, duracao_seg=info["duracao"])
+    print("pronto", path, info)
+
+
 # ---------------------------------------------------------------- main
 def processar(corte_id, broll_franqueada_id):
-    patch(corte_id, status="processando", etapa="transcrevendo", erro_msg=None)
+    # A etapa só é anunciada DEPOIS de saber o modo: dizer "transcrevendo"
+    # num vídeo que não tem fala é a tela mentindo pra quem está esperando.
     row = rest_get("cortes_ia", {"id": f"eq.{corte_id}", "select": "*"})[0]
     fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nicho_principal"})[0]
     handle = fr.get("instagram_handle") or ""
@@ -188,6 +262,12 @@ def processar(corte_id, broll_franqueada_id):
     handle = handle or "@scannerdasaude"
 
     work = tempfile.mkdtemp(prefix="corte-")
+
+    # Clipe com frase não tem fala: outro caminho inteiro.
+    if (row.get("modo") or "fala") == "clipe_frase":
+        return processar_clipe_frase(corte_id, row, handle, work)
+
+    patch(corte_id, status="processando", etapa="transcrevendo", erro_msg=None)
     bruto = os.path.join(work, "bruto" + os.path.splitext(row["origem_path"])[1])
     limpo = os.path.join(work, "in.mp4")
     baixar_objeto(BUCKET_ORIGEM, row["origem_path"], bruto)
@@ -197,10 +277,28 @@ def processar(corte_id, broll_franqueada_id):
     transcricao = transcrever(limpo, os.path.join(work, "audio.wav"))
     if not any(s["palavras"] for s in transcricao):
         raise RuntimeError("não encontrei fala no vídeo. Confere se o microfone gravou.")
-    patch(corte_id, transcricao=transcricao, etapa="planejando")
+    patch(corte_id, transcricao=transcricao, etapa="limpando")
+
+    # --- pausa, erro e hesitação -----------------------------------------
+    # O silêncio vem do ÁUDIO, não da transcrição: buraco no reconhecimento
+    # não é prova de silêncio (ver a trava principal de limpeza.py).
+    silencios = recorte.medir_silencio(limpo)
+    plano_limpeza = limpeza.planejar_limpeza(transcricao, dur, silencios)
+    if plano_limpeza["removidos"]:
+        cortado = recorte.recortar(limpo, plano_limpeza["manter"], os.path.join(work, "cortado.mp4"))
+        transcricao = limpeza.remapear_transcricao(transcricao, plano_limpeza["manter"])
+        limpo = cortado
+        _, _, dur = render.probe(limpo)
+    print("limpeza:", limpeza.frase_do_aviso(plano_limpeza))
+    patch(corte_id, limpeza=plano_limpeza, transcricao=transcricao, etapa="planejando")
 
     catalogo = catalogo_broll(row["franqueada_id"], broll_franqueada_id)
     plano = planejar(transcricao, catalogo, row["tema"], fr.get("nicho_principal"), round(dur, 1))
+
+    # Biblioteca vazia (ou nada que combine): busca a retomada no banco de
+    # imagem. A biblioteca dela sempre ganha — isto é a queda.
+    plano, baixar_extra = broll_pexels.completar_plano(
+        plano, dur, fr.get("nicho_principal"))
     patch(corte_id, plano=plano, etapa="renderizando")
 
     broll_dir = os.path.join(work, "broll"); os.makedirs(broll_dir, exist_ok=True)
@@ -210,16 +308,31 @@ def processar(corte_id, broll_franqueada_id):
         vid = str(b["video_id"])
         if vid in arquivos:
             continue
+        url = baixar_extra.get(vid) or (por_id.get(vid) or {}).get("url")
+        if not url:
+            continue
         dest = os.path.join(broll_dir, f"{vid}.mp4")
         try:
-            baixar_url(por_id[vid]["url"], dest)
+            baixar_url(url, dest)
             arquivos[vid] = dest
         except Exception as e:  # b-roll que não baixa só sai do plano
             print("b-roll ignorado", vid, e)
 
+    # --- filtro de imagem -------------------------------------------------
+    nome_filtro = (row.get("filtro") or "nenhum").strip().lower()
+    if nome_filtro != "nenhum":
+        patch(corte_id, etapa="filtrando")
+        limpo, aviso_filtro = aplicar_filtro(limpo, os.path.join(work, "filtrado.mp4"), nome_filtro)
+        if aviso_filtro:
+            print("filtro:", aviso_filtro)
+            plano_limpeza = dict(plano_limpeza)
+            plano_limpeza["aviso_filtro"] = aviso_filtro
+            patch(corte_id, limpeza=plano_limpeza)
+        patch(corte_id, etapa="renderizando")
+
     saida = os.path.join(work, "corte.mp4")
     info = render.render(limpo, transcricao, plano, arquivos, handle, "Scanner da Saúde", saida,
-                         os.path.join(work, "fonts"))
+                         os.path.join(work, "fonts"), row.get("estilo_legenda"))
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url = subir_mp4(path, saida)
     patch(corte_id, status="pronto", etapa=None, path=path, url=url, duracao_seg=info["duracao"])

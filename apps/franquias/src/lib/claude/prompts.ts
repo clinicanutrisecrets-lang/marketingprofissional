@@ -364,10 +364,39 @@ export function buildPromptPostVenda(params: {
   const { produto, tipo, incluir_preco } = params;
 
   const isCarrossel = tipo === "feed_carrossel";
+  // Reels e stories são ROTEIRO pra ela gravar, não arte pra postar. Pedido
+  // da Aline (22/09/2026): "podia ter roteiro de reels e roteiro de stories
+  // pra abrir já a câmera com o prompt".
   const schemaExtra = isCarrossel
     ? `,
   "slides": ["texto slide 1 (capa/hook)", "texto slide 2", "...", "texto slide final (CTA)"]`
-    : "";
+    : tipo === "reels"
+      ? `,
+  "roteiro": "o texto CORRIDO que ela vai FALAR, do jeito que se fala em voz alta (30 a 45 segundos, 80 a 120 palavras). Primeira frase é o gancho e tem que prender em 3 segundos. Sem marcação de cena, sem '[pausa]', sem numeração: é o que rola no teleprompter, então tudo que estiver aqui vai ser lido em voz alta."`
+      : tipo === "stories"
+        ? `,
+  "stories": ["texto do story 1 (gancho)", "story 2", "story 3", "story 4 (convite)"]`
+        : "";
+
+  const instrucaoFormato = isCarrossel
+    ? ""
+    : tipo === "reels"
+      ? `
+FORMATO REELS (roteiro falado):
+- O campo "roteiro" é lido em voz alta no teleprompter. Escreva como se fala: frase curta, sem jargão de texto escrito, sem tópicos.
+- 30 a 45 segundos. Passar disso a pessoa não termina de assistir.
+- Gancho nos 3 primeiros segundos, antes de qualquer contexto.
+- Fecha convidando, não vendendo: o link não é falado, vai na legenda.
+`
+      : tipo === "stories"
+        ? `
+FORMATO STORIES (sequência):
+- De 3 a 5 stories, um pensamento por tela. Cada um tem que fazer sentido sozinho: muita gente entra no meio.
+- O primeiro é gancho puro. O último é o convite.
+- Frases curtas — isso vai por cima de um vídeo gravado por ela, então texto longo não cabe na tela.
+- O link vai no adesivo de link do story, não escrito no texto.
+`
+        : "";
 
   return `Gere 1 post de Instagram do tipo "${tipo}" de VENDA do produto abaixo.
 
@@ -389,7 +418,7 @@ COMO VENDER SEM PARECER PANFLETO:
 - Máximo 1 post de venda a cada 5 posts — este é o post de venda, então capriche na conexão, não no volume de oferta.
 - Compliance CFN integral: nada de promessa de resultado, prazo ou cura.
 - Ao citar a tecnologia por trás da análise, escreva "algoritmo Scanner" ou "Scanner da Saúde". Nunca "IA" nem "inteligência artificial" (regra de marca do Scanner).
-${params.consciencia ? `${blocoConsciencia(params.consciencia, { esteira: true })}\n` : ""}
+${instrucaoFormato}${params.consciencia ? `${blocoConsciencia(params.consciencia, { esteira: true })}\n` : ""}
 Responda APENAS com JSON válido neste schema:
 {
   "headline": "texto curto que vai no criativo (máx 40 chars, impacto máximo)",

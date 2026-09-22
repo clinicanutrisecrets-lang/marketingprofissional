@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { semanaAlvo, formatarSemana } from "@/lib/conteudo/semana";
+import { montarAvisoPronto } from "@/lib/conteudo/aviso-pronto-db";
 import TendenciasCard from "@/components/TendenciasCard";
 import { TutorialTour } from "@/components/TutorialTour";
 
@@ -60,6 +61,12 @@ export default async function DashboardPage() {
 
   const temSugestoes = (sugestoesSemana ?? 0) > 0;
 
+  // "Seus conteúdos ficaram prontos" — inclusive o que ela pediu em "Pedir
+  // conteúdo". A contagem de posts sai de `posts_agendados`, nunca de
+  // `total_posts` (que fica em 0 em quase toda linha), senão uma aprovação
+  // vazia viraria aviso e mandaria a nutri pra uma tela sem nada.
+  const aviso = await montarAvisoPronto(supabase, fId);
+
   return (
     <main className="mx-auto max-w-5xl py-6 lg:py-10 lg:pl-6">
       <TutorialTour />
@@ -100,6 +107,31 @@ export default async function DashboardPage() {
           Abrir guia →
         </span>
       </a>
+
+      {/* Conteúdo pronto esperando aprovação (Aline, 22/09/2026). Fica acima
+          do CTA de gerar: o que ela tem pra fazer agora é aprovar o que já
+          existe, não gerar mais. Some sozinho quando ela aprova. */}
+      {aviso && (
+        <Link
+          href={aviso.href}
+          className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 transition hover:bg-emerald-100"
+        >
+          <span className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-xl">
+              ✅
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-bold text-emerald-900">{aviso.titulo}</span>
+              <span className="mt-0.5 block text-[13px] leading-snug text-emerald-800/80">
+                {aviso.detalhe}
+              </span>
+            </span>
+          </span>
+          <span className="flex-shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-[13px] font-semibold text-white">
+            {aviso.acao} →
+          </span>
+        </Link>
+      )}
 
       {/* CTA principal */}
       <Link
@@ -160,3 +192,4 @@ function StatCard({ icone, valor, label }: { icone: string; valor: string; label
     </div>
   );
 }
+

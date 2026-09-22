@@ -32,7 +32,7 @@ export default async function BibliotecaVideosPage() {
             🎬 Meus vídeos
           </h1>
           <p className="text-sm text-brand-text/60">
-            Vídeos curtos de apoio (b-roll) pros seus reels. A IA escolhe daqui
+            Vídeos curtos de apoio (b-roll) pros seus reels. O Scanner escolhe daqui
             o clipe que entra por cima da sua fala nos cortes automáticos.
           </p>
         </header>

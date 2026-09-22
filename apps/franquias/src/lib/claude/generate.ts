@@ -92,7 +92,13 @@ export async function gerarPost(
   };
 }
 
-export type PostVendaGerado = PostGerado & { slides?: string[] };
+export type PostVendaGerado = PostGerado & {
+  slides?: string[];
+  /** Reels: o texto corrido que ela fala — vai direto pro teleprompter. */
+  roteiro?: string;
+  /** Stories: uma frase por tela, na ordem. */
+  stories?: string[];
+};
 
 /**
  * Gera 1 post de VENDA de um produto real do Scanner Tratamentos.

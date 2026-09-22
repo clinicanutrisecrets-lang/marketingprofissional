@@ -18,6 +18,8 @@ import argparse, json, os, shlex, subprocess, sys, tempfile
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 
+import legenda_estilos
+
 W, H = 1080, 1920
 AMBER, TIFF, WHITE = "&H0B9EF5&", "&HA8B80B&", "&HFFFFFF&"
 NAVY_HEX = "171627"
@@ -93,6 +95,22 @@ def preparar_fontes(dest):
         out = os.path.join(dest, os.path.basename(src))
         if not os.path.exists(out):
             TTFont(src).save(out)
+    # Fraunces em negrito, pro estilo "editorial". Se a fonte nao tiver o eixo
+    # de peso, cai na normal: estilo feio e melhor que render que nao sai.
+    outb = os.path.join(dest, "FrauncesBold.ttf")
+    if not os.path.exists(outb):
+        try:
+            f = TTFont(src_fraunces)
+            inst = instancer.instantiateVariableFont(f, {"wght": 700})
+            for rec in inst["name"].names:
+                if rec.nameID in (1, 4, 6, 16):
+                    rec.string = "FrauncesBold"
+                if rec.nameID == 2:
+                    rec.string = "Regular"
+            inst.save(outb)
+        except Exception as e:
+            print("FrauncesBold indisponivel, usando Fraunces:", e)
+            TTFont(src_fraunces).save(outb)
     inter = TTFont(os.path.join(dest, "InterBold.ttf"))
     return inter
 
@@ -139,13 +157,19 @@ def blocos_de_legenda(palavras, correcoes):
     return merged, sent_of
 
 
-def eventos_legenda(chunks, sent_of, layout, text_w):
+def eventos_legenda(chunks, sent_of, layout, text_w, est=None):
+    est = est or legenda_estilos.por_nome(None)
+    rot = est["rot"]
+    destaque = est["destaque"]
+    caixa = (lambda t: t.upper()) if est["caixa_alta"] else (lambda t: t)
+    ital_on = "\\i1" if est["italico_destaque"] else ""
+    ital_off = "\\i0" if est["italico_destaque"] else ""
     ev = []
     for ci, ch in enumerate(chunks):
         start = ch[0]["i"]; end = ch[-1]["f"] + 0.25
         if ci + 1 < len(chunks):
             end = min(end, chunks[ci + 1][0]["i"])
-        style = ROT[sent_of[ci] % len(ROT)]
+        style = rot[sent_of[ci] % len(rot)]
         if style == "big":
             for k, w in enumerate(ch):
                 a = w["i"] if k > 0 else start
@@ -154,14 +178,14 @@ def eventos_legenda(chunks, sent_of, layout, text_w):
                     continue
                 parts = []
                 for j, x in enumerate(ch):
-                    t = esc(x["t"].upper())
+                    t = esc(caixa(x["t"]))
                     parts.append(
-                        f"{{\\c{AMBER}\\fscx86\\fscy86\\t(0,110,\\fscx100\\fscy100)}}{t}{{\\c{WHITE}\\fscx100\\fscy100}}"
+                        f"{{\\c{destaque}\\fscx86\\fscy86\\t(0,110,\\fscx100\\fscy100)}}{t}{{\\c{WHITE}\\fscx100\\fscy100}}"
                         if j == k else t)
                 ev.append(f"Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{{\\pos(540,{layout['cap_big_y']})}}" + " ".join(parts))
         else:
             cy = layout["cap_pill_band_y"] if style == "pill_band" else layout["cap_pill_top_y"]
-            size = 56
+            size = est["fs_pill"]
             full = " ".join(x["t"] for x in ch)
             Wp = min(text_w(full, size) + 90, 1000); Hp = 96; r = 48
             x0 = 540 - Wp / 2; y0 = cy - Hp / 2
@@ -176,14 +200,17 @@ def eventos_legenda(chunks, sent_of, layout, text_w):
                 parts = []
                 for j, x in enumerate(ch):
                     t = esc(x["t"])
-                    parts.append(f"{{\\c{AMBER}\\i1\\fnInterBlack}}{t}{{\\c{WHITE}\\i0\\fnInterBold}}" if j == k else t)
+                    parts.append(
+                        f"{{\\c{destaque}{ital_on}\\fn{est['fonte_pill_destaque']}}}{t}"
+                        f"{{\\c{WHITE}{ital_off}\\fn{est['fonte_pill']}}}" if j == k else t)
                 ev.append(f"Dialogue: 1,{ts(a)},{ts(b)},PillTxt,,0,0,0,,{{\\pos(540,{cy})}}" + " ".join(parts))
     return ev
 
 
-def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w):
+def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None):
+    est = legenda_estilos.por_nome(estilo)
     chunks, sent_of = blocos_de_legenda(palavras, plano.get("correcoes"))
-    ev = eventos_legenda(chunks, sent_of, layout, text_w)
+    ev = eventos_legenda(chunks, sent_of, layout, text_w, est)
 
     capa = plano.get("capa") or {}
     l1 = esc(capa.get("linha1", "")).upper()[:14]
@@ -195,7 +222,8 @@ def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w):
     fs1 = 150 if len(l1) <= 9 else 118
     fs2 = 104 if len(l2) <= 12 else 84
     cover = (f"Dialogue: 2,{ts(0)},{ts(cover_end)},Cover,,0,0,0,,{{\\pos(540,{layout['key_y'] + 60})\\fad(0,200)\\fscx92\\fscy92\\t(0,250,\\fscx100\\fscy100)}}"
-             f"{{\\c{TIFF}\\fs{fs1}}}{l1}\\N{{\\c{WHITE}\\fs{fs2}}}{l2}\\N{{\\fs50\\b0\\fnFraunces\\c&HDDDDDD&}}{apoio}")
+             f"{{\\c{TIFF}\\fs{fs1}}}{l1}\\N{{\\c{WHITE}\\fs{fs2}}}{l2}"
+             f"\\N{{\\fs50\\b0\\fn{est['fonte_apoio']}\\c&HDDDDDD&}}{apoio}")
 
     keyev = []
     for sec in plano.get("secoes") or []:
@@ -228,11 +256,11 @@ WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cover,InterBlack,150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-2,0,1,0,0,5,30,30,0,1
-Style: Key,InterBlack,150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-3,0,1,0,0,5,30,30,0,1
-Style: Cap,InterBold,92,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,1,0,1,5,0,5,60,60,0,1
+Style: Cover,{est['fonte_capa']},150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-2,0,1,0,0,5,30,30,0,1
+Style: Key,{est['fonte_capa']},150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,-3,0,1,0,0,5,30,30,0,1
+Style: Cap,{est['fonte_cap']},{est['fs_cap']},{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,1,0,1,5,0,5,60,60,0,1
 Style: Pill,Inter,20,&H3A2E2B&,&H3A2E2B&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
-Style: PillTxt,InterBold,56,{WHITE},{WHITE},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
+Style: PillTxt,{est['fonte_pill']},{est['fs_pill']},{WHITE},{WHITE},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
 Style: Tag,Inter,34,&HB4A39B&,&HB4A39B&,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,40,40,0,1
 Style: Bar,Inter,20,{TIFF},{TIFF},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: Fundo,Inter,20,&H000000&,&H000000&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
@@ -319,7 +347,7 @@ def filtro_fonte(label, modo, band_h):
             f"[{label}bgo][{label}fgo]overlay=0:(H-h)/2")
 
 
-def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir):
+def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir, estilo=None):
     w0, h0, dur = probe(video)
     retrato = h0 > w0
     palavras = [w for s in transcricao for w in s["palavras"]]
@@ -345,7 +373,7 @@ def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir
     text_w = medidor(font)
     ass_path = os.path.join(os.path.dirname(out) or ".", "corte.ass")
     with open(ass_path, "w", encoding="utf-8") as f:
-        f.write(montar_ass(plano, palavras, dur, layout, handle, rodape, text_w))
+        f.write(montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo))
 
     tl = cadenciar(timeline(plano, dur, broll_files))
     fontes = sorted({s[0] for s in tl if s[0] != "head"})

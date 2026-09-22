@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Teleprompter } from "../conteudo/reel/[id]/Teleprompter";
 
 export type RoteiroSemana = {
@@ -29,9 +30,19 @@ export function TeleprompterHub({
   roteiros: RoteiroSemana[];
   corteIa?: boolean;
 }) {
-  const [texto, setTexto] = useState("");
+  // Roteiro que veio pronto de outra tela (post de venda → "Abrir a câmera
+  // com este roteiro"). Pedido da Aline em 22/09/2026: a nutri sai do roteiro
+  // direto pra gravação, sem copiar e colar no meio do caminho.
+  const params = useSearchParams();
+  const textoDaUrl = (params.get("texto") ?? "").slice(0, 4000);
+
+  const [texto, setTexto] = useState(textoDaUrl);
   const [gravando, setGravando] = useState(false);
-  const [modo, setModo] = useState<"semana" | "livre">(roteiros.length ? "semana" : "livre");
+  // Com roteiro na URL a tela já abre na aba do texto colado: cair na lista
+  // da semana esconderia justamente o que ela veio gravar.
+  const [modo, setModo] = useState<"semana" | "livre">(
+    textoDaUrl ? "livre" : roteiros.length ? "semana" : "livre",
+  );
 
   if (gravando) {
     return (
@@ -73,7 +84,7 @@ export function TeleprompterHub({
               : "bg-white text-brand-text/70 ring-1 ring-brand-text/15"
           }`}
         >
-          ✨ Roteiros da semana ({roteiros.length})
+          📅 Roteiros da semana ({roteiros.length})
         </button>
         <button
           onClick={() => setModo("livre")}
@@ -98,7 +109,7 @@ export function TeleprompterHub({
               href="/dashboard/conteudo"
               className="mt-4 inline-block rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
             >
-              ✨ Gerar sugestões da semana
+              📝 Gerar sugestões da semana
             </Link>
           </div>
         ) : (
