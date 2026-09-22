@@ -95,20 +95,29 @@ test("o aviso não escreve travessão", () => {
   assert.doesNotMatch(`${a.titulo} ${a.detalhe} ${a.acao}`, /[—–]/);
 });
 
-test("LIGAÇÃO: o painel desenha o aviso e conta os posts de posts_agendados", () => {
+test("LIGAÇÃO: o painel desenha o aviso, e a consulta vive num arquivo só", () => {
   const raiz = join(import.meta.dirname, "../../../../..");
   // Sem os comentários: a explicação do código cita `total_posts` de
-  // propósito, e a trava é sobre o que a página CONSULTA.
-  const painel = readFileSync(join(raiz, "apps/franquias/src/app/dashboard/page.tsx"), "utf8")
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/^\s*\/\/.*$/gm, "");
-  assert.match(painel, /avisoConteudoPronto/);
+  // propósito, e a trava é sobre o que se CONSULTA.
+  const semComentario = (f: string) =>
+    f.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const painel = semComentario(
+    readFileSync(join(raiz, "apps/franquias/src/app/dashboard/page.tsx"), "utf8"),
+  );
+  const db = semComentario(
+    readFileSync(join(raiz, "apps/franquias/src/lib/conteudo/aviso-pronto-db.ts"), "utf8"),
+  );
   assert.match(painel, /aviso\.href/);
+  // 🔴 Desde 22/09 o MESMO aviso aparece no dashboard do Scanner, e a
+  // consulta é uma só (aviso-pronto-db). O painel importa; não reimplementa.
+  assert.match(painel, /montarAvisoPronto/);
+  assert.doesNotMatch(painel, /from\("aprovacoes_semanais"\)/);
+  assert.match(db, /avisoConteudoPronto/);
   // `total_posts` fica em 0 em quase toda linha — contar por ela faria a
   // carcaça vazia passar pela trava acima e o aviso voltaria a mentir.
-  assert.doesNotMatch(painel, /total_posts/);
-  assert.match(painel, /from\("posts_agendados"\)/);
+  assert.doesNotMatch(db, /total_posts/);
+  assert.match(db, /from\("posts_agendados"\)/);
   // A MESMA escolha da tela "Aprovar semana": o aviso não pode apontar pra
   // uma semana diferente da que o botão abre.
-  assert.match(painel, /escolherAprovacao/);
+  assert.match(db, /escolherAprovacao/);
 });
