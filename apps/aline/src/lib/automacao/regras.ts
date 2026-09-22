@@ -245,6 +245,10 @@ export function extrairEventos(payload: unknown): EventoInstagram[] {
 
     for (const m of (entry.messaging as Json[] | undefined) ?? []) {
       const sender = (m.sender ?? {}) as Json;
+      // 🔴 No ECO o sender é a PRÓPRIA CONTA e o recipient é a pessoa. Usar o
+      // sender ali apontaria a conversa pra conta da Aline, e o robô nunca
+      // saberia com quem ela falou.
+      const recipient = (m.recipient ?? {}) as Json;
       const msg = m.message as Json | undefined;
       if (!msg) {
         // read / postback / reaction: não vira resposta
@@ -268,7 +272,7 @@ export function extrairEventos(payload: unknown): EventoInstagram[] {
         bruto: m,
       };
       if (msg.is_echo === true) {
-        eventos.push({ ...base, tipo: "eco", texto: str(msg.text) ?? "" });
+        eventos.push({ ...base, igsid: str(recipient.id) ?? "", tipo: "eco", texto: str(msg.text) ?? "" });
         continue;
       }
       const replyTo = msg.reply_to as Json | undefined;
