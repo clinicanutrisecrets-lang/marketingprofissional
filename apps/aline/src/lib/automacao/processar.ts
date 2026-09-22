@@ -175,6 +175,10 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         regrasPorPerfil.set(perfil.id, regras);
       }
       const vars = { nome: contato.nome, username: contato.username ?? ev.username };
+      // 🔴 O ofício de quem vende costuma estar no NOME do perfil, não na
+      // mensagem ("João Pedro | Tráfego Pago"). Por isso a identidade anda
+      // junto do texto em toda checagem de abordagem comercial.
+      const quemEscreve = { nome: contato.nome, username: contato.username ?? ev.username };
 
       // ── Toque num botão, ou "2", ou o rótulo digitado, ou a frase que quer
       //    dizer um dos botões ("sou farmacêutico" → Outro profissional) ──
@@ -202,7 +206,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // A pessoa escreveu com as palavras dela em vez de digitar o comando.
       // Só roda depois que a palavra-chave não pegou nada: quem digitou
       // "GLP1" continua tendo a resposta instantânea e previsível de sempre.
-      if (!regra && config.entender_pedido_sem_palavra && ev.texto.trim() && !ev.texto.startsWith("[") && !pareceSpam(ev.texto) && !pareceAbordagemComercial(ev.texto)) {
+      if (!regra && config.entender_pedido_sem_palavra && ev.texto.trim() && !ev.texto.startsWith("[") && !pareceSpam(ev.texto) && !pareceAbordagemComercial(ev.texto, quemEscreve)) {
         const candidatas = candidatasPorIntencao({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
         if (candidatas.length > 0) {
           const i = await escolherRegraPorIntencao(ev.texto, candidatas.map(descreverRegra));
@@ -222,7 +226,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
       // ── Sem regra: chaves gerais ──
       if (gatilho === "comentario") {
-        if (!config.agradecer_comentarios || pareceSpam(ev.texto) || pareceAbordagemComercial(ev.texto) || ev.parentCommentId) { resumo.ignorados++; continue; }
+        if (!config.agradecer_comentarios || pareceSpam(ev.texto) || pareceAbordagemComercial(ev.texto, quemEscreve) || ev.parentCommentId) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
         let texto: string | null;
         let origem: string;
@@ -250,7 +254,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         // decide se responde. Esta chave VENCE a IA de propósito: o pedido
         // nasceu de o robô ter escrito onde não devia (22/09/2026).
         if (config.reagir_com_coracao) {
-          if (pareceAbordagemComercial(textoPessoa)) { resumo.ignorados++; continue; }
+          if (pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
           if (!ev.externalId) { resumo.ignorados++; continue; } // sem id não há o que reagir
           try {
             await reagirMensagem(cred, ev.igsid, ev.externalId);
@@ -263,7 +267,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           continue;
         }
 
-        if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa)) { resumo.ignorados++; continue; }
+        if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
         const [historico, contexto] = await Promise.all([historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa)]);
         const resp = await responderDmComScanner({
