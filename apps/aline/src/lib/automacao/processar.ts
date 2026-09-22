@@ -58,11 +58,8 @@ export type ResumoProcessamento = {
   regrasPorIntencao: number;
   /** Mensagens que saíram da conta (robô ou a própria Aline). */
   ecos: number;
-<<<<<<< HEAD
   /** Direct que recebeu só um coração, sem texto. */
   coracoes: number;
-=======
->>>>>>> origin/main
   opcoes: number;
   agradecimentos: number;
   respostasDm: number;
@@ -88,11 +85,7 @@ const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-<<<<<<< HEAD
     eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, ecos: 0, coracoes: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
-=======
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, ecos: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
->>>>>>> origin/main
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
