@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import type { BrandGuidelines, ConteudoPeca, Dimensoes } from "./types";
-import { comporTexto, medirTexto, type PedacoTexto } from "./textVector";
+import { comporTexto, medirTexto, type FamiliaFonte, type PedacoTexto } from "./textVector";
+import { resolverFamiliaTitulo, type EstiloFonte } from "./estiloFonte";
 import {
   AVISO_LAYOUT_SEM_FOTO,
   larguraColunaTexto,
@@ -62,6 +63,12 @@ export type CardInput = {
   corFundoHex?: string;
   /** Logo (PNG/JPG) composta no topo-centro do card */
   logoBuffer?: Buffer;
+  /**
+   * Estilo de fonte do TÍTULO escolhido pela profissional (clássica /
+   * impacto / leve). Ausente = cada layout usa a família de sempre, e a
+   * arte sai byte a byte igual à de antes desta opção existir.
+   */
+  fonte?: EstiloFonte;
 };
 
 /**
@@ -203,7 +210,7 @@ type Bloco = { pedacos: PedacoTexto[]; largura: number; altura: number };
 
 function blocoDeTexto(
   texto: string,
-  familia: "serif" | "sans" | "sans-black" | "manuscrita",
+  familia: FamiliaFonte,
   cor: string,
   fontSize: number,
   maxWidth: number,
@@ -265,19 +272,25 @@ function blocoPill(texto: string, cor: string, larguraCard: number): Bloco | nul
   return { pedacos, largura: w, altura: h };
 }
 
-/** Título serif com auto-ajuste de tamanho até caber no orçamento de altura. */
+/**
+ * Título com auto-ajuste de tamanho até caber no orçamento de altura.
+ * A família padrão é a serifada (Playfair) — é o que estes layouts sempre
+ * fizeram; `familia` só chega diferente quando a profissional escolheu um
+ * estilo de fonte na tela.
+ */
 function blocoTitulo(
   texto: string,
   cor: string,
   maxWidth: number,
   maxHeight: number,
   fontSizeInicial: number,
+  familia: FamiliaFonte = "serif",
 ): Bloco {
   let fs = fontSizeInicial;
   for (let i = 0; i < 12; i++) {
     const r = comporTexto({
       texto,
-      familia: "serif",
+      familia,
       fontSize: fs,
       maxWidth,
       cor,
@@ -291,7 +304,7 @@ function blocoTitulo(
   }
   const r = comporTexto({
     texto,
-    familia: "serif",
+    familia,
     fontSize: fs,
     maxWidth,
     cor,
@@ -404,23 +417,31 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
   const handle = derivarHandle(brand);
   const foto = fotoPedida(input);
 
+  // A família do título: o estilo que a profissional escolheu na tela, ou o
+  // padrão daquele layout. Cada layout tem o SEU padrão — a capa nasceu em
+  // Montserrat 900 e os outros em Playfair; um padrão único aqui redesenharia
+  // metade das artes que já existem.
+  const fonteTitulo = resolverFamiliaTitulo(input.fonte, "serif");
+  const fonteTituloCapa = resolverFamiliaTitulo(input.fonte, "sans-black");
+
   if (layout === "conteudo") {
     // Logo também vale aqui (slides de carrossel) — a marca aparece em todos.
     const buffer = await renderConteudo({
-      W, H, scheme, conteudo, handle,
+      W, H, scheme, conteudo, handle, fonteTitulo,
       logoComposite: await prepararLogo(input, brand, W, H),
     });
     return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
   }
   if (layout === "citacao") {
-    return renderCitacao({ W, H, scheme, conteudo, handle, foto });
+    return renderCitacao({ W, H, scheme, conteudo, handle, foto, fonteTitulo });
   }
   if (layout === "lista") {
-    return renderLista({ W, H, scheme, conteudo, handle, foto });
+    return renderLista({ W, H, scheme, conteudo, handle, foto, fonteTitulo });
   }
   if (layout === "capa_clara" || layout === "capa_escura") {
     const buffer = await renderCapa({
       W, H, conteudo, handle,
+      fonteTitulo: fonteTituloCapa,
       escura: layout === "capa_escura",
       corMarca: brand.corPrimariaHex || "#2F5D50",
       logoComposite: await prepararLogo(input, brand, W, H),
@@ -429,14 +450,14 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
   }
   if (layout === "editorial") {
     return renderEditorial({
-      W, H, scheme, conteudo, handle, foto,
+      W, H, scheme, conteudo, handle, foto, fonteTitulo,
       corMarca: brand.corPrimariaHex || "#2F5D50",
     });
   }
 
   // hero / foto: a mesma pilha — "hero" com foto vira "foto".
   return renderPilha({
-    W, H, scheme, conteudo, handle, foto,
+    W, H, scheme, conteudo, handle, foto, fonteTitulo,
     logoComposite: await prepararLogo(input, brand, W, H),
   });
 }
@@ -450,9 +471,10 @@ async function renderPilha(params: {
   conteudo: ConteudoPeca;
   handle: string;
   foto: FotoPedida | null;
+  fonteTitulo: FamiliaFonte;
   logoComposite: { buf: Buffer; w: number; h: number } | null;
 }): Promise<CardResultado> {
-  const { W, H, scheme, conteudo, handle, foto, logoComposite } = params;
+  const { W, H, scheme, conteudo, handle, foto, fonteTitulo, logoComposite } = params;
   const stories = H / W > 1.5;
 
   const headline = (conteudo.headline ?? "").trim();
@@ -501,6 +523,7 @@ async function renderPilha(params: {
       contentW,
       budget,
       Math.round(W * (stories ? 0.095 : aoLado ? 0.078 : 0.1) * esc),
+      fonteTitulo,
     );
     itens.push({ bloco: titulo, gapAntes: itens.length ? Math.round(gapUnit * 1.15) : 0 });
   }
@@ -637,9 +660,10 @@ async function renderConteudo(params: {
   scheme: Scheme;
   conteudo: ConteudoPeca;
   handle: string;
+  fonteTitulo: FamiliaFonte;
   logoComposite?: { buf: Buffer; w: number; h: number } | null;
 }): Promise<Buffer> {
-  const { W, H, scheme, conteudo, handle, logoComposite } = params;
+  const { W, H, scheme, conteudo, handle, fonteTitulo, logoComposite } = params;
   const contentW = Math.round(W * 0.82);
   const composites: sharp.OverlayOptions[] = [];
 
@@ -658,7 +682,7 @@ async function renderConteudo(params: {
   const pecas: Peca[] = [];
 
   if (headline) {
-    const titulo = blocoTitulo(headline, scheme.titulo, contentW, H * 0.24, Math.round(W * 0.062));
+    const titulo = blocoTitulo(headline, scheme.titulo, contentW, H * 0.24, Math.round(W * 0.062), fonteTitulo);
     pecas.push({
       altura: titulo.altura,
       gapAntes: 0,
@@ -756,8 +780,9 @@ async function renderCitacao(params: {
   conteudo: ConteudoPeca;
   handle: string;
   foto: FotoPedida | null;
+  fonteTitulo: FamiliaFonte;
 }): Promise<CardResultado> {
-  const { W, H, scheme, conteudo, handle, foto } = params;
+  const { W, H, scheme, conteudo, handle, foto, fonteTitulo } = params;
   const contentW = Math.round(W * 0.78);
   const composites: sharp.OverlayOptions[] = [];
 
@@ -776,6 +801,7 @@ async function renderCitacao(params: {
     contentW,
     H * (foto ? (foto.tamanho === "grande" ? 0.26 : 0.32) : 0.44),
     Math.round(W * (foto ? 0.068 : 0.078)),
+    fonteTitulo,
   );
 
   const autorBloco = autor
@@ -854,8 +880,9 @@ async function renderLista(params: {
   conteudo: ConteudoPeca;
   handle: string;
   foto: FotoPedida | null;
+  fonteTitulo: FamiliaFonte;
 }): Promise<CardResultado> {
-  const { W, H, scheme, conteudo, handle, foto } = params;
+  const { W, H, scheme, conteudo, handle, foto, fonteTitulo } = params;
   const contentW = Math.round(W * 0.8);
   const composites: sharp.OverlayOptions[] = [];
 
@@ -884,7 +911,7 @@ async function renderLista(params: {
   }
 
   if (titulo) {
-    const t = blocoTitulo(titulo, scheme.titulo, contentW, H * (foto ? 0.16 : 0.22), Math.round(W * (foto ? 0.062 : 0.07)));
+    const t = blocoTitulo(titulo, scheme.titulo, contentW, H * (foto ? 0.16 : 0.22), Math.round(W * (foto ? 0.062 : 0.07)), fonteTitulo);
     pecas.push({
       altura: t.altura,
       gapAntes: pecas.length ? Math.round(H * 0.035) : 0,
@@ -984,17 +1011,20 @@ const DOURADO = "#A9803F";
  * O título vai em Montserrat 900 de VERDADE (família "sans-black", instância
  * estática) — engrossar por contorno daria um traço sujo neste tamanho. A
  * linha de apoio fica em Playfair, que é o contraponto serifado da marca.
+ * Os dois respeitam o estilo de fonte que a profissional escolher: `fonteTitulo`
+ * já chega resolvido, e sem escolha ele é o "sans-black" de sempre.
  */
 async function renderCapa(params: {
   W: number;
   H: number;
   conteudo: ConteudoPeca;
   handle: string;
+  fonteTitulo: FamiliaFonte;
   escura: boolean;
   corMarca: string;
   logoComposite: { buf: Buffer; w: number; h: number } | null;
 }): Promise<Buffer> {
-  const { W, H, conteudo, handle, escura, corMarca, logoComposite } = params;
+  const { W, H, conteudo, handle, fonteTitulo, escura, corMarca, logoComposite } = params;
   const prim = /^#[0-9a-fA-F]{6}$/.test(corMarca) ? corMarca : "#2F5D50";
 
   const bg = escura ? prim : CREME;
@@ -1027,7 +1057,7 @@ async function renderCapa(params: {
     let atual = "";
     for (const p of palavras) {
       const teste = atual ? `${atual} ${p}` : p;
-      if (atual && medirTexto(teste, "sans-black", tam) > larguraTexto) {
+      if (atual && medirTexto(teste, fonteTitulo, tam) > larguraTexto) {
         linhas.push(atual);
         atual = p;
       } else {
@@ -1052,7 +1082,7 @@ async function renderCapa(params: {
   // A cor de destaque vai na ÚLTIMA linha — a ênfase cai no fim da frase, e
   // isso continua funcionando com 2 ou com 4 linhas.
   const blocosTitulo = linhas.map((linha, i) =>
-    blocoDeTexto(linha, "sans-black", i === linhas.length - 1 ? tintaDestaque : tintaBase, fs, larguraTexto + 40, {
+    blocoDeTexto(linha, fonteTitulo, i === linhas.length - 1 ? tintaDestaque : tintaBase, fs, larguraTexto + 40, {
       align: "left",
       lineHeight: 1.0,
       letterSpacing: -Math.round(fs * 0.022),
@@ -1062,8 +1092,13 @@ async function renderCapa(params: {
   const alturaTitulo =
     avancoLinha * (blocosTitulo.length - 1) + (blocosTitulo[blocosTitulo.length - 1]?.altura ?? fs);
   const fsApoio = Math.round(fs * 0.62);
+  // A linha de apoio é o CONTRAPONTO do título: Playfair embaixo do
+  // Montserrat 900 de sempre. Se a profissional escolheu o título serifado,
+  // o apoio vai pra sans — as duas linhas na mesma família apagariam a
+  // hierarquia que faz a capa funcionar.
+  const familiaApoio: FamiliaFonte = fonteTitulo === "serif" ? "sans" : "serif";
   const blocoApoio = apoio
-    ? blocoDeTexto(apoio, "serif", tintaApoio, fsApoio, larguraTexto, { align: "left", lineHeight: 1.18 })
+    ? blocoDeTexto(apoio, familiaApoio, tintaApoio, fsApoio, larguraTexto, { align: "left", lineHeight: 1.18 })
     : null;
   const fsEyebrow = Math.round(W * 0.026);
   const blocoEyebrow =
@@ -1147,9 +1182,10 @@ async function renderEditorial(params: {
   conteudo: ConteudoPeca;
   handle: string;
   foto: FotoPedida | null;
+  fonteTitulo: FamiliaFonte;
   corMarca: string;
 }): Promise<CardResultado> {
-  const { W, H, scheme, conteudo, handle, foto, corMarca } = params;
+  const { W, H, scheme, conteudo, handle, foto, fonteTitulo, corMarca } = params;
   // Editorial vive melhor no fundo claro: força creme se o esquema for escuro
   const bgClaro = luminancia(scheme.bg) >= 0.55 ? scheme.bg : CREME;
   // Título SEMPRE na cor da marca da nutri (escurecida p/ contraste)
@@ -1177,7 +1213,7 @@ async function renderEditorial(params: {
     let atual = "";
     for (const p of palavras) {
       const teste = atual ? `${atual} ${p}` : p;
-      if (atual && medirTexto(teste, "serif", tam) > larguraTexto) {
+      if (atual && medirTexto(teste, fonteTitulo, tam) > larguraTexto) {
         linhas.push(atual);
         atual = p;
       } else {
@@ -1195,7 +1231,7 @@ async function renderEditorial(params: {
     headline
       .split(/\s+/)
       .filter(Boolean)
-      .every((p) => medirTexto(p, "serif", tam) <= larguraTexto);
+      .every((p) => medirTexto(p, fonteTitulo, tam) <= larguraTexto);
 
   // Orçamento de altura do título: com foto em cima/embaixo sobra menos.
   const budgetTitulo = H * (foto && !aoLado ? (foto.tamanho === "grande" ? 0.28 : 0.36) : 0.5);
@@ -1209,7 +1245,7 @@ async function renderEditorial(params: {
   const lineGap = Math.round(fs * 1.22);
   const blocosLinha = linhas.map((linha, i) => {
     const dourada = i % 3 === 2; // a cada 3 linhas, uma dourada (ritmo das referências)
-    return blocoDeTexto(linha, "serif", dourada ? dourado : verde, fs, larguraTexto + 40, {
+    return blocoDeTexto(linha, fonteTitulo, dourada ? dourado : verde, fs, larguraTexto + 40, {
       align: "left",
       lineHeight: 1.05,
     });

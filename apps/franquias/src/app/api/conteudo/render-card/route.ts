@@ -9,6 +9,7 @@ import {
   type Dimensoes,
 } from "@scanner/ai-image";
 import { ctaDoSlide, semLink, temLink } from "@/lib/criativo/texto-arte";
+import { normalizarFonte } from "@/lib/criativo/fontes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -113,6 +114,11 @@ export async function POST(request: Request) {
   const fotoLugar = normalizarFotoLugar(String(form.get("fotoLugar") ?? ""));
   const fotoTamanho = normalizarFotoTamanho(String(form.get("fotoTamanho") ?? ""));
 
+  // Estilo de fonte do TÍTULO escolhido pela profissional. Valor
+  // desconhecido vira `undefined` e cada layout usa a família de sempre —
+  // cliente antigo que não mande o campo continua gerando a arte igual.
+  const fonte = normalizarFonte(form.get("fonte"));
+
   const itens = semLink(String(form.get("itens") ?? ""));
   const layoutRaw = String(form.get("layout") ?? "auto");
   let layout: CardLayout;
@@ -190,6 +196,7 @@ export async function POST(request: Request) {
           conteudo: conteudos[i]!,
           schemeIndex: ehCapa || ehUltimo ? 0 : 1,
           corFundoHex,
+          fonte,
           // Logo em TODOS os slides (antes só na capa — os miolos saíam sem
           // marca nenhuma). Sem upload, o renderer cai na logo do onboarding.
           logoBuffer,
@@ -247,6 +254,7 @@ export async function POST(request: Request) {
       fotoTamanho,
       schemeIndex: esquema >= 0 && esquema <= 2 ? esquema : undefined,
       corFundoHex,
+      fonte,
       logoBuffer,
     });
 
@@ -266,7 +274,7 @@ export async function POST(request: Request) {
         franqueada_id: f.id,
         url,
         path,
-        params: { layout, formato, esquema, corFundoHex, headline, fotoLugar, fotoTamanho },
+        params: { layout, formato, esquema, corFundoHex, fonte, headline, fotoLugar, fotoTamanho },
       } as never);
       return NextResponse.json({ ok: true, url, avisoFoto });
     }
