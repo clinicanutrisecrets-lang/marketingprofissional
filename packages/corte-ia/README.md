@@ -3,7 +3,21 @@
 Gravação do teleprompter (até 60 s) **ou vídeo do celular (até 3 min)** →
 reel 9:16 editado, sem editor.
 
-Fluxo completo:
+Dois modos, um worker só:
+
+| modo | entra | sai |
+|---|---|---|
+| `fala` (o de sempre) | gravação com voz | reel legendado, com b-roll e limpeza |
+| `clipe_frase` | um clipe da biblioteca + uma frase | vídeo curto 9:16 com a frase grande em cima |
+
+O `clipe_frase` (`clipe_frase.py`) **não passa por transcrição, limpeza nem
+plano do Claude** — não há fala pra transcrever. Ele baixa o clipe, escreve a
+frase e sobe: leva segundos e custo de modelo ZERO. A URL do clipe é
+resolvida no worker a partir do id (`videos_franqueada` da nutri ou
+`acervo_videos`); aceitar o endereço vindo da tela transformaria o worker num
+buscador de qualquer endereço da internet.
+
+Fluxo completo (modo `fala`):
 
 1. **App** (`apps/franquias/src/lib/corte/`): a nutri grava no teleprompter com
    cronômetro de 60 s; ao parar, o vídeo bruto sobe direto do navegador pro
