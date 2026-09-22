@@ -55,6 +55,8 @@ export type ResumoProcessamento = {
   regras: number;
   /** Regras entregues porque a IA entendeu o pedido sem a palavra-chave. */
   regrasPorIntencao: number;
+  /** Mensagens que saíram da conta (robô ou a própria Aline). */
+  ecos: number;
   opcoes: number;
   agradecimentos: number;
   respostasDm: number;
@@ -69,16 +71,18 @@ type Contato = {
   tags: string[];
   silenciado: boolean;
   ultimas_opcoes: UltimasOpcoes | null;
+  /** Quando a Aline escreveu ELA MESMA nesta conversa. Preenchido = robô fora. */
+  aline_falou_em: string | null;
 };
 
-const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes";
+const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes, aline_falou_em";
 const COLS_REGRA =
   "id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade, opcoes";
 const THROTTLE_SAIDA_MS = 20_000;
 
 export async function processarWebhook(payload: unknown): Promise<ResumoProcessamento> {
   const resumo: ResumoProcessamento = {
-    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
+    eventos: 0, ignorados: 0, duplicados: 0, regras: 0, regrasPorIntencao: 0, ecos: 0, opcoes: 0, agradecimentos: 0, respostasDm: 0, encaminhados: 0, erros: 0,
   };
   const eventos = extrairEventos(payload);
   resumo.eventos = eventos.length;
@@ -90,7 +94,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   const aline = createAlineClient();
 
   for (const ev of eventos) {
-    if (ev.tipo === "eco" || ev.tipo === "ignorar" || !ev.igsid) { resumo.ignorados++; continue; }
+    if (ev.tipo === "ignorar" || !ev.igsid) { resumo.ignorados++; continue; }
     try {
       let perfil = perfis.get(ev.contaId);
       if (perfil === undefined) {
@@ -104,6 +108,13 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       }
       if (ehDaPropriaConta(ev.igsid, [perfil.instagram_user_id, perfil.instagram_conta_id])) {
         resumo.ignorados++;
+        continue;
+      }
+
+      // ── Eco: a conta mandou uma mensagem. Foi o robô, ou foi a Aline? ──
+      if (ev.tipo === "eco") {
+        await marcarSeFoiAline(perfil.id, ev);
+        resumo.ecos++;
         continue;
       }
 
@@ -123,6 +134,11 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const contato = await upsertContato(perfil.id, ev, cred);
       await aline.from("ig_mensagens").update({ contato_id: contato.id }).eq("id", entrada);
       if (contato.silenciado) { resumo.ignorados++; continue; }
+
+      // 🔴 A Aline já escreveu ELA MESMA nesta conversa: é conversa dela, não
+      // lead. O robô não entra. (Incidente 22/09: a Mariana respondeu uma
+      // mensagem da Aline e o robô ofereceu teste genético por cima.)
+      if (contato.aline_falou_em) { resumo.ignorados++; continue; }
 
       const config = lerConfig(perfil.automacao_config);
       const orientacoes = blocoOrientacoesDaDona(config);
@@ -233,8 +249,8 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
         if (!resp || !resp.texto) { resumo.erros++; continue; }
-        await enviarDm(cred, ev.igsid, resp.texto);
-        await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: resp.texto, origem: "ia_scanner" });
+        const env = await enviarDm(cred, ev.igsid, resp.texto);
+        await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: resp.texto, origem: "ia_scanner", externalId: env.message_id ?? null });
         resumo.respostasDm++;
         if (resp.encaminhar) {
           await aline.from("ig_contatos")
@@ -254,6 +270,50 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   return resumo;
 
   /* ── helpers com acesso ao client ── */
+
+  /**
+   * Chegou um ECO: alguma mensagem saiu da conta. Foi o robô, ou foi a Aline
+   * digitando no celular?
+   *
+   * 🔴 Se foi ela, o robô sai da conversa PRA SEMPRE: quem responde uma
+   * mensagem dela está falando com ELA, não com a empresa. Foi assim que a
+   * Mariana Uchoa respondeu "Meu sonhooooooo" e levou uma oferta de teste
+   * genético por cima (22/09/2026).
+   *
+   * O lado seguro do erro é ficar calado: se a gente confundir o eco do robô
+   * com o dela, o robô só para de responder aquela pessoa.
+   */
+  async function marcarSeFoiAline(perfilId: string, ev: EventoInstagram) {
+    const { data } = await aline
+      .from("ig_contatos").select("id, aline_falou_em")
+      .eq("perfil_id", perfilId).eq("igsid", ev.igsid).maybeSingle();
+    if (!data) return; // ela escreveu pra quem nunca falou com a gente
+    const c = data as { id: string; aline_falou_em: string | null };
+    if (c.aline_falou_em) return; // já está travado
+
+    // Foi o robô? O id do eco é o message_id que a Meta devolveu no envio.
+    if (ev.externalId) {
+      const { data: nossa } = await aline
+        .from("ig_mensagens").select("id")
+        .eq("contato_id", c.id).eq("direcao", "saida").eq("external_id", ev.externalId)
+        .maybeSingle();
+      if (nossa) return;
+    }
+    // Rede, pros envios cujo id não ficou guardado: texto idêntico que saiu
+    // daqui há pouco. O robô manda e o eco volta em segundos.
+    if (ev.texto.trim()) {
+      const desde = new Date(Date.now() - 10 * 60_000).toISOString();
+      const { data: igual } = await aline
+        .from("ig_mensagens").select("id")
+        .eq("contato_id", c.id).eq("direcao", "saida").eq("texto", ev.texto)
+        .gte("criado_em", desde).limit(1);
+      if (igual && igual.length > 0) return;
+    }
+
+    await aline.from("ig_contatos")
+      .update({ aline_falou_em: new Date().toISOString() }).eq("id", c.id);
+    console.log("[automacao] a dona do perfil escreveu nesta conversa; o robô sai:", c.id);
+  }
 
   async function registrarEntrada(perfilId: string, ev: EventoInstagram): Promise<string | "duplicado"> {
     const { data, error } = await aline
@@ -393,10 +453,13 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
   async function registrarSaida(p: {
     perfilId: string; contatoId: string; canal: "dm" | "comentario"; texto: string | null; origem: string; regraId?: string; mediaId?: string;
+    /** message_id devolvido pela Meta: é o que faz o eco ser reconhecido como NOSSO. */
+    externalId?: string | null;
   }) {
     await aline.from("ig_mensagens").insert({
       perfil_id: p.perfilId, contato_id: p.contatoId, canal: p.canal, direcao: "saida",
       texto: p.texto, origem: p.origem, regra_id: p.regraId ?? null, media_id: p.mediaId ?? null,
+      external_id: p.externalId ?? null,
     });
   }
 
@@ -446,16 +509,17 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
       let enviado = texto;
+      let enviado_id: string | null = null;
       if (opcoes.length > 0) {
         enviado = await enviarComBotoes({ cred, ev, texto, regra, opcoes });
         const ultimas: UltimasOpcoes = { regra_id: regra.id, rotulos: opcoes.map((o) => o.rotulo) };
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", contato.id);
       } else if (ehComentario && ev.commentId) {
-        await respostaPrivadaComentario(cred, ev.commentId, texto);
+        enviado_id = (await respostaPrivadaComentario(cred, ev.commentId, texto)).message_id ?? null;
       } else {
-        await enviarDm(cred, ev.igsid, texto);
+        enviado_id = (await enviarDm(cred, ev.igsid, texto)).message_id ?? null;
       }
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
+      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId, externalId: enviado_id });
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.

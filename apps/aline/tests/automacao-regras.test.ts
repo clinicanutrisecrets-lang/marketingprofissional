@@ -111,7 +111,10 @@ test("extrairEventos lê comentário nos dois formatos e DMs com story", () => {
       ["comentario", "u1", "c1"],
       ["comentario", "u2", "c2"],
       ["dm", "u3", "m-1"],
-      ["eco", "1784", "m-2"],
+      // 🔴 O eco aponta pra PESSOA (u3), não pra conta. Era "1784" até
+      // 22/09/2026, e era esse o defeito: sem saber COM QUEM a Aline falou,
+      // o robô respondia por cima da conversa dela.
+      ["eco", "u3", "m-2"],
       ["story_reply", "u4", "m-3"],
       ["story_mention", "u5", "m-4"],
       ["ignorar", "u6", ""],
