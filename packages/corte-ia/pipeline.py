@@ -243,7 +243,8 @@ def processar_clipe_frase(corte_id, row, handle, work):
     saida = os.path.join(work, "clipe-frase.mp4")
     info = clipe_frase.render_clipe_frase(
         limpo, row.get("frase") or "", saida, os.path.join(work, "fonts"),
-        handle=handle, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"))
+        handle=handle, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"),
+        pos=row.get("frase_pos"))
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url_saida = subir_mp4(path, saida)
     patch(corte_id, status="pronto", etapa=None, path=path, url=url_saida, duracao_seg=info["duracao"])

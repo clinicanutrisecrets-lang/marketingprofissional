@@ -5,7 +5,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { corteIaLiberadoPara } from "./gate";
 import { CORTE_MAX_SEG } from "./constantes";
 import { estiloValido, filtroValido, UPLOAD_MAX_SEG, type FiltroId } from "./opcoes";
-import { avaliarFrase, duracaoFinal, origemValida } from "./video-curto";
+import { avaliarFrase, duracaoFinal, origemValida, posicaoFaixa } from "./video-curto";
 
 /**
  * Cortes com IA: a gravação do teleprompter (até 60 s) vira um reel editado
@@ -277,6 +277,8 @@ export async function criarVideoCurtoAction(params: {
   frase: string;
   segundos?: number;
   estiloLegenda?: string;
+  /** Altura da faixa, em fração (0 = topo, 1 = pé). Ver posicaoFaixa. */
+  posicao?: number;
 }): Promise<{ ok: boolean; msg: string; id?: string }> {
   const f = await franqueadaLiberada();
   if (!f) return { ok: false, msg: "recurso não liberado pra esta conta" };
@@ -313,6 +315,9 @@ export async function criarVideoCurtoAction(params: {
       tema: c.titulo?.trim() || "Vídeo curto",
       duracao_seg: duracaoFinal(params.segundos, c.duracao_seg),
       estilo_legenda: estiloValido(params.estiloLegenda),
+      // A mesma régua da tela: número torto vira o centro de sempre, nunca
+      // recusa. Quem manda é esta linha, não o que chegou no corpo.
+      frase_pos: posicaoFaixa(params.posicao),
       origem_tipo: "biblioteca",
     } as never)
     .select("id")
