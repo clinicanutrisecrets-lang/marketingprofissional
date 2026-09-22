@@ -8,10 +8,11 @@
 import { createAlineClient } from "@/lib/supabase/server";
 import { carregarPerfilPorSlug } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig } from "./config";
-import { escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import { escolherRegraPorIntencao, gerarAgradecimentoComentario, lerTomDaCritica, responderDmComScanner } from "./ia";
 import {
   candidatasPorIntencao,
   descreverRegra,
+  casaPalavraChave,
   pareceAbordagemComercial,
   pareceClinico,
   pareceSpam,
@@ -21,6 +22,7 @@ import {
   type Gatilho,
   type Regra,
 } from "./regras";
+import { suspeitaDeAcusacao, acaoParaLeitura, contatoJaAcusou } from "./acusacao";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 
 export type ResultadoSimulacao = {
@@ -55,7 +57,36 @@ export async function simularEvento(params: {
     .eq("perfil_id", perfil.id)
     .eq("ativa", true);
   const regras = (data ?? []) as Regra[];
-  let regra = selecionarRegra({ gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId }, regras);
+
+  // 🔴 A peneira da crítica roda ANTES, igual ao caminho real. Sem isto o
+  // simulador diria "nenhuma regra casou" justamente no caso que a Aline vai
+  // usar pra decidir se liga a resposta de acusação.
+  const regraAcusacao = regras.find((r) => r.gatilho === params.gatilho && contatoJaAcusou(r.tags_adicionar));
+  if (regraAcusacao && suspeitaDeAcusacao(params.texto, casaPalavraChave)) {
+    const leitura = await lerTomDaCritica(params.texto);
+    const acao = acaoParaLeitura(leitura);
+    const lido = leitura ?? "não deu pra ler";
+    if (acao.acao === "responder_acusacao") {
+      return {
+        regra: regraAcusacao.nome,
+        acoes: [`Responde no comentário: "${preencherTexto(regraAcusacao.resposta_publica ?? "", vars)}"`,
+                "Marca você pra conferir o tom, e nunca responde de novo pra esta pessoa."],
+        avisos: [...avisos, `A leitura entendeu esta frase como: ${lido}.`],
+      };
+    }
+    if (acao.acao === "mandar_pra_ela") {
+      return {
+        regra: null,
+        acoes: [`Não responde nada. Põe na sua fila: "${acao.motivo}".`],
+        avisos: [...avisos, `A leitura entendeu esta frase como: ${lido}. Só "acusacao" recebe resposta automática.`],
+      };
+    }
+    avisos.push(`A frase tinha marca de crítica, mas a leitura entendeu como "${lido}": segue o caminho normal.`);
+  }
+
+  // A regra de acusação sai das vias normais: só a peneira acima a dispara.
+  const regrasComuns = regras.filter((r) => !contatoJaAcusou(r.tags_adicionar));
+  let regra = selecionarRegra({ gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId }, regrasComuns);
 
   // Vendedor: o robô não conversa (vale antes de qualquer chave geral).
   const ehVendedor = pareceAbordagemComercial(params.texto, quemEscreve);
@@ -65,7 +96,7 @@ export async function simularEvento(params: {
   if (!regra && config.entender_pedido_sem_palavra && params.texto.trim() && !pareceSpam(params.texto) && !ehVendedor) {
     const candidatas = candidatasPorIntencao(
       { gatilho: params.gatilho, texto: params.texto, mediaId: params.mediaId },
-      regras,
+      regrasComuns,
     );
     if (candidatas.length > 0) {
       const i = await escolherRegraPorIntencao(params.texto, candidatas.map(descreverRegra));

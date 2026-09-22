@@ -297,3 +297,53 @@ Responda SÓ o número do material (1 a ${descricoes.length}). Responda 0 se:
     return null;
   }
 }
+
+/* ── É ataque ou é dúvida? ────────────────────────────────────────────── */
+
+/**
+ * Lê o TOM de um comentário que passou pela peneira de suspeita.
+ *
+ * 🔴 Existe porque a classificação genérica de regras decide olhando só o
+ * NOME da regra e 160 caracteres da resposta. Pra escolher qual material
+ * mandar, basta. Pra separar ataque de curiosidade, não: o preço do erro
+ * aqui é responder uma defesa a quem só fez uma pergunta.
+ *
+ * Devolve `null` quando não dá pra ler (falha do modelo, resposta fora do
+ * esperado). Quem chama manda pra ela nesse caso — na dúvida sobre tom,
+ * decide gente.
+ */
+export async function lerTomDaCritica(texto: string): Promise<"acusacao" | "duvida" | "nenhum" | null> {
+  const t = texto.trim();
+  if (!t) return null;
+  const claude = createClaude();
+  const system = `Você lê UM comentário de Instagram no perfil de uma nutricionista que trabalha com nutrigenética, e classifica a INTENÇÃO de quem escreveu.
+
+Responda com UMA palavra, sem pontuação:
+
+acusacao  = acusa a profissional ou a área de desonestidade, fraude, charlatanismo, picaretagem, de enganar as pessoas ou de vender ilusão. É ataque à legitimidade, não pergunta.
+duvida    = questiona, duvida, discorda ou pede prova, mas SEM acusar de desonestidade. Inclui "isso tem estudo?", "funciona mesmo?", "acho caro", "comigo não funcionou", "prefiro outra abordagem", ceticismo educado e discordância técnica.
+nenhum    = não é nem uma coisa nem outra (elogio, pergunta comum, pedido de material, desabafo, comentário sobre terceiros).
+
+Regras de desempate, nesta ordem:
+- Na dúvida entre acusacao e duvida, responda duvida. Tratar quem perguntou como se tivesse atacado é o erro mais caro.
+- Crítica a OUTRA pessoa, a outra clínica ou ao sistema de saúde não é acusacao: é nenhum.
+- Ironia e deboche contra o trabalho dela contam como acusacao mesmo sem palavrão.
+- A palavra "charlatanismo" só é acusacao quando aponta para ela ou para a área. Quem escreve "dizem que é charlatanismo, mas eu confio em você" é nenhum.`;
+
+  try {
+    const msg = await claude.messages.create({
+      model: CLAUDE_MODEL_RAPIDO,
+      max_tokens: 5,
+      temperature: 0,
+      system,
+      messages: [{ role: "user", content: t.slice(0, 600) }],
+    });
+    const r = textoDaResposta(msg).trim().toLowerCase().replace(/[^a-z]/g, "");
+    if (r === "acusacao" || r === "duvida" || r === "nenhum") return r;
+    console.warn("[automacao/ia] tom da crítica veio fora do esperado:", r.slice(0, 40));
+    return null;
+  } catch (e) {
+    console.error("[automacao/ia] leitura do tom falhou:", (e as Error).message);
+    return null;
+  }
+}

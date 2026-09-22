@@ -24,7 +24,7 @@ import {
 } from "@/lib/instagram/credenciais";
 import { blocoOrientacoesDaDona, lerConfig, normalizarNome, normalizarUsername } from "./config";
 import { enfileirarSequencia } from "./fila";
-import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, responderDmComScanner } from "./ia";
+import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, lerTomDaCritica, responderDmComScanner } from "./ia";
 import {
   casarOpcao,
   ehDaPropriaConta,
@@ -33,6 +33,7 @@ import {
   opcoesComoTexto,
   pareceClinico,
   pareceSpam,
+  casaPalavraChave,
   pareceAbordagemComercial,
   payloadDaOpcao,
   preencherTexto,
@@ -48,7 +49,10 @@ import {
 } from "./regras";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
-import { decidirAposAcusacao, contatoJaAcusou, TAG_ACUSACAO } from "./acusacao";
+import {
+  decidirAposAcusacao, contatoJaAcusou, TAG_ACUSACAO,
+  suspeitaDeAcusacao, acaoParaLeitura,
+} from "./acusacao";
 
 export type ResumoProcessamento = {
   eventos: number;
@@ -200,7 +204,39 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       }
 
       const jaAplicadas = await regrasJaAplicadas(contato.id);
-      let regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+
+      // ── Crítica: o TOM decide, não a palavra ──
+      // 🔴 Pedido da Aline (22/09/2026). Duas etapas: a peneira larga é de
+      // graça e não decide nada; quem decide é uma leitura curta. Dúvida
+      // legítima JAMAIS recebe a defesa, porque responder "Genética é
+      // ciência, é o meu mestrado" a quem só perguntou "isso tem estudo?"
+      // transforma uma curiosa em inimiga, em público.
+      const regraAcusacao = regras.find(
+        (r) => r.gatilho === gatilho && contatoJaAcusou(r.tags_adicionar) && !jaAplicadas.has(r.id),
+      );
+      if (regraAcusacao && suspeitaDeAcusacao(ev.texto, casaPalavraChave)) {
+        const acao = acaoParaLeitura(await lerTomDaCritica(ev.texto));
+        if (acao.acao === "responder_acusacao") {
+          await executarRegra({ perfil, cred, contato, ev, regra: regraAcusacao, vars });
+          resumo.regras++;
+          continue;
+        }
+        if (acao.acao === "mandar_pra_ela") {
+          await marcarPrecisaHumano(contato.id, acao.motivo);
+          resumo.encaminhados++;
+          continue;
+        }
+      }
+
+      // 🔴 A regra de acusação sai das DUAS vias normais. Por palavra-chave
+      // crua ela dispararia em "dizem que é charlatanismo, mas eu confio em
+      // você" (aliada levando defesa na cara). Pela classificação genérica
+      // ela concorreria olhando só nome e 160 caracteres, que não bastam pra
+      // separar ataque de curiosidade. Só a peneira de duas etapas acima a
+      // dispara.
+      const regrasComuns = regras.filter((r) => !contatoJaAcusou(r.tags_adicionar));
+
+      let regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regrasComuns, jaAplicadas);
       let porIntencao = false;
 
       // ── Rede embaixo da palavra-chave ──
@@ -208,7 +244,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // Só roda depois que a palavra-chave não pegou nada: quem digitou
       // "GLP1" continua tendo a resposta instantânea e previsível de sempre.
       if (!regra && config.entender_pedido_sem_palavra && ev.texto.trim() && !ev.texto.startsWith("[") && !pareceSpam(ev.texto) && !pareceAbordagemComercial(ev.texto, quemEscreve)) {
-        const candidatas = candidatasPorIntencao({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regras, jaAplicadas);
+        const candidatas = candidatasPorIntencao({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regrasComuns, jaAplicadas);
         if (candidatas.length > 0) {
           const i = await escolherRegraPorIntencao(ev.texto, candidatas.map(descreverRegra));
           if (i != null) {
