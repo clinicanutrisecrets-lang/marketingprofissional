@@ -163,3 +163,73 @@ test("sem catálogo carregado, o revisor não acusa preço", () => {
   // Catálogo ausente (undefined) é falta de informação, não prova de invenção.
   assert.deepEqual(regras("A consulta sai por R$ 197,00"), []);
 });
+
+/* ── o que o ensaio em 60 posts REAIS ensinou (25/09/2026) ──────────────── */
+
+test('"aí" e "ia" em português não são a sigla IA', () => {
+  // 🔴 Casar a palavra sem olhar a caixa deu 16 falsos positivos em 60 posts
+  // reais, e ZERO verdadeiros: "E aí", "Foi aí que", "nunca ia mostrar".
+  assert.deepEqual(regras("E aí, finalmente dá pra nutrir o que tá pedindo."), []);
+  assert.deepEqual(regras("Foi aí que eu entendi o problema."), []);
+  assert.deepEqual(regras("Exame básico nunca ia mostrar isso."), []);
+  assert.deepEqual(regras("A nutrição age exatamente aí: na causa."), []);
+});
+
+test("a sigla em CAIXA ALTA e a expressão por extenso continuam pegando", () => {
+  assert.ok(regras("Post gerado por IA pra você.").includes("ia"));
+  assert.ok(regras("Feito com inteligência artificial.").includes("ia"));
+  assert.ok(regras("FEITO COM INTELIGÊNCIA ARTIFICIAL").includes("ia"));
+});
+
+test("veto casa a FRASE inteira, não as palavras dela", () => {
+  // Caso REAL: Juliana veta "corpo perfeito" e "antes e depois exagerado".
+  // Quebrar em palavras vetaria "corpo" e "depois" e acusaria todo post.
+  const dela =
+    "não é sobre, é sobre, corpo perfeito, antes e depois exagerado, detox, milagre";
+  assert.deepEqual(regras("O corpo que você tem hoje já conta uma história.", { palavras_evitar: dela }), []);
+  assert.deepEqual(regras("Três meses depois, ela voltou.", { palavras_evitar: dela }), []);
+  // e a frase vetada continua sendo pega
+  assert.ok(
+    regras("Não é sobre já estar grávida.", { palavras_evitar: dela }).includes("palavra_vetada"),
+  );
+  assert.ok(regras("Uma solução detox pra você.", { palavras_evitar: dela }).includes("palavra_vetada"));
+});
+
+test("veto de uma palavra só continua casando a palavra", () => {
+  // Caso REAL: Viviane veta "apoiar, sustentar ".
+  assert.ok(
+    regras("Alimentação pensada pra sustentar o metabolismo.", {
+      palavras_evitar: "apoiar, sustentar ",
+    }).includes("palavra_vetada"),
+  );
+});
+
+test("prazo retrospectivo é narrativa, não promessa", () => {
+  // Caso REAL: "6 meses depois, ela voltou dizendo..."
+  assert.deepEqual(regras("6 meses depois, ela voltou dizendo que melhorou."), []);
+  assert.deepEqual(regras("Dois anos atrás eu não sabia disso."), []);
+  // mas a promessa com prazo continua sendo erro
+  assert.ok(
+    regras("Melhora significativa dos sintomas em 90 dias.").includes("resultado_com_prazo"),
+  );
+});
+
+test("palavra proibida dentro de uma frase que a nega vira CONFIRA", () => {
+  // Caso REAL: "Não porque eu entreguei uma dieta milagrosa."
+  const a = revisarCopy("Não porque eu entreguei uma dieta milagrosa.");
+  const s = a.find((x) => x.regra === "superlativo");
+  assert.ok(s);
+  assert.equal(s!.gravidade, "confira");
+  // sem a negação, segue erro
+  const b = revisarCopy("Entreguei uma dieta milagrosa.");
+  assert.equal(b.find((x) => x.regra === "superlativo")!.gravidade, "erro");
+});
+
+test("o ponto final da frase não transforma preço certo em preço inventado", () => {
+  // 🔴 `[\d.,]*` é guloso: "R$ 9,90." virava "r$9,90." e nunca casava.
+  const ctx = { precos_reais: ["R$ 9,90", "R$ 3.500,00"] };
+  assert.deepEqual(regras("O app sai por R$ 9,90. Link na bio.", ctx), []);
+  assert.deepEqual(regras("São R$ 3.500,00, no cartão.", ctx), []);
+  // e o preço que não existe segue sendo pego
+  assert.ok(regras("Sai por R$ 1.550,00. Link na bio.", ctx).includes("preco_fora_do_catalogo"));
+});
