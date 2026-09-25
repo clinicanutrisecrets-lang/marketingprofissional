@@ -8,6 +8,8 @@ import {
   semanasVisiveis,
   type AprovacaoCandidata,
 } from "@/lib/aprovacao/semana";
+import { validarPublico } from "@/lib/publico/publico";
+import { formatarPrecoBR } from "@/lib/produtos/contexto";
 import { AprovacaoView } from "./AprovacaoView";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +31,7 @@ export default async function AprovarPage({
   const { data: franqueada } = await supabase
     .from("franqueadas")
     .select(
-      "id, nome_comercial, aprovacao_modo, instagram_conta_id, instagram_access_token, instagram_token_expiry, publer_profile_id",
+      "id, nome_comercial, aprovacao_modo, instagram_conta_id, instagram_access_token, instagram_token_expiry, publer_profile_id, palavras_evitar, publico_briefing",
     )
     .eq("auth_user_id", user.id)
     .maybeSingle();
@@ -96,6 +98,27 @@ export default async function AprovarPage({
     posts = (postsData ?? []) as Array<Record<string, unknown>>;
   }
 
+  // Contexto do revisor de copy: o que ela declarou não atender, as palavras
+  // que ela vetou e os preços REAIS. Sem o catálogo carregado o revisor não
+  // acusa preço nenhum, de propósito: falta de informação não é prova de
+  // invenção.
+  const { data: produtosReais } = await supabase
+    .from("produtos_scanner")
+    .select("preco_centavos")
+    .eq("franqueada_id", f.id as string)
+    .eq("ativo", true);
+
+  const publico = validarPublico(f.publico_briefing);
+  const revisao = {
+    nao_atende: publico?.nao_atende ?? null,
+    palavras_evitar: (f.palavras_evitar as string | null) ?? null,
+    precos_reais: produtosReais
+      ? (produtosReais as Array<{ preco_centavos: number | null }>)
+          .map((p) => formatarPrecoBR(p.preco_centavos))
+          .filter((v): v is string => !!v)
+      : undefined,
+  };
+
   return (
     <main className="min-h-screen bg-brand-muted">
       <div className="mx-auto max-w-6xl p-6 lg:p-8">
@@ -127,6 +150,7 @@ export default async function AprovarPage({
           posts={posts}
           fechada={aprovacaoFechada(escolhida?.status)}
           historico={historico}
+          revisao={revisao}
           publicacaoAutomatica={publicacaoAutomaticaLigada({
             instagram_conta_id: f.instagram_conta_id as string | null,
             instagram_access_token: f.instagram_access_token as string | null,

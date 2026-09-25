@@ -33,9 +33,11 @@ import {
   CUSTO_CREATOMATE_RENDER_USD,
 } from "@/lib/custos/log";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
+import { carregarPublicoContexto } from "@/lib/publico/sync";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
+import { revisarCopy, resumoRevisao } from "@/lib/claude/revisor-copy";
 
 const MODELO_CLAUDE_DEFAULT = CLAUDE_MODEL_COPY;
 
@@ -146,6 +148,10 @@ export async function gerarPostsDaSemana(
   // Produtos reais do Scanner Tratamentos entram no system prompt — copy
   // pode citar produto/preço/link verdadeiros (nunca inventados)
   contexto.produtos = await carregarProdutosContexto(admin, franqueadaId);
+  // O público declarado é FRONTEIRA da copy: as queixas dela são o único
+  // vocabulário de dor permitido e "não atende" é proibição. null = não
+  // respondeu, e aí a copy segue como sempre, sem restrição inventada.
+  contexto.publico = await carregarPublicoContexto(admin, franqueadaId);
 
   // 4. Planeja a semana
   // O catálogo é carregado ANTES de propósito: sem produto ativo o plano
@@ -204,6 +210,26 @@ export async function gerarPostsDaSemana(
         item.consciencia,
       );
       const latenciaMs = Date.now() - tInicio;
+
+      // O revisor relê a copy PRONTA. Aqui ele só vai pro log: quem decide é a
+      // nutri, na tela de aprovação, onde o aviso aparece junto do post e some
+      // quando ela corrige. O log é pra sabermos quanto o modelo escorrega, e
+      // em qual regra, sem depender de alguém reportar.
+      const achados = revisarCopy(
+        [post.copy_legenda, post.copy_cta].filter(Boolean).join("\n"),
+        {
+          nao_atende: contexto.publico?.nao_atende ?? null,
+          palavras_evitar: contexto.palavras_evitar ?? null,
+          precos_reais: (contexto.produtos ?? [])
+            .map((pr) => pr.preco_texto)
+            .filter((v): v is string => !!v),
+        },
+      );
+      if (achados.length > 0) {
+        console.warn(
+          `[revisor-copy] ${item.tipo}/${item.angulo}: ${resumoRevisao(achados)}`,
+        );
+      }
 
       // Registra custo Claude (silent fail se falhar)
       if (post._usage) {

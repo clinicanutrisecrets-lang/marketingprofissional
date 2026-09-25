@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sincronizarProdutosScanner } from "@/lib/produtos/sync";
+import { sincronizarPublicoDoHub } from "@/lib/publico/sync";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -37,6 +38,17 @@ export async function GET(request: Request) {
       franqueada_id: fr.id,
       ok: r.ok,
       detalhe: r.ok ? `${r.total} produtos` : r.motivo,
+    });
+
+    // O público declarado no onboarding do Scanner (quem ela atende e, sobretudo,
+    // o que ela NÃO atende) vem pelo mesmo caminho e no mesmo cron: é fronteira
+    // da copy dos posts. Em bloco próprio de propósito — falha aqui não pode
+    // derrubar a sincronia do catálogo, que é o que faz o post citar preço certo.
+    const rp = await sincronizarPublicoDoHub(fr.id);
+    resultados.push({
+      franqueada_id: fr.id,
+      ok: rp.ok,
+      detalhe: rp.ok ? (rp.tem ? "público espelhado" : "sem público declarado") : `publico: ${rp.motivo}`,
     });
   }
 
