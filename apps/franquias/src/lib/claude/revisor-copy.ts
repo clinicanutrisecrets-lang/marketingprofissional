@@ -174,6 +174,43 @@ function casaTermo(texto: string, termo: string): { trecho: string; idx: number 
   return { trecho: texto.slice(m.index, m.index + m[0].length), idx: m.index };
 }
 
+
+/**
+ * As cláusulas de um campo de veto, inteiras. "cura garantida, detox" vira
+ * ["cura garantida", "detox"].
+ *
+ * 🔴 Só o que dá pra procurar LITERALMENTE. Cláusula que descreve um estilo
+ * ("linguagem agressiva", "frases motivacionais genéricas") nunca vai casar
+ * como texto, e tudo bem: sem cobertura é melhor que com alarme falso.
+ */
+export function clausulasVetadas(txt: string | null | undefined): string[] {
+  if (!txt?.trim()) return [];
+  return [
+    ...new Set(
+      txt
+        .split(/[,;\n/]|(?<=\s)\bou\b(?=\s)/giu)
+        .map((c) => c.replace(/^\s*(nunca|jamais|evitar|evite)\s*:?\s*/iu, "").trim())
+        .filter((c) => c.length >= 4 && c.length <= 60)
+        .slice(0, 40),
+    ),
+  ];
+}
+
+/** Casa a frase inteira, sem acento e sem caixa, com fronteira de palavra. */
+function casaFrase(texto: string, frase: string): { trecho: string; idx: number } | null {
+  const alvo = normPos(texto);
+  const alvoFrase = normPos(frase).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  const m = alvo.match(new RegExp(`${ANTES}${alvoFrase}${DEPOIS}`, "iu"));
+  if (!m || m.index === undefined) return null;
+  return { trecho: texto.slice(m.index, m.index + m[0].length), idx: m.index };
+}
+
+/** A palavra aparece dentro de uma frase que a nega? */
+function ehNegado(texto: string, idx: number): boolean {
+  const antes = normPos(texto).slice(Math.max(0, idx - 45), idx);
+  return /(^|[^\p{L}])(nao|nem|nunca|jamais|longe de)([^\p{L}]|$)/u.test(antes);
+}
+
 /* ── o revisor ──────────────────────────────────────────────────────────── */
 
 /**
@@ -196,11 +233,23 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
     });
   }
 
-  for (const { trecho, idx } of achar(texto, regraPalavra(["inteligencia artificial", "ia", "ai"]))) {
+  // 🔴 "ia" e "ai" MINÚSCULOS são português, não sigla: "E aí", "Foi aí que",
+  // "nunca ia mostrar". Medido em 60 posts reais (25/09): casar a palavra sem
+  // olhar a caixa deu 16 falsos positivos e ZERO verdadeiros. A sigla só conta
+  // em CAIXA ALTA, no texto ORIGINAL; a expressão por extenso conta sempre.
+  for (const { trecho, idx } of achar(texto, regraPalavra(["inteligencia artificial"]))) {
     add({
       regra: "ia",
       gravidade: "erro",
       trecho: janela(texto, idx, trecho.length),
+      motivo: 'A copy nunca diz "IA" nem "inteligência artificial". Se precisar nomear, é "algoritmo Scanner".',
+    });
+  }
+  for (const m of texto.matchAll(new RegExp(`${ANTES}IA${DEPOIS}`, "gu"))) {
+    add({
+      regra: "ia",
+      gravidade: "erro",
+      trecho: janela(texto, m.index ?? 0, 2),
       motivo: 'A copy nunca diz "IA" nem "inteligência artificial". Se precisar nomear, é "algoritmo Scanner".',
     });
   }
@@ -232,11 +281,17 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
   }
 
   for (const { trecho, idx } of achar(texto, regraPalavra(SUPERLATIVOS))) {
+    // 🔴 "Não porque eu entreguei uma dieta MILAGROSA" é copy boa negando a
+    // promessa. Sinalizar isso como erro pune exatamente o texto que faz o
+    // certo. Vira "confira": a palavra está lá, mas quem lê decide.
+    const negada = ehNegado(texto, idx);
     add({
       regra: "superlativo",
-      gravidade: "erro",
+      gravidade: negada ? "confira" : "erro",
       trecho: janela(texto, idx, trecho.length),
-      motivo: "Palavra proibida pelo CFN em publicidade de nutrição.",
+      motivo: negada
+        ? "A palavra aparece numa frase que a nega. Confira se lida assim mesmo."
+        : "Palavra proibida pelo CFN em publicidade de nutrição.",
     });
   }
 
@@ -245,7 +300,11 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
   const prazo = /(?<![\p{L}\p{N}])(?:em\s+)?\d{1,3}\s*(?:dias?|semanas?|meses|mes)(?![\p{L}\p{N}])/giu;
   for (const { idx, trecho } of achar(texto, prazo)) {
     const volta = normPos(texto).slice(Math.max(0, idx - 90), idx + trecho.length + 90);
-    if (/(emagre|perde|perca|elimin|seca|queim|reduz|resolv|melhor|transform|ganh)/u.test(volta)) {
+    // "6 meses DEPOIS, ela voltou dizendo" é narrativa do passado, não
+    // promessa. O marcador retrospectivo logo após o prazo desfaz o achado.
+    const logoDepois = normPos(texto).slice(idx + trecho.length, idx + trecho.length + 12);
+    const retrospectivo = /^\s*(depois|atras|apos|antes)/u.test(logoDepois);
+    if (!retrospectivo && /(emagre|perde|perca|elimin|seca|queim|reduz|resolv|melhor|transform|ganh)/u.test(volta)) {
       add({
         regra: "resultado_com_prazo",
         gravidade: "erro",
@@ -285,17 +344,21 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
     });
   }
 
-  if (ctx.palavras_evitar?.trim()) {
-    for (const termo of termosDoNaoAtende(ctx.palavras_evitar)) {
-      const m = casaTermo(texto, termo);
-      if (m) {
-        add({
-          regra: "palavra_vetada",
-          gravidade: "erro",
-          trecho: janela(texto, m.idx, m.trecho.length),
-          motivo: `Ela pediu pra não usar isso ("${ctx.palavras_evitar!.trim().slice(0, 80)}").`,
-        });
-      }
+  // 🔴 Veto é por CLÁUSULA INTEIRA, não por palavra solta. Elas escrevem
+  // frases: "cura garantida", "não é sobre", "linguagem agressiva". Quebrar em
+  // palavras transformaria "corpo perfeito" em veto à palavra "corpo" e
+  // "antes e depois exagerado" em veto a "depois" — medido em 60 posts reais
+  // (25/09): 49 acusações, praticamente todas falsas. Cláusula de uma palavra
+  // continua casando a palavra, que é o caso da lista curta.
+  for (const frase of clausulasVetadas(ctx.palavras_evitar)) {
+    const m = casaFrase(texto, frase);
+    if (m) {
+      add({
+        regra: "palavra_vetada",
+        gravidade: "erro",
+        trecho: janela(texto, m.idx, m.trecho.length),
+        motivo: `Ela pediu pra não usar "${frase}".`,
+      });
     }
   }
 
@@ -315,10 +378,16 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
   }
 
   // Preço que não está no catálogo real é preço inventado.
-  const reais = new Set((ctx.precos_reais ?? []).map((p) => normPos(p).replace(/\s+/g, "")));
+  const reais = new Set(
+    (ctx.precos_reais ?? []).map((p) => normPos(p).replace(/\s+/g, "").replace(/[.,]+$/, "")),
+  );
   if (reais.size > 0 || (ctx.precos_reais && ctx.precos_reais.length === 0)) {
     for (const { trecho, idx } of achar(texto, /r\$\s?\d[\d.,]*/gu)) {
-      if (!reais.has(normPos(trecho).replace(/\s+/g, ""))) {
+      // 🔴 `[\d.,]*` é guloso e come o ponto final da frase: "R$ 9,90." virava
+      // "r$9,90." e nunca casava com o catálogo. Foi o que fez o ensaio em 60
+      // posts reais (25/09) acusar preço certo como inventado.
+      const valor = normPos(trecho).replace(/\s+/g, "").replace(/[.,]+$/, "");
+      if (!reais.has(valor)) {
         add({
           regra: "preco_fora_do_catalogo",
           gravidade: "erro",
