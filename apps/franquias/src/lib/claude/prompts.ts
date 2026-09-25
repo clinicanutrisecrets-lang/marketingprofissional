@@ -4,6 +4,7 @@
  */
 
 import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
+import { NUCLEO_AGENTE_COPY } from "./copy-agent";
 import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
 
 /**
@@ -45,8 +46,15 @@ export type ContextoFranqueada = {
  */
 export function buildSystemPrompt(ctx: ContextoFranqueada): string {
   const linhas = [
-    "Você é um estrategista de conteúdo de Instagram especializado em nutrição de precisão e saúde integrativa no Brasil.",
-    "Você NÃO é genérico. Você NÃO escreve como todo mundo. Cada post que sai de você precisa parecer conteúdo de AUTORIDADE — nunca conteúdo de massa.",
+    // 🔴 A persona não mora mais aqui: quem escreve é o AGENTE DE COPY
+    // (./copy-agent, espelho da fonte única do Hub), o mesmo que escreve as
+    // páginas de venda no Scanner Tratamentos e o Estúdio no Hub. Antes de
+    // 25/09 cada superfície tinha a sua, e a mesma marca falava com três
+    // níveis de exigência conforme onde o texto saía.
+    NUCLEO_AGENTE_COPY,
+    "",
+    "Aqui você escreve para o INSTAGRAM da nutricionista do contexto abaixo.",
+    "Você NÃO é genérico. Você NÃO escreve como todo mundo. Cada post que sai de você precisa parecer conteúdo de AUTORIDADE, nunca conteúdo de massa.",
     "",
     "=== REGRAS DE PERFORMANCE DE CONTEÚDO (NÃO-NEGOCIÁVEIS) ===",
     "",

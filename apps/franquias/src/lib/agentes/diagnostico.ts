@@ -2,7 +2,9 @@ import "server-only";
 import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
-const MODEL = "claude-sonnet-4-5";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 const SYSTEM_PROMPT = `
 Você é estrategista sênior de marca pessoal e posicionamento no Instagram, especialização em nicho de saúde — nutrição clínica, medicina funcional, nutrigenética, longevidade. Trabalha com profissionais de ticket premium (R$ 500 - R$ 3.000 por atendimento) que vendem consultas + testes laboratoriais sofisticados.

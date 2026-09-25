@@ -1,6 +1,7 @@
 import "server-only";
 import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
 
 export type RoteiroVideoInput = {
   franqueada: {
@@ -104,7 +105,7 @@ Retorne JSON com este schema:
 
   try {
     const resp = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: CLAUDE_MODEL_AGENTES,
       max_tokens: 1500,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMsg }],

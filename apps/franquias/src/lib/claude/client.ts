@@ -1,7 +1,26 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
 
-export const CLAUDE_MODEL = "claude-sonnet-4-5";
+/**
+ * 🔴 MODELO: UM ARQUIVO SÓ. Até 25/09/2026 o id do modelo estava escrito à mão
+ * em NOVE arquivos deste app (client, geracao/semanal e os sete agentes), o
+ * que é o mesmo defeito que a regra 0 do Scanner existe pra impedir: quando a
+ * Anthropic publica um modelo novo ou depreca um antigo, tem que dar pra
+ * trocar num lugar só. Arquivo novo que chame o Claude importa daqui.
+ *
+ * São DOIS ids de propósito:
+ *  - COPY: o que escreve texto que a paciente lê (posts, posts de venda, LP).
+ *    É onde a qualidade da escrita vira dinheiro, e onde vale o modelo mais
+ *    novo. Alinhado ao que o Scanner Tratamentos já usa pra montar as páginas.
+ *  - AGENTES: diagnóstico, planejamento, auditoria, tração, ads, storytelling,
+ *    roteiro. Ficam no modelo de sempre: eles analisam e decidem, não
+ *    escrevem copy, e subir o modelo deles é decisão de custo à parte.
+ */
+export const CLAUDE_MODEL_COPY = "claude-sonnet-5";
+export const CLAUDE_MODEL_AGENTES = "claude-sonnet-4-5";
+
+/** @deprecated Use CLAUDE_MODEL_COPY ou CLAUDE_MODEL_AGENTES. */
+export const CLAUDE_MODEL = CLAUDE_MODEL_AGENTES;
 
 /**
  * Cliente do Claude com a trava de travessão embutida.

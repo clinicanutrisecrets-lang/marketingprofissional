@@ -35,8 +35,9 @@ import {
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
+import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
 
-const MODELO_CLAUDE_DEFAULT = "claude-sonnet-4-5";
+const MODELO_CLAUDE_DEFAULT = CLAUDE_MODEL_COPY;
 
 /**
  * Gera a semana de posts de uma franqueada.

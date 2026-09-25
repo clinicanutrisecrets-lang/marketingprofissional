@@ -7,6 +7,7 @@ import {
   gerarPostsDaSemana,
   type ResultadoGeracaoSemana,
 } from "@/lib/geracao/semanal";
+import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
 
 async function getFranqueadaDoUser() {
   const supabase = createClient();
@@ -249,7 +250,7 @@ export async function gerarPostSubstituto(
         copy_legenda_ia_original: post.copy_legenda,
         copy_cta_ia_original: post.copy_cta,
         hashtags_ia_original: post.hashtags,
-        ia_model_usado: "claude-sonnet-4-5",
+        ia_model_usado: CLAUDE_MODEL_COPY,
         bannerbear_design_id: bannerbearId,
         url_imagem_final: urlImagem,
         data_hora_agendada: orig.data_hora_agendada, // mesmo horário

@@ -4,7 +4,9 @@ import { FRAMEWORK_DONALD_MILLER_SB7, FRAMEWORKS_MATRIZ_USO, COMPLIANCE_CFN_2026
 import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 
-const MODEL = "claude-sonnet-4-5";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 const SYSTEM_BASE = `
 Você é roteirista de storytelling especializado em saúde e nutrição — conteúdo que prende, convence e dá vontade de compartilhar. Público premium (mulheres 30-55, ticket R$ 500-3.000 em consultas e testes).

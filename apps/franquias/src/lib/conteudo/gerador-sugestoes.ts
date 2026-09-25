@@ -7,8 +7,9 @@ import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { renderCard, renderReceita } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
 
-const MODEL = "claude-sonnet-4-5";
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 /**
  * Monta o texto do card a partir da sugestão, com rede de segurança.
