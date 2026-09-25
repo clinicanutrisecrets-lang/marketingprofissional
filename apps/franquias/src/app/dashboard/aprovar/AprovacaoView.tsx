@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/lib/posts/actions";
 import { formatDate } from "@/lib/utils";
 import { baixarArquivo } from "@/lib/download-arquivo";
+import { revisarCopy, type AchadoRevisao, type ContextoRevisao } from "@/lib/claude/revisor-copy";
 import {
   legendaParaCopiar,
   nomeArquivoDaArte,
@@ -35,6 +36,13 @@ type Props = {
   historico: SemanaChip[];
   /** Instagram ligado (token ou Publer). Hoje: nenhuma conta tem. */
   publicacaoAutomatica: boolean;
+  /**
+   * O que o revisor de copy precisa saber desta nutri: o que ela não atende,
+   * as palavras que ela vetou e os preços reais dela. A revisão roda AQUI, no
+   * navegador, sobre o texto que está na tela: assim ela some na hora em que a
+   * nutri corrige, em vez de ficar um aviso velho pendurado.
+   */
+  revisao: ContextoRevisao;
 };
 
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -52,6 +60,7 @@ export function AprovacaoView({
   fechada,
   historico,
   publicacaoAutomatica,
+  revisao,
 }: Props) {
   const router = useRouter();
   const [postsState, setPostsState] = useState(posts);
@@ -251,6 +260,7 @@ export function AprovacaoView({
           <PostCard
             key={post.id as string}
             post={post}
+            revisao={revisao}
             onUpdate={(updated) =>
               setPostsState((prev) =>
                 prev.map((p) => (p.id === updated.id ? updated : p)),
@@ -409,15 +419,25 @@ function SubstituirButton({
 function PostCard({
   post,
   onUpdate,
+  revisao,
 }: {
   post: Record<string, unknown>;
   onUpdate: (p: Record<string, unknown>) => void;
+  revisao: ContextoRevisao;
 }) {
   const [editando, setEditando] = useState(false);
   const [copy, setCopy] = useState((post.copy_legenda as string) ?? "");
   const [cta, setCta] = useState((post.copy_cta as string) ?? "");
   const [salvando, setSalvando] = useState(false);
   const [copiado, setCopiado] = useState(false);
+
+  // 🔴 Roda sobre o texto EM EDIÇÃO, não sobre o que está salvo: o aviso tem
+  // que sumir no instante em que ela corrige. Aviso que sobra depois do
+  // conserto ensina a ignorar o aviso.
+  const achados = useMemo(
+    () => revisarCopy([copy, cta].filter(Boolean).join("\n"), revisao),
+    [copy, cta, revisao],
+  );
   const [baixando, setBaixando] = useState(false);
   const [avisoDownload, setAvisoDownload] = useState(false);
 
@@ -512,6 +532,8 @@ function PostCard({
             </div>
           </div>
         )}
+
+        {achados.length > 0 && <AvisosRevisao achados={achados} />}
 
         {editando ? (
           <div className="space-y-2">
@@ -644,6 +666,62 @@ function PostCard({
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Os achados do revisor, no card do post.
+ *
+ * 🔴 SINALIZA, não bloqueia: a nutri continua podendo aprovar. Reescrever ou
+ * travar o post em silêncio trocaria um problema visível por um invisível, e
+ * quem publica é ela.
+ *
+ * Duas gravidades, e a diferença importa: `erro` é regra mecânica (travessão,
+ * promessa de cura, preço que não existe); `confira` é heurística sobre o que
+ * ela declarou não atender, onde prosa com exceção não dá pra ler por regra.
+ */
+function AvisosRevisao({ achados }: { achados: AchadoRevisao[] }) {
+  const erros = achados.filter((a) => a.gravidade === "erro");
+  const confira = achados.filter((a) => a.gravidade === "confira");
+
+  return (
+    <div className="mb-3 space-y-2">
+      {erros.length > 0 && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-2.5">
+          <p className="mb-1 text-[11px] font-semibold text-red-700">
+            {erros.length === 1
+              ? "1 ponto pra corrigir antes de publicar"
+              : `${erros.length} pontos pra corrigir antes de publicar`}
+          </p>
+          <ul className="space-y-1.5">
+            {erros.map((a, i) => (
+              <li key={`${a.regra}-${i}`} className="text-[11px] leading-snug text-red-800">
+                <span className="font-medium">{a.motivo}</span>
+                <br />
+                <span className="text-red-600/80">“{a.trecho}”</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {confira.length > 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5">
+          <p className="mb-1 text-[11px] font-semibold text-amber-800">
+            Vale conferir
+          </p>
+          <ul className="space-y-1.5">
+            {confira.map((a, i) => (
+              <li key={`${a.regra}-${i}`} className="text-[11px] leading-snug text-amber-900">
+                <span className="font-medium">{a.motivo}</span>
+                <br />
+                <span className="text-amber-700/80">“{a.trecho}”</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

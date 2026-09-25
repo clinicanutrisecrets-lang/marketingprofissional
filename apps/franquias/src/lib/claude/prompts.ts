@@ -4,7 +4,7 @@
  */
 
 import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
-import { NUCLEO_AGENTE_COPY } from "./copy-agent";
+import { NUCLEO_AGENTE_COPY, blocoPublicoDaCopy, type PublicoDaCopy } from "./copy-agent";
 import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
 
 /**
@@ -38,6 +38,12 @@ export type ContextoFranqueada = {
   valor_consulta_inicial?: number;
   link_agendamento?: string;
   produtos?: ProdutoContexto[];
+  /**
+   * O público declarado no onboarding do Scanner, espelhado pelo cron diário.
+   * `null`/ausente significa que ela não respondeu: a copy segue sem
+   * restrição, NUNCA com restrição inventada.
+   */
+  publico?: PublicoDaCopy | null;
 };
 
 /**
@@ -142,6 +148,13 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
       ? `NUNCA citar: ${ctx.concorrentes_nao_citar}`
       : "",
     ...(ctx.produtos?.length ? blocoProdutos(ctx.produtos) : []),
+    "",
+    // 🔴 FRONTEIRA, não sugestão: a lista de queixas dela é o único vocabulário
+    // de dor permitido e "não atende" é proibição explícita. Até 25/09/2026 só
+    // a página de venda recebia isto, e o post não tinha como obedecer "ela não
+    // atende gestante". Ausente = ela não respondeu o questionário, e aí nada
+    // entra: apertar por omissão é o outro jeito de errar.
+    ...(ctx.publico ? ["", blocoPublicoDaCopy(ctx.publico)] : []),
     "",
     COMPLIANCE_CFN_BR,
     "",

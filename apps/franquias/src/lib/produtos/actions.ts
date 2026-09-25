@@ -5,6 +5,7 @@ import { gerarPostVenda, type PostVendaGerado } from "@/lib/claude/generate";
 import type { ContextoFranqueada, TipoPost } from "@/lib/claude/prompts";
 import { normalizarNivelConsciencia } from "@/lib/claude/consciencia";
 import { sincronizarProdutosScanner } from "./sync";
+import { sincronizarPublicoDoHub } from "@/lib/publico/sync";
 import { carregarProdutosContexto, formatarPrecoBR } from "./contexto";
 import { traduzirErroClaude } from "@/lib/claude/erros";
 import { revalidatePath } from "next/cache";
@@ -101,7 +102,15 @@ export async function atualizarProdutosScanner(): Promise<
     .maybeSingle();
   if (!f) return { ok: false, erro: "Franqueada não encontrada" };
 
-  const resultado = await sincronizarProdutosScanner((f as { id: string }).id);
+  // O público declarado no Scanner vem junto: é o mesmo botão que a nutri usa
+  // quando quer o app atualizado, e esperar o cron diário pra copy respeitar o
+  // "não atende" seria um dia inteiro de posts sem a fronteira. Em paralelo pra
+  // não somar latência, e `allSettled` porque falha no público não pode
+  // derrubar a atualização do catálogo, que é o que ela pediu ao clicar.
+  const [resultado] = await Promise.all([
+    sincronizarProdutosScanner((f as { id: string }).id),
+    sincronizarPublicoDoHub((f as { id: string }).id).catch(() => null),
+  ]);
   if (!resultado.ok) {
     const mensagens: Record<string, string> = {
       sem_vinculo_scanner:
