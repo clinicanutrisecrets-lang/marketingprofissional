@@ -12,7 +12,9 @@ import {
   COMPLIANCE_CFN_2026_RESUMO,
 } from "./_frameworks";
 
-const MODEL = "claude-sonnet-4-5";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 const SYSTEM_PROMPT = `
 Você é performance marketer sênior especializado em saúde no Brasil — nicho de nutrição clínica, medicina funcional, nutrigenética. Anos de experiência trazendo pacientes de TICKET ALTO (R$ 4.000-7.000 em tratamento anual completo) para profissionais liberais via Meta Ads.

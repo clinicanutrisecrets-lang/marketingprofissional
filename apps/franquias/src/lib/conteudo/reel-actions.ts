@@ -5,8 +5,9 @@ import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
 
-const MODEL = "claude-sonnet-4-5";
+const MODEL = CLAUDE_MODEL_AGENTES;
 const REPO = "clinicanutrisecrets-lang/marketingprofissional";
 
 /**

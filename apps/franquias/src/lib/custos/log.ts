@@ -11,6 +11,11 @@ const PRECOS_CLAUDE: Record<
   { input: number; output: number; cacheWrite5min: number; cacheRead: number }
 > = {
   "claude-opus-4-7": { input: 15, output: 75, cacheWrite5min: 18.75, cacheRead: 1.5 },
+  // 🔴 A CONFIRMAR na tabela oficial antes de confiar no número: entrou com o
+  // preço do Sonnet 4.5 por ser a mesma faixa. Modelo fora desta tabela era
+  // cobrado com o preço do 4.5 EM SILÊNCIO, que é como o Gemini apareceu 6,6x
+  // mais caro no painel do Hub por um mês (15/09). Agora o fallback avisa.
+  "claude-sonnet-5": { input: 3, output: 15, cacheWrite5min: 3.75, cacheRead: 0.3 },
   "claude-sonnet-4-6": { input: 3, output: 15, cacheWrite5min: 3.75, cacheRead: 0.3 },
   "claude-sonnet-4-5": { input: 3, output: 15, cacheWrite5min: 3.75, cacheRead: 0.3 },
   "claude-haiku-4-5-20251001": { input: 1, output: 5, cacheWrite5min: 1.25, cacheRead: 0.1 },
@@ -24,12 +29,20 @@ export type UsoClaude = {
 };
 
 export function calcularCustoClaude(modelo: string, uso: UsoClaude): number {
-  const tabela = PRECOS_CLAUDE[modelo] ?? PRECOS_CLAUDE["claude-sonnet-4-5"];
-  const input = (uso.input_tokens ?? 0) * tabela.input;
-  const output = (uso.output_tokens ?? 0) * tabela.output;
+  const tabela = PRECOS_CLAUDE[modelo];
+  if (!tabela) {
+    // Nunca caia em preço de outro modelo sem dizer: o número vira painel de
+    // custo e, no Hub, régua de bloqueio de cliente.
+    console.warn(
+      `[custos] modelo sem preço na tabela: ${modelo}. Cobrando pelo preço do Sonnet 4.5 até alguém cadastrar.`,
+    );
+  }
+  const preco = tabela ?? PRECOS_CLAUDE["claude-sonnet-4-5"];
+  const input = (uso.input_tokens ?? 0) * preco.input;
+  const output = (uso.output_tokens ?? 0) * preco.output;
   const cacheWrite =
-    (uso.cache_creation_input_tokens ?? 0) * tabela.cacheWrite5min;
-  const cacheRead = (uso.cache_read_input_tokens ?? 0) * tabela.cacheRead;
+    (uso.cache_creation_input_tokens ?? 0) * preco.cacheWrite5min;
+  const cacheRead = (uso.cache_read_input_tokens ?? 0) * preco.cacheRead;
   return (input + output + cacheWrite + cacheRead) / 1_000_000;
 }
 

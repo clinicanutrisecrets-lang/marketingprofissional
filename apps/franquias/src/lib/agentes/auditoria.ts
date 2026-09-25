@@ -2,7 +2,9 @@ import "server-only";
 import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
-const MODEL = "claude-sonnet-4-5";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 const SYSTEM_PROMPT = `
 Você é analista sênior de conteúdo e comportamento de audiência no Instagram, especializado em nicho de saúde/nutrição no Brasil. Trabalha com perfis de ticket premium (R$ 500 - R$ 3.000 por atendimento) e decifra por que alguns posts performam e outros morrem.

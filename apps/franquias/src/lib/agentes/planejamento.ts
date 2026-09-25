@@ -2,7 +2,9 @@ import "server-only";
 import { createClaude } from "@/lib/claude/client";
 import { createAdminClient } from "@/lib/supabase/server";
 
-const MODEL = "claude-sonnet-4-5";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+
+const MODEL = CLAUDE_MODEL_AGENTES;
 
 export type TipoPlanejamento =
   | "skill_2_mecanismo_unico"
