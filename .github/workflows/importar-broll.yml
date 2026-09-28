@@ -23,14 +23,27 @@ on:
         description: "true = só mede e tira miniatura, não sobe nada"
         required: false
         default: "false"
+      # Mesmo desenho dos outros workflows: o repositório NÃO tem os secrets
+      # SUPABASE_URL / SUPABASE_SERVICE_ROLE (conferido em 28/09/2026, o job
+      # saiu com SB_URL vazio). Quem dispara passa a URL e a chave por input,
+      # como o app faz no render-corte. Cadastrar os dois secrets no repo
+      # dispensa isso pra todos os cinco workflows.
+      supabase_url:
+        description: "URL do Supabase (vazio = secret SUPABASE_URL)"
+        required: false
+        default: ""
+      supabase_key:
+        description: "service role do Supabase (vazio = secret SUPABASE_SERVICE_ROLE)"
+        required: false
+        default: ""
 
 jobs:
   importar:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      SB_URL: ${{ secrets.SUPABASE_URL }}
-      SB_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,6 +53,12 @@ jobs:
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
           pip install -q requests
+      - name: Conferir credencial
+        run: |
+          if [ -z "$SB_URL" ] || [ -z "$SB_KEY" ]; then
+            echo "::error::sem SB_URL/SB_KEY: cadastre os secrets SUPABASE_URL e SUPABASE_SERVICE_ROLE no repositório, ou passe os dois inputs ao disparar"
+            exit 1
+          fi
       - name: Importar
         run: |
           python3 packages/corte-ia/importar_broll.py \
