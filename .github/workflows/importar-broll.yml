@@ -1,0 +1,49 @@
+# Importa clipes de b-roll de um manifesto (scripts/dados/broll-*.json) pra
+# Biblioteca de clipes de uma franqueada, ou pro acervo compartilhado.
+# Roda aqui, e não na sessão, porque só o repositório tem a chave de serviço
+# do Supabase (mesmo secret do render-corte). Ver packages/corte-ia/importar_broll.py.
+name: importar-broll
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "caminho do manifesto no repo"
+        required: true
+        default: "scripts/dados/broll-aline-2026-09-28.json"
+      franqueada_id:
+        description: "dona da biblioteca (vazio = o do manifesto)"
+        required: false
+        default: ""
+      acervo:
+        description: "true = grava no acervo compartilhado (acervo_videos)"
+        required: false
+        default: "false"
+      dry_run:
+        description: "true = só mede e tira miniatura, não sobe nada"
+        required: false
+        default: "false"
+
+jobs:
+  importar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SB_URL: ${{ secrets.SUPABASE_URL }}
+      SB_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependências
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install -q requests
+      - name: Importar
+        run: |
+          python3 packages/corte-ia/importar_broll.py \
+            --manifest "${{ inputs.manifest }}" \
+            --franqueada-id "${{ inputs.franqueada_id }}" \
+            $([ "${{ inputs.acervo }}" = "true" ] && echo --acervo) \
+            $([ "${{ inputs.dry_run }}" = "true" ] && echo --dry-run)
