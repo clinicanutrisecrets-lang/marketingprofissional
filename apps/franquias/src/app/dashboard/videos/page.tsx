@@ -8,6 +8,7 @@ import { CortesIaSection } from "./CortesIaSection";
 import { VideoCurtoSection, type ClipeEscolhivel } from "./VideoCurtoSection";
 import { listarBiblioteca } from "@/lib/videos/actions";
 import { listarAcervo } from "@/lib/videos/acervo";
+import { VideosMetodologiaSection } from "./VideosMetodologiaSection";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +106,8 @@ export default async function VideosHubPage() {
           </span>
         </Link>
       </div>
+
+      <VideosMetodologiaSection />
 
       {corteIa && <VideoCurtoSection biblioteca={biblioteca} acervo={acervo} />}
 
