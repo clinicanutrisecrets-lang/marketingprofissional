@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { aplicarPrefillScanner } from "@/lib/onboarding/prefill";
+import { concluirOnboarding } from "@/lib/onboarding/concluir";
 import { EMBED_COOKIE, EMBED_COOKIE_MAX_AGE, destinoSeguro, pediuEmbed } from "@/lib/embed/destino";
 
 export const dynamic = "force-dynamic";
@@ -189,8 +190,19 @@ export async function GET(req: NextRequest) {
   }
 
   // ── 5. Pré-preenchimento + marcação do onboarding (só até ele fechar) ──
+  // Questionário único do Scanner já respondido por inteiro: o cadastro de
+  // 10 passos daqui fecha sozinho e ela cai direto no painel (Aline, 30/09:
+  // "a pessoa responde uma vez só"). Faltando algo, segue pro assistente com
+  // o que veio já preenchido.
   if (!franq.onboarding_completo) {
-    await vincularOnboarding(admin, scannerUserId, franq.id);
+    const r = await vincularOnboarding(admin, scannerUserId, franq.id);
+    if (r.podeFechar) {
+      const fechou = await concluirOnboarding(admin, franq.id);
+      if (fechou.ok) franq = { ...franq, onboarding_completo: true };
+      console.log(`[sso] cadastro fechado pelo questionário do Scanner · ${emailToken} ok=${fechou.ok}${fechou.erro ? ` erro=${fechou.erro}` : ""}`);
+    } else if (r.concluidoLa) {
+      console.log(`[sso] questionário do Scanner concluído, mas falta aqui: ${r.faltando.join(", ")} · ${emailToken}`);
+    }
   }
 
   // ── 6. Abre a sessão com o hash obtido no passo 3 ──
@@ -254,7 +266,8 @@ async function vincularOnboarding(
   admin: ReturnType<typeof createAdminClient>,
   scannerUserId: string,
   franqueadaId: string,
-): Promise<void> {
+): Promise<{ podeFechar: boolean; concluidoLa: boolean; faltando: string[] }> {
+  const nada = { podeFechar: false, concluidoLa: false, faltando: [] as string[] };
   try {
     const { data: ob } = await admin
       .from("franquia_onboardings")
@@ -262,7 +275,7 @@ async function vincularOnboarding(
       .eq("scanner_user_id", scannerUserId)
       .maybeSingle();
 
-    if (!ob) return;
+    if (!ob) return nada;
     const reg = ob as {
       id: string;
       status: string | null;
@@ -282,14 +295,21 @@ async function vincularOnboarding(
 
     const perfil = reg.origem_payload?.perfil;
     if (perfil && typeof perfil === "object") {
-      await aplicarPrefillScanner(
+      const r = await aplicarPrefillScanner(
         admin,
         franqueadaId,
         perfil as Record<string, unknown>,
       );
+      return {
+        podeFechar: r.podeFechar,
+        concluidoLa: (perfil as Record<string, unknown>).q_concluido === "true",
+        faltando: r.faltando,
+      };
     }
+    return nada;
   } catch (e) {
     console.error("[sso] vincularOnboarding falhou:", e);
+    return nada;
   }
 }
 
