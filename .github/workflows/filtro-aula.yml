@@ -105,7 +105,8 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          # libEGL/libGLES: o mediapipe abre mesmo sem placa de vídeo.
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg libegl1 libgles2 libgl1
           pip install -r packages/video-filtro/requirements.txt
           bash packages/video-filtro/baixar-modelos.sh
 

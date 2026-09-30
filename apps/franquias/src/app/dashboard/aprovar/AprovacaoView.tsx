@@ -16,6 +16,7 @@ import { revisarCopy, type AchadoRevisao, type ContextoRevisao } from "@/lib/cla
 import {
   legendaParaCopiar,
   nomeArquivoDaArte,
+  artesDoPost,
   rotuloSemanaCurto,
 } from "@/lib/aprovacao/semana";
 
@@ -125,9 +126,16 @@ export function AprovacaoView({
   );
   const aprovados = postsState.filter((p) => (p.status as string) === "aprovado");
   const cancelados = postsState.filter((p) => (p.status as string) === "cancelado");
-  const paraBaixar = postsState.filter(
-    (p) => (p.status as string) !== "cancelado" && !!p.url_imagem_final,
-  );
+  // Uma entrada por ARTE: o carrossel conta cada slide.
+  const paraBaixar = postsState
+    .filter((p) => (p.status as string) !== "cancelado")
+    .flatMap((p) => {
+      const artes = artesDoPost(p);
+      return artes.map((url, i) => ({
+        url,
+        nome: nomeArquivoDaArte(p, url, artes.length > 1 ? i + 1 : undefined),
+      }));
+    });
 
   async function handleAprovarTudo() {
     setErro(null);
@@ -160,10 +168,9 @@ export function AprovacaoView({
     let falhou = 0;
     // Um a um: o navegador engasga com vários downloads simultâneos.
     for (let i = 0; i < paraBaixar.length; i++) {
-      const p = paraBaixar[i]!;
+      const a = paraBaixar[i]!;
       setBaixandoTudo(`${i + 1} de ${paraBaixar.length}`);
-      const url = p.url_imagem_final as string;
-      const ok = await baixarArquivo(url, nomeArquivoDaArte(p, url));
+      const ok = await baixarArquivo(a.url, a.nome);
       if (!ok) falhou++;
     }
     setBaixandoTudo(null);
@@ -447,7 +454,9 @@ function PostCard({
   const diaLabel = data ? `${DIAS_SEMANA[data.getDay()]} · ${data.toLocaleDateString("pt-BR")}` : "—";
   const horaLabel = data ? data.toTimeString().slice(0, 5) : "";
   const status = (post.status as string) ?? "aguardando_aprovacao";
-  const imgUrl = post.url_imagem_final as string | null;
+  const artes = artesDoPost(post);
+  const imgUrl = artes[0] ?? null;
+  const ehCarrossel = artes.length > 1;
 
   async function salvarEdicao() {
     setSalvando(true);
@@ -487,7 +496,12 @@ function PostCard({
     if (!imgUrl || baixando) return;
     setBaixando(true);
     setAvisoDownload(false);
-    const ok = await baixarArquivo(imgUrl, nomeArquivoDaArte(post, imgUrl));
+    let ok = true;
+    for (let i = 0; i < artes.length; i++) {
+      const url = artes[i]!;
+      const certo = await baixarArquivo(url, nomeArquivoDaArte(post, url, ehCarrossel ? i + 1 : undefined));
+      if (!certo) ok = false;
+    }
     setBaixando(false);
     if (!ok) {
       // Última cartada: abre a arte pra ela salvar com o botão direito.
@@ -506,8 +520,28 @@ function PostCard({
   return (
     <div className={`overflow-hidden rounded-2xl border-2 shadow-sm ${cardClasses}`}>
       {imgUrl ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={imgUrl} alt="Criativo" className="aspect-square w-full object-cover" />
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgUrl} alt="Criativo" className="aspect-square w-full object-cover" />
+          {ehCarrossel && (
+            <>
+              <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-semibold text-white">
+                {artes.length} slides
+              </span>
+              <div className="flex gap-1 overflow-x-auto bg-brand-muted p-1">
+                {artes.map((u, i) => (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    key={u}
+                    src={u}
+                    alt={`Slide ${i + 1}`}
+                    className="h-14 w-11 flex-none rounded object-cover"
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       ) : (
         <div className="flex aspect-square w-full items-center justify-center bg-brand-muted text-4xl">
           🎨
@@ -605,7 +639,11 @@ function PostCard({
                       disabled={baixando}
                       className="rounded-md border border-brand-primary bg-brand-primary/5 px-2 py-1 text-xs font-medium text-brand-primary hover:bg-brand-primary/10 disabled:opacity-60"
                     >
-                      {baixando ? "Baixando..." : "⬇ Baixar arte"}
+                      {baixando
+                        ? "Baixando..."
+                        : ehCarrossel
+                          ? `⬇ Baixar os ${artes.length} slides`
+                          : "⬇ Baixar arte"}
                     </button>
                   )}
                   <button

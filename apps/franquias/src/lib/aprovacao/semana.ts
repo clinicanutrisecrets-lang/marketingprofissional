@@ -147,12 +147,31 @@ const EXTENSOES = new Set(["png", "jpg", "jpeg", "webp", "mp4", "mov", "gif"]);
 export function nomeArquivoDaArte(
   p: { tipo_post?: string | null; data_hora_agendada?: string | null },
   url: string,
+  /** Carrossel: número do slide (1, 2, …). Ausente = peça única. */
+  slide?: number,
 ): string {
   const tipo = (p.tipo_post ?? "post").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
   const dia = (p.data_hora_agendada ?? "").slice(0, 10) || "sem-data";
   const semQuery = url.split(/[?#]/, 1)[0] ?? "";
   const ext = (semQuery.split(".").pop() ?? "").toLowerCase();
-  return `${tipo}-${dia}.${EXTENSOES.has(ext) ? ext : "png"}`;
+  const sufixo = slide ? `-slide-${String(slide).padStart(2, "0")}` : "";
+  return `${tipo}-${dia}${sufixo}.${EXTENSOES.has(ext) ? ext : "png"}`;
+}
+
+/**
+ * Todas as artes de um post, na ordem. Carrossel devolve os slides
+ * (`urls_slides`); o resto devolve a imagem única. Uma função só pra a
+ * prévia, o "Baixar arte" e o "Baixar as N artes" contarem igual.
+ */
+export function artesDoPost(p: {
+  url_imagem_final?: string | null;
+  urls_slides?: unknown;
+}): string[] {
+  const slides = Array.isArray(p.urls_slides)
+    ? p.urls_slides.filter((u): u is string => typeof u === "string" && u.length > 0)
+    : [];
+  if (slides.length) return slides;
+  return p.url_imagem_final ? [p.url_imagem_final] : [];
 }
 
 /**

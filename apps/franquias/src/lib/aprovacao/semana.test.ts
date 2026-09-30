@@ -21,6 +21,7 @@ import {
   nomeArquivoDaArte,
   publicacaoAutomaticaLigada,
   semanasVisiveis,
+  artesDoPost,
 } from "./semana.ts";
 
 const JULIANA = [
@@ -164,4 +165,24 @@ test("🔴 sem Instagram ligado não se promete publicação automática", () =>
     true,
   );
   assert.equal(publicacaoAutomaticaLigada({ publer_profile_id: "p1" }), true);
+});
+
+
+test("artesDoPost: carrossel devolve todos os slides, na ordem", () => {
+  assert.deepEqual(
+    artesDoPost({ url_imagem_final: "a.png", urls_slides: ["a.png", "b.png", "c.png"] }),
+    ["a.png", "b.png", "c.png"],
+  );
+});
+
+test("artesDoPost: peça única e post sem arte", () => {
+  assert.deepEqual(artesDoPost({ url_imagem_final: "x.png", urls_slides: null }), ["x.png"]);
+  assert.deepEqual(artesDoPost({ url_imagem_final: null }), []);
+  assert.deepEqual(artesDoPost({ url_imagem_final: "x.png", urls_slides: [] }), ["x.png"]);
+});
+
+test("nomeArquivoDaArte: slide ganha número, peça única não muda", () => {
+  const p = { tipo_post: "feed_carrossel", data_hora_agendada: "2026-09-29T08:00:00+00:00" };
+  assert.equal(nomeArquivoDaArte(p, "https://x/a.png?t=1", 2), "feed-carrossel-2026-09-29-slide-02.png");
+  assert.equal(nomeArquivoDaArte(p, "https://x/a.png?t=1"), "feed-carrossel-2026-09-29.png");
 });
