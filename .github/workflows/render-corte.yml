@@ -70,7 +70,11 @@ jobs:
       # e a maioria dos cortes não usa.
       - name: Instalar o motor de filtro
         if: inputs.filtro != '' && inputs.filtro != 'nenhum'
+        # O mediapipe abre libEGL/libGLES mesmo sem placa de vídeo. Sem elas o
+        # filtro morria com "libEGL.so.1: cannot open shared object file" e o
+        # corte saía sem filtro (os dois testes de 28/09/2026).
         run: |
+          sudo apt-get install -y -q libegl1 libgles2 libgl1
           pip install -q -r packages/video-filtro/requirements.txt
           bash packages/video-filtro/baixar-modelos.sh
 

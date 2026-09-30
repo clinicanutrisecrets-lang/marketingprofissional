@@ -15,7 +15,12 @@ import {
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
 import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
-import { gerarEUploadImagem } from "@/lib/ai-image/render";
+import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
+import type { EstiloCapa } from "@scanner/ai-image";
+import {
+  conteudoDaArteUnica,
+  slidesDoCarrosselSemanal,
+} from "@/lib/geracao/carrossel-semanal";
 import { escolherVideoParaPost } from "@/lib/videos/actions";
 import {
   buscarDatasProximas,
@@ -260,10 +265,70 @@ export async function gerarPostsDaSemana(
       // Gera criativo: prioridade AI-Image (imagens) > Creatomate (video+estático) > Bannerbear
       let urlImagem: string | null = null;
       let urlVideo: string | null = null;
+      let urlsSlides: string[] | null = null;
       let designId: string | null = null;
 
-      // 1. Tenta AI-Image primeiro (só pra imagens estáticas single-image)
-      //    Reels e carrossel continuam no fluxo Creatomate por enquanto.
+      const brandArte = {
+        nomeMarca:
+          (franqueada.nome_comercial as string) ||
+          (franqueada.nome_completo as string),
+        corPrimariaHex: (franqueada.cor_primaria_hex as string) || "#2F5D50",
+        corSecundariaHex: franqueada.cor_secundaria_hex as string | undefined,
+        logoUrl: logoUrl ?? undefined,
+        fotoProfissionalUrl: fotoUrl ?? undefined,
+        tomVisual: "editorial premium health clinic, sophisticated, calm",
+        nicho: (franqueada.nicho_principal as string) || "nutrição funcional",
+      };
+
+      // 1a. Carrossel: desenhador tipográfico (mesmo estilo do feed e dos
+      //     stories, custo zero, sem foto de IA). Antes ele só tinha o
+      //     Creatomate, que foi zerado de propósito, e saía sem arte.
+      if (item.tipo === "feed_carrossel") {
+        const slides = slidesDoCarrosselSemanal(post);
+        if (slides.length >= 2) {
+          try {
+            const r = await gerarCarrosselEUpload({
+              franqueadaId,
+              brand: brandArte,
+              slides,
+              capaEstilo:
+                ((franqueada as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ??
+                undefined,
+            });
+            if (r.urls.length) {
+              urlImagem = r.urls[0]!;
+              urlsSlides = r.urls;
+            }
+            await logarCusto({
+              franqueadaId,
+              // Card desenhado, sem chamada de modelo de imagem: custo zero.
+              servico: "outro",
+              operacao: "render_carrossel",
+              custoUsd: r.meta.custoTotalUsd,
+              briefingId: item.briefing?.id ?? null,
+              aprovacaoId,
+              metadata: { tipo: item.tipo, slides: r.urls.length },
+            });
+          } catch (carErr) {
+            await logarCusto({
+              franqueadaId,
+              servico: "outro",
+              operacao: "render_carrossel",
+              sucesso: false,
+              erro: (carErr as Error).message,
+              briefingId: item.briefing?.id ?? null,
+              aprovacaoId,
+            });
+            console.warn("[geracao] carrossel desenhado falhou:", carErr);
+          }
+        } else {
+          console.warn(`[geracao] carrossel sem texto pra 2 slides (${item.angulo}); segue sem arte`);
+        }
+      }
+
+      // 1b. Peça única (feed e stories): card desenhado, só título e
+      //     subtítulo. Sem selo e sem chamada na arte (a chamada vai na
+      //     legenda) — pedido do time em 25/09/2026.
       const podeTentarAiImagem =
         (item.tipo === "feed_imagem" || item.tipo === "stories") &&
         (process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
@@ -273,23 +338,8 @@ export async function gerarPostsDaSemana(
           const r = await gerarEUploadImagem({
             franqueadaId,
             tipo: item.tipo as "feed_imagem" | "stories",
-            brand: {
-              nomeMarca:
-                (franqueada.nome_comercial as string) ||
-                (franqueada.nome_completo as string),
-              corPrimariaHex: (franqueada.cor_primaria_hex as string) || "#2F5D50",
-              corSecundariaHex: franqueada.cor_secundaria_hex as string | undefined,
-              logoUrl: logoUrl ?? undefined,
-              fotoProfissionalUrl: fotoUrl ?? undefined,
-              tomVisual: "editorial premium health clinic, sophisticated, calm",
-              nicho: (franqueada.nicho_principal as string) || "nutrição funcional",
-            },
-            conteudo: {
-              eyebrow: "Nutrição de Precisão",
-              headline: post.headline,
-              subtitle: post.subtitle,
-              cta: post.copy_cta,
-            },
+            brand: brandArte,
+            conteudo: conteudoDaArteUnica(post),
           });
           urlImagem = r.url;
           await logarCusto({
@@ -342,7 +392,6 @@ export async function gerarPostsDaSemana(
             modifications: montarModsCreatomate({
               headline: post.headline,
               subtitle: post.subtitle,
-              cta: post.copy_cta,
               copy_legenda: post.copy_legenda,
               cor_primaria: franqueada.cor_primaria_hex as string,
               cor_secundaria: franqueada.cor_secundaria_hex as string,
@@ -408,7 +457,6 @@ export async function gerarPostsDaSemana(
             modifications: buildModifications({
               headline: post.headline,
               subtitle: post.subtitle,
-              cta: post.copy_cta,
               cor_primaria_hex: franqueada.cor_primaria_hex as string,
               logo_url: logoUrl ?? undefined,
               foto_nutri_url: fotoUrl ?? undefined,
@@ -469,6 +517,9 @@ export async function gerarPostsDaSemana(
           bannerbear_design_id: designId,
           url_imagem_final: urlImagem,
           url_video_final: urlVideo,
+          // Carrossel: todos os slides, na ordem. O slide 1 também fica em
+          // url_imagem_final, então quem só lê esse campo segue igual.
+          ...(urlsSlides ? { urls_slides: urlsSlides } : {}),
           data_hora_agendada: dataHora,
           legenda_gerada_ia: true,
         })
