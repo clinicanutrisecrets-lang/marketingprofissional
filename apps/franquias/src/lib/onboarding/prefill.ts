@@ -1,5 +1,5 @@
 import type { createAdminClient } from "@/lib/supabase/server";
-import { calcularPercentual } from "./steps";
+import { calcularPercentual, ESTADOS_BR, ESTILOS_VISUAIS, ONBOARDING_STEPS } from "./steps.ts";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
@@ -116,7 +116,114 @@ export function mapearPerfilScanner(perfil: PerfilScanner): Record<string, unkno
   const linkAgendamento = str(perfil.link_agendamento);
   if (linkAgendamento) campos.link_agendamento = linkAgendamento;
 
-  return campos;
+  // O questionário do Consultório (chaves q_) vence o palpite acima: é a
+  // resposta dela, não uma tradução do perfil.
+  return { ...campos, ...mapearQuestionarioScanner(perfil) };
+}
+
+/**
+ * O questionário ÚNICO do Consultório de Precisão, lá no Scanner (Aline,
+ * 30/09/2026: "o cadastro próprio do marketing são perguntas que já eram pra
+ * estar no onboarding, pra pessoa responder uma vez só"). Chega no `perfil`
+ * com prefixo `q_`, no vocabulário do Hub; o de-para mora aqui.
+ */
+const TOM_DE_PARA: Record<string, string> = {
+  acolhedor: "empatico_acolhedor",
+  cientifico: "cientifico_acessivel",
+  direto: "direto_motivacional",
+};
+const MODALIDADE_DE_PARA: Record<string, string> = { online: "online", presencial: "presencial", ambos: "hibrido" };
+/** Queixa do Scanner (QUEIXAS de lib/onboarding-precisao/tipos.ts lá) → nicho daqui. */
+const QUEIXA_NICHO: Record<string, string> = {
+  peso: "emagrecimento",
+  hormonal_feminino: "saude_feminina",
+  intestinal: "autoimune_intestino",
+  inflamacao: "autoimune_intestino",
+  fertilidade: "fertilidade_gestacao",
+  gestacao: "fertilidade_gestacao",
+  pediatrico: "materno_infantil",
+  performance: "nutricao_esportiva",
+  longevidade: "longevidade",
+  energia: "nutricao_funcional",
+  cardiometabolico: "nutricao_funcional",
+  tireoide: "nutricao_funcional",
+  pele_cabelo: "nutricao_funcional",
+  neuroendocrino: "nutricao_funcional",
+};
+const ESTILOS = new Set(ESTILOS_VISUAIS.map((e) => e.value));
+
+export function mapearQuestionarioScanner(perfil: PerfilScanner): Record<string, unknown> {
+  const c: Record<string, unknown> = {};
+  const tom = TOM_DE_PARA[str(perfil.q_tom) ?? ""];
+  if (tom) c.tom_comunicacao = tom;
+  const estilo = str(perfil.q_estilo_visual);
+  if (estilo && ESTILOS.has(estilo)) c.estilo_visual = estilo;
+  const mod = MODALIDADE_DE_PARA[str(perfil.q_modalidade) ?? ""];
+  if (mod) c.modalidade_atendimento = mod;
+  const historia = str(perfil.q_historia);
+  if (historia) c.historia_pessoal = historia;
+  const transformacao = str(perfil.q_transformacao);
+  if (transformacao) c.resultado_transformacao = transformacao;
+  const diferencial = str(perfil.q_diferencial);
+  if (diferencial) c.diferenciais = diferencial;
+  // "2.000+" → 2000. Texto sem número não vira número.
+  const atend = (str(perfil.q_atendimentos) ?? "").replace(/\D/g, "");
+  if (atend && Number(atend) > 0 && Number(atend) < 1_000_000) c.numero_pacientes_atendidos = Number(atend);
+  const cidade = str(perfil.q_cidade);
+  if (cidade) c.cidade = cidade;
+  const uf = (str(perfil.q_uf) ?? "").toUpperCase();
+  if (ESTADOS_BR.includes(uf)) c.estado = uf;
+  const link = str(perfil.q_link_agendamento);
+  if (link && /^https:\/\//i.test(link)) c.link_agendamento = link;
+  const comercial = str(perfil.q_nome_comercial);
+  if (comercial) c.nome_comercial = comercial;
+  if (perfil.q_tem_depoimentos === "true") c.tem_depoimentos = true;
+  if (perfil.q_tem_depoimentos === "false") c.tem_depoimentos = false;
+  // Nicho: a primeira queixa que ela marcou decide; a próxima diferente vira
+  // o secundário. Sem queixa, fica o que o perfil já mandava.
+  const nichos = (str(perfil.q_queixas) ?? "")
+    .split(",")
+    .map((q) => QUEIXA_NICHO[q.trim()])
+    .filter((n): n is string => !!n);
+  const unicos = [...new Set(nichos)];
+  if (unicos[0]) c.nicho_principal = unicos[0];
+  if (unicos[1]) c.nicho_secundario = unicos[1];
+  // Aprovação em bloco semanal é o que a tela de Aprovar semana faz hoje; só
+  // entra quando ela concluiu lá (senão o passo 9 do assistente decide).
+  if (perfil.q_concluido === "true") c.aprovacao_modo = "semanal_bloco";
+  return c;
+}
+
+/** O questionário foi concluído lá? É o que autoriza fechar o cadastro daqui. */
+export function questionarioConcluido(perfil: PerfilScanner | null | undefined): boolean {
+  return !!perfil && perfil.q_concluido === "true";
+}
+
+/**
+ * Obrigatórios do assistente que ainda faltam. `instagram_handle` fica de fora
+ * DE PROPÓSITO: é opcional no questionário lá, e cadastro sem Instagram
+ * funciona (os posts saem sem o @ na assinatura). Travar o fechamento por ele
+ * mandaria a profissional responder 10 passos por causa de um campo.
+ */
+export function obrigatoriosFaltando(linha: Record<string, unknown>): string[] {
+  const falta: string[] = [];
+  for (const step of ONBOARDING_STEPS) {
+    for (const campo of step.camposObrigatorios) {
+      if (campo === "instagram_handle") continue;
+      if (vazio(linha[campo])) falta.push(campo);
+    }
+  }
+  return falta;
+}
+
+/** Logo e foto que vieram do questionário, já como linhas de arquivos. */
+export function arquivosDoQuestionario(perfil: PerfilScanner): Array<{ tipo: "logo_principal" | "foto_profissional"; url: string }> {
+  const out: Array<{ tipo: "logo_principal" | "foto_profissional"; url: string }> = [];
+  const logo = str(perfil.q_logo_url);
+  const foto = str(perfil.q_foto_url);
+  if (logo && /^https:\/\//i.test(logo)) out.push({ tipo: "logo_principal", url: logo });
+  if (foto && /^https:\/\//i.test(foto)) out.push({ tipo: "foto_profissional", url: foto });
+  return out;
 }
 
 function vazio(v: unknown): boolean {
@@ -136,9 +243,9 @@ export async function aplicarPrefillScanner(
   admin: AdminClient,
   franqueadaId: string,
   perfil: PerfilScanner,
-): Promise<{ aplicados: string[] }> {
+): Promise<{ aplicados: string[]; podeFechar: boolean; faltando: string[] }> {
+  const nada = { aplicados: [] as string[], podeFechar: false, faltando: [] as string[] };
   const candidatos = mapearPerfilScanner(perfil);
-  if (Object.keys(candidatos).length === 0) return { aplicados: [] };
 
   const { data: atual, error: erroBusca } = await admin
     .from("franqueadas")
@@ -148,7 +255,7 @@ export async function aplicarPrefillScanner(
 
   if (erroBusca || !atual) {
     console.error("[prefill-scanner] busca falhou:", erroBusca?.message);
-    return { aplicados: [] };
+    return nada;
   }
 
   const linha = atual as Record<string, unknown>;
@@ -157,23 +264,52 @@ export async function aplicarPrefillScanner(
     if (vazio(linha[campo])) aplicar[campo] = valor;
   }
 
-  if (Object.keys(aplicar).length === 0) return { aplicados: [] };
+  if (Object.keys(aplicar).length > 0) {
+    const percentual = calcularPercentual({ ...linha, ...aplicar });
+    const { error: erroUpdate } = await admin
+      .from("franqueadas")
+      .update({
+        ...aplicar,
+        onboarding_percentual: percentual,
+        atualizado_em: new Date().toISOString(),
+      })
+      .eq("id", franqueadaId);
 
-  const percentual = calcularPercentual({ ...linha, ...aplicar });
-
-  const { error: erroUpdate } = await admin
-    .from("franqueadas")
-    .update({
-      ...aplicar,
-      onboarding_percentual: percentual,
-      atualizado_em: new Date().toISOString(),
-    })
-    .eq("id", franqueadaId);
-
-  if (erroUpdate) {
-    console.error("[prefill-scanner] update falhou:", erroUpdate.message);
-    return { aplicados: [] };
+    if (erroUpdate) {
+      console.error("[prefill-scanner] update falhou:", erroUpdate.message);
+      return nada;
+    }
   }
 
-  return { aplicados: Object.keys(aplicar) };
+  // Logo e foto do questionário entram como arquivos da franqueada (é de lá
+  // que a arte e a LP daqui leem). Só se ela ainda não tem daquele tipo.
+  const arquivos = arquivosDoQuestionario(perfil);
+  if (arquivos.length > 0) {
+    const { data: existentes } = await admin
+      .from("arquivos_franqueada")
+      .select("tipo")
+      .eq("franqueada_id", franqueadaId)
+      .in("tipo", arquivos.map((a) => a.tipo));
+    const ja = new Set(((existentes ?? []) as Array<{ tipo: string }>).map((e) => e.tipo));
+    const novos = arquivos.filter((a) => !ja.has(a.tipo));
+    if (novos.length > 0) {
+      const { error } = await admin.from("arquivos_franqueada").insert(
+        novos.map((a) => ({
+          franqueada_id: franqueadaId,
+          tipo: a.tipo,
+          nome_arquivo: a.tipo === "logo_principal" ? "logo (questionário do Scanner)" : "foto (questionário do Scanner)",
+          url_storage: a.url,
+          formato: (a.url.split("?")[0].split(".").pop() || "jpg").toLowerCase().slice(0, 5),
+        })),
+      );
+      if (error) console.error("[prefill-scanner] arquivos falharam:", error.message);
+    }
+  }
+
+  const faltando = obrigatoriosFaltando({ ...linha, ...aplicar });
+  return {
+    aplicados: Object.keys(aplicar),
+    podeFechar: questionarioConcluido(perfil) && faltando.length === 0 && linha.onboarding_completo !== true,
+    faltando,
+  };
 }

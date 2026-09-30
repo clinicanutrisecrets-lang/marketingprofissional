@@ -94,7 +94,10 @@ export async function POST(req: Request) {
         email: body.email.toLowerCase().trim(),
         whatsapp: body.whatsapp ?? null,
         plano_anterior: body.plano_anterior ?? null,
-        status: "token_gerado",
+        // O Scanner reenvia as respostas sempre que o questionário muda.
+        // Isso atualiza o perfil guardado, mas nunca rebaixa um onboarding
+        // que já foi concluído de volta pra "token gerado".
+        ...(ex.status === "onboarding_concluido" ? {} : { status: "token_gerado" }),
         origem_payload: body as unknown as Record<string, unknown>,
       })
       .eq("id", ex.id);
