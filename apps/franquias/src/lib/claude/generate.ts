@@ -19,6 +19,8 @@ import {
 export type PostGerado = {
   headline: string;
   subtitle?: string;
+  /** Reels: o roteiro falado que o modelo escreveu (lido no teleprompter). */
+  script_reels?: string;
   copy_legenda: string;
   copy_cta: string;
   hashtags: string[];

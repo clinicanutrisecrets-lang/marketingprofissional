@@ -311,11 +311,12 @@ INSTRUÇÕES CARROSSEL:
     : isReels
       ? `
 INSTRUÇÕES REELS:
-- Hook nos primeiros 3 segundos (frase que causa tensão/curiosidade).
+- O campo "script_reels" é o que a profissional vai FALAR olhando pra câmera, lido no teleprompter. Escreva como se fala: frase curta, sem jargão de texto escrito, sem tópicos.
+- Hook nos primeiros 3 segundos: a primeira frase tem que prender sozinha, sem contexto.
 - Script conversacional, como se falasse com uma amiga inteligente.
-- Ritmo: afirmação forte → contexto rápido → virada → CTA.
-- Máx 60 segundos de fala.
-- No campo "script_reels", retorne o roteiro completo de narração.`
+- Ritmo: afirmação forte → contexto rápido → virada → CTA falado.
+- 30 a 45 segundos de fala (80 a 120 palavras). Nada de "[pausa]", marcação de cena, numeração ou rótulo de bloco: tudo que estiver no campo vai ser lido em voz alta.
+- A legenda (copy_legenda) é outro texto, pra ir escrita embaixo do vídeo: não repita o roteiro nela.`
       : isStories
         ? `
 INSTRUÇÕES STORIES:
@@ -332,7 +333,7 @@ INSTRUÇÕES FEED IMAGEM:
   "slides": ["texto slide 1 (capa/hook)", "texto slide 2", "texto slide 3", "...", "texto slide final (CTA)"]`
     : isReels
       ? `,
-  "script_reels": "roteiro completo de narração do reels (máx 150 palavras)"`
+  "script_reels": "o texto corrido que a profissional fala no teleprompter (80 a 120 palavras, sem marcação de cena)"`
       : isStories
         ? `,
   "interacao_sugerida": "enquete, caixa de perguntas, ou quiz (opcional)"`

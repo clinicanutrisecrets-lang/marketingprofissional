@@ -39,6 +39,7 @@ import {
 } from "@/lib/custos/log";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { carregarPublicoContexto } from "@/lib/publico/sync";
+import { roteiroDoReelGerado } from "@/lib/geracao/roteiro-reels";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
@@ -520,6 +521,9 @@ export async function gerarPostsDaSemana(
           // Carrossel: todos os slides, na ordem. O slide 1 também fica em
           // url_imagem_final, então quem só lê esse campo segue igual.
           ...(urlsSlides ? { urls_slides: urlsSlides } : {}),
+          // Reels: o roteiro falado vai pro teleprompter da tela Aprovar
+          // semana. O modelo sempre escreveu isto e ninguém gravava.
+          roteiro_reels: roteiroDoReelGerado(item.tipo, post),
           data_hora_agendada: dataHora,
           legenda_gerada_ia: true,
         })
