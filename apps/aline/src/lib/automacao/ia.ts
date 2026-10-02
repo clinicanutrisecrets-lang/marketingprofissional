@@ -225,7 +225,7 @@ export async function classificarOpcaoPorTexto(texto: string, rotulos: string[])
       model: CLAUDE_MODEL_RAPIDO,
       max_tokens: 10,
       temperature: 0,
-      system: `A pessoa recebeu uma pergunta com estas opções numeradas e respondeu digitando. Diga QUAL opção a resposta dela equivale.
+      system: `A pessoa recebeu uma pergunta com estas opções e respondeu com as palavras dela. Diga a QUAL opção a resposta dela equivale.
 Responda SÓ o número da opção (1 a ${rotulos.length}). Se a resposta não corresponde a nenhuma opção, ou é outra pergunta, responda 0.`,
       messages: [
         {
