@@ -30,7 +30,7 @@ export const maxDuration = 20;
  * `x-scanner-signature`.
  *
  * Body: { scanner_user_id: string, email: string }
- * Resposta: { aviso: { titulo, detalhe, acao, href } | null }
+ * Resposta: { aviso: { titulo, detalhe, acao, href, estrategia? } | null }
  */
 export async function POST(req: Request) {
   const secret = process.env.SCANNER_WEBHOOK_SECRET;

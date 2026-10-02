@@ -1,5 +1,7 @@
 "use client";
 
+import { GuiaDaSemana } from "./GuiaDaSemana";
+import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -185,9 +187,13 @@ export function AprovacaoView({
     }
   }
 
+  const estrategia = lerEstrategia(aprovacao.estrategia);
+
   return (
     <>
       <HistoricoSemanas historico={historico} atual={aprovacao.id as string} />
+
+      {estrategia && <GuiaDaSemana estrategia={estrategia} />}
 
       {estaFechada && (
         <div className="mb-4 rounded-2xl border-2 border-green-300 bg-green-50 p-4">
@@ -469,6 +475,12 @@ function PostCard({
       ? (post.roteiro_reels as string).trim()
       : null;
 
+  const papel = textoOuNulo(post.papel_estrategia);
+  const lembrete = textoOuNulo(post.lembrete_execucao);
+  const objecao = textoOuNulo(post.objecao_dissolvida);
+  // Vídeo curto que nasceu junto com o reel (frase sobre clipe da biblioteca).
+  const videoPronto = ehReels ? textoOuNulo(post.url_video_final) : null;
+
   async function salvarEdicao() {
     setSalvando(true);
     const r = await atualizarCopyPost(post.id as string, {
@@ -588,6 +600,44 @@ function PostCard({
             {diaLabel} {horaLabel}
           </span>
         </div>
+
+        {papel && (
+          <div className="mb-3 rounded-lg bg-brand-primary/5 px-3 py-2 text-xs text-brand-text/80">
+            <div className="font-semibold text-brand-primary">O papel deste post</div>
+            <div className="mt-0.5">{papel}</div>
+            {objecao && (
+              <div className="mt-1 text-brand-text/60">
+                Dissolve no gancho a dúvida &ldquo;{objecao}&rdquo;, sem virar post de resposta.
+              </div>
+            )}
+          </div>
+        )}
+
+        {lembrete && (
+          <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <span className="font-semibold">👉 Ao postar: </span>
+            {lembrete}
+          </div>
+        )}
+
+        {videoPronto && (
+          <div className="mb-3 rounded-lg border border-rose-200 bg-white p-2 text-xs">
+            <div className="mb-1 font-semibold text-rose-800">🎞️ Vídeo curto pronto</div>
+            <video src={videoPronto} controls playsInline className="max-h-80 w-full rounded bg-black" />
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <a
+                href={videoPronto}
+                download
+                className="rounded-md bg-rose-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"
+              >
+                ⬇ Baixar o vídeo
+              </a>
+              <span className="self-center text-rose-700/70">
+                Ou grave você mesma com o roteiro abaixo.
+              </span>
+            </div>
+          </div>
+        )}
 
         {post.origem === "briefing_antecipado" && post.briefing_nutri && (
           <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -818,4 +868,8 @@ function AvisosRevisao({ achados }: { achados: AchadoRevisao[] }) {
       )}
     </div>
   );
+}
+
+function textoOuNulo(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v.trim() : null;
 }

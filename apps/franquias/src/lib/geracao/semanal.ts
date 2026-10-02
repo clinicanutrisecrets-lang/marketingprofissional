@@ -1,7 +1,9 @@
 "use server";
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { gerarPost, planejarSemana, type SlotSemana } from "@/lib/claude/generate";
+import { gerarPost, type SlotSemana } from "@/lib/claude/generate";
+import { planoDaJornada } from "@/lib/geracao/jornada";
+import { enfileirarVideoDoReel } from "@/lib/corte/video-do-reel-db";
 import type { ContextoFranqueada } from "@/lib/claude/prompts";
 import {
   generateImage,
@@ -171,13 +173,29 @@ export async function gerarPostsDaSemana(
   // 4. Planeja a semana
   // O catálogo é carregado ANTES de propósito: sem produto ativo o plano
   // pula o ângulo de divulgação (senão o modelo inventaria a oferta).
-  const plano = planejarSemana({
+  // A Jornada até o Teste (Aline, 02/10/2026): a semana tem uma ESTRATÉGIA
+  // (semana N de 4) e cada post um PAPEL nela. As queixas do questionário dela
+  // são o assunto; sem elas, o nicho. Mesmas regras de formato e de frequência
+  // do planejarSemana antigo (no máximo 1 comercial, reel/carrossel/stories).
+  const { estrategia, slots: plano } = planoDaJornada({
     diasPostSemana: (franqueada.dias_post_semana as number[]) ?? [1, 3, 5],
     frequenciaReels: (franqueada.frequencia_reels as string) ?? "semanal",
     frequenciaStories: (franqueada.frequencia_stories as string) ?? "diario",
     semanaRef,
-    temProdutos: (contexto.produtos?.length ?? 0) > 0,
+    produtos: (contexto.produtos ?? []).map((pr) => ({
+      nome: pr.nome,
+      scanner_produto_id: pr.scanner_produto_id ?? null,
+    })),
+    queixas: contexto.publico?.queixas ?? null,
+    nicho: (franqueada.nicho_principal as string) ?? "saude_integrativa",
   });
+  {
+    const { error: estErr } = await admin
+      .from("aprovacoes_semanais")
+      .update({ estrategia: estrategia })
+      .eq("id", aprovacaoId);
+    if (estErr) console.warn("[semanal] estratégia não gravada:", estErr.message);
+  }
 
   // Busca arquivos pra usar nos criativos (logo + foto)
   const logoUrl = await buscarArquivoUrl(admin, franqueadaId, "logo_principal");
@@ -211,9 +229,11 @@ export async function gerarPostsDaSemana(
 
   for (const item of planoCasado) {
     try {
+      // Pedido da nutri vence a estratégia (é ela trocando o assunto); sem
+      // pedido, o post recebe o papel e o material da semana da jornada.
       const contextoComBriefing = item.briefing
         ? montarContextoComBriefing(blocoContextoExtra, item.briefing)
-        : blocoContextoExtra;
+        : [item.instrucao, blocoContextoExtra].filter(Boolean).join("\n\n");
 
       const tInicio = Date.now();
       const post = await gerarPost(
@@ -511,6 +531,13 @@ export async function gerarPostsDaSemana(
           // Nível de consciência de quem esse post mira. Vem do plano, não
           // do que o modelo devolveu: é decisão de estratégia, não de copy.
           nivel_consciencia: item.consciencia ?? null,
+          // O que o post faz na semana e o que ela faz no Instagram. Com pedido
+          // dela, o papel é o pedido (a estratégia saiu da frente).
+          papel_estrategia: item.briefing
+            ? `Pedido seu: ${item.briefing.tema}`.slice(0, 300)
+            : item.papel,
+          lembrete_execucao: item.briefing ? null : (item.lembrete ?? lembreteDaInteracao(item.tipo, post)),
+          objecao_dissolvida: item.briefing ? null : (item.objecao ?? null),
           copy_legenda_ia_original: post.copy_legenda,
           copy_cta_ia_original: post.copy_cta,
           hashtags_ia_original: post.hashtags,
@@ -537,6 +564,18 @@ export async function gerarPostsDaSemana(
         erros.push(`${item.angulo}: ${postErr?.message ?? "insert falhou"}`);
       } else {
         gerados += 1;
+        // Reel da semana: o vídeo curto (gancho sobre um clipe da biblioteca)
+        // nasce junto e chega no card quando o worker termina. Best-effort.
+        if (item.tipo === "reels") {
+          const v = await enfileirarVideoDoReel(admin, {
+            franqueadaId,
+            email: (franqueada.email as string | null) ?? null,
+            postId: (postInserted as { id: string }).id,
+            post: { headline: post.headline, roteiro: post.script_reels },
+            assunto: estrategia.queixas,
+          });
+          if (!v.ok) console.warn(`[semanal] vídeo do reel não enfileirado: ${v.motivo}`);
+        }
         if (item.briefing) {
           await marcarBriefingUsado(
             item.briefing.id,
@@ -715,16 +754,16 @@ function montarBlocoContextoExtra(
  * pedidos da nutri. Se a nutri pediu formato específico, prioriza
  * matching de tipo. Os demais slots seguem com o tema automático.
  */
-function casarBriefingsComPlano(
-  plano: SlotSemana[],
+function casarBriefingsComPlano<S extends SlotSemana>(
+  plano: S[],
   briefings: Briefing[],
-): Array<SlotSemana & { briefing?: Briefing }> {
+): Array<S & { briefing?: Briefing }> {
   if (briefings.length === 0) {
     return plano.map((p) => ({ ...p }));
   }
 
   const restantes = [...briefings];
-  const resultado: Array<SlotSemana & { briefing?: Briefing }> = plano.map((p) => ({
+  const resultado: Array<S & { briefing?: Briefing }> = plano.map((p) => ({
     ...p,
   }));
 
@@ -782,4 +821,15 @@ function montarContextoComBriefing(
   }
 
   return linhas.join("\n");
+}
+
+/**
+ * Lembrete do stories de rotina: se o modelo sugeriu enquete ou caixinha,
+ * vira o recado "ponha por cima". Arte não leva sticker, quem põe é ela.
+ */
+function lembreteDaInteracao(tipo: string, post: { interacao_sugerida?: unknown }): string | null {
+  if (tipo !== "stories") return null;
+  const i = typeof post.interacao_sugerida === "string" ? post.interacao_sugerida.trim() : "";
+  if (!i) return null;
+  return `A arte está pronta. Ponha por cima no Instagram: ${i.slice(0, 200)}`;
 }

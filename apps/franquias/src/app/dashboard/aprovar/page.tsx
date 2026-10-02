@@ -45,7 +45,7 @@ export default async function AprovarPage({
   // semana desaparecer do app inteiro.
   const { data: aprovacoes, error: errAprov } = await supabase
     .from("aprovacoes_semanais")
-    .select("id, semana_ref, status, deadline, aprovada_em")
+    .select("id, semana_ref, status, deadline, aprovada_em, estrategia")
     .eq("franqueada_id", f.id as string)
     .order("semana_ref", { ascending: false })
     .limit(SEMANAS_NO_HISTORICO);

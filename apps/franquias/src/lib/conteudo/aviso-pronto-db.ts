@@ -1,4 +1,5 @@
 import { avisoConteudoPronto, type AvisoConteudoPronto } from "./aviso-pronto.ts";
+import { lerEstrategia } from "../aprovacao/estrategia.ts";
 import { escolherAprovacao, type AprovacaoCandidata } from "../aprovacao/semana.ts";
 import type { createClient } from "../supabase/server.ts";
 
@@ -28,11 +29,11 @@ export async function montarAvisoPronto(
   try {
     const { data: aprovacoes } = await supabase
       .from("aprovacoes_semanais")
-      .select("id, semana_ref, status")
+      .select("id, semana_ref, status, estrategia")
       .eq("franqueada_id", franqueadaId)
       .order("semana_ref", { ascending: false })
       .limit(4);
-    const linhas = (aprovacoes ?? []) as Array<{ id: string; semana_ref: string; status: string | null }>;
+    const linhas = (aprovacoes ?? []) as Array<{ id: string; semana_ref: string; status: string | null; estrategia?: unknown }>;
     if (!linhas.length) return null;
 
     // 🔴 A contagem sai de posts_agendados, NUNCA da coluna total_posts (que
@@ -70,6 +71,9 @@ export async function montarAvisoPronto(
 
     return avisoConteudoPronto({
       aprovacao: escolhida,
+      estrategia: escolhida
+        ? lerEstrategia(linhas.find((l) => l.id === escolhida.id)?.estrategia)
+        : null,
       pedidosAtendidos: ((pedidos ?? []) as Array<{ tema: string | null; semana_alvo: string | null }>).map(
         (p) => ({ tema: p.tema ?? "", semana: p.semana_alvo ?? null }),
       ),
