@@ -40,6 +40,8 @@ import {
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { carregarPublicoContexto } from "@/lib/publico/sync";
 import { roteiroDoReelGerado } from "@/lib/geracao/roteiro-reels";
+import { brandDaFranqueada } from "@/lib/ai-image/brand";
+import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
@@ -269,17 +271,11 @@ export async function gerarPostsDaSemana(
       let urlsSlides: string[] | null = null;
       let designId: string | null = null;
 
-      const brandArte = {
-        nomeMarca:
-          (franqueada.nome_comercial as string) ||
-          (franqueada.nome_completo as string),
-        corPrimariaHex: (franqueada.cor_primaria_hex as string) || "#2F5D50",
-        corSecundariaHex: franqueada.cor_secundaria_hex as string | undefined,
-        logoUrl: logoUrl ?? undefined,
-        fotoProfissionalUrl: fotoUrl ?? undefined,
-        tomVisual: "editorial premium health clinic, sophisticated, calm",
-        nicho: (franqueada.nicho_principal as string) || "nutrição funcional",
-      };
+      // A MESMA marca do post de venda (lib/ai-image/brand.ts): uma fonte.
+      const brandArte = brandDaFranqueada(
+        franqueada as Parameters<typeof brandDaFranqueada>[0],
+        { logoUrl, fotoUrl },
+      );
 
       // 1a. Carrossel: desenhador tipográfico (mesmo estilo do feed e dos
       //     stories, custo zero, sem foto de IA). Antes ele só tinha o
@@ -640,21 +636,6 @@ function toContexto(f: Record<string, unknown>): ContextoFranqueada {
   };
 }
 
-async function buscarArquivoUrl(
-  admin: ReturnType<typeof createAdminClient>,
-  franqueadaId: string,
-  tipo: string,
-): Promise<string | null> {
-  const { data } = await admin
-    .from("arquivos_franqueada")
-    .select("url_storage")
-    .eq("franqueada_id", franqueadaId)
-    .eq("tipo", tipo)
-    .order("criado_em", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return (data as { url_storage?: string } | null)?.url_storage ?? null;
-}
 
 function calcularDataHora(semanaRef: string, diaSemana: number, horario: string): string {
   const [h, m] = horario.split(":").map(Number);

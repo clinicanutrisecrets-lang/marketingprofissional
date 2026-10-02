@@ -152,7 +152,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <span className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold">
-          {temSugestoes ? "Abrir o Estúdio →" : "✨ Gerar agora →"}
+          {temSugestoes ? "Abrir o Estúdio →" : "Gerar agora →"}
         </span>
       </Link>
 

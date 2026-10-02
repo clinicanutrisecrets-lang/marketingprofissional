@@ -139,6 +139,8 @@ export async function criarPostManual(params: {
    */
   data_hora_agendada?: string | null;
   url_imagem?: string;
+  /** Carrossel desenhado: todos os slides, na ordem (url_imagem = slide 1). */
+  urls_slides?: string[];
   url_video?: string;
   legenda_gerada_ia?: boolean;
   /** Ângulo da copy (AnguloPost). Opcional: post manual pode não ter. */
@@ -222,6 +224,7 @@ export async function criarPostManual(params: {
       video_upload_url: params.url_video,
       url_imagem_final: params.url_imagem,
       url_video_final: params.url_video,
+      ...(params.urls_slides?.length ? { urls_slides: params.urls_slides } : {}),
       criado_por: user.id,
     })
     .select("id")

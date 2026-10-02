@@ -12,7 +12,7 @@ const ITENS = [
   { href: "/dashboard/posts-venda", icone: "🛍️", label: "Posts de venda" },
   { href: "/dashboard/aprovar", icone: "✅", label: "Aprovar semana" },
   { href: "/dashboard/briefings", icone: "📝", label: "Pedir conteúdo" },
-  { href: "/dashboard/posts/novo", icone: "✨", label: "Post manual" },
+  { href: "/dashboard/posts/novo", icone: "✍️", label: "Post manual" },
   { href: "/dashboard/videos", icone: "🎬", label: "Vídeos" },
 ];
 
