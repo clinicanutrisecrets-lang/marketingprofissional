@@ -310,19 +310,34 @@ const SEMANAS: Array<{
   },
 ];
 
+/**
+ * A segunda-feira em que a jornada começa pra todas as contas (o 1º pacote
+ * gerado com ela é o do domingo 04/10/2026, que cria a semana de 05/10). Sem
+ * esta âncora a contagem saía da época Unix e o primeiro pacote caía na
+ * semana 2, com todo mundo começando a jornada pelo meio.
+ */
+export const INICIO_JORNADA = "2026-10-05";
+const SEMANA_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Semanas desde o início da jornada (pode ser negativo antes dela). */
+function semanasDesdeInicio(semanaRef?: string): number | null {
+  const t = semanaRef ? Date.parse(semanaRef) : NaN;
+  if (Number.isNaN(t)) return null;
+  return Math.floor((t - Date.parse(INICIO_JORNADA)) / SEMANA_MS);
+}
+
 /** Qual semana da jornada (1..4) cai nesta segunda-feira. */
 export function semanaDaJornada(semanaRef?: string): number {
-  const t = semanaRef ? Date.parse(semanaRef) : NaN;
-  if (Number.isNaN(t)) return 1;
-  const idx = Math.floor(t / (7 * 24 * 60 * 60 * 1000));
+  const idx = semanasDesdeInicio(semanaRef);
+  if (idx === null) return 1;
   return (((idx % SEMANAS_DA_JORNADA) + SEMANAS_DA_JORNADA) % SEMANAS_DA_JORNADA) + 1;
 }
 
-/** Qual rodada (ciclo de 4 semanas) desde a época: troca o par de queixas. */
+/** Qual rodada (ciclo de 4 semanas): troca o par de queixas. */
 function rodadaDaJornada(semanaRef?: string): number {
-  const t = semanaRef ? Date.parse(semanaRef) : NaN;
-  if (Number.isNaN(t)) return 0;
-  return Math.floor(Math.floor(t / (7 * 24 * 60 * 60 * 1000)) / SEMANAS_DA_JORNADA);
+  const idx = semanasDesdeInicio(semanaRef);
+  if (idx === null) return 0;
+  return Math.floor(idx / SEMANAS_DA_JORNADA);
 }
 
 /**

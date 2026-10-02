@@ -31,6 +31,13 @@ test("quatro segundas seguidas percorrem as quatro semanas, sem repetir", () => 
   for (let i = 1; i < ns.length; i++) assert.equal(ns[i], (ns[i - 1]! % SEMANAS_DA_JORNADA) + 1);
 });
 
+test("o primeiro pacote da jornada (semana de 05/10/2026) é a semana 1", () => {
+  assert.equal(semanaDaJornada("2026-10-05"), 1);
+  assert.equal(semanaDaJornada("2026-10-26"), 4);
+  assert.equal(semanaDaJornada("2026-11-02"), 1);
+  assert.equal(semanaDaJornada("2026-09-28"), 4, "antes do início segue o ciclo, sem quebrar");
+});
+
 test("data inválida cai na semana 1, nunca quebra", () => {
   assert.equal(semanaDaJornada(undefined), 1);
   assert.equal(semanaDaJornada("lixo"), 1);
@@ -50,6 +57,7 @@ test("sem queixa declarada, o assunto é o nicho", () => {
 test("a rodada troca o par de queixas a cada 4 semanas", () => {
   const r1 = queixasDaRodada(GLERYSTON, "x", "2026-10-05");
   const r2 = queixasDaRodada(GLERYSTON, "x", "2026-11-02");
+  assert.deepEqual(queixasDaRodada(GLERYSTON, "x", "2026-10-26"), r1, "mesma rodada, mesmo par");
   assert.notDeepEqual(r1, r2);
 });
 
