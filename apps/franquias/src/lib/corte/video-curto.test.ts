@@ -199,3 +199,34 @@ test("LIGAÇÃO: a coluna nasce no centro e é aditiva", () => {
   assert.match(sql, new RegExp(`>= ${POS_MIN}`));
   assert.match(sql, new RegExp(`<= ${POS_MAX}`));
 });
+
+// ----- estilo da letra na prévia -----
+import { estiloFraseNaTela, ESTILO_FRASE_TELA } from "./video-curto.ts";
+import { ESTILOS_LEGENDA } from "./opcoes.ts";
+
+test("prévia: todo estilo que a tela oferece tem desenho próprio, e desconhecido cai na clássica", () => {
+  for (const e of ESTILOS_LEGENDA) assert.ok(ESTILO_FRASE_TELA[e.id], e.id);
+  assert.deepEqual(estiloFraseNaTela("nao-existe"), ESTILO_FRASE_TELA.classica);
+  assert.deepEqual(estiloFraseNaTela(undefined), ESTILO_FRASE_TELA.classica);
+});
+
+test("prévia: caixa alta e serifa espelham o worker (legenda_estilos.py)", () => {
+  const py = readFileSync(
+    new URL("../../../../../packages/corte-ia/legenda_estilos.py", import.meta.url),
+    "utf8",
+  );
+  for (const e of ESTILOS_LEGENDA) {
+    const bloco = py.slice(py.indexOf(`"${e.id}": {`));
+    const caixaAlta = /"caixa_alta":\s*True/.test(bloco.slice(0, bloco.indexOf("},")));
+    const serif = /"fonte_capa":\s*"Fraunces/.test(bloco.slice(0, bloco.indexOf("},")));
+    const t = estiloFraseNaTela(e.id);
+    assert.equal(t.textTransform === "uppercase", caixaAlta, `${e.id}: caixa`);
+    assert.equal(/serif/.test(t.fontFamily) && !/sans-serif$/.test(t.fontFamily), serif, `${e.id}: serifa`);
+  }
+});
+
+test("ligação: a tarja da prévia usa o estilo escolhido", () => {
+  const s = readFileSync(new URL("../../app/dashboard/videos/VideoCurtoSection.tsx", import.meta.url), "utf8");
+  assert.match(s, /estiloFraseNaTela\(estilo\)/);
+  assert.match(s, /textTransform: estiloTela\.textTransform/);
+});
