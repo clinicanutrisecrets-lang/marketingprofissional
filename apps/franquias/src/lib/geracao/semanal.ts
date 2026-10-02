@@ -38,6 +38,7 @@ import {
   CUSTO_CREATOMATE_RENDER_USD,
 } from "@/lib/custos/log";
 import { carregarProdutosContexto } from "@/lib/produtos/contexto";
+import { produtosDaEstrategia } from "@/lib/produtos/foco";
 import { carregarPublicoContexto } from "@/lib/publico/sync";
 import { roteiroDoReelGerado } from "@/lib/geracao/roteiro-reels";
 import { brandDaFranqueada } from "@/lib/ai-image/brand";
@@ -155,7 +156,13 @@ export async function gerarPostsDaSemana(
   const contexto = toContexto(franqueada);
   // Produtos reais do Scanner Tratamentos entram no system prompt — copy
   // pode citar produto/preço/link verdadeiros (nunca inventados)
-  contexto.produtos = await carregarProdutosContexto(admin, franqueadaId);
+  // Estratégia da semana: produto é SÓ o teste nutrigenético e o epigenético
+  // (Aline, 02/10/2026, todas as contas). Os outros produtos dela ficam pro
+  // "Posts de venda", feito à mão. Sem nenhum dos dois no catálogo, o slot de
+  // produto vira autoridade (temProdutos abaixo), como já era sem catálogo.
+  contexto.produtos = produtosDaEstrategia(
+    await carregarProdutosContexto(admin, franqueadaId),
+  );
   // O público declarado é FRONTEIRA da copy: as queixas dela são o único
   // vocabulário de dor permitido e "não atende" é proibição. null = não
   // respondeu, e aí a copy segue como sempre, sem restrição inventada.

@@ -15,6 +15,8 @@ import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
 export type ProdutoContexto = {
   nome: string;
   tipo?: string;
+  /** teste_genetico, teste_epigenetico, mesa… (filtro da estratégia da semana). */
+  scanner_produto_id?: string;
   preco_texto?: string; // "R$ 1.997,00" — já formatado
   checkout_url: string;
 };
@@ -176,7 +178,7 @@ function blocoProdutos(produtos: ProdutoContexto[]): string[] {
   return [
     "",
     "=== PRODUTOS REAIS DA NUTRI (Scanner Tratamentos) ===",
-    "Estes são os ÚNICOS produtos próprios que ela vende. Regras ABSOLUTAS:",
+    "Estes são os ÚNICOS produtos que esta copy pode citar. Regras ABSOLUTAS:",
     "- NUNCA inventar produto, preço, desconto, condição de pagamento ou link. Só o que está listado abaixo, exatamente como está.",
     "- Se o preço não estiver listado, NÃO citar preço.",
     "- O NOME do produto é marca própria registrada da nutri: quando citar, cite VERBATIM — nome próprio de produto não conta como vocabulário comercial proibido (ex.: um produto chamado 'Protocolo X' pode ser citado pelo nome, mas a palavra 'protocolo' segue proibida fora do nome do produto).",
