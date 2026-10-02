@@ -6,7 +6,8 @@
 import { createAlineClient } from "@/lib/supabase/server";
 import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenLongo, type BotaoRapido } from "@/lib/instagram/api";
 import { carregarPerfilPorId, credenciaisDoPerfil, salvarTokenRenovado } from "@/lib/instagram/credenciais";
-import { janela24hAberta, opcoesComoTexto, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
+import { janela24hAberta, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
+import { desfechoDaFalha, registroDoDesfecho, type Desfecho } from "./envio";
 
 type Passo = { id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null };
 
@@ -128,34 +129,45 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         continue;
       }
 
-      let textoEnviado = item.texto;
       const opcoes = (item.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
+      let botoes: BotaoRapido[] | undefined;
       if (item.tipo === "dm" && opcoes.length > 0 && item.passo_id) {
         const ref = `${PREFIXO_PASSO}${item.passo_id}`;
-        const botoes: BotaoRapido[] = opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(ref, i) }));
-        try {
-          await enviarDm(acesso.cred, item.destino, item.texto, botoes);
-        } catch (e) {
-          console.warn("[automacao/fila] botões recusados, lista numerada:", (e as Error).message.slice(0, 200));
-          textoEnviado = opcoesComoTexto(item.texto, opcoes.map((o) => o.rotulo));
-          await enviarDm(acesso.cred, item.destino, textoEnviado);
-        }
+        botoes = opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(ref, i) }));
+        // 🔴 As opções vão pro contato ANTES do envio: a Meta reclama e
+        // entrega do mesmo jeito, e quem responde precisa ter com o que casar.
         const ultimas: UltimasOpcoes = { regra_id: ref, rotulos: opcoes.map((o) => o.rotulo) };
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", item.contato_id);
-      } else if (item.tipo === "dm") await enviarDm(acesso.cred, item.destino, item.texto);
-      else if (item.tipo === "private_reply") await respostaPrivadaComentario(acesso.cred, item.destino, item.texto);
-      else await responderComentario(acesso.cred, item.destino, item.texto);
+      }
 
-      await marcar(item.id, "enviado");
-      await aline.from("ig_mensagens").insert({
-        perfil_id: item.perfil_id,
-        contato_id: item.contato_id,
-        canal: item.tipo === "comment_reply" ? "comentario" : "dm",
-        direcao: "saida",
-        texto: textoEnviado,
-        origem: item.sequencia_id ? "sequencia" : "regra",
-        regra_id: item.regra_id,
-      });
+      // Tentativa ÚNICA, e o registro sai mesmo quando a Meta reclama — ver
+      // a régua em ./envio.ts (incidente 29/09/2026).
+      let desfecho: Desfecho = "entregue";
+      try {
+        if (item.tipo === "dm") await enviarDm(acesso.cred, item.destino, item.texto, botoes);
+        else if (item.tipo === "private_reply") await respostaPrivadaComentario(acesso.cred, item.destino, item.texto, botoes);
+        else await responderComentario(acesso.cred, item.destino, item.texto);
+      } catch (e) {
+        const msg = (e as Error).message;
+        desfecho = desfechoDaFalha(msg);
+        console.warn(`[automacao/fila] envio ${desfecho}:`, msg.slice(0, 300));
+        await marcar(item.id, desfecho === "sem_confirmacao" ? "sem_confirmacao" : "falhou", msg.slice(0, 500));
+      }
+      if (desfecho === "entregue") await marcar(item.id, "enviado");
+
+      if (desfecho !== "recusado") {
+        const reg = registroDoDesfecho(desfecho, item.sequencia_id ? "sequencia" : "regra", item.regra_id ?? undefined);
+        await aline.from("ig_mensagens").insert({
+          perfil_id: item.perfil_id,
+          contato_id: item.contato_id,
+          canal: item.tipo === "comment_reply" ? "comentario" : "dm",
+          direcao: "saida",
+          texto: item.texto,
+          origem: reg.origem,
+          regra_id: reg.regraId ?? null,
+        });
+      }
+      if (desfecho === "recusado") { resumo.falhas++; continue; }
       resumo.enviados++;
     } catch (e) {
       const msg = (e as Error).message;

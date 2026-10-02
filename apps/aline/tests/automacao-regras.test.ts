@@ -133,7 +133,7 @@ test("pergunta clínica em comentário é reconhecida; spam óbvio também", () 
   assert.equal(pareceSpam("quero o ebook"), false);
 });
 
-import { casarOpcao, opcoesComoTexto, payloadDaOpcao } from "../src/lib/automacao/regras.ts";
+import { casarOpcao, payloadDaOpcao } from "../src/lib/automacao/regras.ts";
 
 test("botões: payload do toque vence; sem payload aceita número ou rótulo digitado", () => {
   const ultimas = { regra_id: "r1", rotulos: ["Outro profissional", "Sim, sou nutri", "Não, sou paciente"] };
@@ -142,7 +142,9 @@ test("botões: payload do toque vence; sem payload aceita número ou rótulo dig
   assert.deepEqual(casarOpcao({ texto: "nao, sou paciente" }, ultimas), { regraId: "r1", indice: 2 });
   assert.equal(casarOpcao({ texto: "quero o material" }, ultimas), null);
   assert.equal(casarOpcao({ texto: "2" }, null), null);
-  assert.match(opcoesComoTexto("Você é nutri?", ultimas.rotulos), /1\. Outro profissional[\s\S]*3\. Não, sou paciente/);
+  // O robô não MANDA mais lista numerada (ver envio-sem-confirmacao.test.ts),
+  // mas segue ENTENDENDO quem digita um número — quem veio do ManyChat
+  // aprendeu a responder assim, e recusar isso seria perder a lead.
 });
 
 test("extrairEventos lê payload do botão e anexo de áudio", () => {
