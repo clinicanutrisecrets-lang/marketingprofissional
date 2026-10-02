@@ -453,7 +453,38 @@ export function casarOpcao(
   return indice >= 0 ? { regraId: ultimas.regra_id, indice } : null;
 }
 
-/** Texto de reserva quando os botões não podem ser mostrados: lista numerada. */
-export function opcoesComoTexto(texto: string, rotulos: string[]): string {
-  return `${texto}\n\n${rotulos.map((r, i) => `${i + 1}. ${r}`).join("\n")}\n\nResponda com o número.`;
+/**
+ * Opção SOZINHA não é escolha, é "continuar" — é a porta que o texto da
+ * regra manda abrir ("Me responde aqui que eu te mando o link"). Quem escreve
+ * qualquer coisa ali quer o material, até quando escreve uma pergunta sobre
+ * ele.
+ *
+ * 🔴 A ÚNICA exceção é estar pedindo OUTRA coisa: sem isso, um "GLP1"
+ * digitado por quem tinha a porta do bebê aberta receberia o PDF do bebê. Só
+ * regra COM palavra-chave conta — `casaPalavraChave` devolve true pra lista
+ * vazia, e regra sem palavra casaria com tudo.
+ */
+export function abrePortaUnica(
+  texto: string,
+  ultimas: UltimasOpcoes | null | undefined,
+  regras: Array<{ id: string; palavras_chave: string[] }>,
+): boolean {
+  if (!ultimas || ultimas.rotulos.length !== 1) return false;
+  const t = texto.trim();
+  if (!t || t.startsWith("[")) return false;
+  const pedeOutroMaterial = regras.some(
+    (r) => r.id !== ultimas.regra_id && (r.palavras_chave ?? []).length > 0 && casaPalavraChave(t, r.palavras_chave),
+  );
+  return !pedeOutroMaterial;
 }
+
+/*
+ * 🔴 NÃO EXISTE MAIS lista numerada de reserva ("1. Sim  2. Não — Responda
+ * com o número"). Pedido da Aline em 01/10/2026: *"tira esse negócio de
+ * mandar o número 1, porque fica bem robótico. Tem que ser como se fosse uma
+ * conversa"*. Quando o botão nativo não aparece, quem segura a conversa é o
+ * texto da regra — que faz a pergunta em palavras — mais a leitura da
+ * resposta digitada (classificarOpcaoPorTexto). Por isso TODO texto de regra
+ * com opções precisa fazer sentido sem os botões: "clique abaixo" vira uma
+ * mensagem com nada abaixo.
+ */

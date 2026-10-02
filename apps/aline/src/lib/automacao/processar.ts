@@ -27,10 +27,10 @@ import { enfileirarSequencia } from "./fila";
 import { classificarOpcaoPorTexto, escolherRegraPorIntencao, gerarAgradecimentoComentario, lerTomDaCritica, responderDmComScanner } from "./ia";
 import {
   casarOpcao,
+  abrePortaUnica,
   ehDaPropriaConta,
   escolherVariante,
   extrairEventos,
-  opcoesComoTexto,
   pareceClinico,
   pareceSpam,
   casaPalavraChave,
@@ -47,6 +47,7 @@ import {
   type Regra,
   type UltimasOpcoes,
 } from "./regras";
+import { desfechoDaFalha, registroDoDesfecho, type Desfecho } from "./envio";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
 import {
@@ -188,10 +189,16 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // ── Toque num botão, ou "2", ou o rótulo digitado, ou a frase que quer
       //    dizer um dos botões ("sou farmacêutico" → Outro profissional) ──
       if (gatilho === "dm") {
-        let escolha = casarOpcao(ev, contato.ultimas_opcoes);
-        if (!escolha && contato.ultimas_opcoes && ev.texto.trim() && !ev.texto.startsWith("[")) {
-          const idx = await classificarOpcaoPorTexto(ev.texto, contato.ultimas_opcoes.rotulos);
-          if (idx != null) escolha = { regraId: contato.ultimas_opcoes.regra_id, indice: idx };
+        const ultimas = contato.ultimas_opcoes;
+        const textoLivre = ev.texto.trim() && !ev.texto.startsWith("[") ? ev.texto : "";
+        let escolha = casarOpcao(ev, ultimas);
+        if (!escolha && ultimas && textoLivre) {
+          const idx = await classificarOpcaoPorTexto(textoLivre, ultimas.rotulos);
+          if (idx != null) escolha = { regraId: ultimas.regra_id, indice: idx };
+        }
+        // Porta única: a régua está em abrePortaUnica (regras.ts).
+        if (!escolha && ultimas && abrePortaUnica(textoLivre, ultimas, regras)) {
+          escolha = { regraId: ultimas.regra_id, indice: 0 };
         }
         if (escolha) {
           const origem = await opcaoDeOrigem(escolha.regraId, escolha.indice, regras);
@@ -324,8 +331,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
         if (!resp || !resp.texto) { resumo.erros++; continue; }
-        const env = await enviarDm(cred, ev.igsid, resp.texto);
-        await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: resp.texto, origem: "ia_scanner", externalId: env.message_id ?? null });
+        await entregar({ perfil, cred, contato, ev, texto: resp.texto, origem: "ia_scanner" });
         resumo.respostasDm++;
         if (resp.encaminhar) {
           await aline.from("ig_contatos")
@@ -553,23 +559,54 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     contato.tags = novas;
   }
 
-  /** Manda a DM com botões; se a Meta recusar os botões, manda a lista numerada. */
-  async function enviarComBotoes(p: {
-    cred: Credenciais; ev: EventoInstagram; texto: string; regra: Regra; opcoes: Opcao[];
-  }): Promise<string> {
-    const botoes: BotaoRapido[] = p.opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(p.regra.id, i) }));
-    const ehComentario = p.ev.tipo === "comentario" && !!p.ev.commentId;
+  /**
+   * Entrega UMA mensagem e registra o que aconteceu. É a saída única de
+   * todo texto que sai do robô numa regra.
+   *
+   * 🔴 TRÊS COISAS QUE NÃO PODEM VOLTAR A SER COMO ERAM (incidente 29/09):
+   *
+   *   1. Tentativa ÚNICA. A Meta devolve 500 e entrega do mesmo jeito; a
+   *      segunda tentativa é a mensagem repetida que a pessoa vê.
+   *   2. Nada de lista numerada. Se o botão não aparecer, o texto da regra
+   *      já faz a pergunta em palavras e a resposta digitada é lida pela
+   *      leitura de intenção. "Responda com o número" é robô falando, e a
+   *      Aline pediu conversa (01/10/2026).
+   *   3. O registro sai SEMPRE que pode ter saído — é ele que faz o eco ser
+   *      reconhecido como nosso e o "uma vez por contato" valer.
+   */
+  async function entregar(p: {
+    perfil: PerfilInstagram; cred: Credenciais; contato: Contato; ev: EventoInstagram;
+    texto: string; origem: string; regraId?: string;
+    /** Botões nativos (quick replies). Sem eles, vai texto puro. */
+    botoes?: BotaoRapido[];
+  }): Promise<Desfecho> {
+    const porComentario = p.ev.tipo === "comentario" && !!p.ev.commentId;
+    let desfecho: Desfecho = "entregue";
+    let messageId: string | null = null;
     try {
-      if (ehComentario) await respostaPrivadaComentario(p.cred, p.ev.commentId!, p.texto, botoes);
-      else await enviarDm(p.cred, p.ev.igsid, p.texto, botoes);
-      return p.texto;
+      const r = porComentario
+        ? await respostaPrivadaComentario(p.cred, p.ev.commentId!, p.texto, p.botoes)
+        : await enviarDm(p.cred, p.ev.igsid, p.texto, p.botoes);
+      messageId = r.message_id ?? null;
     } catch (e) {
-      console.warn("[automacao] botões recusados, mandando lista numerada:", (e as Error).message.slice(0, 200));
-      const textoLista = opcoesComoTexto(p.texto, p.opcoes.map((o) => o.rotulo));
-      if (ehComentario) await respostaPrivadaComentario(p.cred, p.ev.commentId!, textoLista);
-      else await enviarDm(p.cred, p.ev.igsid, textoLista);
-      return textoLista;
+      const msg = (e as Error).message;
+      desfecho = desfechoDaFalha(msg);
+      console.warn(`[automacao] envio ${desfecho}:`, msg.slice(0, 300));
     }
+    const reg = registroDoDesfecho(desfecho, p.origem, p.regraId);
+    await registrarSaida({
+      perfilId: p.perfil.id, contatoId: p.contato.id, canal: "dm", texto: p.texto,
+      origem: reg.origem, regraId: reg.regraId, mediaId: p.ev.mediaId, externalId: messageId,
+    });
+    if (reg.precisaConferir) {
+      await marcarPrecisaHumano(
+        p.contato.id,
+        desfecho === "sem_confirmacao"
+          ? "o Instagram não confirmou a entrega desta mensagem — confira se ela chegou"
+          : "o Instagram recusou esta mensagem — ela NÃO foi entregue",
+      );
+    }
+    return desfecho;
   }
 
   /** Põe o contato na fila dela, sem escrever nada pra pessoa. */
@@ -599,18 +636,19 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     }
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
-      let enviado = texto;
-      let enviado_id: string | null = null;
+      // 🔴 As opções são gravadas ANTES do envio. Se a Meta reclamar e
+      // entregar do mesmo jeito (500 do dia 29/09), a pessoa responde e tem
+      // com o que casar; gravar depois foi o que deixou a resposta da Nara
+      // sem destino nenhum.
       if (opcoes.length > 0) {
-        enviado = await enviarComBotoes({ cred, ev, texto, regra, opcoes });
         const ultimas: UltimasOpcoes = { regra_id: regra.id, rotulos: opcoes.map((o) => o.rotulo) };
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", contato.id);
-      } else if (ehComentario && ev.commentId) {
-        enviado_id = (await respostaPrivadaComentario(cred, ev.commentId, texto)).message_id ?? null;
-      } else {
-        enviado_id = (await enviarDm(cred, ev.igsid, texto)).message_id ?? null;
+        contato.ultimas_opcoes = ultimas;
       }
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: enviado, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId, externalId: enviado_id });
+      const botoes: BotaoRapido[] | undefined = opcoes.length > 0
+        ? opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(regra.id, i) }))
+        : undefined;
+      await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.
@@ -637,9 +675,13 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
   }) {
     const { perfil, cred, contato, ev, regraId, opcao, vars } = p;
     const texto = preencherTexto(opcao.resposta, vars);
-    await enviarDm(cred, ev.igsid, texto);
-    await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto, origem: `opcao:${opcao.rotulo}`, regraId: regraId ?? undefined });
-    await aline.from("ig_contatos").update({ ultimas_opcoes: null }).eq("id", contato.id);
+    const desfecho = await entregar({
+      perfil, cred, contato, ev, texto, origem: `opcao:${opcao.rotulo}`, regraId: regraId ?? undefined,
+    });
+    // Recusado de verdade: as opções FICAM, pra ela poder responder de novo.
+    if (desfecho !== "recusado") {
+      await aline.from("ig_contatos").update({ ultimas_opcoes: null }).eq("id", contato.id);
+    }
     await aplicarTags(contato, opcao.tags ?? []);
     if (opcao.sequencia_id) {
       await enfileirarSequencia({
