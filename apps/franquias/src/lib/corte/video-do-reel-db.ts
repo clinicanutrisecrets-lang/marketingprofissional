@@ -1,6 +1,5 @@
 import "server-only";
 
-import { corteIaLiberadoPara } from "./gate";
 import { DUR_PADRAO, duracaoFinal } from "./video-curto";
 import { escolherClipe, fraseDoReel, palavrasDoAssunto, type ClipeCandidato } from "./video-do-reel";
 
@@ -9,8 +8,8 @@ const REPO = "clinicanutrisecrets-lang/marketingprofissional";
 /**
  * Enfileira o vídeo curto do reel da semana. Best-effort em TODO caminho: o
  * pacote da semana nunca pode falhar por causa dele, e sem ele o card segue
- * com o roteiro pro teleprompter. Mesmo gate da edição automática
- * (gate.ts), porque é o mesmo worker.
+ * com o roteiro pro teleprompter. Vale pra TODAS as contas (Aline, 02/10):
+ * o gate da edição automática (gate.ts) segue só na tela de Vídeos.
  */
 export async function enfileirarVideoDoReel(
   admin: { from: (t: string) => any },
@@ -23,7 +22,6 @@ export async function enfileirarVideoDoReel(
   },
 ): Promise<{ ok: boolean; motivo: string }> {
   try {
-    if (!corteIaLiberadoPara(p.email)) return { ok: false, motivo: "conta fora da edição automática" };
     const token = process.env.GITHUB_ACTIONS_TOKEN || process.env.GITHUB_TOKEN;
     if (!token) return { ok: false, motivo: "sem GITHUB_ACTIONS_TOKEN" };
     const frase = fraseDoReel(p.post);

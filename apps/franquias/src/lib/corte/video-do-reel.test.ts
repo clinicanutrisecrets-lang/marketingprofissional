@@ -40,5 +40,7 @@ test("ligação: o gerador semanal enfileira o vídeo do reel e o worker o liga 
   assert.match(sem, /item\.tipo === "reels"[\s\S]{0,200}enfileirarVideoDoReel\(/);
   const db = fonte("./video-do-reel-db.ts");
   assert.match(db, /post_id: p\.postId/);
-  assert.match(db, /corteIaLiberadoPara\(/);
+  // Aline, 02/10: o vídeo do reel vale pra TODAS as contas, sem o gate da
+  // edição automática.
+  assert.doesNotMatch(db, /corteIaLiberadoPara/);
 });

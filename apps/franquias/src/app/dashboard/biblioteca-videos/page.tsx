@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { corteIaLiberadoPara } from "@/lib/corte/gate";
 import { listarBiblioteca } from "@/lib/videos/actions";
 import { listarAcervo } from "@/lib/videos/acervo";
 import { BibliotecaView } from "./BibliotecaView";
@@ -14,6 +15,17 @@ export default async function BibliotecaVideosPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  // Biblioteca de clipes (b-roll) é material do TIME pros vídeos gerados
+  // automaticamente (Aline, 02/10): a profissional não monta clipe sozinha.
+  const { data: franqueada } = await supabase
+    .from("franqueadas")
+    .select("email")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (!corteIaLiberadoPara((franqueada as { email: string | null } | null)?.email)) {
+    redirect("/dashboard/videos");
+  }
 
   const [videos, acervo] = await Promise.all([listarBiblioteca(), listarAcervo()]);
 
