@@ -201,3 +201,13 @@ if __name__ == "__main__":
                 print("FALHOU", nome, "->", e)
     print(f"\n{falhas} falha(s)")
     sys.exit(1 if falhas else 0)
+
+
+# ------------------------------------------------------------ ligação ao post
+def test_pipeline_liga_o_video_pronto_ao_post_sem_sobrescrever():
+    """O vídeo curto do reel da semana chega no card do post (fonte)."""
+    src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "pipeline.py"), encoding="utf-8").read()
+    corpo = src[src.index("def processar_clipe_frase"):src.index("def processar(")]
+    assert 'ligar_ao_post(row.get("post_id")' in corpo
+    lig = src[src.index("def ligar_ao_post"):src.index("def baixar_objeto")]
+    assert '"url_video_final": "is.null"' in lig, "nunca sobrescreve vídeo que ela pôs"

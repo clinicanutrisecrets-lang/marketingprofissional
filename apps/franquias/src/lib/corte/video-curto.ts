@@ -112,3 +112,37 @@ export function posicaoComFaixaDentro(centro: unknown, alturaFracao: number): nu
   const bruto = posicaoFaixa(centro);
   return Math.round(Math.min(max, Math.max(min, bruto)) * 1000) / 1000;
 }
+
+/**
+ * Como a frase aparece na PRÉVIA, por estilo de letra. Espelha
+ * `packages/corte-ia/legenda_estilos.py` (fonte_capa + caixa_alta), que é
+ * quem desenha o vídeo de verdade. Até 02/10/2026 a prévia ignorava o
+ * seletor: a tarja saía sempre em negrito branco, e trocar o estilo não
+ * mudava nada na tela (Aline).
+ *
+ * As famílias são aproximação (o app não carrega Inter nem Fraunces): o que
+ * a prévia mostra é a DIFERENÇA entre os estilos — sem serifa × com serifa,
+ * caixa alta × mista, peso. O vídeo final usa as fontes do worker.
+ */
+export type EstiloFraseTela = {
+  fontFamily: string;
+  fontWeight: 700 | 900;
+  textTransform: "uppercase" | "none";
+  /** Multiplicador do tamanho da prévia (o worker usa fs 100 no impacto). */
+  escala: number;
+};
+
+const SANS = "Inter, 'Helvetica Neue', Arial, sans-serif";
+const SERIF = "Fraunces, Georgia, 'Times New Roman', serif";
+
+export const ESTILO_FRASE_TELA: Record<string, EstiloFraseTela> = {
+  classica: { fontFamily: SANS, fontWeight: 700, textTransform: "uppercase", escala: 1 },
+  editorial: { fontFamily: SERIF, fontWeight: 700, textTransform: "none", escala: 1 },
+  impacto: { fontFamily: SANS, fontWeight: 900, textTransform: "uppercase", escala: 1.1 },
+};
+
+/** Nome desconhecido cai na clássica, como `por_nome` do worker. */
+export function estiloFraseNaTela(id: unknown): EstiloFraseTela {
+  const chave = String(id ?? "").trim().toLowerCase();
+  return ESTILO_FRASE_TELA[chave] ?? ESTILO_FRASE_TELA.classica!;
+}

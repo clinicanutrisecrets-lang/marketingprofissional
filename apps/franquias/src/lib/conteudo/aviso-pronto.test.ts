@@ -121,3 +121,23 @@ test("LIGAÇÃO: o painel desenha o aviso, e a consulta vive num arquivo só", (
   // uma semana diferente da que o botão abre.
   assert.match(db, /escolherAprovacao/);
 });
+
+test("com estratégia, o aviso leva a linha da semana e o título muda", async () => {
+  const { avisoConteudoPronto } = await import("./aviso-pronto.ts");
+  const { lerEstrategia } = await import("../aprovacao/estrategia.ts");
+  const est = lerEstrategia({ semana: 2, total: 4, titulo: "A máquina é outra", frase: "Mostrar a camada.", passos: ["a"], queixas: [] });
+  const a = avisoConteudoPronto({
+    aprovacao: { id: "x", semana_ref: "2026-10-12", status: "aguardando", posts: 5 },
+    pedidosAtendidos: [],
+    estrategia: est,
+  });
+  assert.equal(a?.estrategia, "Semana 2 de 4: A máquina é outra");
+  assert.match(a!.titulo, /estratégia da semana/);
+});
+
+test("estratégia torta (semana antiga, JSON estranho) não vira aviso nem quebra", async () => {
+  const { lerEstrategia } = await import("../aprovacao/estrategia.ts");
+  assert.equal(lerEstrategia(null), null);
+  assert.equal(lerEstrategia({ semana: 9, total: 4, titulo: "x" }), null);
+  assert.equal(lerEstrategia({ semana: 1, total: 4, titulo: "" }), null);
+});

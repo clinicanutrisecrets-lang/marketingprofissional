@@ -1,5 +1,7 @@
 "use client";
 
+import { GuiaDaSemana } from "./GuiaDaSemana";
+import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,6 +21,10 @@ import {
   artesDoPost,
   rotuloSemanaCurto,
 } from "@/lib/aprovacao/semana";
+import {
+  linkTeleprompter,
+  duracaoEstimadaSegundos,
+} from "@/lib/geracao/roteiro-reels";
 
 type SemanaChip = {
   id: string;
@@ -181,9 +187,13 @@ export function AprovacaoView({
     }
   }
 
+  const estrategia = lerEstrategia(aprovacao.estrategia);
+
   return (
     <>
       <HistoricoSemanas historico={historico} atual={aprovacao.id as string} />
+
+      {estrategia && <GuiaDaSemana estrategia={estrategia} />}
 
       {estaFechada && (
         <div className="mb-4 rounded-2xl border-2 border-green-300 bg-green-50 p-4">
@@ -457,6 +467,19 @@ function PostCard({
   const artes = artesDoPost(post);
   const imgUrl = artes[0] ?? null;
   const ehCarrossel = artes.length > 1;
+  // Reels: o produto é o roteiro que ela grava no teleprompter. Sem roteiro
+  // gravado (post anterior a 01/10/2026), o card segue como era.
+  const ehReels = post.tipo_post === "reels";
+  const roteiro =
+    ehReels && typeof post.roteiro_reels === "string" && post.roteiro_reels.trim()
+      ? (post.roteiro_reels as string).trim()
+      : null;
+
+  const papel = textoOuNulo(post.papel_estrategia);
+  const lembrete = textoOuNulo(post.lembrete_execucao);
+  const objecao = textoOuNulo(post.objecao_dissolvida);
+  // Vídeo curto que nasceu junto com o reel (frase sobre clipe da biblioteca).
+  const videoPronto = ehReels ? textoOuNulo(post.url_video_final) : null;
 
   async function salvarEdicao() {
     setSalvando(true);
@@ -475,6 +498,18 @@ function PostCard({
     if (!confirm("Cancelar esse post?")) return;
     const r = await cancelarPost(post.id as string);
     if (r.ok) onUpdate({ ...post, status: "cancelado" });
+  }
+
+  const [roteiroCopiado, setRoteiroCopiado] = useState(false);
+  async function copiarRoteiro() {
+    if (!roteiro) return;
+    try {
+      await navigator.clipboard?.writeText(roteiro);
+      setRoteiroCopiado(true);
+      setTimeout(() => setRoteiroCopiado(false), 2000);
+    } catch {
+      /* sem clipboard (contexto não seguro): o texto está na tela */
+    }
   }
 
   async function copiarLegenda() {
@@ -542,6 +577,14 @@ function PostCard({
             </>
           )}
         </div>
+      ) : roteiro ? (
+        <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-rose-50 px-6 text-center">
+          <span className="text-4xl">🎬</span>
+          <span className="text-sm font-semibold text-rose-700">Este reel é você gravando</span>
+          <span className="text-xs text-rose-700/70">
+            Roteiro de ~{duracaoEstimadaSegundos(roteiro)}s pronto pro teleprompter, abaixo.
+          </span>
+        </div>
       ) : (
         <div className="flex aspect-square w-full items-center justify-center bg-brand-muted text-4xl">
           🎨
@@ -558,11 +601,74 @@ function PostCard({
           </span>
         </div>
 
+        {papel && (
+          <div className="mb-3 rounded-lg bg-brand-primary/5 px-3 py-2 text-xs text-brand-text/80">
+            <div className="font-semibold text-brand-primary">O papel deste post</div>
+            <div className="mt-0.5">{papel}</div>
+            {objecao && (
+              <div className="mt-1 text-brand-text/60">
+                Dissolve no gancho a dúvida &ldquo;{objecao}&rdquo;, sem virar post de resposta.
+              </div>
+            )}
+          </div>
+        )}
+
+        {lembrete && (
+          <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <span className="font-semibold">👉 Ao postar: </span>
+            {lembrete}
+          </div>
+        )}
+
+        {videoPronto && (
+          <div className="mb-3 rounded-lg border border-rose-200 bg-white p-2 text-xs">
+            <div className="mb-1 font-semibold text-rose-800">🎞️ Vídeo curto pronto</div>
+            <video src={videoPronto} controls playsInline className="max-h-80 w-full rounded bg-black" />
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <a
+                href={videoPronto}
+                download
+                className="rounded-md bg-rose-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"
+              >
+                ⬇ Baixar o vídeo
+              </a>
+              <span className="self-center text-rose-700/70">
+                Ou grave você mesma com o roteiro abaixo.
+              </span>
+            </div>
+          </div>
+        )}
+
         {post.origem === "briefing_antecipado" && post.briefing_nutri && (
           <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
             <div className="font-semibold">📝 Você pediu este tema</div>
             <div className="mt-0.5 line-clamp-2 text-amber-800/80">
               {post.briefing_nutri as string}
+            </div>
+          </div>
+        )}
+
+        {roteiro && (
+          <div className="mb-3 rounded-lg border border-rose-200 bg-rose-50/60 px-3 py-2 text-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-rose-800">🎬 Roteiro pra gravar</span>
+              <span className="text-rose-700/70">~{duracaoEstimadaSegundos(roteiro)}s falando</span>
+            </div>
+            <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-rose-900/90">{roteiro}</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <Link
+                href={linkTeleprompter(roteiro)}
+                className="rounded-md bg-rose-600 px-2.5 py-1 text-xs font-semibold text-white hover:opacity-90"
+              >
+                🎥 Gravar no teleprompter
+              </Link>
+              <button
+                type="button"
+                onClick={copiarRoteiro}
+                className="rounded-md border border-rose-300 px-2 py-1 text-xs text-rose-800 hover:bg-rose-100"
+              >
+                {roteiroCopiado ? "✓ Copiado" : "📋 Copiar roteiro"}
+              </button>
             </div>
           </div>
         )}
@@ -762,4 +868,8 @@ function AvisosRevisao({ achados }: { achados: AchadoRevisao[] }) {
       )}
     </div>
   );
+}
+
+function textoOuNulo(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v.trim() : null;
 }

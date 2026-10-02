@@ -7,6 +7,7 @@ import { normalizarNivelConsciencia } from "@/lib/claude/consciencia";
 import { sincronizarProdutosScanner } from "./sync";
 import { sincronizarPublicoDoHub } from "@/lib/publico/sync";
 import { carregarProdutosContexto, formatarPrecoBR } from "./contexto";
+import { ehOfertaNaoVendavel } from "./foco";
 import { traduzirErroClaude } from "@/lib/claude/erros";
 import { revalidatePath } from "next/cache";
 
@@ -57,7 +58,11 @@ export async function listarProdutosScanner(): Promise<
 
   if (error) return { ok: false, erro: error.message };
 
-  const produtos: ProdutoScannerLista[] = (data ?? []).map((p) => {
+  // A compra própria (o teste que ela compra pra si, a preço de custo) e as
+  // ofertas internas não aparecem como produto pra divulgar.
+  const produtos: ProdutoScannerLista[] = (data ?? [])
+    .filter((p) => !ehOfertaNaoVendavel(p as { nome: string; checkout_url: string }))
+    .map((p) => {
     const row = p as {
       id: string;
       produto_id: string;

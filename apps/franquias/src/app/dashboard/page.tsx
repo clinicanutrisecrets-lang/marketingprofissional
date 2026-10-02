@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { semanaAlvo, formatarSemana } from "@/lib/conteudo/semana";
 import { montarAvisoPronto } from "@/lib/conteudo/aviso-pronto-db";
 import TendenciasCard from "@/components/TendenciasCard";
 import { TutorialTour } from "@/components/TutorialTour";
+import { GuiaPrimeiraVez } from "./GuiaPrimeiraVez";
 
 export const dynamic = "force-dynamic";
 
@@ -34,33 +34,6 @@ export default async function DashboardPage() {
     "Olá";
   const corPrimaria = (f.cor_primaria_hex as string) || "#0BB8A8";
 
-  // Números reais do que funciona hoje.
-  // 🔴 A semana vem de lib/conteudo/semana.ts — a MESMA que o Estúdio lista e
-  // que o botão gera. Este arquivo tinha o seu próprio `proximaSegunda()`, que
-  // numa segunda-feira aponta pra semana SEGUINTE: o painel dizia "0 Sugestões
-  // da semana" com o pacote da semana pronto no Estúdio (Juliana, 17/08).
-  const segunda = semanaAlvo();
-  const [{ count: sugestoesSemana }, { count: artesSalvas }, { count: pedidosPendentes }] =
-    await Promise.all([
-      supabase
-        .from("sugestoes_conteudo")
-        .select("id", { count: "exact", head: true })
-        .eq("franqueada_id", fId)
-        .eq("semana_ref", segunda)
-        .neq("status", "descartado"),
-      supabase
-        .from("artes_geradas")
-        .select("id", { count: "exact", head: true })
-        .eq("franqueada_id", fId),
-      supabase
-        .from("briefings_franqueada")
-        .select("id", { count: "exact", head: true })
-        .eq("franqueada_id", fId)
-        .eq("status", "pendente"),
-    ]);
-
-  const temSugestoes = (sugestoesSemana ?? 0) > 0;
-
   // "Seus conteúdos ficaram prontos" — inclusive o que ela pediu em "Pedir
   // conteúdo". A contagem de posts sai de `posts_agendados`, nunca de
   // `total_posts` (que fica em 0 em quase toda linha), senão uma aprovação
@@ -85,28 +58,7 @@ export default async function DashboardPage() {
           que ele chame atenção e fique SEMPRE à mão (16/08): a profissional que
           não entende como o conteúdo é criado não confia no que recebe.
           O PDF é servido pelo Scanner, que é onde ele vive versionado. */}
-      <a
-        href="https://scannerdasaude.com/guia-estudio-conteudo.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mb-4 flex items-center gap-4 rounded-2xl border-2 border-dashed border-brand-primary/40 bg-white p-4 transition hover:border-brand-primary hover:bg-brand-primary/5"
-      >
-        <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/10 text-xl">
-          📘
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-brand-text">
-            Primeira vez aqui? Comece pelo guia
-          </span>
-          <span className="mt-0.5 block text-[13px] leading-snug text-brand-text/60">
-            Como o seu conteúdo é criado toda semana, o que muda em cada formato
-            e o que fazer com o pacote. 7 páginas.
-          </span>
-        </span>
-        <span className="flex-shrink-0 rounded-lg bg-brand-primary/10 px-3 py-2 text-[13px] font-semibold text-brand-primary">
-          Abrir guia →
-        </span>
-      </a>
+      <GuiaPrimeiraVez />
 
       {/* Conteúdo pronto esperando aprovação (Aline, 22/09/2026). Fica acima
           do CTA de gerar: o que ela tem pra fazer agora é aprovar o que já
@@ -121,6 +73,11 @@ export default async function DashboardPage() {
               ✅
             </span>
             <span className="min-w-0">
+              {aviso.estrategia && (
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                  {aviso.estrategia}
+                </span>
+              )}
               <span className="block text-sm font-bold text-emerald-900">{aviso.titulo}</span>
               <span className="mt-0.5 block text-[13px] leading-snug text-emerald-800/80">
                 {aviso.detalhe}
@@ -133,42 +90,21 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* CTA principal */}
-      <Link
-        href="/dashboard/conteudo"
-        className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl p-5 text-white shadow-sm transition hover:opacity-95"
-        style={{ background: corPrimaria }}
-      >
-        <div>
-          <p className="text-base font-bold">
-            {temSugestoes
-              ? `Você tem ${sugestoesSemana} sugestões prontas esta semana`
-              : "Gere suas sugestões da semana"}
-          </p>
-          <p className="mt-0.5 text-sm text-white/80">
-            {temSugestoes
-              ? "Artes, legendas e roteiros esperando por você no Estúdio."
-              : "Pautas do seu nicho + artes na sua marca + legendas prontas, em 1 minuto."}
-          </p>
+      {/* Sem semana esperando: uma linha só, sem banda de "gerar". O pacote da
+          semana chega sozinho; o Estúdio continua no menu pra quem quiser
+          (Aline, 02/10/2026: "mais clean, mais objetivo possível"). */}
+      {!aviso && (
+        <div className="mb-6 rounded-2xl bg-white p-4 text-sm text-brand-text/70 shadow-sm">
+          Seu pacote da semana, com a estratégia, chega pronto pra aprovar. Quer um
+          assunto específico?{" "}
+          <Link href="/dashboard/briefings" className="font-semibold" style={{ color: corPrimaria }}>
+            Pedir conteúdo
+          </Link>
+          .
         </div>
-        <span className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold">
-          {temSugestoes ? "Abrir o Estúdio →" : "✨ Gerar agora →"}
-        </span>
-      </Link>
+      )}
 
-      {/* Números */}
-      <section className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          icone="🗓️"
-          valor={String(sugestoesSemana ?? 0)}
-          label={`Sugestões da semana de ${formatarSemana(segunda)}`}
-        />
-        <StatCard icone="🗂️" valor={String(artesSalvas ?? 0)} label="Artes na galeria" />
-        <StatCard icone="📝" valor={String(pedidosPendentes ?? 0)} label="Pedidos na fila" />
-        <StatCard icone="🛡️" valor="Ativo" label="Compliance CFN" />
-      </section>
-
-      {/* Em alta no nicho — abaixo dos números */}
+      {/* Em alta no nicho */}
       <section className="mb-6">
         <TendenciasCard
           nicho={(f.nicho_principal as string) ?? "saude_integrativa"}
@@ -182,14 +118,3 @@ export default async function DashboardPage() {
     </main>
   );
 }
-
-function StatCard({ icone, valor, label }: { icone: string; valor: string; label: string }) {
-  return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <div className="text-xl">{icone}</div>
-      <div className="mt-2 text-2xl font-bold text-brand-text">{valor}</div>
-      <div className="mt-0.5 text-xs text-brand-text/50">{label}</div>
-    </div>
-  );
-}
-

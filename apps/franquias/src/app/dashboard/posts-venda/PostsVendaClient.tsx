@@ -13,6 +13,7 @@ import {
   type ProdutoScannerLista,
 } from "@/lib/produtos/actions";
 import { criarPostManual } from "@/lib/posts/manual";
+import { desenharArteDoPostVenda } from "@/lib/posts/arte-venda";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 import { avaliarImagem } from "@/lib/criativo/imagem-upload";
 
@@ -76,6 +77,8 @@ export function PostsVendaClient(props: {
   const inputArquivo = useRef<HTMLInputElement>(null);
   const [agendando, startAgendar] = useTransition();
   const [agendado, setAgendado] = useState(false); // "salvo"
+  const [desenhando, setDesenhando] = useState(false);
+  const [arteUrls, setArteUrls] = useState<string[]>([]);
   const [copiado, setCopiado] = useState<string | null>(null);
 
   async function sincronizar() {
@@ -152,6 +155,29 @@ export function PostsVendaClient(props: {
         }
         imagem = up.url;
       }
+      // Sem anexo, a arte é desenhada na marca dela, como no pacote da
+      // semana. Falha não trava o salvamento: o post sai com a copy e a
+      // mensagem diz o que aconteceu.
+      let urlsSlides: string[] | undefined;
+      let avisoArte: string | null = null;
+      if (!arquivo && (tipo === "feed_imagem" || tipo === "feed_carrossel")) {
+        setDesenhando(true);
+        const arte = await desenharArteDoPostVenda({
+          tipo,
+          headline: post.headline,
+          subtitle: post.subtitle,
+          slides: post.slides,
+          copy_legenda: post.copy_legenda,
+        });
+        setDesenhando(false);
+        if (arte.ok && arte.urls?.length) {
+          imagem = arte.urls[0];
+          if (tipo === "feed_carrossel") urlsSlides = arte.urls;
+          setArteUrls(arte.urls);
+        } else {
+          avisoArte = arte.erro ?? "Não consegui desenhar a arte agora.";
+        }
+      }
       const r = await criarPostManual({
         tipo,
         copy_legenda: montarLegendaFinal(post),
@@ -159,6 +185,7 @@ export function PostsVendaClient(props: {
         hashtags: post.hashtags,
         briefing_nutri: `Post de venda: ${produtoAtivo?.nome ?? ""}`,
         url_imagem: imagem,
+        urls_slides: urlsSlides,
         legenda_gerada_ia: true,
         angulo_copy: "divulgacao_produto",
         nivel_consciencia: consciencia,
@@ -167,6 +194,7 @@ export function PostsVendaClient(props: {
         setAgendado(true);
         setArquivo(null);
         if (inputArquivo.current) inputArquivo.current.value = "";
+        if (avisoArte) setErro(avisoArte);
       } else {
         setErro(r.erro ?? "Não foi possível salvar.");
       }
@@ -238,6 +266,7 @@ export function PostsVendaClient(props: {
               setProdutoAtivo(p);
               setPost(null);
               setAgendado(false);
+              setArteUrls([]);
               setErro(null);
             }}
             className={`rounded-2xl border p-4 text-left transition ${
@@ -308,7 +337,7 @@ export function PostsVendaClient(props: {
               disabled={gerando}
               className="ml-auto rounded-full bg-brand-primary px-5 py-2 text-xs font-bold text-white shadow-sm hover:opacity-90 disabled:opacity-60"
             >
-              {gerando ? "Gerando…" : post ? "Gerar outra versão" : "✨ Gerar post"}
+              {gerando ? "Gerando…" : post ? "Gerar outra versão" : "Gerar post"}
             </button>
           </div>
 
@@ -370,7 +399,7 @@ export function PostsVendaClient(props: {
 
               <div className="flex flex-wrap items-end gap-3 rounded-xl bg-brand-muted p-4">
                 <label className="min-w-[240px] flex-1 text-xs text-brand-text/70">
-                  Imagem do post (opcional)
+                  Sua própria imagem (opcional, no lugar da arte desenhada)
                   <input
                     ref={inputArquivo}
                     type="file"
@@ -396,12 +425,35 @@ export function PostsVendaClient(props: {
                     ? "✓ Salvo"
                     : subindo
                       ? "⏫ Subindo a imagem…"
-                      : agendando
-                        ? "Salvando…"
-                        : "Salvar post"}
+                      : desenhando
+                        ? "🎨 Desenhando a arte…"
+                        : agendando
+                          ? "Salvando…"
+                          : !arquivo && (tipo === "feed_imagem" || tipo === "feed_carrossel")
+                            ? "Salvar e desenhar a arte"
+                            : "Salvar post"}
                 </button>
+                {arteUrls.length > 0 && (
+                  <div className="basis-full">
+                    <p className="mb-1 text-[11px] font-semibold text-brand-text/70">
+                      Arte desenhada na sua marca
+                    </p>
+                    <div className="flex gap-2 overflow-x-auto">
+                      {arteUrls.map((u, i) => (
+                        <a key={u} href={u} target="_blank" rel="noopener" className="flex-none">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={u} alt={`Arte ${i + 1}`} className="h-28 w-28 rounded-lg object-cover ring-1 ring-brand-text/10" />
+                        </a>
+                      ))}
+                    </div>
+                    <p className="mt-1 text-[11px] text-brand-text/50">
+                      Clique na arte pra abrir e baixar. Ela também fica na sua biblioteca de posts.
+                    </p>
+                  </div>
+                )}
                 <p className="basis-full text-[11px] text-brand-text/50">
-                  O post fica salvo na sua biblioteca pra você copiar e publicar no seu
+                  Sem imagem anexada, a arte é desenhada nas suas cores, como no pacote da
+                  semana. O post fica salvo na sua biblioteca pra você copiar e publicar no seu
                   Instagram quando quiser. Publicar automático depende de uma liberação da
                   Meta que ainda não saiu.
                 </p>

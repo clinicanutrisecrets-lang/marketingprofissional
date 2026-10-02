@@ -11,6 +11,7 @@ import {
   DUR_PADRAO,
   FRASE_MAX,
   POS_PADRAO,
+  estiloFraseNaTela,
 } from "@/lib/corte/video-curto";
 
 /**
@@ -41,6 +42,8 @@ export function VideoCurtoSection({
   const [frase, setFrase] = useState("");
   const [segundos, setSegundos] = useState(DUR_PADRAO);
   const [estilo, setEstilo] = useState<string>(ESTILO_PADRAO);
+  // A prévia segue o estilo escolhido (família, caixa, peso), como o vídeo.
+  const estiloTela = estiloFraseNaTela(estilo);
   // Altura da faixa no vídeo, em fração: 0 é o topo, 1 é o pé. Arrastar move
   // isto. Fração e não pixel porque a miniatura aqui tem um tamanho e o
   // vídeo lá tem outro (1080x1920).
@@ -225,7 +228,15 @@ export function VideoCurtoSection({
                       arrastando ? "cursor-grabbing ring-2 ring-white/70" : ""
                     }`}
                   >
-                    <span className="block break-words text-[10px] font-bold leading-tight text-white">
+                    <span
+                      className="block break-words leading-tight text-white"
+                      style={{
+                        fontFamily: estiloTela.fontFamily,
+                        fontWeight: estiloTela.fontWeight,
+                        textTransform: estiloTela.textTransform,
+                        fontSize: `${10 * estiloTela.escala}px`,
+                      }}
+                    >
                       {avaliacao.ok ? avaliacao.frase : "sua frase aparece aqui"}
                     </span>
                   </div>

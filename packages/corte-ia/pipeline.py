@@ -50,6 +50,28 @@ def patch(corte_id, **campos):
     r.raise_for_status()
 
 
+def ligar_ao_post(post_id, url):
+    """Vídeo curto que nasceu junto do reel da semana: entrega no card do post.
+
+    Só preenche quando o post ainda não tem vídeo (nunca sobrescreve o que ela
+    subiu ou trocou). Best-effort: falhar aqui não derruba o vídeo, que segue na
+    lista de Vídeos curtos.
+    """
+    if not post_id or not url:
+        return
+    try:
+        r = requests.patch(
+            f"{SB_URL}/rest/v1/posts_agendados",
+            headers={**HDR, "Content-Type": "application/json", "Prefer": "return=minimal"},
+            params={"id": f"eq.{post_id}", "url_video_final": "is.null"},
+            data=json.dumps({"url_video_final": url}),
+            timeout=60,
+        )
+        r.raise_for_status()
+    except Exception as e:  # noqa: BLE001
+        print(f"[clipe_frase] post {post_id} sem o vídeo ligado: {e}")
+
+
 def baixar_objeto(bucket, path, destino):
     with requests.get(f"{SB_URL}/storage/v1/object/{bucket}/{path}", headers=HDR, stream=True, timeout=300) as r:
         r.raise_for_status()
@@ -248,6 +270,7 @@ def processar_clipe_frase(corte_id, row, handle, work):
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url_saida = subir_mp4(path, saida)
     patch(corte_id, status="pronto", etapa=None, path=path, url=url_saida, duracao_seg=info["duracao"])
+    ligar_ao_post(row.get("post_id"), url_saida)
     print("pronto", path, info)
 
 

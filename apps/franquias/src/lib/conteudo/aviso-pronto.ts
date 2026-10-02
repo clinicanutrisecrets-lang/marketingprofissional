@@ -3,6 +3,7 @@ import {
   aprovacaoVazia,
   type AprovacaoCandidata,
 } from "../aprovacao/semana.ts";
+import { linhaEstrategia, type EstrategiaLida } from "../aprovacao/estrategia.ts";
 
 /**
  * O aviso de "seus conteúdos ficaram prontos" no painel.
@@ -37,12 +38,16 @@ export type AvisoConteudoPronto = {
   /** Rótulo do botão. */
   acao: string;
   href: string;
+  /** "Semana 2 de 4: A máquina é outra", quando a semana tem estratégia. */
+  estrategia?: string | null;
 };
 
 export function avisoConteudoPronto(params: {
   aprovacao: AprovacaoCandidata | null;
   /** Pedidos dela já atendidos (briefings com status "usado"). */
   pedidosAtendidos: PedidoAtendido[];
+  /** A estratégia da semana escolhida (aprovacoes_semanais.estrategia). */
+  estrategia?: EstrategiaLida | null;
 }): AvisoConteudoPronto | null {
   const { aprovacao } = params;
   if (!aprovacao) return null;
@@ -60,11 +65,15 @@ export function avisoConteudoPronto(params: {
     ? `${plural} esperando você, incluindo o que você pediu sobre ${listar(temas)}.`
     : `${plural} com arte e legenda esperando a sua aprovação.`;
 
+  const est = params.estrategia ?? null;
   return {
     titulo: temas.length
       ? "O conteúdo que você pediu ficou pronto"
-      : "Seus conteúdos da semana ficaram prontos",
-    detalhe,
+      : est
+        ? "Seus conteúdos e a estratégia da semana estão prontos"
+        : "Seus conteúdos da semana ficaram prontos",
+    detalhe: est && est.frase ? `${detalhe} ${est.frase}` : detalhe,
+    estrategia: est ? linhaEstrategia(est) : null,
     acao: "Aprovar semana",
     href: "/dashboard/aprovar",
   };
