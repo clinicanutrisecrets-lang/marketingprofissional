@@ -91,20 +91,24 @@ export default async function VideosHubPage() {
           </span>
         </a>
 
-        <Link
-          href="/dashboard/biblioteca-videos"
-          className="group rounded-2xl bg-white p-6 shadow-sm transition hover:shadow-md"
-        >
-          <div className="text-3xl">📚</div>
-          <h2 className="mt-3 font-bold text-brand-text">Biblioteca de clipes</h2>
-          <p className="mt-1 text-sm text-brand-text/60">
-            Seus vídeos curtos de apoio (b-roll). É daqui que o Scanner tira as
-            imagens que entram por cima da sua fala nos cortes.
-          </p>
-          <span className="mt-3 inline-block text-sm font-semibold text-brand-primary">
-            Subir clipes →
-          </span>
-        </Link>
+        {/* A biblioteca de clipes é material do TIME pros vídeos gerados
+            automaticamente (Aline, 02/10), não ferramenta da profissional. */}
+        {corteIa && (
+          <Link
+            href="/dashboard/biblioteca-videos"
+            className="group rounded-2xl bg-white p-6 shadow-sm transition hover:shadow-md"
+          >
+            <div className="text-3xl">📚</div>
+            <h2 className="mt-3 font-bold text-brand-text">Biblioteca de clipes</h2>
+            <p className="mt-1 text-sm text-brand-text/60">
+              Seus vídeos curtos de apoio (b-roll). É daqui que o Scanner tira as
+              imagens que entram por cima da sua fala nos cortes.
+            </p>
+            <span className="mt-3 inline-block text-sm font-semibold text-brand-primary">
+              Subir clipes →
+            </span>
+          </Link>
+        )}
       </div>
 
       <VideosMetodologiaSection />
