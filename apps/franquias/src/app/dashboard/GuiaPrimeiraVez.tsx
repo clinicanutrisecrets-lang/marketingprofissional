@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-const CHAVE = "mp_guia_aberto_v1";
+const CHAVE = "mp_guia_aberto_v2";
 
 /**
- * O guia do Estúdio no painel, só até ela abrir uma vez (Aline, 02/10/2026:
+ * O guia do Marketing (v2, outubro/2026: chave nova pra quem abriu o v1 ver o novo uma vez) no painel, só até ela abrir uma vez (Aline, 02/10/2026:
  * painel mais limpo). Lembrado no aparelho; sem armazenamento (modo privado),
  * o cartão simplesmente continua aparecendo.
  */
