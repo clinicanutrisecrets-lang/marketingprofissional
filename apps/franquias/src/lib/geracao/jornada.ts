@@ -1,7 +1,10 @@
 /**
- * A Jornada até o Teste: o arco de 4 semanas que leva o público da
- * profissional de "não sabe que tem um maquinário" até o pedido do teste
- * nutrigenético (Aline, 01–02/10/2026).
+ * A Jornada até o Teste: leva o público da profissional de "não sabe que
+ * tem um maquinário" até o pedido do teste nutrigenético (Aline,
+ * 01–02/10/2026). Desde 02/10 TODA semana tem todos os níveis de
+ * consciência (um post por ponto do caminho); o ciclo de 4 semanas só gira a
+ * variante de cada nível, o par de queixas e o foco do post do teste (a
+ * oferta com preço sai uma vez a cada 4 semanas).
  *
  * Por que isto existe: o gerador semanal já tinha os 5 níveis de consciência
  * (claude/consciencia.ts), mas o nível saía do ÂNGULO por uma rotação fixa,
@@ -85,72 +88,262 @@ const NAO_DIZER_TESTE = [
 ];
 
 /**
- * As 4 semanas. Cada lista vem em ORDEM DE PRIORIDADE: quem posta 3 vezes
- * recebe os 3 primeiros. O 1º vira reel quando ela tem reel semanal e o 2º
- * vira carrossel (a regra de formato do gerador, que não muda aqui).
+ * Os NÍVEIS de cada semana (Aline, 02/10/2026: "dentro da mesma semana ter
+ * vários níveis de consciência do público"). O público não chega na semana 1
+ * e segue em ordem: entra gente todo dia. Por isso TODA semana tem um post
+ * pra cada ponto do caminho; o que gira de uma semana pra outra é a VARIANTE
+ * (o ângulo dentro do nível) e o par de queixas, nunca o estágio do funil.
+ *
+ * Cada nível tem 4 variantes, uma por semana do ciclo (semanaDaJornada).
+ */
+type Nivel = "reconhecer" | "problema" | "mecanismo" | "teste" | "passo";
+
+const NIVEIS: Record<Nivel, Modelo[]> = {
+  // Quem acabou de chegar: se reconhecer. Sem exame nenhum.
+  reconhecer: [
+    {
+      angulo: "educativo_ciencia",
+      consciencia: "inconsciente",
+      papel: "Descreve {A} como ela vive no dia a dia, até ela pensar \"isso sou eu\".",
+      instrucao:
+        "Assunto: {A}. Descreva a queixa com as palavras que a seguidora usaria, numa cena do dia a dia. Termine em \"isso tem explicação, e não é falta de força de vontade\".",
+      nao_dizer: ["nome de exame, gene, marcador ou produto"],
+    },
+    {
+      angulo: "educativo_ciencia",
+      consciencia: "inconsciente",
+      papel: "O reconhecimento, agora com {B}.",
+      instrucao: "Assunto: {B}. Descreva a queixa com as palavras da seguidora, numa cena do dia a dia.",
+      nao_dizer: ["nome de exame, gene, marcador ou produto"],
+    },
+    {
+      angulo: "dor_do_paciente",
+      consciencia: "inconsciente",
+      papel: "Sinais de {A} que parecem normais e não são.",
+      instrucao:
+        "Assunto: {A}. Três ou quatro sinais do dia a dia que a seguidora acha normal e que fazem parte dessa queixa. Sem culpa e sem susto.",
+      nao_dizer: ["nome de exame, gene, marcador ou produto", "culpa (\"você está fazendo errado\")"],
+    },
+    {
+      angulo: "educativo_ciencia",
+      consciencia: "inconsciente",
+      papel: "Um dia comum de quem vive com {B}.",
+      instrucao:
+        "Assunto: {B}. Conte um dia comum de quem vive com essa queixa, da manhã à noite, com as palavras dela.",
+      nao_dizer: ["nome de exame, gene, marcador ou produto"],
+    },
+  ],
+  // Quem já se reconheceu: por que ainda não resolveu.
+  problema: [
+    {
+      angulo: "dor_do_paciente",
+      consciencia: "consciente_problema",
+      papel: "Mostra por que o que ela já tentou para {A} não pegou a causa.",
+      objecao: "Não muda nada na prática",
+      instrucao:
+        "Assunto: {A}. Nomeie a queixa melhor do que ela nomearia e mostre que restrição, suplemento solto e \"comer melhor\" mexem no estoque de hoje, não em como o corpo dela foi montado. Abra com uma pergunta que dissolve a objeção \"já tentei de tudo e não mudou nada\". Não responda a objeção de forma explícita.",
+      nao_dizer: ["nome de gene ou de produto", "culpa (\"você está fazendo errado\")"],
+    },
+    {
+      angulo: "mito_vs_verdade",
+      consciencia: "consciente_problema",
+      papel: "Exame normal e o sintoma continua: os dois podem estar certos.",
+      objecao: "Já fiz exame e não deu nada",
+      instrucao:
+        "Explique que o exame de sangue mede o que está circulando hoje. Abra a pergunta \"e o que não muda?\" sem responder.",
+      nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste genético"],
+    },
+    {
+      angulo: "educativo_ciencia",
+      consciencia: "consciente_problema",
+      papel: "A Fábrica da Saúde em telas, amarrada a {A}.",
+      instrucao: `Assunto: {A}. Apresente a Fábrica da Saúde, um setor por tela, cada um amarrado à queixa. Feche em "o maquinário é a parte que a gente ainda não olhou". Material: ${FABRICA}`,
+      nao_dizer: ["nome de gene", "dizer que a seguidora tem algum setor com problema"],
+    },
+    {
+      angulo: "bastidor_da_nutri",
+      consciencia: "consciente_problema",
+      papel: "Bastidor: como você escuta uma queixa antes de pedir qualquer exame.",
+      instrucao:
+        "Bastidor da profissional: como ela escuta a queixa ({A}) e o que pergunta antes de pedir qualquer exame.",
+      nao_dizer: ["caso de paciente inventado"],
+    },
+  ],
+  // Quem já entendeu que tem algo a mais: o mecanismo, o maquinário.
+  mecanismo: [
+    {
+      angulo: "autoridade",
+      consciencia: "consciente_solucao",
+      papel: "O que você olha que a abordagem comum não olha: o mecanismo de {A}.",
+      instrucao: `Assunto: {A}. Explique o mecanismo de uma ou duas variações genéticas ligadas a essa queixa, sempre pela função ("quem tem a enzima X mais lenta costuma..."). Apresente "mapa genético" como caminho, sem nome de produto nem preço. Material: ${FABRICA}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "nome de produto ou preço"],
+    },
+    {
+      angulo: "mito_vs_verdade",
+      consciencia: "consciente_solucao",
+      papel: "Genética é destino? Não: é o que se prioriza cuidar.",
+      objecao: "Isso é modinha / genética é destino",
+      instrucao:
+        "Desfaça o medo: gene de risco não é destino, é o que se prioriza silenciar com alimentação e rotina. Diga também o que a leitura genética NÃO faz (não diz destino, não estabelece diagnóstico, não promete resultado): a honestidade sobre o limite é o que separa ciência de modinha.",
+      nao_dizer: [...NAO_DIZER_TESTE, "\"previne a doença X\"", "\"comprovado cientificamente\" solto"],
+    },
+    {
+      angulo: "autoridade",
+      consciencia: "consciente_solucao",
+      papel: "Por que a leitura dos dois exames juntos mostra o gargalo.",
+      objecao: "Já fiz exame e não deu nada",
+      instrucao:
+        "Exame de sangue mede o estoque de hoje; o mapa genético mede como a fábrica foi montada. É o cruzamento dos dois que mostra o gargalo. Escreva \"avaliação individualizada\".",
+      nao_dizer: [...NAO_DIZER_TESTE, "depreciar o exame de sangue", "dizer que o genético substitui o sangue"],
+    },
+    {
+      angulo: "autoridade",
+      consciencia: "consciente_solucao",
+      papel: "O gene vira prato: um exemplo de mecanismo que vira conduta.",
+      objecao: "Não muda nada na prática",
+      instrucao: `Mostre com UM exemplo de mecanismo como um gene vira escolha no prato e na rotina (ex.: enzima da histamina mais lenta, escolhas de alimento e de preparo). ${COMO_FUNCIONA}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "prescrição pública com dose", "prazo de melhora"],
+    },
+  ],
+  // Quem já entendeu o mecanismo: o teste pelo nome. É o único comercial.
+  teste: [
+    {
+      angulo: "divulgacao_produto",
+      consciencia: "consciente_produto",
+      papel: "O teste entra pelo nome: o que ele investiga sobre {A}.",
+      instrucao: `Assunto: {A}. O nome real do produto entra no corpo do post. Estrutura: a queixa, o que o teste investiga que o caminho comum não investiga, o convite pra entender. Preço ainda não. Material: ${AMPLITUDE}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "preço", "prazo de laudo ou de kit"],
+    },
+    {
+      angulo: "divulgacao_produto",
+      consciencia: "consciente_produto",
+      papel: "O teste entra pelo nome: uma coleta, mais de 300 marcadores, referência pra sempre.",
+      objecao: "É caro",
+      instrucao: `O nome real do produto entra no corpo do post. Explique a amplitude com as palavras do material, nessa ordem: mais de 300 marcadores, coleta única, referência permanente, aprofunda a cada consulta. Abra com um gancho que dissolva a objeção de preço sem falar de preço (ex.: "Um exame que se faz uma vez. O resto você refaz todo ano."). Material: ${AMPLITUDE}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "preço", "nome de laboratório"],
+    },
+    {
+      angulo: "divulgacao_produto",
+      consciencia: "consciente_produto",
+      papel: "O teste entra pelo nome: como funciona, do kit à devolutiva.",
+      objecao: "Demora",
+      instrucao: `O nome real do produto entra no corpo do post. Como funciona na prática: ${COMO_FUNCIONA} Dissolva a objeção "demora" dizendo que o cuidado começa antes do laudo, com o que já existe (exames, rotina, alimentação). Preço ainda não.`,
+      nao_dizer: [...NAO_DIZER_TESTE, "prazo de kit ou de laudo", "preço"],
+    },
+    {
+      angulo: "divulgacao_produto",
+      consciencia: "mais_consciente",
+      papel: "A oferta direta: o que inclui, preço do catálogo e como começar.",
+      instrucao:
+        "Oferta direta e curta: nome do produto, o que inclui, preço e parcelas EXATAMENTE como no catálogo (se não houver preço, \"o valor eu te passo na conversa\"), e como começar hoje. Sem recontar o problema.",
+      nao_dizer: [...NAO_DIZER_TESTE, "condição que não esteja no catálogo", "prazo que se renova"],
+    },
+  ],
+  // Quem já quer: o próximo passo, sem preço e sem pressão.
+  passo: [
+    {
+      angulo: "bastidor_da_nutri",
+      consciencia: "mais_consciente",
+      papel: "O próximo passo: como começar, pra quem já decidiu.",
+      instrucao:
+        "Bastidor curto: como é o primeiro contato e o que acontece depois que a pessoa decide fazer o teste. Convite pro link da bio.",
+      nao_dizer: [...NAO_DIZER_TESTE, "inventar \"muita gente me pergunta\""],
+    },
+    {
+      angulo: "mito_vs_verdade",
+      consciencia: "consciente_produto",
+      papel: "A dúvida mais comum sobre o teste, respondida pelo mecanismo.",
+      objecao: "É caro / demora",
+      instrucao: `Responda a dúvida mais comum sobre o teste pelo mecanismo, não pelo preço: coleta única, referência permanente, o cuidado começa antes do laudo. Material: ${AMPLITUDE}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "depreciar outra área"],
+    },
+    {
+      angulo: "bastidor_da_nutri",
+      consciencia: "consciente_produto",
+      papel: "Bastidor: como você conduz uma devolutiva gene a gene.",
+      instrucao: `Bastidor de como a profissional conduz a devolutiva: ${COMO_FUNCIONA}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "laudo, exame ou medida de paciente"],
+    },
+    {
+      angulo: "bastidor_da_nutri",
+      consciencia: "mais_consciente",
+      papel: "O que a pessoa leva pra casa depois da devolutiva.",
+      instrucao: `Bastidor curto: o que a pessoa leva pra casa (cardápio e suplementação desenhados sobre o resultado) e como fica o acompanhamento. Convite pro link da bio. ${COMO_FUNCIONA}`,
+      nao_dizer: [...NAO_DIZER_TESTE, "prazo de melhora"],
+    },
+  ],
+};
+
+/**
+ * Em que ordem os níveis entram na semana, pela quantidade de posts. O 1º
+ * vira reel (quando ela tem reel semanal) e o 2º vira carrossel: o
+ * reconhecimento é o que mais alcança gente nova, e o mecanismo é o que mais
+ * precisa de telas. O teste vem no fim da semana, depois de o mecanismo ter
+ * sido mostrado. Com 1 ou 2 posts não cabe todo o caminho, então o nível
+ * gira com a semana.
+ */
+function niveisDaSemana(n: number, semana: number): Nivel[] {
+  if (n <= 1) return [(["reconhecer", "mecanismo", "teste", "teste"] as Nivel[])[semana - 1]!];
+  if (n === 2) return [semana % 2 === 1 ? "reconhecer" : "mecanismo", "teste"];
+  const base: Nivel[] =
+    n === 3
+      ? ["reconhecer", "mecanismo", "teste"]
+      : n === 4
+        ? ["reconhecer", "mecanismo", "problema", "teste"]
+        : ["reconhecer", "mecanismo", "problema", "teste", "passo"];
+  // Mais de 5 posts: os níveis de conteúdo se repetem com a variante seguinte
+  // (o teste não repete: no máximo 1 comercial por semana).
+  const extras: Nivel[] = ["reconhecer", "problema", "mecanismo", "passo"];
+  for (let i = 0; base.length < n; i++) base.push(extras[i % extras.length]!);
+  return base;
+}
+
+/** Sem o teste no catálogo, o post do teste vira mecanismo (mesma semana). */
+const SEM_TESTE: Modelo[] = [
+  {
+    angulo: "autoridade",
+    consciencia: "consciente_solucao",
+    papel: "O que um mapa genético investiga sobre {A} que o caminho comum não investiga.",
+    instrucao: `Assunto: {A}. O que a leitura genética investiga que o caminho comum não investiga, sem nome de produto nem preço. Material: ${AMPLITUDE}`,
+    nao_dizer: [...NAO_DIZER_TESTE, "nome de produto ou preço"],
+  },
+  {
+    angulo: "autoridade",
+    consciencia: "consciente_solucao",
+    papel: "Um exame que se faz uma vez na vida.",
+    instrucao: `Explique a amplitude da leitura genética, sem nome de produto nem preço: mais de 300 marcadores, coleta única, referência permanente. Material: ${AMPLITUDE}`,
+    nao_dizer: [...NAO_DIZER_TESTE, "nome de produto ou preço"],
+  },
+  {
+    angulo: "bastidor_da_nutri",
+    consciencia: "consciente_solucao",
+    papel: "Como funciona a leitura genética, do kit à devolutiva.",
+    instrucao: `Como funciona na prática, sem nome de produto nem preço: ${COMO_FUNCIONA}`,
+    nao_dizer: [...NAO_DIZER_TESTE, "nome de produto ou preço"],
+  },
+  {
+    angulo: "bastidor_da_nutri",
+    consciencia: "consciente_solucao",
+    papel: "O próximo passo: como é a sua avaliação.",
+    instrucao: "Bastidor curto: como é a avaliação com a profissional e como começar. Convite pro link da bio, sem preço.",
+    nao_dizer: [...NAO_DIZER_TESTE, "preço"],
+  },
+];
+
+/**
+ * A cara de cada semana do ciclo: o foco do post do teste e a conversa dos
+ * stories. O resto da semana é o caminho inteiro, toda semana.
  */
 const SEMANAS: Array<{
   titulo: string;
-  frase: string;
-  passos: string[];
-  feed: Modelo[];
+  foco: string;
   stories: { papel: string; lembrete: string; instrucao: string };
 }> = [
   {
-    titulo: "Isso sou eu",
-    frase:
-      "Fazer a sua seguidora se reconhecer. Ninguém pede um exame que não sabe que existe, então esta semana não se fala de exame nenhum: se fala do que ela sente, com as palavras dela.",
-    passos: [
-      "Reconhecimento: a queixa descrita como ela vive no dia a dia.",
-      "Tirar a culpa: por que o que ela já tentou não pegou a causa.",
-      "Ouvir: uma enquete nos stories pergunta qual queixa ela sente.",
-    ],
-    feed: [
-      {
-        angulo: "educativo_ciencia",
-        consciencia: "inconsciente",
-        papel: "Descreve {A} como ela vive no dia a dia, até ela pensar \"isso sou eu\".",
-        instrucao:
-          "Assunto: {A}. Descreva a queixa com as palavras que a seguidora usaria, numa cena do dia a dia. Termine em \"isso tem explicação, e não é falta de força de vontade\".",
-        nao_dizer: ["nome de exame, gene, marcador ou produto"],
-      },
-      {
-        angulo: "dor_do_paciente",
-        consciencia: "consciente_problema",
-        papel: "Mostra por que o que ela já tentou para {A} não pegou a causa.",
-        objecao: "Não muda nada na prática",
-        instrucao:
-          "Assunto: {A}. Nomeie a queixa melhor do que ela nomearia e mostre que restrição, suplemento solto e \"comer melhor\" mexem no estoque de hoje, não em como o corpo dela foi montado. Abra com uma pergunta que dissolve a objeção \"já tentei de tudo e não mudou nada\", por exemplo sobre quanto já se gastou em suplemento sem saber se o corpo absorve. Não responda a objeção de forma explícita.",
-        nao_dizer: ["nome de gene ou de produto", "culpa (\"você está fazendo errado\")"],
-      },
-      {
-        angulo: "mito_vs_verdade",
-        consciencia: "consciente_problema",
-        papel: "Exame normal e o sintoma continua: os dois podem estar certos.",
-        objecao: "Já fiz exame e não deu nada",
-        instrucao:
-          "Explique que o exame de sangue mede o que está circulando hoje. Abra a pergunta \"e o que não muda?\" sem responder: é a ponte pra semana que vem.",
-        nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste genético"],
-      },
-      {
-        angulo: "educativo_ciencia",
-        consciencia: "inconsciente",
-        papel: "O mesmo reconhecimento, agora com {B}.",
-        instrucao:
-          "Assunto: {B}. Descreva a queixa com as palavras da seguidora, numa cena do dia a dia.",
-        nao_dizer: ["nome de exame, gene, marcador ou produto"],
-      },
-      {
-        angulo: "bastidor_da_nutri",
-        consciencia: "consciente_problema",
-        papel: "Bastidor: como você escuta uma queixa antes de pedir qualquer exame.",
-        instrucao:
-          "Bastidor da profissional: como ela escuta a queixa ({A}) e o que pergunta antes de pedir qualquer exame.",
-        nao_dizer: ["caso de paciente inventado"],
-      },
-    ],
+    titulo: "O que o teste investiga",
+    foco: "apresenta o teste pelo que ele investiga, sem preço",
     stories: {
-      papel: "Enquete: qual dessas você sente? A resposta escolhe o assunto da semana 3.",
+      papel: "Enquete: qual dessas você sente?",
       lembrete:
         "A arte está pronta. Ponha a enquete por cima no Instagram com as opções: {A} / {B}.",
       instrucao:
@@ -158,154 +351,34 @@ const SEMANAS: Array<{
     },
   },
   {
-    titulo: "A máquina é outra",
-    frase:
-      "Mostrar que existe uma camada que o exame comum não lê, e que essa camada não é destino. É a semana em que o maquinário aparece.",
-    passos: [
-      "A Fábrica da Saúde em telas: os quatro setores, amarrados à queixa dela.",
-      "Mecanismo: um ou dois genes explicados pela função, sem sigla.",
-      "Tirar o medo: genética não é destino, é o que se prioriza cuidar.",
-    ],
-    feed: [
-      {
-        angulo: "autoridade",
-        consciencia: "consciente_solucao",
-        papel: "O que você olha que a abordagem comum não olha: o mecanismo de {A}.",
-        instrucao: `Assunto: {A}. Explique o mecanismo de uma ou duas variações genéticas ligadas a essa queixa, sempre pela função ("quem tem a enzima X mais lenta costuma..."). Apresente "mapa genético" como caminho, sem nome de produto nem preço. Material: ${FABRICA}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "nome de produto ou preço"],
-      },
-      {
-        angulo: "educativo_ciencia",
-        consciencia: "consciente_problema",
-        papel: "A Fábrica da Saúde em telas, amarrada a {A}.",
-        instrucao: `Assunto: {A}. Apresente a Fábrica da Saúde, um setor por tela, cada um amarrado à queixa. Feche em "o maquinário é a parte que a gente ainda não olhou". Material: ${FABRICA}`,
-        nao_dizer: ["nome de gene", "dizer que a seguidora tem algum setor com problema"],
-      },
-      {
-        angulo: "mito_vs_verdade",
-        consciencia: "consciente_solucao",
-        papel: "Genética é destino? Não: é o que se prioriza cuidar.",
-        objecao: "Isso é modinha / genética é destino",
-        instrucao:
-          "Desfaça o medo: gene de risco não é destino, é o que se prioriza silenciar com alimentação e rotina. Diga também o que a leitura genética NÃO faz (não diz destino, não estabelece diagnóstico, não promete resultado): a honestidade sobre o limite é o que separa ciência de modinha.",
-        nao_dizer: [...NAO_DIZER_TESTE, "\"previne a doença X\"", "\"comprovado cientificamente\" solto"],
-      },
-      {
-        angulo: "bastidor_da_nutri",
-        consciencia: "consciente_solucao",
-        papel: "Bastidor: como você conduz uma devolutiva gene a gene.",
-        instrucao: `Bastidor de como a profissional conduz a devolutiva: ${COMO_FUNCIONA}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "laudo, exame ou medida de paciente"],
-      },
-    ],
+    titulo: "Um exame que se faz uma vez",
+    foco: "mostra a amplitude do teste: mais de 300 marcadores e coleta única",
     stories: {
       papel: "Caixinha de perguntas sobre o exame que se faz uma vez na vida.",
       lembrete:
-        "A arte está pronta. Ponha a caixinha de perguntas por cima: \"O que você quer saber sobre um exame que se faz uma vez na vida?\" As respostas viram o assunto da semana 4.",
+        "A arte está pronta. Ponha a caixinha de perguntas por cima: \"O que você quer saber sobre um exame que se faz uma vez na vida?\"",
       instrucao:
         "Stories de conversa: convide a seguidora a perguntar o que quer saber sobre um exame que se faz uma vez na vida. A caixinha ela põe por cima.",
     },
   },
   {
-    titulo: "O caminho tem nome",
-    frase:
-      "O teste entra, pelo mecanismo. É a semana em que o nome do produto aparece e as perguntas práticas são respondidas.",
-    passos: [
-      "O que o teste investiga que o caminho comum não investiga.",
-      "A amplitude: mais de 300 marcadores, coleta única, referência pra sempre.",
-      "Como funciona na prática: o kit chega em casa.",
-    ],
-    feed: [
-      {
-        angulo: "divulgacao_produto",
-        consciencia: "consciente_solucao",
-        papel: "O teste entra pelo nome: o que ele investiga sobre {A}.",
-        instrucao: `Assunto: {A}. O nome real do produto entra no corpo do post. Estrutura: a queixa, o que o teste investiga que o caminho comum não investiga, o convite pra entender. Preço ainda não. Material: ${AMPLITUDE}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "preço", "prazo de laudo ou de kit"],
-      },
-      {
-        angulo: "educativo_ciencia",
-        consciencia: "consciente_produto",
-        papel: "A amplitude do teste, que impede ela de procurar \"só um painel\".",
-        objecao: "É caro",
-        instrucao: `Explique a amplitude do teste com as palavras do material, nessa ordem: mais de 300 marcadores, coleta única, referência permanente, aprofunda a cada consulta. Abra com um gancho que dissolva a objeção de preço sem falar de preço (ex.: "Um exame que se faz uma vez. O resto você refaz todo ano."). Material: ${AMPLITUDE}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "preço", "nome de laboratório"],
-      },
-      {
-        angulo: "bastidor_da_nutri",
-        consciencia: "consciente_produto",
-        papel: "Como funciona na prática, do kit à devolutiva.",
-        objecao: "Demora",
-        instrucao: `Como funciona na prática: ${COMO_FUNCIONA} Dissolva a objeção "demora" dizendo que o cuidado começa antes do laudo, com o que já existe (exames, rotina, alimentação).`,
-        nao_dizer: [...NAO_DIZER_TESTE, "prazo de kit ou de laudo"],
-      },
-      {
-        angulo: "autoridade",
-        consciencia: "consciente_produto",
-        papel: "Por que a leitura dos dois exames juntos mostra o gargalo.",
-        objecao: "Já fiz exame e não deu nada",
-        instrucao:
-          "Exame de sangue mede o estoque de hoje; o mapa genético mede como a fábrica foi montada. É o cruzamento dos dois que mostra o gargalo. Escreva \"avaliação individualizada\".",
-        nao_dizer: [...NAO_DIZER_TESTE, "depreciar o exame de sangue", "dizer que o genético substitui o sangue"],
-      },
-    ],
+    titulo: "Do kit à devolutiva",
+    foco: "mostra como funciona na prática, do kit em casa à devolutiva",
     stories: {
       papel: "O que está incluído, com o link.",
-      lembrete:
-        "A arte está pronta. Ponha o adesivo de link por cima, apontando pra página do seu teste.",
+      lembrete: "A arte está pronta. Ponha o adesivo de link por cima, apontando pra página do seu teste.",
       instrucao:
         "Stories: o que a pessoa leva pra casa com o teste (kit em casa, devolutiva gene a gene, cardápio e suplementação sobre o resultado). Uma frase por tela.",
     },
   },
   {
-    titulo: "Decidir",
-    frase:
-      "Quem já entendeu recebe o empurrão prático; quem ainda não, recebe a última dúvida respondida. A oferta aparece direta, com o preço do seu catálogo.",
-    passos: [
-      "O gene vira prato: o que muda na prática.",
-      "A oferta direta, com o que inclui e o preço do catálogo.",
-      "O próximo passo, respondendo as dúvidas da caixinha.",
-    ],
-    feed: [
-      {
-        angulo: "divulgacao_produto",
-        consciencia: "mais_consciente",
-        papel: "A oferta direta: o que inclui, preço do catálogo e como começar.",
-        instrucao:
-          "Oferta direta e curta: nome do produto, o que inclui, preço e parcelas EXATAMENTE como no catálogo (se não houver preço, \"o valor eu te passo na conversa\"), e como começar hoje. Sem recontar o problema.",
-        nao_dizer: [...NAO_DIZER_TESTE, "condição que não esteja no catálogo", "prazo que se renova"],
-      },
-      {
-        angulo: "autoridade",
-        consciencia: "consciente_produto",
-        papel: "O gene vira prato: um exemplo de mecanismo que vira conduta.",
-        objecao: "Não muda nada na prática",
-        instrucao: `Mostre com UM exemplo de mecanismo como um gene vira escolha no prato e na rotina (ex.: enzima da histamina mais lenta, escolhas de alimento e de preparo). ${COMO_FUNCIONA}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "prescrição pública com dose", "prazo de melhora"],
-      },
-      {
-        angulo: "mito_vs_verdade",
-        consciencia: "consciente_produto",
-        papel: "A última dúvida, respondida pelo mecanismo.",
-        objecao: "É caro / demora",
-        instrucao: `Responda a dúvida mais comum sobre o teste pelo mecanismo, não pelo preço: coleta única, referência permanente, o cuidado começa antes do laudo. Material: ${AMPLITUDE}`,
-        nao_dizer: [...NAO_DIZER_TESTE, "depreciar outra área"],
-      },
-      {
-        angulo: "bastidor_da_nutri",
-        consciencia: "mais_consciente",
-        papel: "O próximo passo: como começar, pra quem já decidiu.",
-        instrucao:
-          "Bastidor curto: como é o primeiro contato e o que acontece depois que a pessoa decide fazer o teste. Convite pro link da bio.",
-        nao_dizer: [...NAO_DIZER_TESTE, "inventar \"muita gente me pergunta\""],
-      },
-    ],
+    titulo: "O convite com preço",
+    foco: "é a oferta direta, com o preço do seu catálogo",
     stories: {
       papel: "O link direto do teste.",
       lembrete:
         "A arte está pronta. Ponha o adesivo de link por cima. Escassez só se for real (vagas que a sua agenda comporta).",
-      instrucao:
-        "Stories curto: convite direto pro teste, uma frase por tela. Sem contador, sem \"últimas vagas\".",
+      instrucao: "Stories curto: convite direto pro teste, uma frase por tela. Sem contador, sem \"últimas vagas\".",
     },
   },
 ];
@@ -357,10 +430,8 @@ export function queixasDaRodada(queixas: string[] | null | undefined, nicho: str
   return [curtas[i]!, curtas[(i + 1) % curtas.length]!];
 }
 
-const papelSemProduto = (p: string) => {
-  const s = p.replace(/^O teste entra pelo nome: |^A oferta direta: /, "");
-  return s.charAt(0).toUpperCase() + s.slice(1);
-};
+const FRASE_SEMANA =
+  "Toda semana tem um post pra cada ponto do caminho: quem acabou de chegar se reconhece, quem já se reconheceu entende o mecanismo, quem já entendeu vê o teste pelo nome.";
 
 const preencher = (s: string, a: string, b: string) => s.replaceAll("{A}", a).replaceAll("{B}", b);
 
@@ -411,23 +482,28 @@ export function planoDaJornada(params: {
   const dias = params.diasPostSemana?.length ? params.diasPostSemana : [1, 3, 5];
   const produtoDaSemana = produtoDoSlot(semana, params.produtos ?? []);
   const temProdutos = params.produtos ? produtoDaSemana !== null : (params.temProdutos ?? false);
+  const niveis = niveisDaSemana(dias.length, semana);
+  const vistos: Record<string, number> = {};
 
   let comerciais = 0;
   const slots: SlotJornada[] = dias.map((dia, i) => {
-    let m = modelo.feed[i % modelo.feed.length]!;
-    // Sem o teste no catálogo, post de produto vira autoridade (mesmo
-    // material, sem nome nem preço), como já era sem catálogo.
-    if (m.angulo === "divulgacao_produto" && !temProdutos) {
-      m = { ...m, angulo: "autoridade", consciencia: "consciente_solucao", papel: papelSemProduto(m.papel) };
-    }
+    const nivel = niveis[i]!;
+    // Nível repetido na mesma semana (mais de 5 posts) pega a variante seguinte.
+    const rep = vistos[nivel] ?? 0;
+    vistos[nivel] = rep + 1;
+    const v = (semana - 1 + rep) % SEMANAS_DA_JORNADA;
+    let m = NIVEIS[nivel][v]!;
+    // Sem o teste no catálogo, o post do teste fala da leitura genética sem
+    // nome nem preço (senão o modelo inventaria a oferta).
+    if (nivel === "teste" && !temProdutos) m = SEM_TESTE[v]!;
     // Trava de saturação que já valia: no máximo 1 comercial por semana.
     if (m.angulo === "divulgacao_produto" || m.angulo === "chamada_direta") {
       comerciais += 1;
-      if (comerciais > 1) m = { ...m, angulo: "autoridade", papel: papelSemProduto(m.papel) };
+      if (comerciais > 1) m = SEM_TESTE[v]!;
     }
     const naoDizer = [...NAO_DIZER_BASE, ...m.nao_dizer];
     const instrucao = [
-      `ESTRATÉGIA DA SEMANA (semana ${semana} de ${SEMANAS_DA_JORNADA} da jornada até o teste nutrigenético: "${modelo.titulo}"): ${modelo.frase}`,
+      `ESTRATÉGIA DA SEMANA ("${modelo.titulo}"): ${FRASE_SEMANA} Nesta semana o post do teste ${modelo.foco}.`,
       `PAPEL DESTE POST: ${preencher(m.papel, a, b)}`,
       preencher(m.instrucao, a, b),
       m.angulo === "divulgacao_produto" && produtoDaSemana
@@ -463,7 +539,7 @@ export function planoDaJornada(params: {
         papel: preencher(modelo.stories.papel, a, b),
         lembrete: preencher(modelo.stories.lembrete, a, b),
         instrucao: [
-          `ESTRATÉGIA DA SEMANA (semana ${semana} de ${SEMANAS_DA_JORNADA}: "${modelo.titulo}").`,
+          `ESTRATÉGIA DA SEMANA ("${modelo.titulo}").`,
           preencher(modelo.stories.instrucao, a, b),
           `NÃO DIZER: ${[...NAO_DIZER_BASE, ...NAO_DIZER_TESTE].join("; ")}.`,
         ].join("\n"),
@@ -486,8 +562,9 @@ export function planoDaJornada(params: {
       semana,
       total: SEMANAS_DA_JORNADA,
       titulo: modelo.titulo,
-      frase: modelo.frase,
-      passos: modelo.passos,
+      frase: `${FRASE_SEMANA} Nesta semana o post do teste ${modelo.foco}.`,
+      // Um passo por post do feed: o que cada um faz no caminho.
+      passos: slots.filter((s) => s.tipo !== "stories").map((s) => s.papel),
       queixas: a === b ? [a] : [a, b],
     },
     slots,
@@ -509,7 +586,7 @@ export function produtoDoSlot(semana: number, produtos: ProdutoDaJornada[]): Pro
   return gen ?? epi;
 }
 
-/** Resumo em uma linha, pro aviso do painel ("Semana 2 de 4: A máquina é outra"). */
-export function rotuloEstrategia(e: Pick<EstrategiaSemana, "semana" | "total" | "titulo">): string {
-  return `Semana ${e.semana} de ${e.total}: ${e.titulo}`;
+/** Resumo em uma linha, pro aviso do painel ("Estratégia da semana: O que o teste investiga"). */
+export function rotuloEstrategia(e: Pick<EstrategiaSemana, "titulo">): string {
+  return `Estratégia da semana: ${e.titulo}`;
 }

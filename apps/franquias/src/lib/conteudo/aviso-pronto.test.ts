@@ -131,7 +131,7 @@ test("com estratégia, o aviso leva a linha da semana e o título muda", async (
     pedidosAtendidos: [],
     estrategia: est,
   });
-  assert.equal(a?.estrategia, "Semana 2 de 4: A máquina é outra");
+  assert.equal(a?.estrategia, "Estratégia da semana: A máquina é outra");
   assert.match(a!.titulo, /estratégia da semana/);
 });
 
