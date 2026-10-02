@@ -61,7 +61,8 @@ test("a rodada troca o par de queixas a cada 4 semanas", () => {
   assert.notDeepEqual(r1, r2);
 });
 
-test("produto do slot: semana 3 nomeia o genético, semana 4 o epigenético", () => {
+test("produto do slot: semanas 1 a 3 nomeiam o genético, semana 4 o epigenético", () => {
+  assert.equal(produtoDoSlot(1, PRODUTOS)?.scanner_produto_id, "teste_genetico");
   assert.equal(produtoDoSlot(3, PRODUTOS)?.scanner_produto_id, "teste_genetico");
   assert.equal(produtoDoSlot(4, PRODUTOS)?.scanner_produto_id, "teste_epigenetico");
   assert.equal(produtoDoSlot(4, [PRODUTOS[0]!])?.scanner_produto_id, "teste_genetico");
@@ -85,8 +86,15 @@ for (const seg of SEGUNDAS) {
     assert.equal(feed[1]!.tipo, "feed_carrossel");
     const comerciais = feed.filter((s) => s.angulo === "divulgacao_produto" || s.angulo === "chamada_direta");
     assert.ok(comerciais.length <= 1);
-    // Semanas 1 e 2 não vendem.
-    if (estrategia.semana <= 2) assert.equal(comerciais.length, 0);
+    // Toda semana tem o caminho inteiro: exatamente 1 post do teste, e os
+    // outros níveis de consciência (Aline, 02/10).
+    assert.equal(comerciais.length, 1);
+    const niveis = new Set(feed.map((s) => s.consciencia));
+    assert.ok(niveis.has("inconsciente"), "tem post pra quem acabou de chegar");
+    assert.ok(niveis.has("consciente_problema"));
+    assert.ok(niveis.has("consciente_solucao"));
+    assert.ok(niveis.has("consciente_produto") || niveis.has("mais_consciente"));
+    assert.equal(estrategia.passos.length, feed.length, "um passo por post do feed");
     const stories = slots.filter((s) => s.tipo === "stories");
     assert.equal(stories.length, 3);
     assert.ok(stories[0]!.lembrete, "o 1º stories leva o lembrete da enquete/caixinha/link");
@@ -96,9 +104,38 @@ for (const seg of SEGUNDAS) {
       assert.ok(!s.papel.includes("{A}"));
       assert.ok(!/—/.test(s.papel + s.instrucao + (s.lembrete ?? "")), "sem travessão");
     }
-    assert.match(rotuloEstrategia(estrategia), /^Semana [1-4] de 4: /);
+    assert.match(rotuloEstrategia(estrategia), /^Estratégia da semana: /);
   });
 }
+
+test("com 3 posts (o padrão), a semana tem reconhecimento, mecanismo e o teste", () => {
+  for (const seg of SEGUNDAS) {
+    const { slots } = planoDaJornada({ semanaRef: seg, diasPostSemana: [1, 3, 5], produtos: PRODUTOS, queixas: GLERYSTON });
+    const feed = slots.filter((s) => s.tipo !== "stories");
+    assert.deepEqual(
+      feed.map((s) => s.consciencia),
+      ["inconsciente", "consciente_solucao", semanaDaJornada(seg) === 4 ? "mais_consciente" : "consciente_produto"],
+    );
+    assert.equal(feed[2]!.angulo, "divulgacao_produto", "o teste aparece toda semana");
+  }
+});
+
+test("a oferta com preço sai uma vez por ciclo, não toda semana", () => {
+  const ofertas = SEGUNDAS.map((seg) =>
+    planoDaJornada({ semanaRef: seg, diasPostSemana: [1, 3, 5], produtos: PRODUTOS, queixas: GLERYSTON }).slots.filter((s) =>
+      /preço e parcelas EXATAMENTE/.test(s.instrucao),
+    ).length,
+  );
+  assert.deepEqual([...ofertas].sort(), [0, 0, 0, 1]);
+});
+
+test("mais de 5 posts: nível repetido pega outra variante e o teste não repete", () => {
+  const { slots } = planoDaJornada({ semanaRef: SEGUNDAS[0], diasPostSemana: [0, 1, 2, 3, 4, 5, 6], produtos: PRODUTOS, queixas: GLERYSTON });
+  const feed = slots.filter((s) => s.tipo !== "stories");
+  assert.equal(feed.length, 7);
+  assert.equal(new Set(feed.map((s) => s.papel)).size, 7, "nenhum post repetido");
+  assert.equal(feed.filter((s) => s.angulo === "divulgacao_produto").length, 1);
+});
 
 test("sem os testes no catálogo, nenhum post de produto e nenhum nome de produto", () => {
   for (const seg of SEGUNDAS) {
@@ -106,11 +143,12 @@ test("sem os testes no catálogo, nenhum post de produto e nenhum nome de produt
     assert.ok(slots.every((s) => s.angulo !== "divulgacao_produto"));
     assert.ok(slots.every((s) => !s.instrucao.includes("PRODUTO DESTE POST")));
     assert.ok(slots.every((s) => !/^O teste entra pelo nome|^A oferta direta/.test(s.papel)));
+    assert.ok(slots.every((s) => !/preço e parcelas/.test(s.instrucao)));
   }
 });
 
-test("com o teste, o post de produto da semana 3 carrega o nome real do catálogo", () => {
-  const seg = SEGUNDAS.find((s) => semanaDaJornada(s) === 3)!;
+test("com o teste, o post de produto carrega o nome real do catálogo", () => {
+  const seg = SEGUNDAS.find((s) => semanaDaJornada(s) === 1)!;
   const { slots } = planoDaJornada({ semanaRef: seg, diasPostSemana: [1, 3, 5], produtos: PRODUTOS, queixas: GLERYSTON });
   const prod = slots.find((s) => s.angulo === "divulgacao_produto");
   assert.ok(prod);

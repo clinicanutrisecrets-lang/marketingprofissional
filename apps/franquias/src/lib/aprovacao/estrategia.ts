@@ -33,7 +33,7 @@ export function lerEstrategia(bruto: unknown): EstrategiaLida | null {
   };
 }
 
-/** "Semana 2 de 4: A máquina é outra". */
-export function linhaEstrategia(e: Pick<EstrategiaLida, "semana" | "total" | "titulo">): string {
-  return `Semana ${e.semana} de ${e.total}: ${e.titulo}`;
+/** "Estratégia da semana: O que o teste investiga". */
+export function linhaEstrategia(e: Pick<EstrategiaLida, "titulo">): string {
+  return `Estratégia da semana: ${e.titulo}`;
 }

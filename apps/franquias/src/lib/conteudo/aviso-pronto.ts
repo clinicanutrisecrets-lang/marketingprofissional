@@ -38,7 +38,7 @@ export type AvisoConteudoPronto = {
   /** Rótulo do botão. */
   acao: string;
   href: string;
-  /** "Semana 2 de 4: A máquina é outra", quando a semana tem estratégia. */
+  /** "Estratégia da semana: O que o teste investiga", quando a semana tem estratégia. */
   estrategia?: string | null;
 };
 

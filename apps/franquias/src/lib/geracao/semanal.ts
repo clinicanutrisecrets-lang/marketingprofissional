@@ -174,7 +174,8 @@ export async function gerarPostsDaSemana(
   // O catálogo é carregado ANTES de propósito: sem produto ativo o plano
   // pula o ângulo de divulgação (senão o modelo inventaria a oferta).
   // A Jornada até o Teste (Aline, 02/10/2026): a semana tem uma ESTRATÉGIA
-  // (semana N de 4) e cada post um PAPEL nela. As queixas do questionário dela
+  // (todos os níveis de consciência, o ciclo de 4 semanas gira a variante)
+  // e cada post um PAPEL nela. As queixas do questionário dela
   // são o assunto; sem elas, o nicho. Mesmas regras de formato e de frequência
   // do planejarSemana antigo (no máximo 1 comercial, reel/carrossel/stories).
   const { estrategia, slots: plano } = planoDaJornada({
