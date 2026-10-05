@@ -28,15 +28,28 @@ export async function enfileirarVideoDoReel(
     if (!frase) return { ok: false, motivo: "reel sem gancho curto" };
 
     const cols = "id, titulo, descricao, tags, duracao_seg, largura_px, altura_px, usado_quantas_vezes";
-    const [{ data: meus }, { data: acervo }] = await Promise.all([
+    const desde = new Date(Date.now() - 45 * 24 * 3600 * 1000).toISOString();
+    const [{ data: meus }, { data: acervo }, { data: recentes }] = await Promise.all([
       admin.from("videos_franqueada").select(cols).eq("franqueada_id", p.franqueadaId).eq("ativo", true).limit(200),
       admin.from("acervo_videos").select(cols).eq("ativo", true).limit(300),
+      admin
+        .from("cortes_ia")
+        .select("clipe_video_id")
+        .eq("franqueada_id", p.franqueadaId)
+        .gte("criado_em", desde)
+        .not("clipe_video_id", "is", null)
+        .limit(200),
     ]);
+    const jaUsados = new Set(
+      ((recentes ?? []) as { clipe_video_id: string | null }[])
+        .map((r) => r.clipe_video_id)
+        .filter((v): v is string => !!v),
+    );
     const clipes: ClipeCandidato[] = [
       ...((meus ?? []) as ClipeCandidato[]).map((c) => ({ ...c, origem: "biblioteca" as const })),
       ...((acervo ?? []) as ClipeCandidato[]).map((c) => ({ ...c, origem: "acervo" as const })),
     ];
-    const clipe = escolherClipe(clipes, palavrasDoAssunto([frase, ...p.assunto]));
+    const clipe = escolherClipe(clipes, palavrasDoAssunto([frase, ...p.assunto]), jaUsados);
     if (!clipe) return { ok: false, motivo: "biblioteca sem clipe" };
 
     const { data: row, error } = await admin

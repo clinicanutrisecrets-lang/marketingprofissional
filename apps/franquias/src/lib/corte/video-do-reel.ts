@@ -51,7 +51,16 @@ export function palavrasDoAssunto(textos: string[]): string[] {
  * depois pro da biblioteca dela, depois pro menos usado (variedade).
  * Clipe com menos de 3 s fica de fora (a frase não dá pra ler).
  */
-export function escolherClipe(clipes: ClipeCandidato[], palavras: string[]): ClipeCandidato | null {
+export function escolherClipe(
+  clipes: ClipeCandidato[],
+  palavras: string[],
+  /**
+   * Clipes que a conta já usou em vídeo recente. Ficam por último: sem isso
+   * os dois reels da mesma semana saíam com o MESMO clipe (Gleryston,
+   * 04/10/2026), porque o assunto é parecido e o contador de uso nunca sobe.
+   */
+  jaUsados: ReadonlySet<string> = new Set(),
+): ClipeCandidato | null {
   const ok = clipes.filter((c) => (c.duracao_seg ?? 0) >= 3);
   if (ok.length === 0) return null;
   const pontos = (c: ClipeCandidato) => {
@@ -61,6 +70,7 @@ export function escolherClipe(clipes: ClipeCandidato[], palavras: string[]): Cli
   const emPe = (c: ClipeCandidato) => ((c.altura_px ?? 0) > (c.largura_px ?? 0) ? 1 : 0);
   return [...ok].sort(
     (a, b) =>
+      (jaUsados.has(a.id) ? 1 : 0) - (jaUsados.has(b.id) ? 1 : 0) ||
       pontos(b) - pontos(a) ||
       emPe(b) - emPe(a) ||
       (a.origem === "biblioteca" ? 0 : 1) - (b.origem === "biblioteca" ? 0 : 1) ||

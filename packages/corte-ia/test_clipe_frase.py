@@ -96,7 +96,7 @@ def test_palavra_gigante_nao_trava_o_ajuste():
 
 # ------------------------------------------------------------ ASS
 def test_ass_tem_a_frase_a_assinatura_e_a_faixa():
-    ass = cf.montar_ass("VOCE NAO ESTA SEM FORCA", 8.0, "@nutri", "Scanner da Saúde", medidor_falso())
+    ass = cf.montar_ass("VOCE NAO ESTA SEM FORCA", 8.0, "@nutri", "Dra. Fulana", medidor_falso())
     assert "VOCE NAO ESTA SEM FORCA" in ass.replace("\\N", " ")
     assert "@nutri" in ass
     assert "Style: Fundo" in ass and "alpha&H4D&" in ass  # faixa atrás do texto
@@ -211,3 +211,23 @@ def test_pipeline_liga_o_video_pronto_ao_post_sem_sobrescrever():
     assert 'ligar_ao_post(row.get("post_id")' in corpo
     lig = src[src.index("def ligar_ao_post"):src.index("def baixar_objeto")]
     assert '"url_video_final": "is.null"' in lig, "nunca sobrescreve vídeo que ela pôs"
+
+
+def test_assinatura_e_o_nome_da_profissional_nunca_a_nossa_marca():
+    # Gleryston, 04/10/2026: o pé dos vídeos dele dizia "Scanner da Saúde".
+    ass = cf.montar_ass("O GENE QUE MUDA TUDO", 8.0, "@gleryston.agra", "Gleryston Agra de Mello", medidor_falso())
+    assert "Gleryston Agra de Mello   |   @gleryston.agra" in ass
+    so_handle = cf.montar_ass("O GENE QUE MUDA TUDO", 8.0, "@x", "", medidor_falso())
+    assert "|   @x" not in so_handle and "@x" in so_handle
+    with open(os.path.join(os.path.dirname(__file__), "pipeline.py"), encoding="utf-8") as f:
+        assert "Scanner da Saúde" not in f.read()
+
+
+def test_clipe_preenche_a_tela_sem_copia_desfocada_atras():
+    # Reels do Gleryston (04/10/2026): clipe deitado entrava com fundo
+    # desfocado + imagem nítida no meio, e o vídeo aparecia duas vezes.
+    with open(os.path.join(os.path.dirname(__file__), "clipe_frase.py"), encoding="utf-8") as f:
+        fonte = f.read()
+    assert 'filtro_fonte("0:v", "retrato"' not in fonte
+    assert "gblur" not in fonte
+    assert "force_original_aspect_ratio=increase" in fonte

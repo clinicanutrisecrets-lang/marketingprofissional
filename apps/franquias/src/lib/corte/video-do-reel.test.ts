@@ -44,3 +44,14 @@ test("ligação: o gerador semanal enfileira o vídeo do reel e o worker o liga 
   // edição automática.
   assert.doesNotMatch(db, /corteIaLiberadoPara/);
 });
+
+test("clipe já usado pela conta fica por último: dois reels da semana não repetem o clipe", () => {
+  const a = c("dna-azul", { tags: ["gene", "dna"] });
+  const b = c("dna-laranja", { tags: ["gene", "dna"] });
+  const palavras = palavrasDoAssunto(["O gene que muda tudo"]);
+  const primeiro = escolherClipe([a, b], palavras)!;
+  const segundo = escolherClipe([a, b], palavras, new Set([primeiro.id]))!;
+  assert.notEqual(segundo.id, primeiro.id);
+  // Todos usados: ainda entrega um (nunca reel sem vídeo por isso).
+  assert.ok(escolherClipe([a, b], palavras, new Set([a.id, b.id])));
+});

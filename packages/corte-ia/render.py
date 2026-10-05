@@ -207,6 +207,12 @@ def eventos_legenda(chunks, sent_of, layout, text_w, est=None):
     return ev
 
 
+def assinatura(rodape, handle):
+    """Pé do vídeo: "Nome   |   @handle". Sem nome, só o @ (nunca um "| @x" solto)."""
+    partes = [esc(p) for p in ((rodape or "").strip(), (handle or "").strip()) if p]
+    return "   |   ".join(partes)
+
+
 def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None):
     est = legenda_estilos.por_nome(estilo)
     chunks, sent_of = blocos_de_legenda(palavras, plano.get("correcoes"))
@@ -237,7 +243,7 @@ def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None
         if sub:
             keyev.append(f"Dialogue: 2,{ts(a)},{ts(b)},Tag,,0,0,0,,{{\\pos(540,{layout['key_y'] + 110})\\fad(150,150)\\c{TIFF}}}{sub}")
 
-    tag = f"Dialogue: 0,{ts(0)},{ts(dur)},Tag,,0,0,0,,{{\\pos(540,{layout['tag_y']})}}{esc(rodape)}   |   {esc(handle)}"
+    tag = f"Dialogue: 0,{ts(0)},{ts(dur)},Tag,,0,0,0,,{{\\pos(540,{layout['tag_y']})}}{assinatura(rodape, handle)}"
     progress = [
         f"Dialogue: 0,{ts(i / 10)},{ts(i / 10 + 0.1)},Bar,,0,0,0,,{{\\pos(0,1905)\\p1\\c{TIFF}}}m 0 0 l {int(W * (i / 10) / dur)} 0 {int(W * (i / 10) / dur)} 8 0 8{{\\p0}}"
         for i in range(int(dur * 10))
@@ -261,7 +267,7 @@ Style: Key,{est['fonte_capa']},150,{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,
 Style: Cap,{est['fonte_cap']},{est['fs_cap']},{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,1,0,1,5,0,5,60,60,0,1
 Style: Pill,Inter,20,&H3A2E2B&,&H3A2E2B&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: PillTxt,{est['fonte_pill']},{est['fs_pill']},{WHITE},{WHITE},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
-Style: Tag,Inter,34,&HB4A39B&,&HB4A39B&,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,40,40,0,1
+Style: Tag,Inter,34,&H00FFFFFF,&H00FFFFFF,&H8C000000,&H8C000000,0,0,0,0,100,100,2,0,1,2,1,5,40,40,0,1
 Style: Bar,Inter,20,{TIFF},{TIFF},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: Fundo,Inter,20,&H000000&,&H000000&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
@@ -421,7 +427,7 @@ def main():
     ap.add_argument("--plano", required=True)
     ap.add_argument("--broll-dir", default="")
     ap.add_argument("--handle", default="@nutri")
-    ap.add_argument("--rodape", default="Scanner da Saúde")
+    ap.add_argument("--rodape", default="")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     with open(a.transcricao, encoding="utf-8") as f:

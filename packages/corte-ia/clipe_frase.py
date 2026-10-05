@@ -160,7 +160,7 @@ def montar_ass(frase, dur, handle, rodape, text_w, estilo=None, pos=None):
                 f"\\fscx94\\fscy94\\t(0,320,\\fscx100\\fscy100)}}{corpo}")
 
     tag = (f"Dialogue: 0,{render.ts(0)},{render.ts(dur)},Tag,,0,0,0,,"
-           f"{{\\pos(540,1800)}}{render.esc(rodape)}   |   {render.esc(handle)}")
+           f"{{\\pos(540,1800)}}{render.assinatura(rodape, handle)}")
 
     return f"""[Script Info]
 ScriptType: v4.00+
@@ -171,7 +171,7 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Frase,{est['fonte_capa']},{fs},{WHITE},{WHITE},&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,5,{MARGEM_X},{MARGEM_X},0,1
-Style: Tag,Inter,34,&HB4A39B&,&HB4A39B&,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,40,40,0,1
+Style: Tag,Inter,34,&H00FFFFFF,&H00FFFFFF,&H8C000000,&H8C000000,0,0,0,0,100,100,2,0,1,2,1,5,40,40,0,1
 Style: Fundo,Inter,20,&H000000&,&H000000&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
@@ -186,7 +186,7 @@ def tem_audio(caminho):
 
 
 def render_clipe_frase(clipe, frase, out, fontsdir, handle="@nutri",
-                       rodape="Scanner da Saúde", segundos=None, estilo=None,
+                       rodape="", segundos=None, estilo=None,
                        pos=None):
     """Gera o MP4 9:16 com a frase por cima do clipe."""
     frase = normalizar_frase(frase)
@@ -199,10 +199,12 @@ def render_clipe_frase(clipe, frase, out, fontsdir, handle="@nutri",
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(montar_ass(frase, dur, handle, rodape, text_w, estilo, pos))
 
-    # O clipe entra como o b-roll em retrato já entra no corte: fundo
-    # desfocado + imagem centralizada. Clipe deitado sem isso vira duas
-    # tarjas pretas ocupando metade do vídeo.
-    fc = [render.filtro_fonte("0:v", "retrato", None) + f"[base]",
+    # O clipe PREENCHE a tela 9:16 (recorta as laterais do clipe deitado).
+    # Antes ele entrava com fundo desfocado + a imagem nítida no meio: com a
+    # faixa da frase por cima, o vídeo aparecia duas vezes e parecia ter duas
+    # tarjas pretas (Aline, olhando os reels do Gleryston em 05/10/2026).
+    fc = [f"[0:v]scale={render.W}:{render.H}:force_original_aspect_ratio=increase,"
+          f"crop={render.W}:{render.H},setsar=1,fps=25[base]",
           f"[base]trim=0:{dur},setpts=PTS-STARTPTS,ass={ass_path}:fontsdir={fontsdir},"
           f"fade=t=in:st=0:d=0.3,fade=t=out:st={dur - 0.5:.2f}:d=0.5[v]"]
 
