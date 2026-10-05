@@ -253,7 +253,7 @@ def url_do_clipe(clipe_id, origem, franqueada_id):
     return rows[0]["url"]
 
 
-def processar_clipe_frase(corte_id, row, handle, work):
+def processar_clipe_frase(corte_id, row, handle, work, rodape):
     patch(corte_id, status="processando", etapa="baixando", erro_msg=None)
     url = url_do_clipe(row["clipe_video_id"], (row.get("clipe_origem") or "biblioteca"), row["franqueada_id"])
     bruto = os.path.join(work, "clipe.mp4")
@@ -265,7 +265,7 @@ def processar_clipe_frase(corte_id, row, handle, work):
     saida = os.path.join(work, "clipe-frase.mp4")
     info = clipe_frase.render_clipe_frase(
         limpo, row.get("frase") or "", saida, os.path.join(work, "fonts"),
-        handle=handle, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"),
+        handle=handle, rodape=rodape, segundos=row.get("duracao_seg"), estilo=row.get("estilo_legenda"),
         pos=row.get("frase_pos"))
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url_saida = subir_mp4(path, saida)
@@ -274,12 +274,24 @@ def processar_clipe_frase(corte_id, row, handle, work):
     print("pronto", path, info)
 
 
+def rodape_da_conta(fr):
+    """O nome no pé do vídeo é o DA PROFISSIONAL. Antes era "Scanner da
+    Saúde" escrito à mão em todo vídeo de toda conta: a nossa marca no
+    Instagram dela. Sem nome cadastrado, o pé fica só com o @."""
+    for campo in ("nome_comercial", "nome_completo"):
+        v = (fr.get(campo) or "").strip()
+        if v:
+            return v
+    return ""
+
+
 # ---------------------------------------------------------------- main
 def processar(corte_id, broll_franqueada_id):
     # A etapa só é anunciada DEPOIS de saber o modo: dizer "transcrevendo"
     # num vídeo que não tem fala é a tela mentindo pra quem está esperando.
     row = rest_get("cortes_ia", {"id": f"eq.{corte_id}", "select": "*"})[0]
-    fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nicho_principal"})[0]
+    fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nome_comercial,nicho_principal"})[0]
+    rodape = rodape_da_conta(fr)
     handle = fr.get("instagram_handle") or ""
     handle = handle if not handle or handle.startswith("@") else f"@{handle}"
     handle = handle or "@scannerdasaude"
@@ -288,7 +300,7 @@ def processar(corte_id, broll_franqueada_id):
 
     # Clipe com frase não tem fala: outro caminho inteiro.
     if (row.get("modo") or "fala") == "clipe_frase":
-        return processar_clipe_frase(corte_id, row, handle, work)
+        return processar_clipe_frase(corte_id, row, handle, work, rodape)
 
     patch(corte_id, status="processando", etapa="transcrevendo", erro_msg=None)
     bruto = os.path.join(work, "bruto" + os.path.splitext(row["origem_path"])[1])
@@ -354,7 +366,7 @@ def processar(corte_id, broll_franqueada_id):
         patch(corte_id, etapa="renderizando")
 
     saida = os.path.join(work, "corte.mp4")
-    info = render.render(limpo, transcricao, plano, arquivos, handle, "Scanner da Saúde", saida,
+    info = render.render(limpo, transcricao, plano, arquivos, handle, rodape, saida,
                          os.path.join(work, "fonts"), row.get("estilo_legenda"))
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url = subir_mp4(path, saida)
