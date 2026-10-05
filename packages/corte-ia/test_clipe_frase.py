@@ -221,3 +221,13 @@ def test_assinatura_e_o_nome_da_profissional_nunca_a_nossa_marca():
     assert "|   @x" not in so_handle and "@x" in so_handle
     with open(os.path.join(os.path.dirname(__file__), "pipeline.py"), encoding="utf-8") as f:
         assert "Scanner da Saúde" not in f.read()
+
+
+def test_clipe_preenche_a_tela_sem_copia_desfocada_atras():
+    # Reels do Gleryston (04/10/2026): clipe deitado entrava com fundo
+    # desfocado + imagem nítida no meio, e o vídeo aparecia duas vezes.
+    with open(os.path.join(os.path.dirname(__file__), "clipe_frase.py"), encoding="utf-8") as f:
+        fonte = f.read()
+    assert 'filtro_fonte("0:v", "retrato"' not in fonte
+    assert "gblur" not in fonte
+    assert "force_original_aspect_ratio=increase" in fonte

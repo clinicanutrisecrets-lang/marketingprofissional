@@ -199,10 +199,12 @@ def render_clipe_frase(clipe, frase, out, fontsdir, handle="@nutri",
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(montar_ass(frase, dur, handle, rodape, text_w, estilo, pos))
 
-    # O clipe entra como o b-roll em retrato já entra no corte: fundo
-    # desfocado + imagem centralizada. Clipe deitado sem isso vira duas
-    # tarjas pretas ocupando metade do vídeo.
-    fc = [render.filtro_fonte("0:v", "retrato", None) + f"[base]",
+    # O clipe PREENCHE a tela 9:16 (recorta as laterais do clipe deitado).
+    # Antes ele entrava com fundo desfocado + a imagem nítida no meio: com a
+    # faixa da frase por cima, o vídeo aparecia duas vezes e parecia ter duas
+    # tarjas pretas (Aline, olhando os reels do Gleryston em 05/10/2026).
+    fc = [f"[0:v]scale={render.W}:{render.H}:force_original_aspect_ratio=increase,"
+          f"crop={render.W}:{render.H},setsar=1,fps=25[base]",
           f"[base]trim=0:{dur},setpts=PTS-STARTPTS,ass={ass_path}:fontsdir={fontsdir},"
           f"fade=t=in:st=0:d=0.3,fade=t=out:st={dur - 0.5:.2f}:d=0.5[v]"]
 
