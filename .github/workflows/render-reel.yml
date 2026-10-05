@@ -24,6 +24,10 @@ on:
         description: "id na tabela reels_animados (pra marcar pronto/erro)"
         required: false
         default: ""
+      post_id:
+        description: "post do pacote de domingo que recebe o vídeo (vazio no botão manual)"
+        required: false
+        default: ""
       supabase_url:
         required: false
         default: ""
@@ -78,6 +82,12 @@ jobs:
             -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"status\":\"pronto\",\"path\":\"${{ inputs.destino_path }}\",\"url\":\"$SB_URL/storage/v1$SIGNED\"}"
+          if [ -n "${{ inputs.post_id }}" ]; then
+            curl -sf -X PATCH "$SB_URL/rest/v1/posts_agendados?id=eq.${{ inputs.post_id }}" \
+              -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"url_video_final\":\"$SB_URL/storage/v1$SIGNED\"}"
+          fi
 
       - name: Marcar erro
         if: failure() && inputs.reel_id != ''

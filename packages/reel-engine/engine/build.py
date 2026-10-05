@@ -73,8 +73,8 @@ CLOSE_HEAD_TOP = 470
 # (1560), 30 px acima de SAFE_B.
 CLOSE_FADE_Y0 = 1400
 
-# --- teto de duração (pedido da Juliana, 01/09/2026: reel até 1min30) ---
-DUR_MAX_TOTAL = 90.0  # soma das cenas
+# --- teto de duração: reel até 1 minuto (Aline, 05/10/2026; antes 1min30) ---
+DUR_MAX_TOTAL = 60.0  # soma das cenas
 DUR_MAX_CENA = 20.0   # nenhuma cena sozinha passa disso
 
 COR = {"AMBER":AMBER,"CORAL":CORAL,"MUSTARD":MUSTARD,"TIFFANY":TIFFANY,
@@ -447,9 +447,9 @@ TIPOS = {"hook":c_hook, "cta_anuncio":c_cta_anuncio, "sintoma":c_sintoma, "gene"
          "marcadores":c_marcadores, "virada":c_virada, "cta":c_cta}
 
 def limitar_duracoes(cenas):
-    """Aplica o teto de 1min30 do reel e devolve [(cena, dur), ...].
+    """Aplica o teto de 1 minuto do reel e devolve [(cena, dur), ...].
 
-    Regra (pedido da Juliana, 01/09/2026): reel até 90 s. Quando o roteiro
+    Regra (Aline, 05/10/2026): reel até 60 s. Quando o roteiro
     passa disso, as cenas EXCEDENTES DO FIM são descartadas inteiras — nunca
     encolhidas na proporção. Encurtar todas estraga o ritmo da narração e o
     tempo de leitura dos cards; perder a última cena é um corte limpo.

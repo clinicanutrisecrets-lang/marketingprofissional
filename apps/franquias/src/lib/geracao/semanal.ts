@@ -4,6 +4,8 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { gerarPost, type SlotSemana } from "@/lib/claude/generate";
 import { planoDaJornada } from "@/lib/geracao/jornada";
 import { enfileirarVideoDoReel } from "@/lib/corte/video-do-reel-db";
+import { produzirReelAnimado, type FranqueadaReel } from "@/lib/conteudo/reel-animado";
+import { diaDoReelAnimado, temaDoReelAnimado } from "@/lib/geracao/reel-animado-semanal";
 import type { ContextoFranqueada } from "@/lib/claude/prompts";
 import {
   generateImage,
@@ -587,6 +589,64 @@ export async function gerarPostsDaSemana(
       }
     } catch (e) {
       erros.push(`${item.angulo}: ${(e as Error).message}`);
+    }
+  }
+
+  // 5b. O reel animado da semana, JUNTO com o de b-roll (Aline, 05/10/2026).
+  //     O post nasce com a legenda do mesmo roteiro e recebe o vídeo quando o
+  //     worker termina (~5 a 10 min). Best-effort: o pacote nunca falha por ele.
+  if ((franqueada.frequencia_reels as string | null) !== "nunca") {
+    try {
+      const dias = ((franqueada.dias_post_semana as number[]) ?? [1, 3, 5]).slice();
+      const { data: postReel, error: prErr } = await admin
+        .from("posts_agendados")
+        .insert({
+          franqueada_id: franqueadaId,
+          aprovacao_semanal_id: aprovacaoId,
+          semana_ref: semanaRef,
+          tipo_post: "reels",
+          status: "aguardando_aprovacao",
+          origem: "ia_automatico",
+          copy_legenda: "",
+          papel_estrategia: "Reel animado: o mecanismo da queixa da semana, do sintoma ao que investigar.",
+          data_hora_agendada: calcularDataHora(
+            semanaRef,
+            diaDoReelAnimado(dias),
+            (franqueada.horario_preferido_post as string) ?? "08:00",
+          ),
+          legenda_gerada_ia: true,
+        })
+        .select("id")
+        .single();
+      if (prErr || !postReel) throw new Error(prErr?.message ?? "insert falhou");
+      const postId = (postReel as { id: string }).id;
+      const r = await produzirReelAnimado(admin, {
+        franqueada: franqueada as unknown as FranqueadaReel,
+        tema: temaDoReelAnimado(estrategia.queixas, (franqueada.nicho_principal as string) ?? "saude_integrativa"),
+        duracao: "60s",
+        postId,
+        comLegenda: true,
+      });
+      if (!r.ok || !r.legenda) {
+        // Sem roteiro ou sem legenda, o card vazio confundiria: sai inteiro.
+        await admin.from("posts_agendados").delete().eq("id", postId);
+        console.warn(`[semanal] reel animado não saiu: ${r.ok ? "sem legenda" : r.msg}`);
+      } else {
+        await admin
+          .from("posts_agendados")
+          .update({
+            copy_legenda: r.legenda.texto,
+            copy_cta: r.legenda.cta,
+            hashtags: r.legenda.hashtags,
+            copy_legenda_ia_original: r.legenda.texto,
+            copy_cta_ia_original: r.legenda.cta,
+            hashtags_ia_original: r.legenda.hashtags,
+          })
+          .eq("id", postId);
+        gerados += 1;
+      }
+    } catch (e) {
+      console.warn("[semanal] reel animado falhou:", (e as Error).message);
     }
   }
 

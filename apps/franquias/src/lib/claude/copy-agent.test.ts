@@ -56,6 +56,7 @@ test("o id do modelo vive num arquivo só", () => {
     "../agentes/ads.ts",
     "../agentes/roteiro-video.ts",
     "../conteudo/reel-actions.ts",
+    "../conteudo/reel-animado.ts",
   ];
   for (const rel of semLiteral) {
     const fonte = readFileSync(new URL(rel, import.meta.url), "utf8");

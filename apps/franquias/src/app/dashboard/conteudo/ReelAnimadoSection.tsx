@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { gerarReelAnimadoAction, type DuracaoReel } from "@/lib/conteudo/reel-actions";
+import { gerarReelAnimadoAction } from "@/lib/conteudo/reel-actions";
+import type { DuracaoReel } from "@/lib/conteudo/reel-animado";
 
 export type ReelAnimado = {
   id: string;
@@ -47,11 +48,10 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
           onChange={(e) => setDuracao(e.target.value as DuracaoReel)}
           className="rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
         >
-          {/* Teto de 1min30 (Juliana, 01/09/2026): o motor corta as cenas
-              excedentes do fim, então não existe opção acima de 90s. */}
+          {/* Teto de 1 minuto (Aline, 05/10/2026): o motor corta as cenas
+              excedentes do fim, então não existe opção acima de 60s. */}
           <option value="30s">~30 segundos</option>
-          <option value="60s">~60 segundos</option>
-          <option value="90s">~90 segundos (máximo)</option>
+          <option value="60s">~60 segundos (máximo)</option>
         </select>
         <button
           disabled={pending}
