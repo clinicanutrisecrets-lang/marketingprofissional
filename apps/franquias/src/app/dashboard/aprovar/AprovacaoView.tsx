@@ -724,7 +724,7 @@ function PostCard({
               <div className="mb-3 flex flex-wrap gap-1">
                 {(post.hashtags as string[]).slice(0, 4).map((h, i) => (
                   <span key={i} className="text-[10px] text-brand-primary">
-                    #{h}
+                    #{h.replace(/^#+/, "")}
                   </span>
                 ))}
                 {(post.hashtags as string[]).length > 4 && (
