@@ -7,7 +7,7 @@ import { createAlineClient } from "@/lib/supabase/server";
 import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenLongo, type BotaoRapido } from "@/lib/instagram/api";
 import { carregarPerfilPorId, credenciaisDoPerfil, salvarTokenRenovado } from "@/lib/instagram/credenciais";
 import { janela24hAberta, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
-import { desfechoDaFalha, registroDoDesfecho, type Desfecho } from "./envio";
+import { desfechoDaFalha, registroDoDesfecho, statusNaFila, type Desfecho, type StatusFila } from "./envio";
 
 type Passo = { id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null };
 
@@ -78,13 +78,14 @@ type ItemFila = {
   regra_id: string | null;
   passo_id: string | null;
   opcoes: Opcao[] | null;
+  tentativas: number;
 };
 
 export async function processarFila(limite = 40): Promise<{ enviados: number; cancelados: number; falhas: number }> {
   const aline = createAlineClient();
   const { data, error } = await aline
     .from("ig_fila")
-    .select("id, perfil_id, contato_id, tipo, destino, texto, sequencia_id, regra_id, passo_id, opcoes")
+    .select("id, perfil_id, contato_id, tipo, destino, texto, sequencia_id, regra_id, passo_id, opcoes, tentativas")
     .eq("status", "pendente")
     .lte("enviar_em", new Date().toISOString())
     .order("enviar_em", { ascending: true })
@@ -97,6 +98,19 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
 
   for (const item of itens) {
     try {
+      // 🔴 Linha que JÁ foi tentada e continua `pendente` significa que a
+      // marcação não pegou (incidente 05/10/2026: dez envios da mesma
+      // resposta privada). Qualquer que seja o motivo, para aqui — repetir é
+      // o defeito que a pessoa do outro lado vê.
+      if ((item.tentativas ?? 0) >= 2) {
+        console.error(
+          `[automacao/fila] ${item.id} tentada ${item.tentativas} vezes e ainda pendente — parando pra não reenviar`,
+        );
+        await marcar(item.id, "falhou", `parado depois de ${item.tentativas} tentativas sem conseguir marcar a linha`);
+        resumo.falhas++;
+        continue;
+      }
+
       let acesso = credCache.get(item.perfil_id);
       if (!acesso) {
         const perfil = await carregarPerfilPorId(item.perfil_id);
@@ -140,9 +154,15 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", item.contato_id);
       }
 
+      // A tentativa é contada ANTES de sair, pra que uma função cortada no
+      // meio do envio também conte (e caia na guarda de cima na rodada
+      // seguinte, em vez de mandar de novo).
+      await aline.from("ig_fila").update({ tentativas: (item.tentativas ?? 0) + 1 }).eq("id", item.id);
+
       // Tentativa ÚNICA, e o registro sai mesmo quando a Meta reclama — ver
       // a régua em ./envio.ts (incidente 29/09/2026).
       let desfecho: Desfecho = "entregue";
+      let motivo: string | undefined;
       try {
         if (item.tipo === "dm") await enviarDm(acesso.cred, item.destino, item.texto, botoes);
         else if (item.tipo === "private_reply") await respostaPrivadaComentario(acesso.cred, item.destino, item.texto, botoes);
@@ -150,10 +170,12 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
       } catch (e) {
         const msg = (e as Error).message;
         desfecho = desfechoDaFalha(msg);
+        motivo = msg.slice(0, 500);
         console.warn(`[automacao/fila] envio ${desfecho}:`, msg.slice(0, 300));
-        await marcar(item.id, desfecho === "sem_confirmacao" ? "sem_confirmacao" : "falhou", msg.slice(0, 500));
       }
-      if (desfecho === "entregue") await marcar(item.id, "enviado");
+      // 🔴 `statusNaFila` traduz o desfecho do código pro vocabulário do
+      // banco. Carimbar o desfecho cru aqui é o que gerou o loop de 05/10.
+      await marcar(item.id, statusNaFila(desfecho), motivo);
 
       if (desfecho !== "recusado") {
         const reg = registroDoDesfecho(desfecho, item.sequencia_id ? "sequencia" : "regra", item.regra_id ?? undefined);
@@ -178,11 +200,23 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
   }
   return resumo;
 
-  async function marcar(id: string, status: string, erro?: string) {
-    await aline
+  /**
+   * 🔴 O `status` é `StatusFila` de propósito: é o compilador recusando o
+   * valor inventado que produziu o loop de 05/10/2026. E o erro do UPDATE é
+   * LIDO — engolir ele foi a outra metade do incidente: a linha seguia
+   * `pendente` e o cron reenviava a cada 5 minutos, calado.
+   */
+  async function marcar(id: string, status: StatusFila, erro?: string) {
+    const { error } = await aline
       .from("ig_fila")
       .update({ status, erro: erro ?? null, enviado_em: status === "enviado" ? new Date().toISOString() : null })
       .eq("id", id);
+    if (error) {
+      console.error(
+        `[automacao/fila] NÃO consegui marcar ${id} como "${status}" — a linha segue pendente e o cron vai pegar de novo:`,
+        error.message,
+      );
+    }
   }
 
   async function cancelarRestoDaSequencia(item: ItemFila) {
