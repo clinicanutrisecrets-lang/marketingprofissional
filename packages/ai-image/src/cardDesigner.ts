@@ -1,3 +1,4 @@
+import { removerFundoChapado } from "./logoFundo";
 import sharp from "sharp";
 import type { BrandGuidelines, ConteudoPeca, Dimensoes } from "./types";
 import { comporTexto, medirTexto, type FamiliaFonte, type PedacoTexto } from "./textVector";
@@ -641,7 +642,8 @@ async function prepararLogo(
   try {
     const maxLogoH = Math.round(H * 0.055);
     const maxLogoW = Math.round(W * 0.34);
-    const logoPng = await sharp(logoBruta)
+    const limpa = await logoSemFundo(logoBruta);
+    const logoPng = await sharp(limpa)
       .resize(maxLogoW, maxLogoH, { fit: "inside", withoutEnlargement: true })
       .png()
       .toBuffer();
@@ -649,6 +651,30 @@ async function prepararLogo(
     return { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
   } catch {
     return null; // logo inválida — segue sem
+  }
+}
+
+/**
+ * Tira o fundo chapado (JPG com fundo branco virava um quadrado branco no
+ * card, caso Daiane 01/10/2026) e corta a margem vazia, pra logo ocupar o
+ * espaço dela. Qualquer falha devolve a original: logo com fundo é melhor
+ * que card sem logo.
+ */
+export async function logoSemFundo(bruta: Buffer): Promise<Buffer> {
+  try {
+    const { data, info } = await sharp(bruta)
+      .rotate()
+      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const r = removerFundoChapado(data, info.width, info.height);
+    const base = sharp(r ? Buffer.from(r.pixels.buffer) : data, {
+      raw: { width: info.width, height: info.height, channels: 4 },
+    });
+    return await base.png().toBuffer().then((png) => sharp(png).trim({ threshold: 10 }).png().toBuffer());
+  } catch {
+    return bruta;
   }
 }
 
