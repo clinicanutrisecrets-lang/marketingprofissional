@@ -8,7 +8,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "node --experimental-strip-types --test src/cardDesigner.test.ts"
+    "test": "node --experimental-strip-types --test src/cardDesigner.test.ts src/logoFundo.test.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

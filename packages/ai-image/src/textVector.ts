@@ -85,13 +85,30 @@ export type TextoComposto = {
 };
 
 /**
+ * As fontes embutidas não têm emoji: o glifo vazio saía como um quadradinho
+ * no fim da frase (carrossel da Juliana, 05/10/2026, "corpo insiste em dizer
+ * que não está. □"). Emoji fica na LEGENDA, que o Instagram desenha; na arte
+ * ele sai.
+ */
+export function semEmoji(texto: string): string {
+  return texto
+    .replace(/[\p{Extended_Pictographic}\p{Regional_Indicator}\u{1F3FB}-\u{1F3FF}\u200D\uFE0E\uFE0F\u20E3]/gu, (c) =>
+      // ©, ® e ™ são "pictográficos" pro Unicode, mas as fontes têm o glifo.
+      c === "\u00A9" || c === "\u00AE" || c === "\u2122" ? c : "",
+    )
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+([.,!?;:])/g, "$1")
+    .trim();
+}
+
+/**
  * Compõe um bloco de texto como uma lista de SVGs pequenos (um por palavra),
  * com quebra de linha automática, alinhamento e auto-redução para palavras
  * que não cabem na largura.
  */
 export function comporTexto(opts: ComposeOpts): TextoComposto {
+  const texto = semEmoji(opts.texto);
   const {
-    texto,
     familia,
     maxWidth,
     cor,
@@ -208,7 +225,7 @@ export function medirTexto(
   const font = getFont(familia);
   const sc = fontSize / font.unitsPerEm;
   let w = 0;
-  for (const g of font.stringToGlyphs(texto)) {
+  for (const g of font.stringToGlyphs(semEmoji(texto))) {
     w += (g.advanceWidth ?? 0) * sc + letterSpacing;
   }
   return w;
