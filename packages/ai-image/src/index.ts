@@ -33,12 +33,12 @@ export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> 
 
   // ——— PADRÃO: card tipográfico desenhado (determinístico, custo zero) ———
   if (estilo === "design" || estilo === "design_foto") {
-    let fotoBuffer: Buffer | undefined;
+    let fotoBuffer: Buffer | undefined = req.fotoPropria;
     let custoUsd = 0;
 
     // "design_foto": tenta gerar uma tirinha de foto decorativa; qualquer
     // falha é silenciosa — o card tipográfico puro é sempre um bom resultado.
-    if (estilo === "design_foto" && req.apiKey) {
+    if (!fotoBuffer && estilo === "design_foto" && req.apiKey) {
       try {
         const prompt = buildPrompt({
           tipo: req.tipo,
@@ -78,6 +78,9 @@ export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> 
       brand: req.brand,
       conteudo: req.conteudo,
       fotoBuffer,
+      // Foto da própria profissional ganha destaque; a tirinha decorativa de
+      // IA segue no tamanho de sempre.
+      ...(req.fotoPropria ? { fotoTamanho: "grande" as const } : {}),
     });
 
     return {
@@ -165,6 +168,11 @@ export async function renderCarrossel(params: {
   /** Estilo da CAPA (slide 1). O fecho continua sempre editorial. */
   capaEstilo?: EstiloCapa;
   timeoutMs?: number;
+  /**
+   * Foto do banco "Minhas fotos" pra CAPA. Com ela a capa sai com a foto (topo,
+   * grande) em vez do estilo tipográfico; os outros slides não mudam.
+   */
+  fotoCapa?: Buffer;
 }): Promise<RenderResult[]> {
   const estilo = params.estilo ?? "design";
 
@@ -182,11 +190,14 @@ export async function renderCarrossel(params: {
       // A capa pode ter estilo próprio (escolha da profissional em Meu perfil);
       // o ÚLTIMO slide segue sempre no editorial, que é o fecho da peça — e é o
       // contraste com a capa que dá arco visual ao carrossel.
-      const layout = ehCapa
-        ? layoutDaCapa(params.capaEstilo)
-        : ehUltimo
-          ? "hero"
-          : "conteudo";
+      const capaComFoto = ehCapa && !!params.fotoCapa;
+      const layout = capaComFoto
+        ? "foto"
+        : ehCapa
+          ? layoutDaCapa(params.capaEstilo)
+          : ehUltimo
+            ? "hero"
+            : "conteudo";
       const schemeIndex = ehCapa || ehUltimo ? 0 : 1;
 
       const buffer = await renderCard({
@@ -195,6 +206,7 @@ export async function renderCarrossel(params: {
         brand: params.brand,
         conteudo,
         schemeIndex,
+        ...(capaComFoto ? { fotoBuffer: params.fotoCapa, fotoTamanho: "grande" as const } : {}),
       });
       resultados.push({
         buffer,

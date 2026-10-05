@@ -22,6 +22,7 @@ const PRINCIPAIS: Item[] = [
 const FERRAMENTAS: Item[] = [
   { href: "/dashboard/conteudo", icone: "🎨", label: "Estúdio de conteúdo" },
   { href: "/dashboard/conteudo/editor", icone: "🖼️", label: "Editor de arte" },
+  { href: "/dashboard/fotos", icone: "📷", label: "Minhas fotos" },
   { href: "/dashboard/conteudo/galeria", icone: "🗂️", label: "Minha galeria" },
   { href: "/dashboard/biblioteca-posts", icone: "📚", label: "Posts prontos" },
   { href: "/dashboard/posts/novo", icone: "✍️", label: "Post manual" },

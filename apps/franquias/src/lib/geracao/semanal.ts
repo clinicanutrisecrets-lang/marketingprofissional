@@ -48,6 +48,13 @@ import { roteiroDoReelGerado } from "@/lib/geracao/roteiro-reels";
 import { brandDaFranqueada, COR_PRIMARIA_PADRAO } from "@/lib/ai-image/brand";
 import { chavesUsadas, buscarReceitaSinergia, escreverSinergia, dispararRenderSinergia } from "@/lib/conteudo/sinergia-semanal";
 import { diaDaSinergia } from "@/lib/geracao/sinergia";
+import {
+  TIPOS_FOTO_BANCO,
+  caminhoNoBucket,
+  filaDaSemana,
+  tipoLevaFotoDoBanco,
+  type FotoDoBanco,
+} from "./fotos-banco";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
@@ -206,6 +213,38 @@ export async function gerarPostsDaSemana(
   const logoUrl = await buscarArquivoUrl(admin, franqueadaId, "logo_principal");
   const fotoUrl = await buscarArquivoUrl(admin, franqueadaId, "foto_profissional");
 
+  // "Minhas fotos": a capa do carrossel e o post de feed usam uma foto do
+  // banco dela, girando pela semana. Sem foto, a arte segue tipográfica.
+  // Falha ao ler ou baixar nunca derruba o pacote: o post sai sem foto.
+  const { data: bancoRaw, error: bancoErr } = await admin
+    .from("arquivos_franqueada")
+    .select("id, url_storage")
+    .eq("franqueada_id", franqueadaId)
+    .in("tipo", [...TIPOS_FOTO_BANCO])
+    .order("criado_em", { ascending: true });
+  if (bancoErr) console.warn("[semanal] banco de fotos não lido:", bancoErr.message);
+  const filaFotos = filaDaSemana((bancoRaw ?? []) as FotoDoBanco[], semanaRef);
+  let posFoto = 0;
+  const proximaFotoDoBanco = async (): Promise<Buffer | undefined> => {
+    for (let tentativa = 0; tentativa < filaFotos.length; tentativa++) {
+      const f = filaFotos[posFoto++ % filaFotos.length]!;
+      const local = caminhoNoBucket(f.url_storage);
+      try {
+        if (local) {
+          const { data, error } = await admin.storage.from(local.bucket).download(local.path);
+          if (!error && data) return Buffer.from(await data.arrayBuffer());
+        } else {
+          const res = await fetch(f.url_storage, { signal: AbortSignal.timeout(10000) });
+          if (res.ok) return Buffer.from(await res.arrayBuffer());
+        }
+      } catch {
+        // tenta a próxima
+      }
+      console.warn(`[semanal] foto ${f.id} do banco não baixou; tentando a próxima`);
+    }
+    return undefined;
+  };
+
   // Busca inteligencia pra enriquecer os posts: datas comemorativas (14 dias a frente) + trends do dia
   const nicho = (franqueada.nicho_principal as string) ?? "saude_integrativa";
   const [datasRaw, tendencias] = await Promise.all([
@@ -320,6 +359,7 @@ export async function gerarPostsDaSemana(
               franqueadaId,
               brand: brandArte,
               slides,
+              fotoCapa: await proximaFotoDoBanco(),
               capaEstilo:
                 ((franqueada as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ??
                 undefined,
@@ -369,6 +409,7 @@ export async function gerarPostsDaSemana(
             tipo: item.tipo as "feed_imagem" | "stories",
             brand: brandArte,
             conteudo: conteudoDaArteUnica(post),
+            fotoPropria: tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco() : undefined,
           });
           urlImagem = r.url;
           await logarCusto({

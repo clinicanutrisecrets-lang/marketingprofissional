@@ -53,6 +53,11 @@ export type RenderRequest = {
   modoTexto?: ModoTexto;
   estilo?: EstiloArte;
   timeoutMs?: number;
+  /**
+   * Foto do banco "Minhas fotos" da profissional. Com ela, o card sai com a
+   * foto dela (topo, tamanho grande) e nenhuma foto é gerada por IA.
+   */
+  fotoPropria?: Buffer;
 };
 
 export type RenderResult = {
