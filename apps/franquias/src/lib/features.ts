@@ -56,7 +56,20 @@ const CONTAS_PAUSADAS = new Set<string>([
   // Aline: pausada a pedido dela em 06/09/2026 até o gerador aprender as
   // regras de docs/REGRAS-CONTEUDO.md. Religar tirando desta lista.
   "clinicanutrisecrets@gmail.com",
+  // Aline, 05/10/2026: "as demos não precisam gastar com gerações semanais
+  // de domingo, nem a minha e nem a do Scanner". A +metareview é a conta da
+  // revisão da Meta, também dela.
+  "clinicanutrisecrets+metareview@gmail.com",
+  "demo@scannerdasaude.com",
+  "demo.nutri@scannerdasaude.com",
 ]);
+
+/**
+ * Domínios cujas contas são todas internas (demos e contas do Scanner): sem
+ * geração automática de domingo. Gerar pra elas é crédito de modelo gasto sem
+ * nenhuma cliente do outro lado.
+ */
+const DOMINIOS_PAUSADOS = ["@scannerdasaude.com"];
 
 /**
  * Freio de emergência para TODAS as contas. Só a string exata 'false' desliga
@@ -70,5 +83,6 @@ export function geracaoAutomaticaAtiva(): boolean {
 /** true quando a geração automática está pausada para esta conta. */
 export function geracaoPausadaParaConta(email: string | null | undefined): boolean {
   if (!geracaoAutomaticaAtiva()) return true;
-  return CONTAS_PAUSADAS.has((email ?? "").trim().toLowerCase());
+  const e = (email ?? "").trim().toLowerCase();
+  return CONTAS_PAUSADAS.has(e) || DOMINIOS_PAUSADOS.some((d) => e.endsWith(d));
 }
