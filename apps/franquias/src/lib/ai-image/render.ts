@@ -38,6 +38,8 @@ export type GerarPostInput = {
   provider?: Provider;
   /** "design" (card puro) | "design_foto" (card + tirinha de foto IA, com fallback) | "foto_ia" (legado) */
   estilo?: RenderRequest["estilo"];
+  /** Foto do banco "Minhas fotos" (já baixada). */
+  fotoPropria?: Buffer;
 };
 
 export async function gerarEUploadImagem(input: GerarPostInput): Promise<{
@@ -55,6 +57,7 @@ export async function gerarEUploadImagem(input: GerarPostInput): Promise<{
     brand: input.brand,
     conteudo: input.conteudo,
     estilo: input.estilo,
+    fotoPropria: input.fotoPropria,
   });
 
   const path = `${input.franqueadaId}/ai-image/${Date.now()}_${input.tipo}.png`;
@@ -95,6 +98,8 @@ export async function gerarCarrosselEUpload(input: {
   /** Estilo da capa escolhido pela profissional (Meu perfil). */
   capaEstilo?: EstiloCapa;
   provider?: Provider;
+  /** Foto do banco "Minhas fotos" pra capa (já baixada). */
+  fotoCapa?: Buffer;
 }): Promise<{
   urls: string[];
   meta: { custoTotalUsd: number; tempoTotalMs: number; provider: Provider };
@@ -108,6 +113,7 @@ export async function gerarCarrosselEUpload(input: {
     brand: input.brand,
     slides: input.slides,
     capaEstilo: input.capaEstilo,
+    fotoCapa: input.fotoCapa,
   });
 
   const admin = createAdminClient();

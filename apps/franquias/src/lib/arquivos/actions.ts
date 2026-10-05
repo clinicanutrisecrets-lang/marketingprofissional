@@ -11,6 +11,7 @@ export type TipoArquivo =
   | "foto_perfil"
   | "foto_clinica"
   | "foto_atendimento"
+  | "foto_post"
   | "depoimento_print"
   | "depoimento_video"
   | "certificado"

@@ -11,6 +11,7 @@ import {
 import { validarPublico } from "@/lib/publico/publico";
 import { formatarPrecoBR } from "@/lib/produtos/contexto";
 import { AprovacaoView } from "./AprovacaoView";
+import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
 
 export const dynamic = "force-dynamic";
 
@@ -108,6 +109,16 @@ export default async function AprovarPage({
     .eq("franqueada_id", f.id as string)
     .eq("ativo", true);
 
+  // Aviso do banco de fotos: sem foto, a arte da semana sai só tipográfica.
+  // Erro de leitura não mostra o aviso (nunca afirmar "você não tem fotos"
+  // sem ter conseguido olhar).
+  const { count: totalFotos, error: errFotos } = await supabase
+    .from("arquivos_franqueada")
+    .select("id", { count: "exact", head: true })
+    .eq("franqueada_id", f.id as string)
+    .in("tipo", [...TIPOS_FOTO_BANCO]);
+  const semFotos = !errFotos && (totalFotos ?? 0) === 0;
+
   const publico = validarPublico(f.publico_briefing);
   const revisao = {
     nao_atende: publico?.nao_atende ?? null,
@@ -141,6 +152,21 @@ export default async function AprovarPage({
           <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
             Erro ao carregar as suas semanas. Recarregue a página: nenhum post
             foi perdido.
+          </div>
+        )}
+
+        {semFotos && (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-primary/20 bg-white p-4">
+            <p className="text-sm text-brand-text">
+              <strong>Suba fotos suas e dos seus pratos para os posts ganharem vida.</strong>{" "}
+              O pacote da semana usa uma delas na capa do carrossel e no post de feed.
+            </p>
+            <Link
+              href="/dashboard/fotos"
+              className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+            >
+              Subir minhas fotos
+            </Link>
           </div>
         )}
 
