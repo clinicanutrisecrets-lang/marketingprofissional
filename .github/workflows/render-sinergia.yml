@@ -1,0 +1,50 @@
+name: Render Carrossel de Sinergia
+
+# Worker de arte: desenha o carrossel de sinergia (7 slides) e o trio de
+# stories no Chromium, com a cor e a logo da conta, sobe pro Supabase Storage
+# e liga as imagens aos posts do pacote de domingo. Disparado pelo app
+# (lib/conteudo/sinergia-semanal.ts) via workflow_dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload_b64:
+        description: "conteúdo conferido + foto + marca + ids dos posts, em JSON base64"
+        required: true
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependências
+        working-directory: packages/sinergia-render
+        run: npm install --no-save --no-package-lock puppeteer-core@23
+
+      - name: Desenhar
+        run: |
+          echo "${{ inputs.payload_b64 }}" | base64 -d > /tmp/payload.json
+          CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable) \
+            node packages/sinergia-render/render.mjs /tmp/payload.json /tmp/sinergia
+
+      - name: Subir e ligar aos posts
+        run: node packages/sinergia-render/publicar.mjs /tmp/payload.json /tmp/sinergia
+
+      - name: Tirar os cards vazios
+        if: failure()
+        run: node packages/sinergia-render/publicar.mjs /tmp/payload.json /tmp/sinergia --falhou || true
