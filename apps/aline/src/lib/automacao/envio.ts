@@ -70,3 +70,37 @@ export function registroDoDesfecho(
   }
   return { origem: `falha_envio:${origem}`, regraId: undefined, precisaConferir: true };
 }
+
+/**
+ * Os status que a linha da FILA aceita. É a lista do CHECK
+ * `ig_fila_status_check` no banco.
+ *
+ * 🔴 ISTO EXISTE POR CAUSA DE UM SEGUNDO INCIDENTE REAL (05/10/2026), que foi
+ * o conserto acima mal ligado. A fila passou a gravar
+ * `status='sem_confirmacao'` — valor que o CHECK RECUSA — e o `marcar()` não
+ * lia o erro do UPDATE. A linha continuou `pendente`, o cron pegou de novo, e
+ * a MESMA resposta privada saiu DEZ vezes, de 5 em 5 minutos, até alguém
+ * marcar a linha à mão.
+ *
+ * A lição: `Desfecho` é vocabulário do CÓDIGO, `status` é vocabulário do
+ * BANCO. Os dois nunca são a mesma lista, e a tradução entre eles mora aqui —
+ * com o tipo fechado, pra o compilador recusar o valor inventado.
+ */
+export const STATUS_FILA = ["pendente", "enviado", "falhou", "cancelado"] as const;
+export type StatusFila = (typeof STATUS_FILA)[number];
+
+export function ehStatusDeFila(valor: string): valor is StatusFila {
+  return (STATUS_FILA as readonly string[]).includes(valor);
+}
+
+/**
+ * Em que status a linha da fila para, depois de uma tentativa de envio.
+ *
+ * 🔴 `sem_confirmacao` vira `enviado`, nunca `pendente`: `pendente` É o loop
+ * do incidente. E nunca `falhou`, que mentiria no histórico sobre uma
+ * mensagem que provavelmente chegou. O motivo verdadeiro fica no campo `erro`
+ * da própria linha, pra quem for conferir ler.
+ */
+export function statusNaFila(desfecho: Desfecho): StatusFila {
+  return desfecho === "recusado" ? "falhou" : "enviado";
+}
