@@ -96,6 +96,12 @@ export default async function PerfilPage({ params, searchParams }: PageProps) {
                 </a>
               )}
               <Link
+                href={`/perfis/${perfil.slug as string}/feed`}
+                className="rounded-full bg-teal-100 px-3 py-1 text-xs font-medium text-teal-800 hover:bg-teal-200"
+              >
+                🗓️ Planejamento do feed
+              </Link>
+              <Link
                 href={`/perfis/${perfil.slug as string}/automacoes`}
                 className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 hover:bg-purple-200"
               >
