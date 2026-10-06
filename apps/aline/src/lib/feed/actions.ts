@@ -2,13 +2,12 @@
 
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { ehAcervoAntigo, type PostFeed } from "./plano";
+import { CORTE_ACERVO_ANTIGO, ehAcervoAntigo, type PostFeed } from "./plano";
 
-/**
- * Data em que a Aline mandou começar limpo. Post criado ANTES disso, que nunca
- * foi ao ar e segue esperando aprovação, é acervo velho.
- */
-export const CORTE_ACERVO_ANTIGO = "2026-10-06T00:00:00.000Z";
+// 🔴 A data do corte mora em ./plano.ts, não aqui: arquivo "use server" só
+// pode exportar função assíncrona. Exportar a const daqui quebrou o build
+// (preview do PR #72, 06/10/2026) com "Only async functions are allowed to be
+// exported in a 'use server' file".
 
 async function assertSuperAdmin() {
   const supabase = createClient();

@@ -138,6 +138,8 @@ export function dataCurta(iso: string | null): string {
  * 🔴 `data_hora_postada` é a trava que importa. Post que já foi ao ar é
  * histórico do perfil e não se apaga, qualquer que seja o status dele.
  */
+export const CORTE_ACERVO_ANTIGO = "2026-10-06T00:00:00.000Z";
+
 export function ehAcervoAntigo(p: PostFeed, corteIso: string): boolean {
   if (p.data_hora_postada) return false;
   if (p.status !== "aguardando_aprovacao") return false;

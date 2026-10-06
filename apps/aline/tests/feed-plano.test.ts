@@ -4,7 +4,20 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+/** Varre a pasta atrás de arquivo que começa com "use server". */
+function arquivosUseServer(dir: string, achados: string[] = []): string[] {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const caminho = join(dir, e.name);
+    if (e.isDirectory()) { arquivosUseServer(caminho, achados); continue; }
+    if (!/\.(ts|tsx)$/.test(e.name)) continue;
+    const fonte = readFileSync(caminho, "utf8");
+    if (/^\s*["']use server["']/.test(fonte)) achados.push(caminho);
+  }
+  return achados;
+}
 import {
   agruparPorMes, chaveDoMes, dataCurta, dataDoPost, ehAcervoAntigo, ehDeGrade,
   ordenarParaFeed, rotuloDoMes, rotuloTipo, seloDoStatus, tituloDoPost, type PostFeed,
@@ -158,4 +171,26 @@ test("a limpeza é só de super_admin e apaga mídia antes do post", () => {
   const iMid = acoes.indexOf('from("post_midias").delete()');
   const iPost = acoes.indexOf('from("posts").delete()');
   assert.ok(iMid > 0 && iPost > iMid, "a mídia tem que sair antes do post");
+});
+
+/* ── a armadilha do "use server" (preview do PR #72 quebrou nela) ──────── */
+
+test('🔴 arquivo "use server" só exporta função async, nunca const', () => {
+  // "Only async functions are allowed to be exported in a 'use server' file."
+  // O build quebra, e o `npm test` daqui NÃO pega: a suíte roda os módulos
+  // puros sem passar pelo Next. Então a trava é ler o fonte.
+  const lista = arquivosUseServer("src");
+  assert.ok(lista.length > 0, "não achei nenhum arquivo use server");
+  for (const arq of lista) {
+    const fonte = readFileSync(arq, "utf8");
+    for (const linha of fonte.split("\n")) {
+      if (!/^export\s/.test(linha)) continue;
+      if (/^export\s+(type|interface)\s/.test(linha)) continue; // tipo some na compilação
+      assert.match(
+        linha,
+        /^export\s+async\s+function\s/,
+        `${arq}: "${linha.trim()}" — em "use server" só vale export async function`,
+      );
+    }
+  }
 });

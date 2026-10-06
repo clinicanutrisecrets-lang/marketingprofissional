@@ -2,10 +2,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import {
-  agruparPorMes, dataCurta, dataDoPost, ehAcervoAntigo, ehDeGrade,
-  ordenarParaFeed, rotuloTipo, seloDoStatus, tituloDoPost, type PostFeed,
+  agruparPorMes, CORTE_ACERVO_ANTIGO, dataCurta, dataDoPost, ehAcervoAntigo,
+  ehDeGrade, ordenarParaFeed, rotuloTipo, seloDoStatus, tituloDoPost, type PostFeed,
 } from "@/lib/feed/plano";
-import { CORTE_ACERVO_ANTIGO } from "@/lib/feed/actions";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 
 export const dynamic = "force-dynamic";
