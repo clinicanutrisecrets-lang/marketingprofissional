@@ -6,6 +6,8 @@ import {
   escolherAprovacao,
   publicacaoAutomaticaLigada,
   semanasVisiveis,
+  semanasPendentesAnteriores,
+  rotuloSemanaCurto,
   type AprovacaoCandidata,
 } from "@/lib/aprovacao/semana";
 import { validarPublico } from "@/lib/publico/publico";
@@ -89,6 +91,8 @@ export default async function AprovarPage({
     fechada: aprovacaoFechada(c.status),
   }));
 
+  const pendentesAntigas = semanasPendentesAnteriores(candidatas, escolhida);
+
   let posts: Array<Record<string, unknown>> = [];
   if (escolhida) {
     const { data: postsData } = await supabase
@@ -152,6 +156,28 @@ export default async function AprovarPage({
           <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
             Erro ao carregar as suas semanas. Recarregue a página: nenhum post
             foi perdido.
+          </div>
+        )}
+
+        {pendentesAntigas.length > 0 && (
+          <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            <p>
+              <strong>
+                Você ainda tem {pendentesAntigas.length === 1 ? "1 semana passada pendente" : `${pendentesAntigas.length} semanas passadas pendentes`} de aprovação.
+              </strong>{" "}
+              Se quiser usar esses posts, abra a semana e aprove. Elas foram montadas antes das mudanças de estilo, então a arte pode estar no modelo antigo.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {pendentesAntigas.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/dashboard/aprovar?semana=${s.id}`}
+                  className="rounded-full border border-amber-400 bg-white px-3 py-1 text-xs font-semibold text-amber-900 hover:bg-amber-100"
+                >
+                  Semana de {rotuloSemanaCurto(s.semana_ref)} ({s.posts} posts)
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 

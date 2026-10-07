@@ -31,7 +31,7 @@ import {
   filtrarPorNicho,
 } from "@/lib/tendencias/datas-comemorativas";
 import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
-import { aplicarTemaEmAlta, escolherTemaEmAlta } from "@/lib/geracao/tema-em-alta";
+import { aplicarTemaEmAlta, escolherTemaEmAlta, temaSinergiaDoTemaEmAlta } from "@/lib/geracao/tema-em-alta";
 import {
   buscarBriefingsPendentes,
   marcarBriefingUsado,
@@ -716,7 +716,15 @@ export async function gerarPostsDaSemana(
       .filter(Boolean)
       .join(" · ");
     const usadas = await chavesUsadas(admin, franqueadaId);
-    const r = await buscarReceitaSinergia({ texto: textoTema, usadas, semente: `${franqueadaId}:${semanaRef}` });
+    // Tema em alta que cai numa área de saúde (ex.: câncer de intestino →
+    // intestino) escolhe a receita e o assunto da sinergia (Aline, 07/10).
+    const temaSinergia = temaSinergiaDoTemaEmAlta(temaEmAlta);
+    const r = await buscarReceitaSinergia({
+      texto: textoTema,
+      temas: temaSinergia ? [temaSinergia] : undefined,
+      usadas,
+      semente: `${franqueadaId}:${semanaRef}`,
+    });
     if (!r.ok) throw new Error(`receita: ${r.motivo}`);
     const esc = await escreverSinergia({
       franqueadaId,
@@ -725,6 +733,7 @@ export async function gerarPostsDaSemana(
       publico: contexto.publico ?? null,
       publicoTexto: (franqueada.publico_alvo_descricao as string | null) ?? null,
       queixas: estrategia.queixas.join(", ") || null,
+      temaEmAlta: temaSinergia ? temaEmAlta : null,
     });
     if (!esc.ok) throw new Error(`texto: ${esc.motivo}`);
     if (esc.avisos.length) console.warn("[semanal] sinergia, linhas descartadas:", esc.avisos.join(" | "));
@@ -756,7 +765,10 @@ export async function gerarPostsDaSemana(
         copy_legenda_ia_original: c.legenda,
         copy_cta_ia_original: c.cta,
         hashtags_ia_original: c.hashtags,
-        papel_estrategia: `Sinergia da semana: ${c.titulo_receita}`.slice(0, 300),
+        papel_estrategia: (temaSinergia && temaEmAlta
+          ? `Sinergia da semana, puxada pelo tema em alta "${temaEmAlta.tema}": ${c.titulo_receita}`
+          : `Sinergia da semana: ${c.titulo_receita}`
+        ).slice(0, 300),
         lembrete_execucao: "Poste o carrossel e, no mesmo dia, os três stories que vêm logo abaixo.",
         ia_model_usado: CLAUDE_MODEL_COPY,
       })
