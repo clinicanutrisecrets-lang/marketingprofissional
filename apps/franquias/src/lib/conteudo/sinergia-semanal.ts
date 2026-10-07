@@ -23,6 +23,8 @@ type Admin = ReturnType<typeof createAdminClient>;
  */
 export async function buscarReceitaSinergia(p: {
   texto: string;
+  /** Tema da sinergia já decidido (o do tema em alta). Tem precedência sobre o texto. */
+  temas?: string[];
   usadas: string[];
   semente: string;
 }): Promise<{ ok: true; receita: ReceitaSinergia } | { ok: false; motivo: string }> {
@@ -30,6 +32,7 @@ export async function buscarReceitaSinergia(p: {
   if (!secret) return { ok: false, motivo: "sem MARKETING_WEBHOOK_SECRET" };
   const base = process.env.SCANNER_SAAS_URL ?? "https://scannerdasaude.com";
   const q = new URLSearchParams({
+    ...(p.temas?.length ? { temas: p.temas.join(",") } : {}),
     texto: p.texto.slice(0, 600),
     usadas: p.usadas.join(","),
     semente: p.semente,
@@ -69,11 +72,50 @@ TAMANHOS MÁXIMOS (o slide tem espaço fixo): tema 60 · subtitulo 110 · trio 5
 
 O TEMA puxa a queixa da conta quando a receita conversa com ela (ex.: "Sinergia nutricional para a saúde hormonal"); quando não conversa, fale do benefício da própria receita. Nunca force.
 
+TEMA EM ALTA (quando vier "tema_em_alta" no pedido): a receita foi escolhida pela área de saúde desse assunto. O carrossel é a SINERGIA voltada pra essa área (ex.: em alta "câncer de intestino" → "Sinergia nutricional para a saúde intestinal"). A legenda abre pelo assunto em alta como gancho e leva pra o cuidado que a nutrição faz. Nome de doença só como referência do assunto do momento, nunca afirmando que a leitora tem, nunca prometendo prevenir ou tratar, e sem opinar sobre conduta médica.
+
 LEGENDA do post (Instagram): 4 a 7 parágrafos curtos, abre com gancho que funciona sem contexto, explica a sinergia em linguagem de leiga, termina convidando a salvar e compartilhar. "cta": uma frase curta de convite pra falar com a profissional. "hashtags": 6 a 10.
 
-Responda APENAS JSON válido, sem markdown:
-{"titulo_receita":"","tema":"","subtitulo":"","trio":"A • B • C","explicacao":"","nutrientes":[{"nome":"","onde":"","texto":"","microbiota":"","nutrigenetica":"","exame":""}],"ingredientes_idx":[0,1,2],"passos":["","",""],"trocas":[""],"fecho":"","legenda":"","cta":"","hashtags":[""]}
+Entregue chamando a ferramenta "carrossel_sinergia" (uma vez só).
 `;
+
+/**
+ * Resposta estruturada (ferramenta) em vez de JSON escrito em texto.
+ * 🔴 Em 07/10/2026 a sinergia caiu duas vezes em "JSON inválido": a legenda
+ * tem 4 a 7 parágrafos, e o modelo escrevia quebra de linha crua dentro da
+ * string, que JSON não aceita. Com ferramenta, quem monta o JSON é a API.
+ */
+const STR = { type: "string" } as const;
+const FERRAMENTA_SINERGIA: Anthropic.Tool = {
+  name: "carrossel_sinergia",
+  description: "Entrega o carrossel de sinergia da semana.",
+  input_schema: {
+    type: "object",
+    properties: {
+      titulo_receita: STR,
+      tema: STR,
+      subtitulo: STR,
+      trio: STR,
+      explicacao: STR,
+      nutrientes: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: { nome: STR, onde: STR, texto: STR, microbiota: STR, nutrigenetica: STR, exame: STR },
+          required: ["nome", "onde", "texto"],
+        },
+      },
+      ingredientes_idx: { type: "array", items: { type: "integer" } },
+      passos: { type: "array", items: STR },
+      trocas: { type: "array", items: STR },
+      fecho: STR,
+      legenda: STR,
+      cta: STR,
+      hashtags: { type: "array", items: STR },
+    },
+    required: ["titulo_receita", "tema", "explicacao", "nutrientes", "ingredientes_idx", "passos", "legenda", "hashtags"],
+  },
+};
 
 export async function escreverSinergia(p: {
   franqueadaId: string;
@@ -83,6 +125,8 @@ export async function escreverSinergia(p: {
   publico: PublicoDaCopy | null;
   publicoTexto: string | null;
   queixas: string | null;
+  /** O tema em alta que escolheu a receita (null = semana sem tema em alta ligado). */
+  temaEmAlta?: { tema: string; resumo?: string | null } | null;
 }): Promise<{ ok: true; conteudo: ConteudoSinergia; avisos: string[] } | { ok: false; motivo: string }> {
   const system = comAgenteDeCopy(TAREFA, {
     publico: p.publico ?? undefined,
@@ -97,6 +141,7 @@ export async function escreverSinergia(p: {
       compostos_marcados_pela_curadoria: p.receita.compostos,
     },
     conta: { nicho: p.nicho, publico: p.publicoTexto, queixas_da_semana: p.queixas },
+    ...(p.temaEmAlta ? { tema_em_alta: p.temaEmAlta } : {}),
   };
   // Duas tentativas: a conferência recusa resposta fora do formato.
   let ultimo = "";
@@ -104,8 +149,10 @@ export async function escreverSinergia(p: {
     const anthropic = createClaude();
     const msg = await anthropic.messages.create({
       model: CLAUDE_MODEL_COPY,
-      max_tokens: 4000,
+      max_tokens: 6000,
       system,
+      tools: [FERRAMENTA_SINERGIA],
+      tool_choice: { type: "tool", name: FERRAMENTA_SINERGIA.name },
       messages: [{ role: "user", content: JSON.stringify(pedido) }],
     });
     await logarCusto({
@@ -115,22 +162,16 @@ export async function escreverSinergia(p: {
       modelo: CLAUDE_MODEL_COPY,
       uso: msg.usage,
     });
-    const texto = msg.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-    const m = texto.match(/\{[\s\S]*\}/);
-    if (!m) {
-      ultimo = "sem JSON";
+    if (msg.stop_reason === "max_tokens") {
+      ultimo = "resposta cortada (max_tokens)";
       continue;
     }
-    let bruto: unknown;
-    try {
-      bruto = JSON.parse(m[0]);
-    } catch {
-      ultimo = "JSON inválido";
+    const bloco = msg.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
+    if (!bloco) {
+      ultimo = "sem resposta estruturada";
       continue;
     }
+    const bruto: unknown = bloco.input;
     const c = conferirConteudo(bruto, p.receita);
     if (c.ok) return c;
     ultimo = c.motivo;

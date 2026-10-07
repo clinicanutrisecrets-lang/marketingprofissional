@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { aplicarTemaEmAlta, escolherTemaEmAlta, indiceDoSlotTemaEmAlta } from "./tema-em-alta.ts";
+import { aplicarTemaEmAlta, escolherTemaEmAlta, indiceDoSlotTemaEmAlta, temaSinergiaDoTemaEmAlta } from "./tema-em-alta.ts";
 
 // Temas reais de saude_feminina, 07/10/2026 (ordem de relevância).
 const TENDENCIAS = [
@@ -48,4 +48,27 @@ test("a geração semanal aplica o tema e o prompt geral não manda mais 'não f
   assert.match(src, /aplicarTemaEmAlta\(/);
   assert.match(src, /escolherTemaEmAlta\(/);
   assert.doesNotMatch(src, /TEMAS EM ALTA HOJE NO NICHO/);
+});
+
+test("o tema em alta puxa o tema da sinergia (câncer de intestino → intestino)", () => {
+  const t = (tema: string, resumo: string | null = null) => temaSinergiaDoTemaEmAlta({ tema, resumo });
+  assert.equal(t("Câncer de intestino cresce entre jovens"), "intestino");
+  assert.equal(t("Câncer colorretal: rastreamento aos 45"), "intestino");
+  assert.equal(t("Terapia hormonal na menopausa: além dos fogachos"), "hormonal");
+  assert.equal(t("Insônia e telas antes de dormir"), "sono");
+  assert.equal(t("Burnout e cortisol no trabalho"), "estresse");
+  assert.equal(t("Lipedema ganha nova diretriz"), "inflamacao");
+  assert.equal(t("Fadiga depois da covid"), "cansaco");
+  assert.equal(t("Mamão é bom pra que?"), null);
+  assert.equal(temaSinergiaDoTemaEmAlta(null), null);
+});
+
+test("a geração liga o tema em alta à sinergia, e a sinergia responde por ferramenta", () => {
+  const semanal = readFileSync(new URL("./semanal.ts", import.meta.url), "utf8");
+  assert.match(semanal, /temaSinergiaDoTemaEmAlta\(temaEmAlta\)/);
+  assert.match(semanal, /temas: temaSinergia \? \[temaSinergia\]/);
+  const sin = readFileSync(new URL("../conteudo/sinergia-semanal.ts", import.meta.url), "utf8");
+  // 07/10: "JSON inválido" duas vezes, legenda com quebra de linha crua.
+  assert.match(sin, /tool_choice/);
+  assert.doesNotMatch(sin, /JSON\.parse\(/);
 });

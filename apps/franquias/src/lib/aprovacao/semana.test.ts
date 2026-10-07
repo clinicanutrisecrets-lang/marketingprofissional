@@ -11,6 +11,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   aprovacaoEmRevisao,
   aprovacaoFechada,
@@ -21,6 +22,7 @@ import {
   nomeArquivoDaArte,
   publicacaoAutomaticaLigada,
   semanasVisiveis,
+  semanasPendentesAnteriores,
   artesDoPost,
 } from "./semana.ts";
 
@@ -201,4 +203,22 @@ test("caso Viviane: pendente ANTIGA não toma a vez da semana que ela acabou de 
   assert.equal(escolherAprovacao(cands, "40d40ebb")?.id, "40d40ebb");
   // sem nada aprovado, a pendente mais nova abre como sempre
   assert.equal(escolherAprovacao(cands.slice(1))?.id, "40d40ebb");
+});
+
+test("a tela avisa as semanas passadas pendentes (Aline, 07/10)", () => {
+  const cands = [
+    { id: "91a96532", semana_ref: "2026-10-05", status: "aprovada_integral", posts: 12 },
+    { id: "40d40ebb", semana_ref: "2026-09-28", status: "aguardando", posts: 11 },
+    { id: "a2d9f4b3", semana_ref: "2026-09-21", status: "aguardando", posts: 8 },
+    { id: "velha-ok", semana_ref: "2026-09-07", status: "aprovada_integral", posts: 9 },
+    { id: "vazia", semana_ref: "2026-08-31", status: "aguardando", posts: 0 },
+  ];
+  const aberta = escolherAprovacao(cands);
+  assert.deepEqual(semanasPendentesAnteriores(cands, aberta).map((c) => c.id), ["40d40ebb", "a2d9f4b3"]);
+  // abrindo a de 28/09, só a de 21/09 é "passada"
+  assert.deepEqual(semanasPendentesAnteriores(cands, cands[1]).map((c) => c.id), ["a2d9f4b3"]);
+  assert.deepEqual(semanasPendentesAnteriores(cands, null), []);
+  const tela = readFileSync(new URL("../../app/dashboard/aprovar/page.tsx", import.meta.url), "utf8");
+  assert.match(tela, /semanasPendentesAnteriores\(candidatas, escolhida\)/);
+  assert.match(tela, /semanas passadas pendentes/);
 });

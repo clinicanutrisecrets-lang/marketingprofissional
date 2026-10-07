@@ -100,6 +100,22 @@ export function escolherAprovacao<T extends AprovacaoCandidata>(
   );
 }
 
+/**
+ * Semanas passadas que ainda esperam aprovação, fora a que está aberta na
+ * tela (Aline, 07/10/2026): depois que a tela passou a abrir a semana mais
+ * nova, as pendentes antigas só apareciam nos chips, e ninguém sabia que
+ * estavam ali. A tela avisa e manda o link de cada uma.
+ */
+export function semanasPendentesAnteriores<T extends AprovacaoCandidata>(
+  candidatas: T[],
+  aberta: Pick<AprovacaoCandidata, "id" | "semana_ref"> | null,
+): T[] {
+  if (!aberta) return [];
+  return semanasVisiveis(candidatas).filter(
+    (c) => c.id !== aberta.id && aprovacaoEmRevisao(c.status) && c.semana_ref < aberta.semana_ref,
+  );
+}
+
 /** "14/09" — rótulo curto de semana pra chip e frase. */
 export function rotuloSemanaCurto(semanaRef: string): string {
   const [, mes, dia] = semanaRef.split("-");

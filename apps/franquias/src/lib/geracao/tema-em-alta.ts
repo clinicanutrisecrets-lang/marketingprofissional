@@ -88,3 +88,29 @@ export function aplicarTemaEmAlta<S extends SlotMinimo>(
   copia[i] = novo;
   return { slots: copia, usado: tema };
 }
+
+/**
+ * O tema em alta também puxa o carrossel de SINERGIA da semana (Aline,
+ * 07/10/2026): se está em alta "câncer de intestino" e ela atende intestino,
+ * a sinergia é voltada pra saúde intestinal. O Scanner escolhe a receita por
+ * um destes seis temas; aqui o tema em alta é traduzido pra um deles.
+ * Sem tradução, a sinergia segue pelas queixas da conta, como antes.
+ */
+export const TEMAS_SINERGIA = ["estresse", "sono", "hormonal", "cansaco", "inflamacao", "intestino"] as const;
+export type TemaSinergia = (typeof TEMAS_SINERGIA)[number];
+
+const PALAVRAS_SINERGIA: [TemaSinergia, RegExp][] = [
+  ["intestino", /intestin|colorret|\bcolon\b|microbiot|disbiose|constipa|prisao de ventre|diarreia|sibo|gases|distens|refluxo|gastrit|digest|celiac|gluten|probiot|fezes/],
+  ["sono", /\bsono\b|insoni|dormir|melatonin|ronco|apneia|ritmo circadiano/],
+  ["estresse", /estresse|cortisol|ansiedad|burnout|depress|saude mental|panico|humor/],
+  ["hormonal", /menopaus|climater|hormon|tireoid|hashimoto|\bsop\b|ovario policistico|endometrio|fertilidad|gestac|gravid|libido|estrogen|testosteron|\btpm\b|ciclo menstrual|\bmama\b/],
+  ["cansaco", /cansaco|fadiga|energia|exaust|disposic|anemia|ferro|vitamina d|b12/],
+  ["inflamacao", /inflama|autoimun|artrit|artros|dor cronic|fibromialg|lipedema|psoria|dermatit|alergi|rinite|cardio|colesterol|diabet|glicem|insulin|obesid|figado|esteatos/],
+];
+
+export function temaSinergiaDoTemaEmAlta(tema: TemaEmAlta | null): TemaSinergia | null {
+  if (!tema) return null;
+  const t = `${tema.tema} ${tema.resumo ?? ""}`.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  for (const [alvo, re] of PALAVRAS_SINERGIA) if (re.test(t)) return alvo;
+  return null;
+}
