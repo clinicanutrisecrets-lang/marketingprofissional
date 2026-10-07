@@ -31,6 +31,7 @@ import {
   filtrarPorNicho,
 } from "@/lib/tendencias/datas-comemorativas";
 import { listarTendenciasDoDia } from "@/lib/tendencias/orquestrar";
+import { aplicarTemaEmAlta, escolherTemaEmAlta } from "@/lib/geracao/tema-em-alta";
 import {
   buscarBriefingsPendentes,
   marcarBriefingUsado,
@@ -189,7 +190,18 @@ export async function gerarPostsDaSemana(
   // e cada post um PAPEL nela. As queixas do questionário dela
   // são o assunto; sem elas, o nicho. Mesmas regras de formato e de frequência
   // do planejarSemana antigo (no máximo 1 comercial, reel/carrossel/stories).
-  const { estrategia, slots: plano } = planoDaJornada({
+  // Busca inteligencia pra enriquecer os posts: datas comemorativas (14 dias a frente) + trends do dia
+  const nicho = (franqueada.nicho_principal as string) ?? "saude_integrativa";
+  const [datasRaw, tendencias] = await Promise.all([
+    buscarDatasProximas(14, new Date(semanaRef)),
+    // O nicho da franqueada, não um fixo: era o segundo lugar (junto do
+    // TendenciasCard) onde "saude_integrativa" estava escrito na mão e o
+    // radar de outra especialidade entrava no prompt dos posts dela.
+    listarTendenciasDoDia(nicho, 5),
+  ]);
+  const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
+
+  const { estrategia, slots: planoBase } = planoDaJornada({
     diasPostSemana: (franqueada.dias_post_semana as number[]) ?? [1, 3, 5],
     frequenciaReels: (franqueada.frequencia_reels as string) ?? "semanal",
     frequenciaStories: (franqueada.frequencia_stories as string) ?? "diario",
@@ -201,6 +213,16 @@ export async function gerarPostsDaSemana(
     queixas: contexto.publico?.queixas ?? null,
     nicho: (franqueada.nicho_principal as string) ?? "saude_integrativa",
   });
+  // O tema em alta vira ASSUNTO de um post de conteúdo (Viviane, 06/10/2026:
+  // "adorei os temas em alta, mas não vi eles nos posts"). Antes entrava em
+  // todos os prompts como "inspiração, não force encaixe" e nunca aparecia.
+  const { slots: plano, usado: temaEmAlta } = aplicarTemaEmAlta(
+    planoBase,
+    escolherTemaEmAlta(tendencias, contexto.publico?.nao_atende ?? null),
+  );
+  if (temaEmAlta) {
+    estrategia.passos = plano.filter((p) => p.tipo !== "stories").map((p) => p.papel);
+  }
   {
     const { error: estErr } = await admin
       .from("aprovacoes_semanais")
@@ -245,22 +267,9 @@ export async function gerarPostsDaSemana(
     return undefined;
   };
 
-  // Busca inteligencia pra enriquecer os posts: datas comemorativas (14 dias a frente) + trends do dia
-  const nicho = (franqueada.nicho_principal as string) ?? "saude_integrativa";
-  const [datasRaw, tendencias] = await Promise.all([
-    buscarDatasProximas(14, new Date(semanaRef)),
-    // O nicho da franqueada, não um fixo: era o segundo lugar (junto do
-    // TendenciasCard) onde "saude_integrativa" estava escrito na mão e o
-    // radar de outra especialidade entrava no prompt dos posts dela.
-    listarTendenciasDoDia(nicho, 5),
-  ]);
-  const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
-
   // Monta bloco de contexto extra textual que vai entrar no prompt do Claude
-  const blocoContextoExtra = montarBlocoContextoExtra(
-    datasComemorativas,
-    tendencias,
-  );
+  // (só as datas: o tema em alta já virou assunto de um post, lá no plano).
+  const blocoContextoExtra = montarBlocoContextoExtra(datasComemorativas);
 
   // Briefings antecipados — temas que a nutri pediu durante a semana.
   // Consumidos primeiro, antes do plano automático.
@@ -908,7 +917,7 @@ function proximaSegunda(): string {
 }
 
 /**
- * Monta bloco de texto com datas comemorativas + tendencias do momento
+ * Monta bloco de texto com as datas comemorativas
  * pra injetar no prompt do Claude como contexto_extra.
  * Se vazio, retorna undefined (Claude nao usa nada extra).
  */
@@ -921,36 +930,20 @@ function montarBlocoContextoExtra(
     descricao: string | null;
     ideias_angulo: string | null;
   }>,
-  tendencias: Array<Record<string, unknown>>,
 ): string | undefined {
-  const partes: string[] = [];
-
-  if (datas.length > 0) {
-    partes.push("DATAS COMEMORATIVAS NAS PROXIMAS 2 SEMANAS (use se fizer sentido no calendario da semana):");
-    datas.slice(0, 5).forEach((d) => {
-      partes.push(
-        `- ${d.data_dia}/${d.data_mes} — ${d.nome}${d.ideias_angulo ? `: ${d.ideias_angulo}` : ""}`,
-      );
-    });
-    partes.push("");
-  }
-
-  if (tendencias.length > 0) {
-    partes.push("TEMAS EM ALTA HOJE NO NICHO (use como inspiracao de angulo se casar com a franqueada):");
-    tendencias.slice(0, 5).forEach((t) => {
-      partes.push(
-        `- ${t.tema as string}${t.resumo ? ` — ${t.resumo as string}` : ""}`,
-      );
-    });
-    partes.push("");
-  }
-
-  if (partes.length === 0) return undefined;
-
+  if (datas.length === 0) return undefined;
+  const partes: string[] = [
+    "DATAS COMEMORATIVAS NAS PROXIMAS 2 SEMANAS (use se fizer sentido no calendario da semana):",
+  ];
+  datas.slice(0, 5).forEach((d) => {
+    partes.push(
+      `- ${d.data_dia}/${d.data_mes}, ${d.nome}${d.ideias_angulo ? `: ${d.ideias_angulo}` : ""}`,
+    );
+  });
+  partes.push("");
   partes.push(
-    "IMPORTANTE: use esses inputs SOMENTE se forem realmente relevantes pra franqueada e pro publico-alvo dela. Nao force encaixe.",
+    "IMPORTANTE: use essas datas SOMENTE se forem realmente relevantes pra franqueada e pro publico-alvo dela. Nao force encaixe.",
   );
-
   return partes.join("\n");
 }
 
