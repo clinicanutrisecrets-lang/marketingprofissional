@@ -45,11 +45,11 @@ test("🔴 aprovação sem post nenhum é resíduo: não aparece e não é escol
   );
 });
 
-test("pendente vem antes de aprovada, e a mais recente antes da antiga", () => {
+test("pendente mais nova vem antes de aprovada, e a mais recente antes da antiga", () => {
   const cands = [
     { id: "velha-aprovada", semana_ref: "2026-08-31", status: "aprovada_integral", posts: 6 },
     { id: "nova-aprovada", semana_ref: "2026-09-14", status: "aprovada_integral", posts: 13 },
-    { id: "pendente", semana_ref: "2026-09-07", status: "aguardando", posts: 8 },
+    { id: "pendente", semana_ref: "2026-09-21", status: "aguardando", posts: 8 },
   ];
   assert.equal(escolherAprovacao(cands)?.id, "pendente");
   assert.equal(
@@ -185,4 +185,20 @@ test("nomeArquivoDaArte: slide ganha número, peça única não muda", () => {
   const p = { tipo_post: "feed_carrossel", data_hora_agendada: "2026-09-29T08:00:00+00:00" };
   assert.equal(nomeArquivoDaArte(p, "https://x/a.png?t=1", 2), "feed-carrossel-2026-09-29-slide-02.png");
   assert.equal(nomeArquivoDaArte(p, "https://x/a.png?t=1"), "feed-carrossel-2026-09-29.png");
+});
+
+test("caso Viviane: pendente ANTIGA não toma a vez da semana que ela acabou de aprovar", () => {
+  // Linhas reais de 06/10/2026 (suporte.vivitavares): aprovou 05/10 com a arte
+  // nova; 28/09, 21/09 e 14/09 seguiam pendentes, geradas no estilo antigo.
+  const cands = [
+    { id: "91a96532", semana_ref: "2026-10-05", status: "aprovada_integral", posts: 12 },
+    { id: "40d40ebb", semana_ref: "2026-09-28", status: "aguardando", posts: 11 },
+    { id: "a2d9f4b3", semana_ref: "2026-09-21", status: "aguardando", posts: 8 },
+    { id: "29d97867", semana_ref: "2026-09-14", status: "aguardando", posts: 9 },
+  ];
+  assert.equal(escolherAprovacao(cands)?.id, "91a96532");
+  // e as antigas continuam abríveis pelo chip
+  assert.equal(escolherAprovacao(cands, "40d40ebb")?.id, "40d40ebb");
+  // sem nada aprovado, a pendente mais nova abre como sempre
+  assert.equal(escolherAprovacao(cands.slice(1))?.id, "40d40ebb");
 });

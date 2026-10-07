@@ -74,8 +74,9 @@ export function semanasVisiveis<T extends AprovacaoCandidata>(candidatas: T[]): 
 
 /**
  * A semana que a tela abre por padrão: primeiro a que ainda espera revisão
- * (é o que exige ação dela), depois a mais recente já aprovada. Semana
- * aprovada NUNCA é escondida — só perde a vez pra uma pendente.
+ * E é mais nova que a última aprovada (é o que exige ação dela), senão a mais
+ * recente. Semana aprovada NUNCA é escondida — só perde a vez pra uma
+ * pendente mais nova.
  */
 export function escolherAprovacao<T extends AprovacaoCandidata>(
   candidatas: T[],
@@ -86,7 +87,17 @@ export function escolherAprovacao<T extends AprovacaoCandidata>(
     const pedida = visiveis.find((c) => c.id === idPedido);
     if (pedida) return pedida;
   }
-  return visiveis.find((c) => aprovacaoEmRevisao(c.status)) ?? visiveis[0] ?? null;
+  // 🔴 Pendente MAIS ANTIGA que a última aprovada ficou pra trás (Viviane,
+  // 06/10/2026): ela aprovou a semana de 05/10 com a arte nova e, no dia
+  // seguinte, a tela abriu a de 28/09, ainda pendente e gerada no estilo
+  // antigo. Ela leu "voltou ao estilo antigo". Pendente só tem a vez quando é
+  // mais nova que tudo que ela já aprovou; as antigas seguem nos chips.
+  const ultimaFechada = visiveis.find((c) => aprovacaoFechada(c.status))?.semana_ref ?? "";
+  return (
+    visiveis.find((c) => aprovacaoEmRevisao(c.status) && c.semana_ref > ultimaFechada) ??
+    visiveis[0] ??
+    null
+  );
 }
 
 /** "14/09" — rótulo curto de semana pra chip e frase. */
