@@ -20,7 +20,7 @@ import {
 } from "@/lib/creatomate/client";
 import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
-import type { EstiloCapa } from "@scanner/ai-image";
+import type { ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 import {
   conteudoDaArteUnica,
   slidesDoCarrosselSemanal,
@@ -247,17 +247,21 @@ export async function gerarPostsDaSemana(
   if (bancoErr) console.warn("[semanal] banco de fotos não lido:", bancoErr.message);
   const filaFotos = filaDaSemana((bancoRaw ?? []) as FotoDoBanco[], semanaRef);
   let posFoto = 0;
+  // A foto que entrou na última arte: vai pro post (foto_arte_ref) pra o
+  // redesenho com o texto corrigido manter a mesma foto.
+  let ultimaFotoRef: string | null = null;
   const proximaFotoDoBanco = async (): Promise<Buffer | undefined> => {
+    ultimaFotoRef = null;
     for (let tentativa = 0; tentativa < filaFotos.length; tentativa++) {
       const f = filaFotos[posFoto++ % filaFotos.length]!;
       const local = caminhoNoBucket(f.url_storage);
       try {
         if (local) {
           const { data, error } = await admin.storage.from(local.bucket).download(local.path);
-          if (!error && data) return Buffer.from(await data.arrayBuffer());
+          if (!error && data) { ultimaFotoRef = f.url_storage; return Buffer.from(await data.arrayBuffer()); }
         } else {
           const res = await fetch(f.url_storage, { signal: AbortSignal.timeout(10000) });
-          if (res.ok) return Buffer.from(await res.arrayBuffer());
+          if (res.ok) { ultimaFotoRef = f.url_storage; return Buffer.from(await res.arrayBuffer()); }
         }
       } catch {
         // tenta a próxima
@@ -350,6 +354,11 @@ export async function gerarPostsDaSemana(
       let urlVideo: string | null = null;
       let urlsSlides: string[] | null = null;
       let designId: string | null = null;
+      // O texto desenhado na arte, guardado pra ela poder corrigir depois
+      // (tela Aprovar semana). Só existe quando a arte saiu do desenhador
+      // tipográfico, que é o que sabe redesenhar.
+      let textoArte: ConteudoPeca[] | null = null;
+      let fotoArteRef: string | null = null;
 
       // A MESMA marca do post de venda (lib/ai-image/brand.ts): uma fonte.
       const brandArte = brandDaFranqueada(
@@ -376,6 +385,8 @@ export async function gerarPostsDaSemana(
             if (r.urls.length) {
               urlImagem = r.urls[0]!;
               urlsSlides = r.urls;
+              textoArte = slides;
+              fotoArteRef = ultimaFotoRef;
             }
             await logarCusto({
               franqueadaId,
@@ -421,6 +432,8 @@ export async function gerarPostsDaSemana(
             fotoPropria: tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco() : undefined,
           });
           urlImagem = r.url;
+          textoArte = [conteudoDaArteUnica(post)];
+          fotoArteRef = tipoLevaFotoDoBanco(item.tipo) ? ultimaFotoRef : null;
           await logarCusto({
             franqueadaId,
             servico: "gemini",
@@ -606,6 +619,10 @@ export async function gerarPostsDaSemana(
           // Carrossel: todos os slides, na ordem. O slide 1 também fica em
           // url_imagem_final, então quem só lê esse campo segue igual.
           ...(urlsSlides ? { urls_slides: urlsSlides } : {}),
+          // Só vai quando a arte é a do desenhador (Creatomate e Bannerbear
+          // não sabem redesenhar com texto novo): sem ele, a tela não oferece
+          // "corrigir o texto da arte" pra este post.
+          ...(urlImagem && textoArte ? { texto_arte: textoArte, foto_arte_ref: fotoArteRef } : {}),
           // Reels: o roteiro falado vai pro teleprompter da tela Aprovar
           // semana. O modelo sempre escreveu isto e ninguém gravava.
           roteiro_reels: roteiroDoReelGerado(item.tipo, post),

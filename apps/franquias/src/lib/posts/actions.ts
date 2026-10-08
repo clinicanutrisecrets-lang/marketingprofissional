@@ -298,3 +298,121 @@ function proximaSegunda(): string {
   d.setHours(0, 0, 0, 0);
   return d.toISOString().slice(0, 10);
 }
+
+/**
+ * Corrige o texto DA ARTE e redesenha a imagem (pedido da Juliana, 08/10).
+ * O redesenho é o desenhador tipográfico da geração: nenhum modelo é
+ * chamado, então corrigir custa zero. Só vale pra post cuja arte saiu do
+ * desenhador (tem `texto_arte`) e que ainda não foi pro Instagram.
+ */
+export async function redesenharArteComTexto(
+  postId: string,
+  pecasEditadas: unknown,
+): Promise<{ ok: true; url_imagem_final: string; urls_slides: string[] | null; texto_arte: unknown } | { ok: false; erro: string }> {
+  const ctx = await getFranqueadaDoUser();
+  if (!ctx) return { ok: false, erro: "Não autenticado" };
+
+  const { lerTextoArte, normalizarPecasEditadas, mesmasPecas, podeRedesenhar } = await import(
+    "@/lib/criativo/texto-arte-edicao"
+  );
+  const admin = createAdminClient();
+  const { data: post, error: postErr } = await admin
+    .from("posts_agendados")
+    .select("id, franqueada_id, tipo_post, status, data_hora_postado, texto_arte, foto_arte_ref, url_imagem_final, urls_slides, edicoes_log")
+    .eq("id", postId)
+    .eq("franqueada_id", ctx.franqueadaId)
+    .maybeSingle();
+  if (postErr) return { ok: false, erro: "Não consegui ler o post. Tente de novo." };
+  if (!post) return { ok: false, erro: "Post não encontrado." };
+  const p = post as Record<string, unknown>;
+  if (!podeRedesenhar(p)) return { ok: false, erro: "Este post não pode mais ter a arte refeita." };
+
+  const original = lerTextoArte(p.texto_arte);
+  if (!original) return { ok: false, erro: "A arte deste post não guardou o texto. Só posts gerados a partir de hoje podem ser corrigidos." };
+  const conferido = normalizarPecasEditadas(pecasEditadas, original);
+  if (!conferido.ok) return conferido;
+  if (mesmasPecas(conferido.pecas, original)) {
+    return {
+      ok: true,
+      url_imagem_final: p.url_imagem_final as string,
+      urls_slides: (p.urls_slides as string[] | null) ?? null,
+      texto_arte: original,
+    };
+  }
+
+  const { data: f } = await admin.from("franqueadas").select("*").eq("id", ctx.franqueadaId).maybeSingle();
+  if (!f) return { ok: false, erro: "Conta não encontrada." };
+  const { brandDaFranqueada } = await import("@/lib/ai-image/brand");
+  const { buscarArquivoUrl } = await import("@/lib/arquivos/url-asset");
+  const { gerarEUploadImagem, gerarCarrosselEUpload } = await import("@/lib/ai-image/render");
+  const { caminhoNoBucket } = await import("@/lib/geracao/fotos-banco");
+
+  const logoUrl = await buscarArquivoUrl(admin, ctx.franqueadaId, "logo_principal");
+  const fotoUrl = await buscarArquivoUrl(admin, ctx.franqueadaId, "foto_profissional");
+  const brand = brandDaFranqueada(f as Parameters<typeof brandDaFranqueada>[0], { logoUrl, fotoUrl });
+
+  // A mesma foto do banco que estava na arte. Se ela não baixar mais, a arte
+  // sai sem foto em vez de travar a correção.
+  let foto: Buffer | undefined;
+  const ref = typeof p.foto_arte_ref === "string" ? p.foto_arte_ref : null;
+  if (ref) {
+    try {
+      const local = caminhoNoBucket(ref);
+      if (local) {
+        const { data } = await admin.storage.from(local.bucket).download(local.path);
+        if (data) foto = Buffer.from(await data.arrayBuffer());
+      } else {
+        const res = await fetch(ref, { signal: AbortSignal.timeout(10000) });
+        if (res.ok) foto = Buffer.from(await res.arrayBuffer());
+      }
+    } catch {
+      console.warn(`[redesenhar] foto ${ref} não baixou; segue sem foto`);
+    }
+  }
+
+  let urlImagem: string;
+  let urlsSlides: string[] | null = null;
+  try {
+    if (p.tipo_post === "feed_carrossel") {
+      const r = await gerarCarrosselEUpload({
+        franqueadaId: ctx.franqueadaId,
+        brand,
+        slides: conferido.pecas,
+        fotoCapa: foto,
+        capaEstilo: ((f as { estilo_capa?: string | null }).estilo_capa ?? undefined) as never,
+      });
+      if (!r.urls.length) throw new Error("carrossel sem slides");
+      urlImagem = r.urls[0]!;
+      urlsSlides = r.urls;
+    } else {
+      const r = await gerarEUploadImagem({
+        franqueadaId: ctx.franqueadaId,
+        tipo: p.tipo_post as "feed_imagem" | "stories",
+        brand,
+        conteudo: conferido.pecas[0]!,
+        fotoPropria: foto,
+      });
+      urlImagem = r.url;
+    }
+  } catch (e) {
+    console.error("[redesenhar] falhou:", e);
+    return { ok: false, erro: "Não consegui redesenhar a arte agora. O texto anterior segue valendo." };
+  }
+
+  const log = Array.isArray(p.edicoes_log) ? (p.edicoes_log as unknown[]) : [];
+  const { error: updErr } = await admin
+    .from("posts_agendados")
+    .update({
+      texto_arte: conferido.pecas,
+      url_imagem_final: urlImagem,
+      ...(urlsSlides ? { urls_slides: urlsSlides } : {}),
+      editado_pela_nutri: true,
+      edicoes_log: [...log, { em: new Date().toISOString(), campo: "texto_arte", antes: original }],
+    })
+    .eq("id", postId)
+    .eq("franqueada_id", ctx.franqueadaId);
+  if (updErr) return { ok: false, erro: "A arte nova foi desenhada, mas não foi salva. Tente de novo." };
+
+  revalidatePath("/dashboard/aprovar");
+  return { ok: true, url_imagem_final: urlImagem, urls_slides: urlsSlides, texto_arte: conferido.pecas };
+}
