@@ -1,6 +1,7 @@
 "use client";
 
 import { GuiaDaSemana } from "./GuiaDaSemana";
+import { TextoDaArte } from "./TextoDaArte";
 import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -777,6 +778,7 @@ function PostCard({
                   >
                     🗑 Cancelar
                   </button>
+                  <TextoDaArte post={post} onUpdate={onUpdate} />
                 </>
               )}
               {status === "aprovado" && (
