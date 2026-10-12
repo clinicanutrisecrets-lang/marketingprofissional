@@ -28,6 +28,10 @@ on:
         description: "post do pacote de domingo que recebe o vídeo (vazio no botão manual)"
         required: false
         default: ""
+      aline_post_id:
+        description: "post do Studio (aline.posts) que recebe o vídeo (vazio fora do Studio)"
+        required: false
+        default: ""
       supabase_url:
         required: false
         default: ""
@@ -88,6 +92,33 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"url_video_final\":\"$SB_URL/storage/v1$SIGNED\"}"
           fi
+
+      - name: Ligar ao post do Studio
+        if: inputs.aline_post_id != ''
+        run: |
+          SIGNED=$(curl -sf -X POST "$SB_URL/storage/v1/object/sign/franqueadas-assets/${{ inputs.destino_path }}" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"expiresIn":31536000}' | python3 -c "import json,sys;print(json.load(sys.stdin)['signedURL'])")
+          URL="$SB_URL/storage/v1$SIGNED"
+          # o vídeo novo substitui o vídeo anterior do post (a arte de capa fica)
+          curl -sf -X DELETE "$SB_URL/rest/v1/post_midias?post_id=eq.${{ inputs.aline_post_id }}&tipo=eq.video" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Profile: aline"
+          curl -sf -X POST "$SB_URL/rest/v1/post_midias" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Profile: aline" \
+            -H "Content-Type: application/json" \
+            -d "{\"post_id\":\"${{ inputs.aline_post_id }}\",\"ordem\":0,\"tipo\":\"video\",\"url\":\"$URL\",\"largura_px\":1080,\"altura_px\":1920}"
+          curl -sf -X PATCH "$SB_URL/rest/v1/posts?id=eq.${{ inputs.aline_post_id }}" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Profile: aline" \
+            -H "Content-Type: application/json" \
+            -d '{"status":"aguardando_aprovacao","midia_pendente":false}'
+
+      - name: Devolver o post do Studio se falhar
+        if: failure() && inputs.aline_post_id != ''
+        run: |
+          curl -s -X PATCH "$SB_URL/rest/v1/posts?id=eq.${{ inputs.aline_post_id }}&status=eq.gerando" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Profile: aline" \
+            -H "Content-Type: application/json" \
+            -d '{"status":"aguardando_midia"}' || true
 
       - name: Marcar erro
         if: failure() && inputs.reel_id != ''
