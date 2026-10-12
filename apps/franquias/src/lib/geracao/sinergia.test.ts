@@ -133,3 +133,21 @@ test("o modelo nunca escreve ingrediente: o prompt pede ÍNDICE e o público ent
   assert.match(s, /publico: p\.publico/);
   assert.match(s, /COMPLIANCE_CFN_BR/);
 });
+
+test("campo acima do teto: a recusa diz QUAL campo e quantos caracteres (vai pra nova tentativa)", () => {
+  const receita = { titulo: "Bowl", tipo: "receita", ingredientes: ["1 xícara de lentilha", "limão"], modo_preparo: "", compostos: [] } as never;
+  const n = (nome: string) => ({ nome, onde: "lentilha", texto: "Ajuda.", microbiota: "Alimenta bactérias boas.", exame: "Ferritina." });
+  const r = conferirConteudo(
+    { tema: "x".repeat(90), explicacao: "ok", legenda: "ok", passos: ["a", "b"], nutrientes: [n("Ferro"), n("Fibra"), n("Vitamina C")], hashtags: [] },
+    receita,
+  );
+  assert.equal(r.ok, false);
+  assert.match((r as { motivo: string }).motivo, /tema com 90 caracteres \(máximo 70\)/);
+});
+
+test("ligação: o teto vai na ferramenta e a nova tentativa recebe o motivo", () => {
+  const s = readFileSync(new URL("../conteudo/sinergia-semanal.ts", import.meta.url), "utf8");
+  assert.match(s, /tema: ATE\(MAX_SINERGIA\.tema/);
+  assert.match(s, /A RESPOSTA ANTERIOR FOI RECUSADA: \$\{ultimo\}/);
+  assert.match(s, /tentativa < 3/);
+});

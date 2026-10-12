@@ -76,7 +76,7 @@ const SIGLAS_LIVRES = new Set([
   "PCR", "TSH", "HPA", "SNP", "ABC", "B12", "B6", "B9", "IL", "TPM", "SOP",
 ]);
 
-const MAX = {
+export const MAX_SINERGIA = {
   titulo_receita: 90,
   tema: 70,
   subtitulo: 130,
@@ -90,6 +90,14 @@ const MAX = {
   troca: 60,
   fecho: 80,
 } as const;
+const MAX = MAX_SINERGIA;
+
+/** Qual campo passou do teto (ou faltou), dito em voz alta pra nova tentativa. */
+function motivoDoCampo(v: unknown, max: number, nome: string): string {
+  const s = typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "";
+  if (!s) return `${nome} vazio`;
+  return `${nome} com ${s.length} caracteres (máximo ${max})`;
+}
 
 function semAcento(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -174,7 +182,10 @@ export function conferirConteudo(bruto: unknown, receita: ReceitaSinergia): Conf
     const nome = txt(x.nome, MAX.nome);
     const onde = txt(x.onde, MAX.onde);
     const texto = txt(x.texto, MAX.texto);
-    if (!nome || !texto) continue;
+    if (!nome || !texto) {
+      avisos.push(!nome ? motivoDoCampo(x.nome, MAX.nome, "nome do nutriente") : motivoDoCampo(x.texto, MAX.texto, `texto de ${nome}`));
+      continue;
+    }
     const linhas: [string, string][] = [];
     const micro = txt(x.microbiota, MAX.linha);
     if (micro) linhas.push(["Microbiota", micro]);
@@ -192,7 +203,10 @@ export function conferirConteudo(bruto: unknown, receita: ReceitaSinergia): Conf
     }
     nutrientes.push({ nome, onde, texto, linhas });
   }
-  if (nutrientes.length < 3) return { ok: false, motivo: `só ${nutrientes.length} nutriente(s) completos` };
+  if (nutrientes.length < 3) {
+    const porque = avisos.length ? `: ${avisos.join("; ")}` : "";
+    return { ok: false, motivo: `só ${nutrientes.length} nutriente(s) completos${porque}` };
+  }
 
   const passos = (Array.isArray(o.passos) ? o.passos : [])
     .map((p) => txt(p, MAX.passo))
@@ -203,7 +217,14 @@ export function conferirConteudo(bruto: unknown, receita: ReceitaSinergia): Conf
   const tema = txt(o.tema, MAX.tema);
   const explicacao = txt(o.explicacao, MAX.explicacao);
   const legenda = typeof o.legenda === "string" ? o.legenda.replace(/\s*[—–]\s*/g, ", ").trim() : "";
-  if (!tema || !explicacao || !legenda) return { ok: false, motivo: "faltou título, explicação ou legenda" };
+  if (!tema || !explicacao || !legenda) {
+    const faltas = [
+      !tema ? motivoDoCampo(o.tema, MAX.tema, "tema") : null,
+      !explicacao ? motivoDoCampo(o.explicacao, MAX.explicacao, "explicação") : null,
+      !legenda ? "legenda vazia" : null,
+    ].filter(Boolean);
+    return { ok: false, motivo: `faltou título, explicação ou legenda: ${faltas.join("; ")}` };
+  }
 
   const hashtags = (Array.isArray(o.hashtags) ? o.hashtags : [])
     .filter((h): h is string => typeof h === "string")
