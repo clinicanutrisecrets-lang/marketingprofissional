@@ -2,6 +2,7 @@
 
 import { useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export const dynamic = "force-dynamic";
@@ -118,6 +119,13 @@ function LoginInner() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+
+        <Link
+          href="/recuperar-senha"
+          className="mt-4 inline-block text-sm text-aline-text/60 hover:text-aline-scanner"
+        >
+          Esqueci minha senha
+        </Link>
       </div>
     </main>
   );
