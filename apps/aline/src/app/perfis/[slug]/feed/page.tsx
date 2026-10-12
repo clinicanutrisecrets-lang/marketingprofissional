@@ -5,6 +5,7 @@ import {
   agruparPorMes, CORTE_ACERVO_ANTIGO, dataCurta, dataDoPost, ehAcervoAntigo,
   ehDeGrade, ordenarParaFeed, rotuloTipo, seloDoStatus, tituloDoPost, type PostFeed,
 } from "@/lib/feed/plano";
+import { DesenharVideoButton } from "./DesenharVideoButton";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 
 export const dynamic = "force-dynamic";
@@ -47,15 +48,17 @@ export default async function FeedPage({ params }: PageProps) {
   const todos = (postsData ?? []) as PostFeed[];
 
   const midiaPorPost = new Map<string, string>();
+  const videoPorPost = new Map<string, string>();
   if (todos.length > 0) {
     const { data: midias } = await aline
       .from("post_midias").select("post_id, url, ordem, tipo").in("post_id", todos.map((p) => p.id));
     for (const m of ((midias ?? []) as Array<{ post_id: string; url: string; ordem: number; tipo: string }>)
       .sort((a, b) => a.ordem - b.ordem)) {
       if (!midiaPorPost.has(m.post_id) && m.tipo !== "video") midiaPorPost.set(m.post_id, m.url);
+      if (!videoPorPost.has(m.post_id) && m.tipo === "video") videoPorPost.set(m.post_id, m.url);
     }
   }
-  const comMidia = todos.map((p) => ({ ...p, midia_url: midiaPorPost.get(p.id) ?? null }));
+  const comMidia = todos.map((p) => ({ ...p, midia_url: midiaPorPost.get(p.id) ?? null, video_url: videoPorPost.get(p.id) ?? null }));
 
   const antigos = comMidia.filter((p) => ehAcervoAntigo(p, CORTE_ACERVO_ANTIGO));
   const vivos = comMidia.filter((p) => !ehAcervoAntigo(p, CORTE_ACERVO_ANTIGO));
@@ -93,6 +96,8 @@ export default async function FeedPage({ params }: PageProps) {
                     {p.midia_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.midia_url} alt="" className="h-full w-full object-cover" />
+                    ) : p.video_url ? (
+                      <video src={p.video_url} muted playsInline preload="metadata" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center p-2">
                         <span className="text-center text-[10px] leading-tight text-slate-500">
@@ -104,7 +109,12 @@ export default async function FeedPage({ params }: PageProps) {
                     )}
                     <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-1 p-1">
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${selo.classe}`}>{selo.texto}</span>
-                      <span className="rounded bg-black/55 px-1.5 py-0.5 text-[10px] text-white">{rotuloTipo(p.tipo)}</span>
+                      <span className="flex flex-col items-end gap-1">
+                        <span className="rounded bg-black/55 px-1.5 py-0.5 text-[10px] text-white">{rotuloTipo(p.tipo)}</span>
+                        {p.tipo === "reels" && p.status !== "postado" && (
+                          <DesenharVideoButton postId={p.id} emProducao={p.status === "gerando"} temVideo={!!p.video_url} />
+                        )}
+                      </span>
                     </div>
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2 pt-6">
                       <p className="text-[11px] font-medium leading-snug text-white line-clamp-2">{tituloDoPost(p)}</p>

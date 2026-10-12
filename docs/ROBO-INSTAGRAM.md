@@ -159,26 +159,57 @@ ManyChat cobra mensalidade fixa independente de uso.
 
 ---
 
-## 7. Estado e bloqueios (06/09/2026)
+## 7. Estado e bloqueios (medido em 12/10/2026, substitui o de 06/09)
 
-- `@nutri_secrets` **conectada**, webhook assinado.
-- As três regras (GLP1, SOMP, BEBÊ) existem e estão **`ativa=false`**.
-- 🔴 **GLP1 e BEBÊ não têm o link do material** — o PDF mora no ManyChat. Cancelar
-  hoje faz essas duas responderem sem entregar nada.
-- 🔴 **O app não está publicado na Meta** — sem isso ela **não entrega webhook
-  nenhum**, nem para a própria conta.
-- **App Review** é necessário para interagir com quem não tem papel no app — ou
-  seja, as seguidoras. Sem revisão, só contas testadoras.
-  Sem a revisão **não há risco de bloqueio: simplesmente não funciona** (a API
-  devolve erro). O risco de bloqueio real é comportamento de spam, e vale mesmo
-  com a revisão aprovada — por isso **só recebe resposta privada quem pediu
-  alguma coisa no comentário.**
-- **Teste que resolve a dúvida em 10 minutos, sem custo:** publicar o app, pedir
-  para alguém sem papel no app comentar a palavra, e ver se o robô responde.
+- **O app está publicado e entregando**: chegam comentários, directs e respostas
+  de story de seguidoras reais todo dia (só de comentário, 36 "GLP1", 10 "SOMP",
+  10 "Bebê" desde setembro).
+- **Resposta privada a quem NÃO tem papel no app funciona**: crisbnutri (05/10) e
+  anapaulanutricionista (02/10) receberam.
+- **As 10 regras estão `ativa=false`.** Hoje quem responde é o ManyChat.
+- **GLP1 e BEBÊ já têm o link do material** (glp1.scannerdasaude.com e o PDF em
+  scannerdasaude.com/materiais). A pendência de 06/09 caiu.
+- **Token** da @nutri_secrets vence em 04/11; o cron renova sozinho a partir de
+  25/10 (10 dias antes). Se a renovação falhar, só fica no log da Vercel.
+- **Corrigido em 12/10:** o direct agora sai ANTES da resposta pública, e falha
+  na resposta pública não derruba mais o direct (antes derrubava o evento todo).
 
-**Ordem para cancelar o ManyChat:** publicar o app → colar os dois links → testar
-com conta testadora → ativar as regras → **só então** cancelar. O histórico de
-quem já passou pelos fluxos não migra.
+- **Corrigido em 12/10:** convite (podcast, entrevista, imprensa) e cliente com
+  dúvida de compra, acesso ou bônus NUNCA são curtidos nem respondidos: viram
+  "esperando uma pessoa". O modo coração curtiu 5 mensagens da assessora do
+  Fitocast em 25/09 e a de uma aluna perguntando do bônus. E o coração agora é
+  um por conversa a cada 24 h. "Designer" no nome do perfil conta como vendedor.
+- **Relatório da manhã** (`/api/cron/relatorio-instagram`, 8h de Brasília):
+  o que espera ela, envios recusados, comentários sem regra, regras desligadas
+  que teriam respondido, token perto de vencer. 🔴 **Só envia com
+  `RESEND_API_KEY` (e opcional `RELATORIO_INSTAGRAM_EMAIL`, `RESEND_FROM_EMAIL`)
+  no Vercel do `studio-aline`**; sem elas, devolve o relatório no corpo e grita
+  no log, nunca finge que mandou. Antes de 12/10 esse relatório NÃO existia.
+
+### Palavras que chegam e NÃO têm regra (perde a lead quando o ManyChat sair)
+
+| comentário | vezes | o que falta |
+|---|---|---|
+| "quero" / "eu quero" | 5, todos no MESMO post | ✅ regra "POST ANTIGO" (desligada): material indisponível + pergunta quem ela é |
+| "MC4R" | 1 (12/10) | ✅ mesma regra |
+| "somo" | 1 | ✅ entrou na regra do SOMP |
+
+### Ordem para desligar o ManyChat SEM falha
+
+1. Fechar as palavras que faltam (tabela acima).
+2. Testar com a conta de outra pessoa (sem papel no app): comentar GLP1 num
+   post e ver o direct chegar. **Com as regras ligadas e o ManyChat ainda
+   ligado, as duas respondem**: a Meta só aceita UMA resposta privada por
+   comentário, e a segunda dá erro. Por isso o teste é rápido e a troca é no
+   MESMO minuto.
+3. **No mesmo minuto:** pausar as automações de comentário no ManyChat e ligar
+   as regras no Studio (`/perfis/nutrisecrets/automacoes`).
+4. Nas primeiras 48 h, ler as "últimas interações" do Studio duas vezes por dia.
+5. Só cancelar a assinatura do ManyChat depois de uma semana limpa. O histórico
+   de quem passou pelos fluxos do ManyChat não migra.
+
+⚠️ Directs e respostas de story (regras AGENDAR e QUADRO DE SAÚDE) são outra
+decisão: ligar só depois que os comentários rodarem uma semana.
 
 ---
 

@@ -35,6 +35,7 @@ import {
   pareceSpam,
   casaPalavraChave,
   pareceAbordagemComercial,
+  motivoParaAvisarAline,
   payloadDaOpcao,
   preencherTexto,
   PREFIXO_PASSO,
@@ -305,6 +306,15 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       if (gatilho === "dm") {
         const textoPessoa = ev.texto.trim();
 
+        // ── É pra ELA ler (convite, imprensa, cliente com problema) ──
+        // Vence o coração e a IA: nem curte, nem responde, avisa.
+        const motivoAviso = motivoParaAvisarAline(textoPessoa);
+        if (motivoAviso) {
+          await marcarPrecisaHumano(contato.id, motivoAviso);
+          resumo.encaminhados++;
+          continue;
+        }
+
         // ── Modo coração ──
         // 🔴 Em vez de falar em nome dela, o robô só avisa que viu. A Aline
         // decide se responde. Esta chave VENCE a IA de propósito: o pedido
@@ -312,6 +322,8 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         if (config.reagir_com_coracao) {
           if (pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
           if (!ev.externalId) { resumo.ignorados++; continue; } // sem id não há o que reagir
+          // Um coração por conversa a cada 24 h: a Erika recebeu cinco seguidos.
+          if (await coracaoNasUltimas24h(contato.id)) { resumo.ignorados++; continue; }
           try {
             await reagirMensagem(cred, ev.igsid, ev.externalId);
             await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: "♥️", origem: "coracao" });
@@ -501,6 +513,17 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     return new Set(((data ?? []) as Array<{ regra_id: string }>).map((r) => r.regra_id));
   }
 
+  async function coracaoNasUltimas24h(contatoId: string): Promise<boolean> {
+    const { data } = await aline
+      .from("ig_mensagens")
+      .select("id")
+      .eq("contato_id", contatoId)
+      .eq("origem", "coracao")
+      .gte("criado_em", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .limit(1);
+    return (data ?? []).length > 0;
+  }
+
   async function saidaRecente(contatoId: string): Promise<boolean> {
     const { data } = await aline
       .from("ig_mensagens")
@@ -629,11 +652,14 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     const ehComentario = ev.tipo === "comentario";
     const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
-    if (ehComentario && regra.resposta_publica && ev.commentId) {
-      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
-      await responderComentario(cred, ev.commentId, texto);
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
-    }
+    // 🔴 O DIRECT VEM ANTES DA RESPOSTA PÚBLICA (12/10/2026). Era o contrário,
+    // e a resposta pública sem try/catch derrubava o evento inteiro: um
+    // comentário que a Meta não deixasse responder em público (apagado,
+    // oculto, limite) fazia o material NUNCA sair no direct. E responder
+    // "te mandei no direct" quando o direct foi recusado é prometer o que não
+    // aconteceu. Por isso: direct primeiro, público só se o direct não foi
+    // recusado, e falha no público vira aviso, nunca perda do material.
+    let desfechoDireto: Desfecho | null = null;
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
       // 🔴 As opções são gravadas ANTES do envio. Se a Meta reclamar e
@@ -648,7 +674,16 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const botoes: BotaoRapido[] | undefined = opcoes.length > 0
         ? opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(regra.id, i) }))
         : undefined;
-      await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
+      desfechoDireto = await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
+    }
+    if (ehComentario && regra.resposta_publica && ev.commentId && desfechoDireto !== "recusado") {
+      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
+      try {
+        await responderComentario(cred, ev.commentId, texto);
+        await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
+      } catch (e) {
+        console.warn("[automacao] resposta pública falhou (o direct seguiu):", (e as Error).message.slice(0, 300));
+      }
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.
