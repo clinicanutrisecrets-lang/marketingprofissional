@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { createClaude } from "@/lib/claude/client";
 import { SYSTEM_SPEC, normalizarSpecReel, type DuracaoReel } from "./spec";
+import { blocoPublicoReel, resumoDoRoteiro, type PublicoReel, type ResumoRoteiro } from "./publico";
 
 /**
  * "Desenhar o vídeo" de um reel do Studio (Aline, 12/10/2026).
@@ -15,6 +16,12 @@ import { SYSTEM_SPEC, normalizarSpecReel, type DuracaoReel } from "./spec";
  * (render-reel.yml, Python/PIL + ffmpeg, custo zero de imagem e nada de
  * avatar) desenha o MP4. Quando fica pronto, o próprio worker liga o vídeo
  * ao post em aline.post_midias e devolve o post pra aprovação.
+ *
+ * 🔴 O CONTEÚDO É O DO SCANNER, CURADO: antes do roteiro o Studio pergunta à
+ * base do Scanner (`/api/integrations/marketing/conhecimento?modo=conteudo`,
+ * a mesma curadoria do Cérebro Aline: genes com rs, faixas ideais, alimentos
+ * e doses). Sem curadoria sobre o tema, o vídeo NÃO é desenhado: roteiro de
+ * gene inventado é exatamente o que o Scanner existe pra impedir.
  *
  * 🔴 Enquanto desenha, o post fica em `gerando` (o feed mostra "em
  * produção"). Se o worker falhar, ele volta pra `aguardando_midia`, nunca
@@ -34,10 +41,34 @@ async function assertSuperAdmin() {
   if (!row || row.papel !== "super_admin") throw new Error("Só super_admin pode desenhar vídeo");
 }
 
+async function conteudoCuradoDoScanner(tema: string): Promise<{ blocos: string; total: number } | { erro: string }> {
+  const base = (process.env.SCANNER_API_URL ?? "https://scannerdasaude.com").replace(/\/$/, "");
+  const secret = process.env.STUDIO_CONHECIMENTO_SECRET ?? process.env.MARKETING_WEBHOOK_SECRET;
+  if (!secret) return { erro: "O Studio não está ligado à curadoria do Scanner (falta STUDIO_CONHECIMENTO_SECRET)." };
+  const url = new URL(`${base}/api/integrations/marketing/conhecimento`);
+  url.searchParams.set("q", tema.slice(0, 500));
+  url.searchParams.set("modo", "conteudo");
+  try {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${secret}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return { erro: `A curadoria do Scanner não respondeu (${res.status}). Tente de novo.` };
+    const json = (await res.json()) as { blocos?: string; total?: number };
+    return { blocos: json.blocos ?? "", total: json.total ?? 0 };
+  } catch {
+    return { erro: "A curadoria do Scanner não respondeu a tempo. Tente de novo." };
+  }
+}
+
 export async function desenharVideoDoPost(params: {
   postId: string;
+  /** O que o vídeo explica (ex.: "FTO e fome à noite"). Vazio = a legenda do post. */
+  tema?: string;
+  publico?: PublicoReel;
   duracao?: DuracaoReel;
-}): Promise<{ ok: true } | { ok: false; erro: string }> {
+}): Promise<{ ok: true; roteiro: ResumoRoteiro } | { ok: false; erro: string }> {
   try {
     await assertSuperAdmin();
     const token = process.env.GITHUB_ACTIONS_TOKEN || process.env.GITHUB_TOKEN;
@@ -59,7 +90,20 @@ export async function desenharVideoDoPost(params: {
     if (post.status === "gerando") return { ok: false, erro: "Este vídeo já está sendo desenhado." };
     if (post.status === "postado") return { ok: false, erro: "Este post já foi ao ar." };
     const legenda = (post.copy_legenda ?? "").trim();
-    if (legenda.length < 20) return { ok: false, erro: "Escreva a legenda do post antes: o vídeo é desenhado a partir dela." };
+    const temaPedido = (params.tema ?? "").trim();
+    const publico: PublicoReel = params.publico === "profissional" ? "profissional" : "paciente";
+    if (!temaPedido && legenda.length < 20) {
+      return { ok: false, erro: "Diga o que o vídeo explica (ex.: FTO e fome à noite), ou escreva a legenda do post antes." };
+    }
+    const temaBusca = temaPedido || legenda.slice(0, 400);
+    const curadoria = await conteudoCuradoDoScanner(temaBusca);
+    if ("erro" in curadoria) return { ok: false, erro: curadoria.erro };
+    if (curadoria.total === 0 || curadoria.blocos.trim().length < 40) {
+      return {
+        ok: false,
+        erro: `O Scanner não tem curadoria sobre "${temaBusca.slice(0, 60)}". Escreva o tema pelo nome do gene, do exame ou da bactéria (ex.: FTO, ferritina, Akkermansia).`,
+      };
+    }
 
     const { data: perfilData } = await aline
       .from("perfis")
@@ -80,14 +124,19 @@ export async function desenharVideoDoPost(params: {
       system: SYSTEM_SPEC,
       messages: [{
         role: "user",
-        content: JSON.stringify({
-          tema: legenda.slice(0, 1500),
-          duracao: params.duracao ?? "60s",
-          assinatura: perfil.nome ?? "",
-          nicho: perfil.nicho_principal ?? null,
-          publico: perfil.publico_alvo ?? null,
-          instrucao: "O tema é a legenda deste post: o reel conta o MESMO raciocínio, com o mesmo gene e os mesmos alimentos que ela cita.",
-        }),
+        content: [
+          JSON.stringify({
+            tema: temaPedido || legenda.slice(0, 1500),
+            duracao: params.duracao ?? "60s",
+            assinatura: perfil.nome ?? "",
+            nicho: perfil.nicho_principal ?? null,
+            legenda_do_post: temaPedido && legenda ? legenda.slice(0, 1200) : null,
+          }),
+          blocoPublicoReel(publico),
+          "CURADORIA DO SCANNER (a ÚNICA fonte permitida pra gene, rs, genótipo, marcador, faixa, alimento, quantidade e dose):",
+          curadoria.blocos.slice(0, 14000),
+          "REGRA: todo gene, rs, marcador, faixa e alimento do SPEC TEM que aparecer na curadoria acima. O que não estiver nela não entra no vídeo, mesmo que você conheça. Se a curadoria não sustentar um bloco inteiro, faça o reel mais curto em vez de inventar.",
+        ].join("\n\n"),
       }],
     });
     const texto = msg.content
@@ -104,13 +153,14 @@ export async function desenharVideoDoPost(params: {
     }
     const spec = normalizarSpecReel(bruto);
     spec.assinatura = perfil.nome ?? "";
+    const roteiro = resumoDoRoteiro(spec, publico, curadoria.total);
 
     const destino = `aline/${perfil.slug ?? post.perfil_id}/reels/${post.id}-${Date.now()}.mp4`;
 
     // Reserva ANTES de disparar: dois cliques seguidos não podem virar dois renders.
     const { data: reservado, error: resErr } = await aline
       .from("posts")
-      .update({ status: "gerando" })
+      .update({ status: "gerando", heygen_script: JSON.stringify({ tipo: "reel_desenhado", publico, tema: temaBusca, spec }) })
       .eq("id", post.id)
       .neq("status", "gerando")
       .select("id");
@@ -144,7 +194,7 @@ export async function desenharVideoDoPost(params: {
     }
 
     revalidatePath(`/perfis/${perfil.slug ?? ""}/feed`);
-    return { ok: true };
+    return { ok: true, roteiro };
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "não deu certo" };
   }
