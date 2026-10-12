@@ -93,3 +93,14 @@ test("o resumo mostra gene, exame e alimento que o vídeo vai citar", () => {
   assert.equal(r.registrosCurados, 7);
   assert.equal(r.gancho, "Fome à noite? Pode ser o FTO.");
 });
+
+test("o card do feed abre o post: artes, legenda e o botão grande do vídeo", () => {
+  const card = ler("../src/app/perfis/[slug]/feed/PostCard.tsx");
+  assert.match(card, /onClick=\{\(\) => setAberto\(true\)\}/);
+  assert.match(card, /post\.legenda/);
+  assert.match(card, /variante="grande"/);
+  const pagina = ler("../src/app/perfis/[slug]/feed/page.tsx");
+  assert.match(pagina, /copy_cta, hashtags/);
+  assert.match(pagina, /<PostCard key=\{p\.id\} post=\{dadosDoCard\(p\)\} formato="grade"/);
+  assert.match(pagina, /<PostCard key=\{p\.id\} post=\{dadosDoCard\(p\)\} formato="story"/);
+});

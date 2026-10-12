@@ -5,7 +5,7 @@ import {
   agruparPorMes, CORTE_ACERVO_ANTIGO, dataCurta, dataDoPost, ehAcervoAntigo,
   ehDeGrade, ordenarParaFeed, rotuloTipo, seloDoStatus, tituloDoPost, type PostFeed,
 } from "@/lib/feed/plano";
-import { DesenharVideoButton } from "./DesenharVideoButton";
+import { PostCard, type MidiaCard, type PostCardDados } from "./PostCard";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 type PageProps = { params: Promise<{ slug: string }> };
 
 const COLS_POST =
-  "id, tipo, status, semana_ref, data_hora_agendada, data_hora_postada, pilar, angulo, copy_legenda, criado_em";
+  "id, tipo, status, semana_ref, data_hora_agendada, data_hora_postada, pilar, angulo, copy_legenda, copy_cta, hashtags, criado_em";
 
 export default async function FeedPage({ params }: PageProps) {
   const { slug } = await params;
@@ -49,6 +49,7 @@ export default async function FeedPage({ params }: PageProps) {
 
   const midiaPorPost = new Map<string, string>();
   const videoPorPost = new Map<string, string>();
+  const todasMidias = new Map<string, MidiaCard[]>();
   if (todos.length > 0) {
     const { data: midias } = await aline
       .from("post_midias").select("post_id, url, ordem, tipo").in("post_id", todos.map((p) => p.id));
@@ -56,6 +57,9 @@ export default async function FeedPage({ params }: PageProps) {
       .sort((a, b) => a.ordem - b.ordem)) {
       if (!midiaPorPost.has(m.post_id) && m.tipo !== "video") midiaPorPost.set(m.post_id, m.url);
       if (!videoPorPost.has(m.post_id) && m.tipo === "video") videoPorPost.set(m.post_id, m.url);
+      const lista = todasMidias.get(m.post_id) ?? [];
+      lista.push({ url: m.url, tipo: m.tipo });
+      todasMidias.set(m.post_id, lista);
     }
   }
   const comMidia = todos.map((p) => ({ ...p, midia_url: midiaPorPost.get(p.id) ?? null, video_url: videoPorPost.get(p.id) ?? null }));
@@ -65,11 +69,28 @@ export default async function FeedPage({ params }: PageProps) {
   const naGrade = vivos.filter((p) => ehDeGrade(p.tipo));
   const stories = ordenarParaFeed(vivos.filter((p) => !ehDeGrade(p.tipo)));
   const meses = agruparPorMes(naGrade);
+  const dadosDoCard = (p: PostFeed & { copy_cta?: string | null; hashtags?: string[] | null }): PostCardDados => ({
+    id: p.id,
+    tipo: p.tipo,
+    status: p.status,
+    rotuloTipo: rotuloTipo(p.tipo),
+    selo: seloDoStatus(p.status),
+    titulo: tituloDoPost(p),
+    data: dataCurta(dataDoPost(p)),
+    pilar: p.pilar,
+    legenda: p.copy_legenda,
+    cta: p.copy_cta ?? null,
+    hashtags: Array.isArray(p.hashtags) ? p.hashtags : [],
+    midias: todasMidias.get(p.id) ?? [],
+  });
 
   return (
     <Moldura perfil={perfil} cor={cor}>
       <div className="space-y-6">
         <LimparAcervoButton perfilId={perfil.id} quantos={antigos.length} />
+        {(naGrade.length > 0 || stories.length > 0) && (
+          <p className="text-sm text-slate-500">Toque num post pra ver a arte, passar os slides e ler a legenda. Nos reels, é ali que você desenha o vídeo.</p>
+        )}
 
         {naGrade.length === 0 && stories.length === 0 ? (
           <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
@@ -89,43 +110,9 @@ export default async function FeedPage({ params }: PageProps) {
               {mes.rotulo} <span className="font-normal normal-case tracking-normal">· {mes.posts.length} na grade</span>
             </h2>
             <div className="grid grid-cols-3 gap-1 sm:gap-2">
-              {mes.posts.map((p) => {
-                const selo = seloDoStatus(p.status);
-                return (
-                  <article key={p.id} className="group relative aspect-[4/5] overflow-hidden rounded-md bg-slate-100">
-                    {p.midia_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.midia_url} alt="" className="h-full w-full object-cover" />
-                    ) : p.video_url ? (
-                      <video src={p.video_url} muted playsInline preload="metadata" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center p-2">
-                        <span className="text-center text-[10px] leading-tight text-slate-500">
-                          {rotuloTipo(p.tipo)}
-                          <br />
-                          <span className="text-slate-400">sem arte ainda</span>
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-1 p-1">
-                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${selo.classe}`}>{selo.texto}</span>
-                      <span className="flex flex-col items-end gap-1">
-                        <span className="rounded bg-black/55 px-1.5 py-0.5 text-[10px] text-white">{rotuloTipo(p.tipo)}</span>
-                        {p.tipo === "reels" && p.status !== "postado" && (
-                          <DesenharVideoButton postId={p.id} emProducao={p.status === "gerando"} temVideo={!!p.video_url} />
-                        )}
-                      </span>
-                    </div>
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2 pt-6">
-                      <p className="text-[11px] font-medium leading-snug text-white line-clamp-2">{tituloDoPost(p)}</p>
-                      <p className="mt-0.5 text-[10px] text-white/75">
-                        {dataCurta(dataDoPost(p))}
-                        {p.pilar ? ` · ${p.pilar}` : ""}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
+              {mes.posts.map((p) => (
+                <PostCard key={p.id} post={dadosDoCard(p)} formato="grade" />
+              ))}
             </div>
           </section>
         ))}
@@ -136,18 +123,7 @@ export default async function FeedPage({ params }: PageProps) {
             <p className="mb-3 text-xs text-slate-500">Não entram na grade do perfil, por isso ficam aqui.</p>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {stories.map((p) => (
-                <div key={p.id} className="w-28 flex-none">
-                  <div className="aspect-[9/16] overflow-hidden rounded-lg bg-slate-100 ring-2 ring-offset-2" style={{ "--tw-ring-color": cor } as React.CSSProperties}>
-                    {p.midia_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.midia_url} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-[10px] text-slate-400">sem arte</div>
-                    )}
-                  </div>
-                  <p className="mt-1 text-[11px] leading-tight text-slate-600 line-clamp-2">{tituloDoPost(p, 40)}</p>
-                  <p className="text-[10px] text-slate-400">{dataCurta(dataDoPost(p))}</p>
-                </div>
+                <PostCard key={p.id} post={dadosDoCard(p)} formato="story" />
               ))}
             </div>
           </section>

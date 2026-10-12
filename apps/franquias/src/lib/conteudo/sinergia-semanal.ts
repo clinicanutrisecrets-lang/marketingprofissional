@@ -7,6 +7,7 @@ import { logarCusto } from "@/lib/custos/log";
 import type { createAdminClient } from "@/lib/supabase/server";
 import {
   conferirConteudo,
+  MAX_SINERGIA,
   GENES_SINERGIA,
   type ConteudoSinergia,
   type ReceitaSinergia,
@@ -86,29 +87,45 @@ Entregue chamando a ferramenta "carrossel_sinergia" (uma vez só).
  * string, que JSON não aceita. Com ferramenta, quem monta o JSON é a API.
  */
 const STR = { type: "string" } as const;
+/**
+ * 🔴 O teto de cada campo VAI NA FERRAMENTA. A conferência recusa o campo que
+ * passa do teto (picotar frase no meio é pior), e sem o teto escrito aqui o
+ * modelo não tinha como saber: no domingo 11/10 a sinergia não saiu em 3 de 4
+ * contas por isso ("faltou título, explicação ou legenda", "só 2 nutrientes").
+ */
+const ATE = (max: number, extra = "") =>
+  ({ type: "string", description: `No máximo ${max} caracteres${extra ? `. ${extra}` : ""}.` }) as const;
 const FERRAMENTA_SINERGIA: Anthropic.Tool = {
   name: "carrossel_sinergia",
   description: "Entrega o carrossel de sinergia da semana.",
   input_schema: {
     type: "object",
     properties: {
-      titulo_receita: STR,
-      tema: STR,
-      subtitulo: STR,
-      trio: STR,
-      explicacao: STR,
+      titulo_receita: ATE(MAX_SINERGIA.titulo_receita),
+      tema: ATE(MAX_SINERGIA.tema, "É o título do carrossel"),
+      subtitulo: ATE(MAX_SINERGIA.subtitulo),
+      trio: ATE(MAX_SINERGIA.trio),
+      explicacao: ATE(MAX_SINERGIA.explicacao),
       nutrientes: {
         type: "array",
+        description: "Exatamente 3 nutrientes da receita. Cada um precisa de pelo menos duas frentes: microbiota e exame sempre, nutrigenética só com gene da lista do pedido. Exame sem faixa numérica.",
         items: {
           type: "object",
-          properties: { nome: STR, onde: STR, texto: STR, microbiota: STR, nutrigenetica: STR, exame: STR },
-          required: ["nome", "onde", "texto"],
+          properties: {
+            nome: ATE(MAX_SINERGIA.nome),
+            onde: ATE(MAX_SINERGIA.onde),
+            texto: ATE(MAX_SINERGIA.texto),
+            microbiota: ATE(MAX_SINERGIA.linha),
+            nutrigenetica: ATE(MAX_SINERGIA.linha),
+            exame: ATE(MAX_SINERGIA.linha),
+          },
+          required: ["nome", "onde", "texto", "microbiota", "exame"],
         },
       },
       ingredientes_idx: { type: "array", items: { type: "integer" } },
-      passos: { type: "array", items: STR },
-      trocas: { type: "array", items: STR },
-      fecho: STR,
+      passos: { type: "array", items: ATE(MAX_SINERGIA.passo) },
+      trocas: { type: "array", items: ATE(MAX_SINERGIA.troca) },
+      fecho: ATE(MAX_SINERGIA.fecho),
       legenda: STR,
       cta: STR,
       hashtags: { type: "array", items: STR },
@@ -143,9 +160,14 @@ export async function escreverSinergia(p: {
     conta: { nicho: p.nicho, publico: p.publicoTexto, queixas_da_semana: p.queixas },
     ...(p.temaEmAlta ? { tema_em_alta: p.temaEmAlta } : {}),
   };
-  // Duas tentativas: a conferência recusa resposta fora do formato.
+  // Três tentativas: a conferência recusa resposta fora do formato, e a
+  // tentativa seguinte recebe O MOTIVO (repetir o mesmo pedido às cegas dava o
+  // mesmo erro, foi o que aconteceu no domingo 11/10).
   let ultimo = "";
-  for (let tentativa = 0; tentativa < 2; tentativa++) {
+  for (let tentativa = 0; tentativa < 3; tentativa++) {
+    const correcao = ultimo
+      ? `\n\nA RESPOSTA ANTERIOR FOI RECUSADA: ${ultimo}. Refaça respeitando o limite de caracteres de cada campo e com 3 nutrientes completos (microbiota e exame em todos; nutrigenética só com gene da lista; exame sem faixa numérica).`
+      : "";
     const anthropic = createClaude();
     const msg = await anthropic.messages.create({
       model: CLAUDE_MODEL_COPY,
@@ -153,7 +175,7 @@ export async function escreverSinergia(p: {
       system,
       tools: [FERRAMENTA_SINERGIA],
       tool_choice: { type: "tool", name: FERRAMENTA_SINERGIA.name },
-      messages: [{ role: "user", content: JSON.stringify(pedido) }],
+      messages: [{ role: "user", content: JSON.stringify(pedido) + correcao }],
     });
     await logarCusto({
       franqueadaId: p.franqueadaId,
