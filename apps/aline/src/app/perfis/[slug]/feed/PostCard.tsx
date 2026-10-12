@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DesenharVideoButton } from "./DesenharVideoButton";
+import { MontarArteButton } from "./MontarArteButton";
 
 /**
  * O card do feed que ABRE (Aline, 12/10/2026: "não dá pra clicar pra ver, nem
@@ -131,7 +132,7 @@ function Detalhe({ post, onFechar }: { post: PostCardDados; onFechar: () => void
               ) : (
                 <div className="flex h-full items-center justify-center p-6 text-center text-sm text-slate-500">
                   Este post ainda não tem arte.
-                  {ehReel ? " Use o botão abaixo pra desenhar o vídeo." : ""}
+                  {ehReel ? " Use o botão abaixo pra desenhar o vídeo." : ehStory ? "" : " Use o botão abaixo pra montar."}
                 </div>
               )}
               {total > 1 && (
@@ -177,6 +178,11 @@ function Detalhe({ post, onFechar }: { post: PostCardDados; onFechar: () => void
             {ehReel && post.status !== "postado" && (
               <div className="mt-3">
                 <DesenharVideoButton postId={post.id} emProducao={post.status === "gerando"} temVideo={temVideo} variante="grande" />
+              </div>
+            )}
+            {!ehReel && !ehStory && post.status !== "postado" && (
+              <div className="mt-3">
+                <MontarArteButton postId={post.id} temArte={total > 0} />
               </div>
             )}
           </div>

@@ -91,7 +91,6 @@ export async function desenharVideoDoPost(params: {
     if (post.status === "postado") return { ok: false, erro: "Este post já foi ao ar." };
     const legenda = (post.copy_legenda ?? "").trim();
     const temaPedido = (params.tema ?? "").trim();
-    const publico: PublicoReel = params.publico === "profissional" ? "profissional" : "paciente";
     if (!temaPedido && legenda.length < 20) {
       return { ok: false, erro: "Diga o que o vídeo explica (ex.: FTO e fome à noite), ou escreva a legenda do post antes." };
     }
@@ -116,6 +115,11 @@ export async function desenharVideoDoPost(params: {
     };
     const handleBruto = perfil.instagram_username || perfil.instagram_handle || perfil.slug || "nutri_secrets";
     const handle = handleBruto.startsWith("@") ? handleBruto : `@${handleBruto}`;
+    // Sem escolha, o público é o do perfil: @scannerdasaude fala com a
+    // profissional, @nutri_secrets com a paciente.
+    const publico: PublicoReel = params.publico
+      ? params.publico === "profissional" ? "profissional" : "paciente"
+      : perfil.slug === "scannerdasaude" ? "profissional" : "paciente";
 
     const anthropic = createClaude();
     const msg = await anthropic.messages.create({

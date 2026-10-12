@@ -246,6 +246,10 @@ export async function gerarCarrosselEUpload(input: {
   brand: BrandGuidelines;
   slides: ConteudoPeca[];
   provider?: Provider;
+  /** Estilo da capa (o Studio usa a capa clara, com o destaque da marca). */
+  capaEstilo?: Parameters<typeof renderCarrossel>[0]["capaEstilo"];
+  /** Foto da capa (a foto real da receita Lótus, nos posts de receita). */
+  fotoCapa?: Buffer;
 }): Promise<{
   urls: string[];
   meta: { custoTotalUsd: number; tempoTotalMs: number; provider: Provider };
@@ -258,6 +262,8 @@ export async function gerarCarrosselEUpload(input: {
     apiKey,
     brand: input.brand,
     slides: input.slides,
+    ...(input.capaEstilo ? { capaEstilo: input.capaEstilo } : {}),
+    ...(input.fotoCapa ? { fotoCapa: input.fotoCapa } : {}),
   });
 
   const admin = createPublicAdminClient();

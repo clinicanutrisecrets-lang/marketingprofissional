@@ -16,6 +16,17 @@ export type BrandGuidelines = {
   fotoProfissionalUrl?: string;
   tomVisual?: string;
   nicho?: string;
+  /**
+   * Cor de DESTAQUE própria (número, CTA, palavra da virada). Opcional: sem
+   * ela vale a terracota de sempre. O Studio passa o magenta do nutrisecrets.
+   */
+  corDestaqueHex?: string;
+  /**
+   * Cor do TEXTO sobre o creme. Opcional: sem ela o título usa a cor da marca.
+   * Pra marca cuja cor não serve de letra (Tiffany sobre creme não tem
+   * contraste), o Studio passa o escuro da paleta.
+   */
+  corTextoHex?: string;
 };
 
 export type ConteudoPeca = {

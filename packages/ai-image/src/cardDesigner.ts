@@ -120,6 +120,27 @@ function tint(hex: string, f: number): string {
 }
 
 const CREME = "#F5EFE2";
+
+function corValida(hex?: string): string | null {
+  return hex && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : null;
+}
+
+/**
+ * Cores declaradas pela marca vencem as derivadas (só quando declaradas, então
+ * quem não passa nada recebe o card de sempre). Destaque troca a terracota;
+ * texto troca o título na cor da marca sobre fundo claro.
+ */
+function aplicarCoresDaMarca(scheme: Scheme, brand: { corDestaqueHex?: string; corTextoHex?: string }): Scheme {
+  const destaque = corValida(brand.corDestaqueHex);
+  const texto = corValida(brand.corTextoHex);
+  if (!destaque && !texto) return scheme;
+  const claro = luminancia(scheme.bg) >= 0.55;
+  return {
+    ...scheme,
+    kicker: destaque ?? scheme.kicker,
+    ...(texto && claro ? { titulo: texto, sub: texto, pill: texto } : {}),
+  };
+}
 const TEXTO_ESCURO = "#3E3A33";
 const TERRACOTA = "#C0765A";
 
@@ -414,6 +435,7 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
     const idx = input.schemeIndex ?? hashString(conteudo.headline || "x") % lista.length;
     scheme = lista[Math.abs(idx) % lista.length]!;
   }
+  scheme = aplicarCoresDaMarca(scheme, brand);
 
   const handle = derivarHandle(brand);
   const foto = fotoPedida(input);
@@ -445,6 +467,8 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
       fonteTitulo: fonteTituloCapa,
       escura: layout === "capa_escura",
       corMarca: brand.corPrimariaHex || "#2F5D50",
+      corDestaque: corValida(brand.corDestaqueHex),
+      corTexto: corValida(brand.corTextoHex),
       logoComposite: await prepararLogo(input, brand, W, H),
     });
     return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
@@ -1048,15 +1072,19 @@ async function renderCapa(params: {
   fonteTitulo: FamiliaFonte;
   escura: boolean;
   corMarca: string;
+  corDestaque?: string | null;
+  corTexto?: string | null;
   logoComposite: { buf: Buffer; w: number; h: number } | null;
 }): Promise<Buffer> {
   const { W, H, conteudo, handle, fonteTitulo, escura, corMarca, logoComposite } = params;
   const prim = /^#[0-9a-fA-F]{6}$/.test(corMarca) ? corMarca : "#2F5D50";
 
+  // Na capa clara, a marca que declara cor de texto e de destaque (Studio)
+  // escreve no escuro e destaca no destaque: a cor da marca fica só na faixa.
   const bg = escura ? prim : CREME;
-  const tintaBase = escura ? "#FFFFFF" : shade(prim, 0.22);
-  const tintaDestaque = escura ? "#FFFFFF" : prim;
-  const tintaApoio = escura ? "#FFFFFF" : shade(prim, 0.62);
+  const tintaBase = escura ? "#FFFFFF" : params.corTexto ?? shade(prim, 0.22);
+  const tintaDestaque = escura ? "#FFFFFF" : params.corDestaque ?? prim;
+  const tintaApoio = escura ? "#FFFFFF" : params.corTexto ?? shade(prim, 0.62);
   const tintaHandle = escura ? "#FFFFFF" : shade(prim, 0.5);
 
   const composites: sharp.OverlayOptions[] = [];
