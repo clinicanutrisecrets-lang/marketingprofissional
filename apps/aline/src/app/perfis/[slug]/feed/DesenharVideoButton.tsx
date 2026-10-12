@@ -8,8 +8,10 @@ import type { ResumoRoteiro } from "@/lib/reel-animado/publico";
  * "Desenhar vídeo" no card de reel do feed: o reel animado do Avançado
  * (personagem com o sintoma circulado, gene, alimentos desenhados). Sem avatar.
  *
- * Abre uma janela com o que o vídeo explica, pra quem e quanto dura. O roteiro
- * sai SÓ da curadoria do Scanner; sem curadoria sobre o tema, ele recusa.
+ * O clique principal desenha o vídeo DO PRÓPRIO POST (Aline, 12/10/2026: "se
+ * já está desenhado o tema, por que me pergunta o tema?"): tema = a legenda do
+ * post, público = o do perfil. Perguntar tema, público e duração fica só no
+ * "vídeo extra, com outro tema". O roteiro sai SÓ da curadoria do Scanner.
  * Depois de pedir, mostra o que o vídeo vai citar (gene, exame, alimentos)
  * pra ela conferir antes de postar. Leva uns 10 minutos pra desenhar.
  */
@@ -29,16 +31,18 @@ export function DesenharVideoButton({
   const [aberto, setAberto] = useState(false);
   const [tema, setTema] = useState("");
   const [publico, setPublico] = useState<"paciente" | "profissional">("paciente");
+  const [extra, setExtra] = useState(false);
   const [duracao, setDuracao] = useState<"30s" | "60s">("60s");
   const [estado, setEstado] = useState<"parado" | "indo" | "pedido" | "erro">(emProducao ? "pedido" : "parado");
   const [msg, setMsg] = useState("");
   const [roteiro, setRoteiro] = useState<ResumoRoteiro | null>(null);
 
-  async function desenhar() {
+  async function desenhar(comEscolhas: boolean) {
     if (temVideo && !window.confirm("Este post já tem vídeo. Desenhar um novo no lugar dele?")) return;
+    setAberto(true);
     setEstado("indo");
     setMsg("");
-    const r = await desenharVideoDoPost({ postId, tema, publico, duracao });
+    const r = await desenharVideoDoPost(comEscolhas ? { postId, tema, publico, duracao } : { postId });
     if (r.ok) {
       setRoteiro(r.roteiro);
       setEstado("pedido");
@@ -62,11 +66,19 @@ export function DesenharVideoButton({
   return (
     <>
       <button
-        onClick={(e) => { e.preventDefault(); setAberto(true); }}
+        onClick={(e) => { e.preventDefault(); setExtra(false); void desenhar(false); }}
         className={grande ? "w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800" : "rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-800 hover:bg-white"}
       >
         {temVideo ? "Desenhar o vídeo de novo" : "▶ Desenhar o vídeo deste reel"}
       </button>
+      {grande && (
+        <button
+          onClick={(e) => { e.preventDefault(); setExtra(true); setEstado("parado"); setAberto(true); }}
+          className="mt-1.5 w-full text-center text-xs text-slate-500 underline hover:text-slate-700"
+        >
+          Fazer um vídeo extra, com outro tema
+        </button>
+      )}
 
       {aberto && (
         <div
@@ -91,10 +103,26 @@ export function DesenharVideoButton({
                   Fechar
                 </button>
               </div>
+            ) : !extra ? (
+              <div className="space-y-3 text-sm">
+                <p className="font-semibold">Desenhar o vídeo deste reel</p>
+                <p className="text-slate-600">
+                  Tema e linguagem saem do próprio post e do perfil. O conteúdo vem só da curadoria do Scanner.
+                </p>
+                {estado === "indo" && <p className="rounded bg-slate-50 p-2 text-slate-700">Montando o roteiro…</p>}
+                {estado === "erro" && <p className="rounded bg-rose-50 p-2 text-rose-800">{msg}</p>}
+                <button
+                  onClick={() => setAberto(false)}
+                  disabled={estado === "indo"}
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-60"
+                >
+                  Fechar
+                </button>
+              </div>
             ) : (
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="font-semibold">Desenhar o vídeo deste reel</p>
+                  <p className="font-semibold">Vídeo extra, com outro tema</p>
                   <p className="mt-1 text-xs text-slate-500">
                     Vídeo animado com personagem, sintoma circulado, gene e alimentos desenhados. Sem avatar. O conteúdo vem
                     só da curadoria do Scanner.
@@ -108,7 +136,7 @@ export function DesenharVideoButton({
                     placeholder="ex.: FTO e a fome à noite"
                     className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
                   />
-                  <span className="mt-1 block text-[11px] text-slate-500">Em branco, usa a legenda do post. Use o nome do gene, exame ou bactéria.</span>
+                  <span className="mt-1 block text-[11px] text-slate-500">Use o nome do gene, exame ou bactéria. O vídeo novo entra no lugar do vídeo deste reel.</span>
                 </label>
                 <div>
                   <span className="text-xs font-medium text-slate-600">Pra quem</span>
@@ -144,8 +172,8 @@ export function DesenharVideoButton({
                     Cancelar
                   </button>
                   <button
-                    onClick={desenhar}
-                    disabled={estado === "indo"}
+                    onClick={() => void desenhar(true)}
+                    disabled={estado === "indo" || !tema.trim()}
                     className="flex-1 rounded-lg bg-slate-900 px-4 py-2 font-medium text-white disabled:opacity-60"
                   >
                     {estado === "indo" ? "Montando o roteiro…" : "Desenhar"}

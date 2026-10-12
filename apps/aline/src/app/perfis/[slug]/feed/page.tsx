@@ -7,8 +7,11 @@ import {
 } from "@/lib/feed/plano";
 import { PostCard, type MidiaCard, type PostCardDados } from "./PostCard";
 import { LimparAcervoButton } from "./LimparAcervoButton";
+import { MontarArtesQueFaltam } from "./MontarArteButton";
 
 export const dynamic = "force-dynamic";
+// Montar a arte de um post leva perto de um minuto (curadoria + texto + render).
+export const maxDuration = 300;
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -88,8 +91,13 @@ export default async function FeedPage({ params }: PageProps) {
     <Moldura perfil={perfil} cor={cor}>
       <div className="space-y-6">
         <LimparAcervoButton perfilId={perfil.id} quantos={antigos.length} />
+        <MontarArtesQueFaltam
+          postIds={naGrade
+            .filter((p) => p.tipo !== "reels" && p.status !== "postado" && p.status !== "gerando" && (todasMidias.get(p.id) ?? []).length === 0)
+            .map((p) => p.id)}
+        />
         {(naGrade.length > 0 || stories.length > 0) && (
-          <p className="text-sm text-slate-500">Toque num post pra ver a arte, passar os slides e ler a legenda. Nos reels, é ali que você desenha o vídeo.</p>
+          <p className="text-sm text-slate-500">Toque num post pra ver a arte, passar os slides e ler a legenda. Carrossel sem arte tem o botão de montar; nos reels, é ali que você desenha o vídeo.</p>
         )}
 
         {naGrade.length === 0 && stories.length === 0 ? (
