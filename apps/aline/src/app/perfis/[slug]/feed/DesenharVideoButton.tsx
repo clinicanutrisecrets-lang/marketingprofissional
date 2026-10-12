@@ -17,11 +17,15 @@ export function DesenharVideoButton({
   postId,
   emProducao,
   temVideo,
+  variante = "card",
 }: {
   postId: string;
   emProducao: boolean;
   temVideo: boolean;
+  /** "grande" = botão largo dentro do post aberto. */
+  variante?: "card" | "grande";
 }) {
+  const grande = variante === "grande";
   const [aberto, setAberto] = useState(false);
   const [tema, setTema] = useState("");
   const [publico, setPublico] = useState<"paciente" | "profissional">("paciente");
@@ -48,9 +52,9 @@ export function DesenharVideoButton({
     return (
       <button
         onClick={(e) => { e.preventDefault(); if (roteiro) setAberto(true); }}
-        className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-700"
+        className={grande ? "w-full rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700" : "rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-700"}
       >
-        desenhando, uns 10 min
+        {grande ? "Desenhando o vídeo, fica pronto em uns 10 minutos" : "desenhando, uns 10 min"}
       </button>
     );
   }
@@ -59,9 +63,9 @@ export function DesenharVideoButton({
     <>
       <button
         onClick={(e) => { e.preventDefault(); setAberto(true); }}
-        className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-800 hover:bg-white"
+        className={grande ? "w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800" : "rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-800 hover:bg-white"}
       >
-        {temVideo ? "Desenhar de novo" : "Desenhar vídeo"}
+        {temVideo ? "Desenhar o vídeo de novo" : "▶ Desenhar o vídeo deste reel"}
       </button>
 
       {aberto && (
