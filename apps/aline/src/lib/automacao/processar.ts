@@ -35,6 +35,7 @@ import {
   pareceSpam,
   casaPalavraChave,
   pareceAbordagemComercial,
+  motivoParaAvisarAline,
   payloadDaOpcao,
   preencherTexto,
   PREFIXO_PASSO,
@@ -305,6 +306,15 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       if (gatilho === "dm") {
         const textoPessoa = ev.texto.trim();
 
+        // ── É pra ELA ler (convite, imprensa, cliente com problema) ──
+        // Vence o coração e a IA: nem curte, nem responde, avisa.
+        const motivoAviso = motivoParaAvisarAline(textoPessoa);
+        if (motivoAviso) {
+          await marcarPrecisaHumano(contato.id, motivoAviso);
+          resumo.encaminhados++;
+          continue;
+        }
+
         // ── Modo coração ──
         // 🔴 Em vez de falar em nome dela, o robô só avisa que viu. A Aline
         // decide se responde. Esta chave VENCE a IA de propósito: o pedido
@@ -312,6 +322,8 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         if (config.reagir_com_coracao) {
           if (pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
           if (!ev.externalId) { resumo.ignorados++; continue; } // sem id não há o que reagir
+          // Um coração por conversa a cada 24 h: a Erika recebeu cinco seguidos.
+          if (await coracaoNasUltimas24h(contato.id)) { resumo.ignorados++; continue; }
           try {
             await reagirMensagem(cred, ev.igsid, ev.externalId);
             await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "dm", texto: "♥️", origem: "coracao" });
@@ -499,6 +511,17 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       .eq("direcao", "saida")
       .not("regra_id", "is", null);
     return new Set(((data ?? []) as Array<{ regra_id: string }>).map((r) => r.regra_id));
+  }
+
+  async function coracaoNasUltimas24h(contatoId: string): Promise<boolean> {
+    const { data } = await aline
+      .from("ig_mensagens")
+      .select("id")
+      .eq("contato_id", contatoId)
+      .eq("origem", "coracao")
+      .gte("criado_em", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .limit(1);
+    return (data ?? []).length > 0;
   }
 
   async function saidaRecente(contatoId: string): Promise<boolean> {

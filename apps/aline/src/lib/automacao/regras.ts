@@ -353,7 +353,7 @@ const OFICIOS_QUE_ABORDAM = [
   "lancamento digital", "gestor de lancamento", "coproducao", "co producao",
   "imovel", "imoveis", "imobiliaria", "consorcio", "financiamento",
   "investimento", "day trade", "renda extra", "marketing digital",
-  "designer grafico", "criacao de site", "copywriter", "assessoria de imprensa",
+  "designer grafico", "designer", "criacao de site", "direcao de arte", "copywriter", "assessoria de imprensa",
   "aumentar seu faturamento", "escalar seu negocio", "captar mais clientes",
 ];
 
@@ -411,6 +411,35 @@ export function pareceAbordagemComercial(texto: string, identidade?: IdentidadeD
   const falaEmParceria = /(^|[^\p{L}])parceri/u.test(t);
   if (falaEmParceria && ABORDAGEM_FRIA.some((f) => t.includes(f))) return true;
   return false;
+}
+
+/**
+ * Mensagem que é pra ALINE ler, não pro robô responder nem curtir.
+ *
+ * 🔴 Incidente de 25/09/2026: com o modo coração ligado, o robô curtiu CINCO
+ * mensagens da assessora do podcast Fitocast (convite de entrevista) e a de uma
+ * aluna perguntando como liberar o bônus de 3 meses, e ninguém avisou a Aline.
+ * Convite e cliente com problema não são lead: são ela que precisa ver.
+ *
+ * Devolve o motivo (vai pro aviso "esperando uma pessoa" e pro relatório da
+ * manhã) ou null. Régua por palavra inteira, sem acento.
+ */
+const OPORTUNIDADE = [
+  "podcast", "entrevista", "entrevistar", "palestra", "palestrante", "convidar voce", "convite para",
+  "jornalista", "reporter", "imprensa", "assessoria de comunicacao", "pauta", "materia sobre",
+  "programa de tv", "live juntas", "collab", "evento", "congresso",
+];
+const CLIENTE_COM_PROBLEMA = [
+  "bonus", "liberar", "acesso", "senha", "nao consigo entrar", "nao consigo acessar",
+  "reembolso", "cancelar", "cancelamento", "paguei", "pagamento", "boleto", "cobranca", "cobrado",
+  "comprei", "minha compra", "nao recebi", "certificado", "formacao",
+];
+export function motivoParaAvisarAline(texto: string): string | null {
+  const t = normalizarTexto(texto);
+  if (!t) return null;
+  if (OPORTUNIDADE.some((p) => palavraInteira(t, p))) return "convite ou imprensa: leia você";
+  if (CLIENTE_COM_PROBLEMA.some((p) => palavraInteira(t, p))) return "cliente com dúvida de compra, acesso ou bônus";
+  return null;
 }
 
 /* ── Botões (respostas rápidas) ────────────────────────────────────────── */

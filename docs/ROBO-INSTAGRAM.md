@@ -174,13 +174,25 @@ ManyChat cobra mensalidade fixa independente de uso.
 - **Corrigido em 12/10:** o direct agora sai ANTES da resposta pública, e falha
   na resposta pública não derruba mais o direct (antes derrubava o evento todo).
 
+- **Corrigido em 12/10:** convite (podcast, entrevista, imprensa) e cliente com
+  dúvida de compra, acesso ou bônus NUNCA são curtidos nem respondidos: viram
+  "esperando uma pessoa". O modo coração curtiu 5 mensagens da assessora do
+  Fitocast em 25/09 e a de uma aluna perguntando do bônus. E o coração agora é
+  um por conversa a cada 24 h. "Designer" no nome do perfil conta como vendedor.
+- **Relatório da manhã** (`/api/cron/relatorio-instagram`, 8h de Brasília):
+  o que espera ela, envios recusados, comentários sem regra, regras desligadas
+  que teriam respondido, token perto de vencer. 🔴 **Só envia com
+  `RESEND_API_KEY` (e opcional `RELATORIO_INSTAGRAM_EMAIL`, `RESEND_FROM_EMAIL`)
+  no Vercel do `studio-aline`**; sem elas, devolve o relatório no corpo e grita
+  no log, nunca finge que mandou. Antes de 12/10 esse relatório NÃO existia.
+
 ### Palavras que chegam e NÃO têm regra (perde a lead quando o ManyChat sair)
 
 | comentário | vezes | o que falta |
 |---|---|---|
-| "quero" / "eu quero" | 5, todos no MESMO post | saber o post e o material |
-| "MC4R" | 1 (12/10) | regra nova + o material |
-| "somo" | 1 | erro de digitação de SOMP: pôr "somo" nas palavras da regra |
+| "quero" / "eu quero" | 5, todos no MESMO post | ✅ regra "POST ANTIGO" (desligada): material indisponível + pergunta quem ela é |
+| "MC4R" | 1 (12/10) | ✅ mesma regra |
+| "somo" | 1 | ✅ entrou na regra do SOMP |
 
 ### Ordem para desligar o ManyChat SEM falha
 
