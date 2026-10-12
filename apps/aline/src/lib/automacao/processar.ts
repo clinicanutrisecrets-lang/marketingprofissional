@@ -629,11 +629,14 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     const ehComentario = ev.tipo === "comentario";
     const opcoes = (regra.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
 
-    if (ehComentario && regra.resposta_publica && ev.commentId) {
-      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
-      await responderComentario(cred, ev.commentId, texto);
-      await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
-    }
+    // 🔴 O DIRECT VEM ANTES DA RESPOSTA PÚBLICA (12/10/2026). Era o contrário,
+    // e a resposta pública sem try/catch derrubava o evento inteiro: um
+    // comentário que a Meta não deixasse responder em público (apagado,
+    // oculto, limite) fazia o material NUNCA sair no direct. E responder
+    // "te mandei no direct" quando o direct foi recusado é prometer o que não
+    // aconteceu. Por isso: direct primeiro, público só se o direct não foi
+    // recusado, e falha no público vira aviso, nunca perda do material.
+    let desfechoDireto: Desfecho | null = null;
     if (regra.resposta_privada) {
       const texto = preencherTexto(escolherVariante(regra.resposta_privada), vars);
       // 🔴 As opções são gravadas ANTES do envio. Se a Meta reclamar e
@@ -648,7 +651,16 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       const botoes: BotaoRapido[] | undefined = opcoes.length > 0
         ? opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(regra.id, i) }))
         : undefined;
-      await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
+      desfechoDireto = await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
+    }
+    if (ehComentario && regra.resposta_publica && ev.commentId && desfechoDireto !== "recusado") {
+      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
+      try {
+        await responderComentario(cred, ev.commentId, texto);
+        await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });
+      } catch (e) {
+        console.warn("[automacao] resposta pública falhou (o direct seguiu):", (e as Error).message.slice(0, 300));
+      }
     }
     if (!regra.resposta_publica && !regra.resposta_privada) {
       // Regra só de tag/sequência: registra a aplicação pra "uma vez por contato" valer.
