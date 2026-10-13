@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { corteIaLiberadoPara } from "@/lib/corte/gate";
+import { bibliotecaDoTime } from "@/lib/corte/gate";
 import { listarBiblioteca } from "@/lib/videos/actions";
 import { listarAcervo } from "@/lib/videos/acervo";
 import { BibliotecaView } from "./BibliotecaView";
@@ -23,7 +23,7 @@ export default async function BibliotecaVideosPage() {
     .select("email")
     .eq("auth_user_id", user.id)
     .maybeSingle();
-  if (!corteIaLiberadoPara((franqueada as { email: string | null } | null)?.email)) {
+  if (!bibliotecaDoTime((franqueada as { email: string | null } | null)?.email)) {
     redirect("/dashboard/videos");
   }
 

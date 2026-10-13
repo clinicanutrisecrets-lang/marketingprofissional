@@ -116,17 +116,14 @@ export function VideoCurtoSection({
     <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
       <h2 className="text-lg font-bold text-brand-text">✍️ Vídeo curto com frase</h2>
       <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
-        Um clipe da sua biblioteca com uma frase grande escrita em cima. Sem
+        Uma cena do acervo do Scanner com uma frase grande escrita em cima. Sem
         você aparecer e sem gravar nada.
       </p>
 
       {clipes.length === 0 ? (
         <p className="mt-4 rounded-xl bg-brand-muted p-4 text-sm text-brand-text/70">
-          Sua biblioteca ainda está vazia. Suba um clipe em{" "}
-          <a href="/dashboard/biblioteca-videos" className="font-semibold text-brand-primary">
-            Biblioteca de clipes
-          </a>{" "}
-          e ele aparece aqui.
+          O acervo de cenas ainda não carregou. Recarregue a página em
+          instantes.
         </p>
       ) : (
         <>
