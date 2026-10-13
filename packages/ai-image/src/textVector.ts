@@ -9,6 +9,7 @@ import { PLAYFAIR_DISPLAY_B64 } from "./fonts/playfair";
 import { MONTSERRAT_B64 } from "./fonts/montserrat";
 import { MONTSERRAT_BLACK_B64 } from "./fonts/montserratBlack";
 import { CAVEAT_B64 } from "./fonts/caveat";
+import { INTER_B64 } from "./fonts/inter";
 
 /**
  * Renderização de texto 100% vetorial.
@@ -28,6 +29,7 @@ let _playfair: opentypeNS.Font | null = null;
 let _montserrat: opentypeNS.Font | null = null;
 let _caveat: opentypeNS.Font | null = null;
 let _montserratBlack: opentypeNS.Font | null = null;
+let _inter: opentypeNS.Font | null = null;
 
 function b64ToArrayBuffer(b64: string): ArrayBuffer {
   const buf = Buffer.from(b64, "base64");
@@ -38,6 +40,10 @@ function getFont(familia: FamiliaFonte): opentypeNS.Font {
   if (familia === "serif") {
     if (!_playfair) _playfair = opentype.parse(b64ToArrayBuffer(PLAYFAIR_DISPLAY_B64));
     return _playfair;
+  }
+  if (familia === "inter") {
+    if (!_inter) _inter = opentype.parse(b64ToArrayBuffer(INTER_B64));
+    return _inter;
   }
   if (familia === "manuscrita") {
     if (!_caveat) _caveat = opentype.parse(b64ToArrayBuffer(CAVEAT_B64));
@@ -54,7 +60,7 @@ function getFont(familia: FamiliaFonte): opentypeNS.Font {
   return _montserrat;
 }
 
-export type FamiliaFonte = "serif" | "sans" | "sans-black" | "manuscrita";
+export type FamiliaFonte = "serif" | "sans" | "sans-black" | "manuscrita" | "inter";
 
 export type ComposeOpts = {
   texto: string;

@@ -2,6 +2,9 @@ import "server-only";
 import {
   renderImagemIA,
   renderCarrossel,
+  renderCarrosselEditorial,
+  type SlideEditorial,
+  type OpcoesEditorial,
   type RenderRequest,
   type RenderResult,
   type Provider,
@@ -307,4 +310,28 @@ export async function gerarImagemPreview(
       custoEstimadoUsd: r.custoEstimadoUsd,
     },
   };
+}
+
+
+/**
+ * Carrossel EDITORIAL (o estilo que a Aline aprovou em 13/10/2026): desenhado
+ * pelo motor tipográfico, sem modelo de imagem e sem custo, e enviado ao bucket.
+ */
+export async function gerarCarrosselEditorialEUpload(input: {
+  perfilSlug: string;
+  slides: SlideEditorial[];
+  opcoes: OpcoesEditorial;
+}): Promise<{ urls: string[] }> {
+  const buffers = await renderCarrosselEditorial(input.slides, input.opcoes);
+  const admin = createPublicAdminClient();
+  const urls: string[] = [];
+  const carimbo = Date.now();
+  for (let i = 0; i < buffers.length; i++) {
+    const path = `${input.perfilSlug}/ai-image/${carimbo}_editorial_${i + 1}.png`;
+    const { error } = await admin.storage.from(BUCKET).upload(path, buffers[i]!, { contentType: "image/png", upsert: false });
+    if (error) throw new Error(`upload slide ${i + 1}: ${error.message}`);
+    const { data: signed } = await admin.storage.from(BUCKET).createSignedUrl(path, 365 * 24 * 60 * 60);
+    urls.push(signed?.signedUrl ?? path);
+  }
+  return { urls };
 }

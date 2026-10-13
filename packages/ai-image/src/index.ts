@@ -246,3 +246,5 @@ export async function renderCarrossel(params: {
 
   return resultados;
 }
+export { renderCarrosselEditorial, renderSlideEditorial, CORES_EDITORIAL } from "./editorial";
+export type { SlideEditorial, OpcoesEditorial } from "./editorial";
