@@ -2,6 +2,7 @@
 
 import { GuiaDaSemana } from "./GuiaDaSemana";
 import { TextoDaArte } from "./TextoDaArte";
+import { VisorArtes } from "./VisorArtes";
 import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -556,28 +557,7 @@ function PostCard({
   return (
     <div className={`overflow-hidden rounded-2xl border-2 shadow-sm ${cardClasses}`}>
       {imgUrl ? (
-        <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgUrl} alt="Criativo" className="aspect-square w-full object-cover" />
-          {ehCarrossel && (
-            <>
-              <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-semibold text-white">
-                {artes.length} slides
-              </span>
-              <div className="flex gap-1 overflow-x-auto bg-brand-muted p-1">
-                {artes.map((u, i) => (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    key={u}
-                    src={u}
-                    alt={`Slide ${i + 1}`}
-                    className="h-14 w-11 flex-none rounded object-cover"
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        <VisorArtes artes={artes} story={post.tipo_post === "stories"} />
       ) : roteiro ? (
         <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-rose-50 px-6 text-center">
           <span className="text-4xl">🎬</span>
