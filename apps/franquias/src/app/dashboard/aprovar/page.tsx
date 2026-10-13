@@ -101,6 +101,21 @@ export default async function AprovarPage({
       .eq("aprovacao_semanal_id", escolhida.id)
       .order("data_hora_agendada", { ascending: true });
     posts = (postsData ?? []) as Array<Record<string, unknown>>;
+    // O vídeo animado ligado ao post ganha o botão de gravar narração.
+    const ids = posts.map((p) => p.id as string);
+    if (ids.length) {
+      const { data: reelsDoPost } = await supabase
+        .from("reels_animados")
+        .select("id, post_id")
+        .in("post_id", ids)
+        .eq("status", "pronto");
+      const porPost = new Map(
+        ((reelsDoPost ?? []) as { id: string; post_id: string }[]).map((r) => [r.post_id, r.id]),
+      );
+      posts = posts.map((p) =>
+        porPost.has(p.id as string) ? { ...p, _reel_animado_id: porPost.get(p.id as string) } : p,
+      );
+    }
   }
 
   // Contexto do revisor de copy: o que ela declarou não atender, as palavras
