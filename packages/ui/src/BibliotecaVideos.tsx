@@ -92,11 +92,18 @@ export function BibliotecaVideos({
   acervo = [],
   corPrimaria = "#0BB8A8",
   acoes,
+  acervoPorPadrao = false,
 }: {
   videos: VideoBiblioteca[];
   acervo?: VideoBiblioteca[];
   corPrimaria?: string;
   acoes: AcoesBiblioteca;
+  /**
+   * O upload já nasce marcado pro acervo compartilhado. É o caso do TIME no
+   * Marketing (Aline 13/10): clipe geral vai pros posts de todas as clientes;
+   * clipe em que aparece alguém do time é desmarcado e fica só na conta.
+   */
+  acervoPorPadrao?: boolean;
 }) {
   const abas: Aba[] = [
     ...(acoes.upload ? (["upload"] as Aba[]) : []),
@@ -137,7 +144,12 @@ export function BibliotecaVideos({
       )}
 
       {aba === "upload" && acoes.upload && (
-        <FormUpload acoes={acoes} corPrimaria={corPrimaria} onAdded={adicionado} />
+        <FormUpload
+          acoes={acoes}
+          corPrimaria={corPrimaria}
+          onAdded={adicionado}
+          acervoPorPadrao={acervoPorPadrao}
+        />
       )}
       {aba === "pexels" && acoes.buscarPexels && (
         <FormPexels acoes={acoes} corPrimaria={corPrimaria} onAdded={adicionado} />
@@ -298,17 +310,19 @@ function FormUpload({
   acoes,
   corPrimaria,
   onAdded,
+  acervoPorPadrao = false,
 }: {
   acoes: AcoesBiblioteca;
   corPrimaria: string;
   onAdded: (v: VideoBiblioteca) => void;
+  acervoPorPadrao?: boolean;
 }) {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [enviando, setEnviando] = useState(false);
-  const [paraAcervo, setParaAcervo] = useState(false);
+  const [paraAcervo, setParaAcervo] = useState(acervoPorPadrao);
   const [erro, setErro] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -346,6 +360,7 @@ function FormUpload({
     setTitulo("");
     setDescricao("");
     setTags([]);
+    setParaAcervo(acervoPorPadrao);
     if (!noAcervo) {
       setMsg("Vídeo adicionado!");
       setTimeout(() => setMsg(null), 2500);
@@ -388,14 +403,25 @@ function FormUpload({
             onChange={(e) => setParaAcervo(e.target.checked)}
             className="mt-0.5"
           />
-          <span>
-            Salvar no <strong>acervo compartilhado</strong> (clipe coringa)
-            <span className="block text-xs text-slate-500">
-              Fica disponível pra todos os perfis e franqueadas, e pro corte com
-              Scanner. Use pra cena genérica; o que for específico deste perfil deixe
-              desmarcado.
+          {acervoPorPadrao ? (
+            <span>
+              <strong>Clipe geral</strong>: vai pro acervo e entra nos posts de todas
+              as clientes
+              <span className="block text-xs text-slate-500">
+                Cena, alimento, ambiente, imagem genérica. Se aparece você ou alguém
+                do time, desmarque: o clipe fica só na sua conta.
+              </span>
             </span>
-          </span>
+          ) : (
+            <span>
+              Salvar no <strong>acervo compartilhado</strong> (clipe coringa)
+              <span className="block text-xs text-slate-500">
+                Fica disponível pra todos os perfis e franqueadas, e pro corte com
+                Scanner. Use pra cena genérica; o que for específico deste perfil deixe
+                desmarcado.
+              </span>
+            </span>
+          )}
         </label>
       )}
 

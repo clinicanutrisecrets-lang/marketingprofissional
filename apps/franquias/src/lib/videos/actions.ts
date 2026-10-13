@@ -3,6 +3,7 @@
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { buscarMelhorVideo } from "@/lib/pexels/client";
 import { revalidatePath } from "next/cache";
+import { bibliotecaDoTime } from "@/lib/corte/gate";
 
 async function getFranqueadaId() {
   const supabase = createClient();
@@ -52,6 +53,66 @@ export async function adicionarVideoBiblioteca(params: {
     .select("id")
     .single();
 
+  if (error) return { ok: false, erro: error.message };
+  revalidatePath("/dashboard/biblioteca-videos");
+  return { ok: true, id: (data as { id: string }).id };
+}
+
+/**
+ * Upload do TIME que vai pro acervo COMPARTILHADO (public.acervo_videos), e
+ * não pra biblioteca da conta de quem sobe. Aline 13/10/2026: "faz o upload do
+ * time ir pro acervo, só os de imagens e vídeos gerais". O acervo entra nos
+ * posts da semana de TODAS as clientes (catalogo_broll e video-do-reel-db), por
+ * isso o clipe em que aparece alguém do time vai por `adicionarVideoBiblioteca`.
+ *
+ * O gate é o mesmo da tela (bibliotecaDoTime) e é conferido AQUI: esconder o
+ * checkbox não impede a chamada direta da action.
+ */
+export async function adicionarAoAcervoDoTime(params: {
+  titulo: string;
+  descricao?: string;
+  url: string;
+  tags: string[];
+  fonte?: "upload" | "pexels";
+  pexels_video_id?: string;
+  thumbnail_url?: string;
+  duracao_seg?: number;
+  largura_px?: number;
+  altura_px?: number;
+}): Promise<{ ok: boolean; id?: string; erro?: string }> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Não autenticado" };
+  const { data: fq } = await supabase
+    .from("franqueadas")
+    .select("email")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (!bibliotecaDoTime((fq as { email: string | null } | null)?.email)) {
+    return { ok: false, erro: "Só o time grava no acervo compartilhado" };
+  }
+
+  // A RLS do acervo só deixa admin escrever; a conferência de quem é do time
+  // foi feita acima, então a escrita usa a chave de serviço.
+  const { data, error } = await createAdminClient()
+    .from("acervo_videos")
+    .insert({
+      titulo: params.titulo,
+      descricao: params.descricao || null,
+      url: params.url,
+      tags: params.tags,
+      fonte: params.fonte ?? "upload",
+      pexels_video_id: params.pexels_video_id,
+      thumbnail_url: params.thumbnail_url,
+      duracao_seg: params.duracao_seg,
+      largura_px: params.largura_px,
+      altura_px: params.altura_px,
+      criado_por: user.id,
+    })
+    .select("id")
+    .single();
   if (error) return { ok: false, erro: error.message };
   revalidatePath("/dashboard/biblioteca-videos");
   return { ok: true, id: (data as { id: string }).id };

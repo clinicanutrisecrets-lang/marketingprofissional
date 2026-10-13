@@ -22,3 +22,22 @@ test("menu: o caminho da semana fica à mostra e o resto vai pra Mais ferramenta
   assert.ok(!principais.includes("/dashboard/conteudo/editor"));
   assert.match(nav, /Mais ferramentas/);
 });
+
+test("upload do time vai pro acervo compartilhado, com o gate conferido na action", () => {
+  const actions = ler("lib/videos/actions.ts");
+  const fn = actions.slice(actions.indexOf("export async function adicionarAoAcervoDoTime"));
+  const corpo = fn.slice(0, fn.indexOf("\nexport async function"));
+  assert.match(corpo, /bibliotecaDoTime\(/);
+  assert.ok(corpo.indexOf("bibliotecaDoTime(") < corpo.indexOf('.from("acervo_videos")'), "gate antes da escrita");
+  assert.match(corpo, /criado_por: user\.id/);
+
+  const view = ler("app/dashboard/biblioteca-videos/BibliotecaView.tsx");
+  assert.match(view, /acervoPorPadrao\b/);
+  assert.match(view, /adicionarAoAcervo: adicionarAoAcervoDoTime/);
+
+  // O componente compartilhado nasce marcado só quando pedido (o Studio segue desmarcado).
+  const ui = readFileSync(join(raiz, "../../../packages/ui/src/BibliotecaVideos.tsx"), "utf8");
+  assert.match(ui, /useState\(acervoPorPadrao\)/);
+  assert.match(ui, /acervoPorPadrao = false/);
+  assert.match(ui, /Se aparece você ou alguém\s+do time, desmarque/);
+});
