@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   gerarMinhaSemana,
   gerarPostsDaSemana,
+  refazerSinergiaDaSemana,
   type ResultadoGeracaoSemana,
 } from "@/lib/geracao/semanal";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
@@ -288,6 +289,22 @@ export async function gerarSemanaAdmin(franqueadaId: string, semanaRef?: string)
 
   const semana = semanaRef ?? proximaSegunda();
   return gerarPostsDaSemana(franqueadaId, semana);
+}
+
+/** Refaz só a sinergia (carrossel + 3 stories) de uma semana já montada. Admin. */
+export async function refazerSinergiaAdmin(franqueadaId: string, semanaRef: string) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false as const, erro: "Não autenticado" };
+  const { data: admin } = await supabase
+    .from("admins")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (!admin) return { ok: false as const, erro: "Sem permissão" };
+  return refazerSinergiaDaSemana(franqueadaId, semanaRef);
 }
 
 function proximaSegunda(): string {

@@ -259,3 +259,21 @@ export function diaDaSinergia(dias: number[]): number {
   if (!d.length) return 4;
   return d[Math.min(2, d.length - 1)];
 }
+
+/** Cards da sinergia que ainda não ganharam arte nem foram ao ar (podem ser trocados). */
+export function cardDeSinergiaSemArte(p: {
+  sinergia_chave?: string | null;
+  status?: string | null;
+  url_imagem_final?: string | null;
+  urls_slides?: string[] | null;
+  data_hora_postado?: string | null;
+}): boolean {
+  return (
+    !!p.sinergia_chave &&
+    !p.data_hora_postado &&
+    !p.url_imagem_final &&
+    !(p.urls_slides ?? []).length &&
+    p.status !== "publicado" &&
+    p.status !== "postado"
+  );
+}

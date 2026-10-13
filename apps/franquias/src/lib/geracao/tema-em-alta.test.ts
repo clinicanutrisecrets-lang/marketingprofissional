@@ -64,7 +64,9 @@ test("o tema em alta puxa o tema da sinergia (câncer de intestino → intestino
 });
 
 test("a geração liga o tema em alta à sinergia, e a sinergia responde por ferramenta", () => {
-  const semanal = readFileSync(new URL("./semanal.ts", import.meta.url), "utf8");
+  // A sinergia mora em sinergia-da-semana.ts (13/10); o pacote passa o tema em alta pra ela.
+  assert.match(readFileSync(new URL("./semanal.ts", import.meta.url), "utf8"), /temaEmAlta,\n\s*logoUrl/);
+  const semanal = readFileSync(new URL("./sinergia-da-semana.ts", import.meta.url), "utf8");
   assert.match(semanal, /temaSinergiaDoTemaEmAlta\(temaEmAlta\)/);
   assert.match(semanal, /temas: temaSinergia \? \[temaSinergia\]/);
   const sin = readFileSync(new URL("../conteudo/sinergia-semanal.ts", import.meta.url), "utf8");
