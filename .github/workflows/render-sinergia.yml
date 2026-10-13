@@ -32,13 +32,25 @@ jobs:
         with:
           node-version: "20"
 
+      # 🔴 O pedido é gravado ANTES de tudo: se a instalação falhar, a limpeza
+      # (if: failure) precisa dele pra tirar os cards vazios. Em 11/10 ele era
+      # gravado no passo "Desenhar", a instalação falhou antes, a limpeza não
+      # achou o arquivo e os 4 cards da Juliana ficaram sem arte.
+      - name: Guardar o pedido
+        run: echo "${{ inputs.payload_b64 }}" | base64 -d > /tmp/payload.json
+
+      # 🔴 Fora da pasta do repo: o repo é workspace (pnpm), e um npm install
+      # dentro dele sobe até a raiz e morre em 'Unsupported URL Type "workspace:"'.
       - name: Instalar dependências
-        working-directory: packages/sinergia-render
-        run: npm install --no-save --no-package-lock puppeteer-core@23
+        run: |
+          mkdir -p "$RUNNER_TEMP/sinergia-deps"
+          cd "$RUNNER_TEMP/sinergia-deps"
+          npm init -y > /dev/null
+          npm install --no-save --no-package-lock --no-audit --no-fund puppeteer-core@23
 
       - name: Desenhar
         run: |
-          echo "${{ inputs.payload_b64 }}" | base64 -d > /tmp/payload.json
+          SINERGIA_DEPS="$RUNNER_TEMP/sinergia-deps" \
           CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable) \
             node packages/sinergia-render/render.mjs /tmp/payload.json /tmp/sinergia
 

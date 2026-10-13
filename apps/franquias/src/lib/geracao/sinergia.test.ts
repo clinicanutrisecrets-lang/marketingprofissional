@@ -127,6 +127,18 @@ test("ligação: o pacote de domingo chama a sinergia, guarda a chave e apaga os
   assert.match(w, /--falhou/);
 });
 
+test("worker: instala FORA do repo e grava o pedido antes de instalar (falha de 11/10)", () => {
+  const w = fonte("../../../../../.github/workflows/render-sinergia.yml");
+  // O repo é workspace: npm install dentro de packages/ morre em "workspace:*".
+  assert.doesNotMatch(w, /working-directory: packages\/sinergia-render/);
+  assert.match(w, /RUNNER_TEMP\/sinergia-deps/);
+  assert.match(w, /SINERGIA_DEPS=/);
+  // A limpeza (if: failure) precisa do pedido: ele é gravado antes da instalação.
+  assert.ok(w.indexOf("base64 -d > /tmp/payload.json") < w.indexOf("npm install"));
+  const r = fonte("../../../../../packages/sinergia-render/render.mjs");
+  assert.match(r, /process\.env\.SINERGIA_DEPS/);
+});
+
 test("o modelo nunca escreve ingrediente: o prompt pede ÍNDICE e o público entra como fronteira", () => {
   const s = fonte("../conteudo/sinergia-semanal.ts");
   assert.match(s, /ingredientes_idx/);
