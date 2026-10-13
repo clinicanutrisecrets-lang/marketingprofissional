@@ -98,3 +98,14 @@ test("a arte do Studio sai no carrossel editorial que a Aline aprovou (13/10), n
   assert.match(editorial, /"serif"/);
   assert.match(editorial, /"inter"/);
 });
+
+test("o botão do topo refaz também os posts que ainda estão na arte antiga", async () => {
+  const { precisaArteNova } = await import("../src/lib/arte-post/molde.ts");
+  assert.equal(precisaArteNova([]), true);
+  assert.equal(precisaArteNova([{ url: "s/nutrisecrets/ai-image/1791848495766_carrossel_1.png", tipo: "imagem" }]), true);
+  assert.equal(precisaArteNova([{ url: "s/nutrisecrets/ai-image/1792_editorial_1.png", tipo: "imagem" }]), false);
+  // Arte feita fora do Studio fica intocada.
+  assert.equal(precisaArteNova([{ url: "s/nutrisecrets/sinergia/lentilha-01.png", tipo: "imagem" }]), false);
+  assert.equal(precisaArteNova([{ url: "v.mp4", tipo: "video" }]), true);
+  assert.match(ler("../src/app/perfis/[slug]/feed/page.tsx"), /precisaArteNova\(/);
+});

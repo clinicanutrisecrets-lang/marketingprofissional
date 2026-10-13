@@ -205,3 +205,17 @@ export function coresDoPerfil(
   }
   return { corPrimariaHex: prim, corTextoHex: "#1A1A2E" };
 }
+
+/**
+ * O post precisa de arte nova? Sem imagem, ou com imagem no estilo antigo
+ * (anterior ao carrossel editorial aprovado em 13/10/2026; os arquivos novos
+ * levam "_editorial_" no nome). Post já no estilo novo fica como está.
+ */
+export function precisaArteNova(midias: Array<{ url?: string | null; tipo?: string | null }>): boolean {
+  const imagens = midias.filter((m) => m.tipo !== "video");
+  if (imagens.length === 0) return true;
+  // Arte que não saiu do motor do Studio (ex.: o carrossel de sinergia que a
+  // própria Aline fez) NUNCA é refeita.
+  if (!imagens.every((m) => (m.url ?? "").includes("/ai-image/"))) return false;
+  return !imagens.every((m) => (m.url ?? "").includes("_editorial_"));
+}

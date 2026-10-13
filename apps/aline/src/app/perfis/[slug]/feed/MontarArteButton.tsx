@@ -78,10 +78,10 @@ export function MontarArtesQueFaltam({ postIds }: { postIds: string[] }) {
           disabled={indo}
           className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
         >
-          {indo ? `Montando ${feitos + 1} de ${postIds.length}…` : `Montar as artes que faltam (${postIds.length})`}
+          {indo ? `Montando ${feitos + 1} de ${postIds.length}…` : `Montar ou refazer as artes no estilo novo (${postIds.length})`}
         </button>
         <span className="text-xs text-slate-500">
-          Carrosséis e posts de imagem, com a curadoria do Scanner e as cores do perfil. Reels e stories têm botão próprio.
+          Os posts sem arte e os que ainda estão no estilo antigo. Foto inteira na capa, Playfair e Tiffany nos detalhes. Reels e stories têm botão próprio.
         </span>
       </div>
       {!indo && feitos > 0 && (

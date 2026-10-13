@@ -8,6 +8,7 @@ import {
 import { PostCard, type MidiaCard, type PostCardDados } from "./PostCard";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 import { MontarArtesQueFaltam } from "./MontarArteButton";
+import { precisaArteNova } from "@/lib/arte-post/molde";
 
 export const dynamic = "force-dynamic";
 // Montar a arte de um post leva perto de um minuto (curadoria + texto + render).
@@ -93,7 +94,7 @@ export default async function FeedPage({ params }: PageProps) {
         <LimparAcervoButton perfilId={perfil.id} quantos={antigos.length} />
         <MontarArtesQueFaltam
           postIds={naGrade
-            .filter((p) => p.tipo !== "reels" && p.status !== "postado" && p.status !== "gerando" && (todasMidias.get(p.id) ?? []).length === 0)
+            .filter((p) => p.tipo !== "reels" && p.status !== "postado" && p.status !== "gerando" && precisaArteNova(todasMidias.get(p.id) ?? []))
             .map((p) => p.id)}
         />
         {(naGrade.length > 0 || stories.length > 0) && (
