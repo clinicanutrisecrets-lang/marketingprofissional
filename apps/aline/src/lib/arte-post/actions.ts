@@ -4,7 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { revalidatePath } from "next/cache";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { createClaude } from "@/lib/claude/client";
-import { gerarCarrosselEUpload } from "@/lib/ai-image/render";
+import { gerarCarrosselEditorialEUpload } from "@/lib/ai-image/render";
+import { LOGO_NUTRISECRETS_BRANCO_B64, LOGO_NUTRISECRETS_TEAL_B64 } from "./logo-nutrisecrets";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import {
   FERRAMENTA_ARTE,
@@ -208,19 +209,26 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
 
     const handle = perfil.instagram_username || perfil.instagram_handle || perfil.slug;
     const cores = coresDoPerfil(perfil, post.pilar);
-    const resultado = await gerarCarrosselEUpload({
+    const ehNutriSecrets = perfil.slug === "nutrisecrets";
+    const resultado = await gerarCarrosselEditorialEUpload({
       perfilSlug: perfil.slug,
-      brand: {
-        nomeMarca: handle ? `@${handle.replace(/^@/, "")}` : perfil.nome ?? perfil.slug,
-        ...cores,
-      },
-      capaEstilo: "grotesca_clara",
-      ...(fotoCapa ? { fotoCapa } : {}),
       slides: [
-        { headline: capa, eyebrow: arte.eyebrow },
-        ...arte.slides.map((s) => ({ headline: s.headline, corpo: s.corpo })),
-        { headline: arte.fecho.headline, cta: arte.fecho.cta },
+        { tipo: "capa", titulo: capa, kicker: arte.eyebrow },
+        ...arte.slides.map((s) => ({ tipo: "meio" as const, titulo: s.headline, corpo: s.corpo })),
+        { tipo: "fecho", titulo: arte.fecho.headline, chamada: arte.fecho.cta },
       ],
+      opcoes: {
+        destaqueHex: cores.corPrimariaHex,
+        ...(fotoCapa ? { fotoCapa } : {}),
+        ...(ehNutriSecrets
+          ? {
+              logoClaro: Buffer.from(LOGO_NUTRISECRETS_TEAL_B64, "base64"),
+              logoEscuro: Buffer.from(LOGO_NUTRISECRETS_BRANCO_B64, "base64"),
+            }
+          : {}),
+        assinatura: handle ? `@${handle.replace(/^@/, "")}` : perfil.nome ?? perfil.slug,
+        aviso: "Conteúdo informativo. Não substitui acompanhamento médico ou nutricional.",
+      },
     });
 
     // Troca as imagens só depois de as novas existirem: falha no render não

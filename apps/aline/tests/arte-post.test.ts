@@ -84,3 +84,17 @@ test("Desenhar vídeo: o clique principal não pergunta o tema", () => {
   assert.match(b, /void desenhar\(false\)/);
   assert.match(ler("../src/lib/reel-animado/actions.ts"), /perfil\.slug === "scannerdasaude" \? "profissional" : "paciente"/);
 });
+
+test("a arte do Studio sai no carrossel editorial que a Aline aprovou (13/10), não no grotesco com magenta", () => {
+  const acoes = ler("../src/lib/arte-post/actions.ts");
+  assert.match(acoes, /gerarCarrosselEditorialEUpload\(/);
+  assert.doesNotMatch(acoes, /gerarCarrosselEUpload\(/);
+  assert.doesNotMatch(acoes, /grotesca_clara/);
+  const editorial = ler("../../../packages/ai-image/src/editorial.ts");
+  // Foto INTEIRA na capa ("está cortando a foto").
+  assert.match(editorial, /fit: "cover"/);
+  // Sem magenta e sem a letra preta pesada ("está roxo e preto").
+  assert.doesNotMatch(editorial, /D946EF|D6336C|sans-black/i);
+  assert.match(editorial, /"serif"/);
+  assert.match(editorial, /"inter"/);
+});
