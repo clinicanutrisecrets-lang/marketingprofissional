@@ -14,11 +14,20 @@ import { quadros } from './template.mjs'
 const DIR = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 
+// No GitHub Actions o puppeteer é instalado FORA do repo (SINERGIA_DEPS), porque
+// o repo é workspace e o npm install dentro dele falha.
+const requires = [require]
+if (process.env.SINERGIA_DEPS) {
+  requires.unshift(createRequire(path.join(process.env.SINERGIA_DEPS, 'package.json')))
+}
+
 function puppeteer() {
-  for (const nome of ['puppeteer-core', 'puppeteer']) {
-    try {
-      return require(nome)
-    } catch {}
+  for (const req of requires) {
+    for (const nome of ['puppeteer-core', 'puppeteer']) {
+      try {
+        return req(nome)
+      } catch {}
+    }
   }
   throw new Error('instale puppeteer-core')
 }
