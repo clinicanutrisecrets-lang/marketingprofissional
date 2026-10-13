@@ -116,7 +116,8 @@ test("dia do carrossel: o 3º dia de post (o 2º é do reel animado)", () => {
 });
 
 test("ligação: o pacote de domingo chama a sinergia, guarda a chave e apaga os cards se o worker não sair", () => {
-  const s = fonte("./semanal.ts");
+  assert.match(fonte("./semanal.ts"), /montarSinergiaDaSemana\(/);
+  const s = fonte("./sinergia-da-semana.ts");
   assert.match(s, /buscarReceitaSinergia\(/);
   assert.match(s, /escreverSinergia\(/);
   assert.match(s, /dispararRenderSinergia\(/);
@@ -162,4 +163,19 @@ test("ligação: o teto vai na ferramenta e a nova tentativa recebe o motivo", (
   assert.match(s, /tema: ATE\(MAX_SINERGIA\.tema/);
   assert.match(s, /A RESPOSTA ANTERIOR FOI RECUSADA: \$\{ultimo\}/);
   assert.match(s, /tentativa < 3/);
+});
+
+test("refazer a sinergia: só troca card sem arte, nunca o que já foi desenhado ou postado", async () => {
+  const { cardDeSinergiaSemArte } = await import("./sinergia.ts");
+  const vazio = { sinergia_chave: "funil:hormonal-16", status: "aguardando_aprovacao", url_imagem_final: null, urls_slides: null };
+  assert.equal(cardDeSinergiaSemArte(vazio), true);
+  assert.equal(cardDeSinergiaSemArte({ ...vazio, url_imagem_final: "https://x/1.jpg" }), false);
+  assert.equal(cardDeSinergiaSemArte({ ...vazio, urls_slides: ["https://x/1.jpg"] }), false);
+  assert.equal(cardDeSinergiaSemArte({ ...vazio, data_hora_postado: "2026-10-12T10:00:00Z" }), false);
+  assert.equal(cardDeSinergiaSemArte({ ...vazio, sinergia_chave: null }), false);
+  const s = fonte("./semanal.ts");
+  assert.match(s, /export async function refazerSinergiaDaSemana/);
+  assert.match(s, /cardDeSinergiaSemArte\(p\)/);
+  const b = readFileSync(new URL("../../app/admin/franqueadas/[id]/GerarSemanaBlock.tsx", import.meta.url), "utf8");
+  assert.match(b, /refazerSinergiaAdmin\(/);
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { gerarSemanaAdmin } from "@/lib/posts/actions";
+import { gerarSemanaAdmin, refazerSinergiaAdmin } from "@/lib/posts/actions";
 import { rotuloSemanaCurto } from "@/lib/aprovacao/semana";
 
 /**
@@ -24,6 +24,27 @@ export function GerarSemanaBlock({
   const [msg, setMsg] = useState<{ tom: "ok" | "erro" | "info"; texto: string } | null>(
     null,
   );
+
+  async function refazerSinergia() {
+    if (!confirm(`Refazer só a sinergia (carrossel + 3 stories) de ${rotuloSemanaCurto(semana)}? Os cards da sinergia sem arte saem e entram novos; o resto da semana fica como está.`)) return;
+    setRodando(true);
+    setMsg(null);
+    try {
+      const r = await refazerSinergiaAdmin(franqueadaId, semana);
+      setMsg(
+        r.ok
+          ? {
+              tom: "ok",
+              texto: `Pronto: ${r.gerados} card(s) da sinergia criados${r.tirados ? ` (${r.tirados} vazios saíram)` : ""}. A arte chega em uns 3 minutos.`,
+            }
+          : { tom: "erro", texto: r.erro },
+      );
+    } catch (e) {
+      setMsg({ tom: "erro", texto: (e as Error).message });
+    } finally {
+      setRodando(false);
+    }
+  }
 
   async function gerar() {
     setRodando(true);
@@ -86,6 +107,15 @@ export function GerarSemanaBlock({
         className="w-full rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white hover:bg-brand-secondary/90 disabled:opacity-60"
       >
         {rodando ? "Montando… (pode levar 2 minutos)" : "Montar o pacote desta semana"}
+      </button>
+
+      <button
+        type="button"
+        onClick={refazerSinergia}
+        disabled={rodando}
+        className="mt-2 w-full rounded-lg border border-brand-secondary px-4 py-2 text-sm font-medium text-brand-secondary hover:bg-brand-secondary/5 disabled:opacity-60"
+      >
+        Refazer só a sinergia desta semana
       </button>
 
       {msg && <p className={`mt-2 rounded-lg px-3 py-2 text-xs ${cor}`}>{msg.texto}</p>}
