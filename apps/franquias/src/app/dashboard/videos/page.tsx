@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ReelAnimadoSection, type ReelAnimado } from "../conteudo/ReelAnimadoSection";
-import { corteIaLiberadoPara } from "@/lib/corte/gate";
+import { bibliotecaDoTime, corteIaLiberadoPara } from "@/lib/corte/gate";
 import { listarCortesAction } from "@/lib/corte/actions";
 import { CortesIaSection } from "./CortesIaSection";
 import { VideoCurtoSection, type ClipeEscolhivel } from "./VideoCurtoSection";
@@ -26,6 +26,7 @@ export default async function VideosHubPage() {
     .maybeSingle();
   if (!franqueada) redirect("/onboarding");
   const corteIa = corteIaLiberadoPara((franqueada as { email: string | null }).email);
+  const bibTime = bibliotecaDoTime((franqueada as { email: string | null }).email);
   const cortes = corteIa ? await listarCortesAction() : [];
   // Clipes pro vídeo curto com frase. Só carrega pra quem tem o recurso —
   // são duas consultas que não servem pra mais nada nesta tela.
@@ -93,7 +94,7 @@ export default async function VideosHubPage() {
 
         {/* A biblioteca de clipes é material do TIME pros vídeos gerados
             automaticamente (Aline, 02/10), não ferramenta da profissional. */}
-        {corteIa && (
+        {bibTime && (
           <Link
             href="/dashboard/biblioteca-videos"
             className="group rounded-2xl bg-white p-6 shadow-sm transition hover:shadow-md"
