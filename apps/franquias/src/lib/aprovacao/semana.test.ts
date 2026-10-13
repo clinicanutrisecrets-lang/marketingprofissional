@@ -222,3 +222,12 @@ test("a tela avisa as semanas passadas pendentes (Aline, 07/10)", () => {
   assert.match(tela, /semanasPendentesAnteriores\(candidatas, escolhida\)/);
   assert.match(tela, /semanas passadas pendentes/);
 });
+
+test("tela Aprovar semana: o carrossel passa slide a slide e abre em tela cheia (Juliana, 13/10)", () => {
+  const view = readFileSync(new URL("../../app/dashboard/aprovar/AprovacaoView.tsx", import.meta.url), "utf8");
+  assert.match(view, /<VisorArtes artes=\{artes\}/);
+  const visor = readFileSync(new URL("../../app/dashboard/aprovar/VisorArtes.tsx", import.meta.url), "utf8");
+  assert.match(visor, /Próximo slide/);
+  assert.match(visor, /onClick=\{\(\) => setI\(n\)\}/);
+  assert.match(visor, /onClick=\{\(\) => setCheia\(true\)\}/);
+});
