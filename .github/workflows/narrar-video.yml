@@ -1,0 +1,98 @@
+name: Narrar Vídeo
+
+# Junta a voz que a profissional gravou (karaokê) com o vídeo: o animado
+# (Storage) ou um da metodologia (URL pública). Só ffmpeg, sem modelo.
+# Disparado por apps/franquias/src/lib/narracao/actions.ts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      narracao_id:
+        required: true
+      video_path:
+        description: "caminho no bucket franqueadas-assets (vídeo animado)"
+        required: false
+        default: ""
+      video_url:
+        description: "URL pública do vídeo (metodologia)"
+        required: false
+        default: ""
+      audio_path:
+        required: true
+      atraso_ms:
+        description: "quanto a gravação começou antes do vídeo (sai do início da voz)"
+        required: false
+        default: "0"
+      destino_path:
+        required: true
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  narrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+      NID: ${{ inputs.narracao_id }}
+    steps:
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+
+      - name: Baixar vídeo e voz
+        env:
+          VIDEO_PATH: ${{ inputs.video_path }}
+          VIDEO_URL: ${{ inputs.video_url }}
+          AUDIO_PATH: ${{ inputs.audio_path }}
+        run: |
+          set -e
+          if [ -n "$VIDEO_PATH" ]; then
+            curl -sfL "$SB_URL/storage/v1/object/authenticated/franqueadas-assets/$VIDEO_PATH" \
+              -H "Authorization: Bearer $SB_KEY" -o /tmp/video.mp4
+          else
+            curl -sfL "$VIDEO_URL" -o /tmp/video.mp4
+          fi
+          curl -sfL "$SB_URL/storage/v1/object/authenticated/franqueadas-assets/$AUDIO_PATH" \
+            -H "Authorization: Bearer $SB_KEY" -o /tmp/voz.bin
+          ls -la /tmp/video.mp4 /tmp/voz.bin
+
+      - name: Juntar
+        env:
+          ATRASO_MS: ${{ inputs.atraso_ms }}
+        run: |
+          set -e
+          INICIO=$(python3 -c "import os;print(max(0,min(3000,int(os.environ.get('ATRASO_MS') or 0)))/1000)")
+          # A voz começa no mesmo instante do vídeo (o atraso da gravação sai
+          # do começo), completa com silêncio até o fim e o vídeo manda na
+          # duração. O áudio original do vídeo (se tiver) é descartado.
+          ffmpeg -y -i /tmp/video.mp4 -i /tmp/voz.bin \
+            -filter_complex "[1:a]atrim=start=${INICIO},asetpts=PTS-STARTPTS,loudnorm=I=-16:TP=-1.5,apad[a]" \
+            -map 0:v:0 -map "[a]" -c:v copy -c:a aac -ar 48000 -b:a 160k -shortest -movflags +faststart /tmp/narrado.mp4
+          ls -la /tmp/narrado.mp4
+
+      - name: Subir e marcar pronto
+        env:
+          DESTINO: ${{ inputs.destino_path }}
+        run: |
+          set -e
+          curl -sf -X POST "$SB_URL/storage/v1/object/franqueadas-assets/$DESTINO" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: video/mp4" -H "x-upsert: true" \
+            --data-binary @/tmp/narrado.mp4 > /dev/null
+          SIGNED=$(curl -sf -X POST "$SB_URL/storage/v1/object/sign/franqueadas-assets/$DESTINO" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"expiresIn":31536000}' | python3 -c "import json,sys;print(json.load(sys.stdin)['signedURL'])")
+          curl -sf -X PATCH "$SB_URL/rest/v1/narracoes_video?id=eq.$NID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d "{\"status\":\"pronto\",\"path\":\"$DESTINO\",\"url\":\"$SB_URL/storage/v1$SIGNED\",\"atualizado_em\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Marcar erro
+        if: failure()
+        run: |
+          curl -s -X PATCH "$SB_URL/rest/v1/narracoes_video?id=eq.$NID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"status":"erro","erro_msg":"a montagem falhou"}' || true

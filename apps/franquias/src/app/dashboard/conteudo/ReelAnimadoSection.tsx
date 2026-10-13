@@ -88,15 +88,23 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
                 </p>
               </div>
               {r.status === "pronto" && r.url ? (
-                <a
-                  href={r.url}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-bold text-white"
-                >
-                  ⬇️ Baixar MP4
-                </a>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={`/dashboard/narrar?origem=reel&ref=${r.id}`}
+                    className="rounded-lg bg-red-600 px-4 py-1.5 text-xs font-bold text-white"
+                  >
+                    🎙️ Gravar narração
+                  </a>
+                  <a
+                    href={r.url}
+                    download
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-bold text-white"
+                  >
+                    ⬇️ Baixar MP4
+                  </a>
+                </div>
               ) : r.status === "erro" ? (
                 <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
                   erro — tente de novo

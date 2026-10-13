@@ -221,7 +221,9 @@ export async function produzirReelAnimado(
 
   const { data: row, error: insErr } = await admin
     .from("reels_animados")
-    .insert({ franqueada_id: f.id, tema: p.tema, duracao: p.duracao, post_id: p.postId ?? null } as never)
+    // O spec fica guardado: é ele que dá o ritmo do karaokê da narração
+    // (lib/narracao/roteiro.ts). Antes era jogado fora depois do render.
+    .insert({ franqueada_id: f.id, tema: p.tema, duracao: p.duracao, post_id: p.postId ?? null, spec } as never)
     .select("id")
     .single();
   if (insErr || !row) return { ok: false, msg: "falha ao registrar o reel" };

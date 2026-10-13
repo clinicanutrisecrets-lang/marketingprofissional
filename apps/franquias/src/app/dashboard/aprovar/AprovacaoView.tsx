@@ -613,9 +613,18 @@ function PostCard({
               >
                 ⬇ Baixar o vídeo
               </a>
-              <span className="self-center text-rose-700/70">
-                Ou grave você mesma com o roteiro abaixo.
-              </span>
+              {typeof post._reel_animado_id === "string" ? (
+                <a
+                  href={`/dashboard/narrar?origem=reel&ref=${post._reel_animado_id}`}
+                  className="rounded-md bg-red-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"
+                >
+                  🎙️ Gravar narração
+                </a>
+              ) : (
+                <span className="self-center text-rose-700/70">
+                  Ou grave você mesma com o roteiro abaixo.
+                </span>
+              )}
             </div>
           </div>
         )}
