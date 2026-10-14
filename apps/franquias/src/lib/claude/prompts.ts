@@ -6,6 +6,7 @@
 import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
 import { NUCLEO_AGENTE_COPY, blocoPublicoDaCopy, type PublicoDaCopy } from "./copy-agent";
 import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
+import { regraConsultaInclui } from "../geracao/consulta-teste";
 
 /**
  * Produto real da nutri no Scanner Tratamentos (cache produtos_scanner,
@@ -440,7 +441,11 @@ ${incluir_preco && produto.preco_texto ? `- Preço: ${produto.preco_texto}` : "-
 - Link de compra (checkout real): ${produto.checkout_url}
 
 ${regraProcessoFuncional("A descrição acima é interna (catálogo da nutri) e")}
-
+${
+    produto.scanner_produto_id === "teste_genetico" || produto.scanner_produto_id === "teste_epigenetico"
+      ? `\n${regraConsultaInclui(produto)}\n`
+      : ""
+  }
 COMO VENDER SEM PARECER PANFLETO:
 - Comece pela DOR ou DESEJO que esse produto resolve — nunca pelo produto.
 - O produto entra como o próximo passo NATURAL, não como anúncio.

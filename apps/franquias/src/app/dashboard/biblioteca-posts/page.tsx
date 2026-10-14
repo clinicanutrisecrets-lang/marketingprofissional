@@ -164,7 +164,7 @@ export default async function BibliotecaPostsPage() {
             <strong className="text-brand-text">
               Tem coleção de posts esperando por você.
             </strong>{" "}
-            Os posts de venda do teste genético (DNA 360 e Consulta
+            Os posts de venda do teste nutrigenético (DNA 360 e Consulta
             Nutrigenética) aparecem aqui assim que o produto estiver ativo na
             sua Loja do Scanner Tratamentos — é de lá que sai o link de
             checkout do post.{" "}

@@ -21,7 +21,10 @@ import {
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
 import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
-import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
+import { gerarEUploadImagem, gerarCarrosselEUpload, gerarCarrosselEditorialEUpload } from "@/lib/ai-image/render";
+import { slidesDaConsulta, fotoDaConsultaUrl, FOTOS_COLETA } from "@/lib/geracao/consulta-teste";
+import { descreverEGravarFoto } from "@/lib/arquivos/descrever-foto";
+const FOTOS_COLETA_NOMES = new Set<string>(FOTOS_COLETA);
 import type { ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 import {
   conteudoDaArteUnica,
@@ -56,7 +59,11 @@ import {
   caminhoNoBucket,
   filaDaSemana,
   tipoLevaFotoDoBanco,
+  melhorFotoParaTexto,
+  focoDaFoto,
   type FotoDoBanco,
+  type FotoComAssuntos,
+  type AssuntoFoto,
 } from "./fotos-banco";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
@@ -243,18 +250,65 @@ export async function gerarPostsDaSemana(
   // Falha ao ler ou baixar nunca derruba o pacote: o post sai sem foto.
   const { data: bancoRaw, error: bancoErr } = await admin
     .from("arquivos_franqueada")
-    .select("id, url_storage")
+    .select("id, url_storage, tipo, assuntos, foco_y, descrito_em")
     .eq("franqueada_id", franqueadaId)
     .in("tipo", [...TIPOS_FOTO_BANCO])
     .order("criado_em", { ascending: true });
   if (bancoErr) console.warn("[semanal] banco de fotos não lido:", bancoErr.message);
-  const filaFotos = filaDaSemana((bancoRaw ?? []) as FotoDoBanco[], semanaRef);
+  type FotoBanco = FotoDoBanco & FotoComAssuntos & { descrito_em?: string | null };
+  const banco = (bancoRaw ?? []) as FotoBanco[];
+  // Foto sem descrição (subida antes de 14/10, ou que estourou o tempo no
+  // envio) é descrita agora, uma vez só: no máximo 6 por montagem.
+  for (const f of banco.filter((x) => !x.descrito_em).slice(0, 6)) {
+    const d = await descreverEGravarFoto({ id: f.id, url_storage: f.url_storage, franqueada_id: franqueadaId });
+    if (d) Object.assign(f, { assuntos: d.assuntos, foco_y: d.foco_y, descrito_em: new Date().toISOString() });
+  }
+  const filaFotos = filaDaSemana(banco, semanaRef);
+  const fotosUsadas = new Set<string>();
   let posFoto = 0;
   // A foto que entrou na última arte: vai pro post (foto_arte_ref) pra o
   // redesenho com o texto corrigido manter a mesma foto.
   let ultimaFotoRef: string | null = null;
-  const proximaFotoDoBanco = async (): Promise<Buffer | undefined> => {
+  const baixarDoBanco = async (f: FotoBanco): Promise<Buffer | undefined> => {
+    const local = caminhoNoBucket(f.url_storage);
+    try {
+      if (local) {
+        const { data, error } = await admin.storage.from(local.bucket).download(local.path);
+        if (!error && data) return Buffer.from(await data.arrayBuffer());
+      } else {
+        const res = await fetch(f.url_storage, { signal: AbortSignal.timeout(10000) });
+        if (res.ok) return Buffer.from(await res.arrayBuffer());
+      }
+    } catch {
+      // segue sem
+    }
+    return undefined;
+  };
+  /**
+   * A foto DELA que combina com o texto (assuntos da foto × assuntos do
+   * texto), ainda não usada na semana. null quando nenhuma combina.
+   */
+  const fotoDelaParaTexto = async (
+    texto: string,
+    exigir?: AssuntoFoto[],
+  ): Promise<{ buf: Buffer; foto: FotoBanco } | null> => {
+    const f = melhorFotoParaTexto(banco, texto, fotosUsadas, exigir);
+    if (!f) return null;
+    const buf = await baixarDoBanco(f);
+    if (!buf) return null;
+    fotosUsadas.add(f.id);
+    return { buf, foto: f };
+  };
+  const proximaFotoDoBanco = async (texto?: string): Promise<Buffer | undefined> => {
     ultimaFotoRef = null;
+    // 1º a foto que combina com o assunto do post; sem nenhuma, o rodízio.
+    if (texto) {
+      const casada = await fotoDelaParaTexto(texto);
+      if (casada) {
+        ultimaFotoRef = casada.foto.url_storage;
+        return casada.buf;
+      }
+    }
     for (let tentativa = 0; tentativa < filaFotos.length; tentativa++) {
       const f = filaFotos[posFoto++ % filaFotos.length]!;
       const local = caminhoNoBucket(f.url_storage);
@@ -392,7 +446,77 @@ export async function gerarPostsDaSemana(
       // 1a. Carrossel: desenhador tipográfico (mesmo estilo do feed e dos
       //     stories, custo zero, sem foto de IA). Antes ele só tinha o
       //     Creatomate, que foi zerado de propósito, e saía sem arte.
-      if (item.tipo === "feed_carrossel") {
+      // 1a'. Post de VENDA da consulta (Aline, 14/10/2026): carrossel no
+      //      estilo aprovado, com a foto de consulta na capa inteira e as
+      //      fotos de coleta e de consulta do Drive nos slides do meio. Falhou,
+      //      cai no desenho de sempre logo abaixo.
+      if (item.tipo === "feed_carrossel" && item.produto && !item.briefing) {
+        try {
+          const brutos = (post as { slides?: unknown }).slides;
+          const textos = Array.isArray(brutos) ? brutos.map((t) => String(t ?? "")) : [];
+          const giro = Math.floor(Date.parse(semanaRef) / (7 * 24 * 60 * 60 * 1000)) || 0;
+          const plano = slidesDaConsulta(textos, item.produto, giro);
+          if (plano.length >= 2) {
+            // Foto DELA primeiro, pelo assunto do slide (Aline, 14/10/2026):
+            // capa e slides de consulta pegam a foto de atendimento/consultório
+            // dela; o slide da coleta, uma foto dela com o kit. Sem foto dela
+            // que combine, vale a do Drive.
+            const genetico = item.produto.scanner_produto_id !== "teste_epigenetico";
+            const dela = new Map<number, { buf: Buffer; foco?: number }>();
+            for (let i = 0; i < plano.length; i++) {
+              const x = plano[i]!;
+              if (x.tipo === "fecho") continue;
+              const texto = [x.titulo, "corpo" in x ? x.corpo : "", "subtitulo" in x ? x.subtitulo : ""].join(" ");
+              const ehColeta = x.fotoNome ? FOTOS_COLETA_NOMES.has(x.fotoNome) : false;
+              const exigir: AssuntoFoto[] = ehColeta
+                ? (genetico ? ["coleta", "kit"] : [])
+                : ["atendimento", "consultorio", "profissional", "exame"];
+              if (!exigir.length) continue;
+              const achada = await fotoDelaParaTexto(i === 0 ? `consulta ${texto}` : texto, exigir);
+              if (achada) dela.set(i, { buf: achada.buf, foco: focoDaFoto(achada.foto) });
+            }
+            const fotos = new Map<string, Buffer>();
+            for (const [i, x] of plano.entries()) {
+              if (!x.fotoNome || dela.has(i) || fotos.has(x.fotoNome)) continue;
+              const b = await baixarFotoPublica(fotoDaConsultaUrl(x.fotoNome));
+              if (b) fotos.set(x.fotoNome, b);
+            }
+            const capa = plano[0]!;
+            const slidesEd = plano.map((x, i) => {
+              const { fotoNome, ...resto } = x;
+              if (resto.tipo !== "meio") return resto;
+              const minha = dela.get(i);
+              if (minha) {
+                const { fotoFocoY: _f, ...semFoco } = resto as typeof resto & { fotoFocoY?: number };
+                return { ...semFoco, foto: minha.buf, ...(minha.foco !== undefined ? { fotoFocoY: minha.foco } : {}) };
+              }
+              if (fotoNome && fotos.has(fotoNome)) return { ...resto, foto: fotos.get(fotoNome) };
+              return resto;
+            });
+            const fotoCapaDela = dela.get(0)?.buf;
+            const handle = ((franqueada as { instagram_handle?: string | null }).instagram_handle ?? "").trim();
+            const r = await gerarCarrosselEditorialEUpload({
+              franqueadaId,
+              slides: slidesEd,
+              fotoCapa: fotoCapaDela ?? (capa.fotoNome ? fotos.get(capa.fotoNome) : undefined),
+              destaqueHex: brandArte.corPrimariaHex,
+              fundoFecho: brandArte.corPrimariaHex,
+              logoUrl: logoUrl ?? null,
+              assinatura: handle ? (handle.startsWith("@") ? handle : `@${handle}`) : undefined,
+            });
+            if (r.urls.length) {
+              urlImagem = r.urls[0]!;
+              urlsSlides = r.urls;
+            }
+          } else {
+            console.warn("[geracao] carrossel da consulta sem texto pra 2 slides; segue no desenho de sempre");
+          }
+        } catch (edErr) {
+          console.warn("[geracao] carrossel da consulta falhou; segue no desenho de sempre:", edErr);
+        }
+      }
+
+      if (item.tipo === "feed_carrossel" && !urlsSlides) {
         const slides = slidesDoCarrosselSemanal(post);
         if (slides.length >= 2) {
           try {
@@ -402,7 +526,7 @@ export async function gerarPostsDaSemana(
               franqueadaId,
               brand: brandArte,
               slides,
-              fotoCapa: kitCapa ? kitCapa.buf : await proximaFotoDoBanco(),
+              fotoCapa: kitCapa ? kitCapa.buf : await proximaFotoDoBanco(textoDoPost(post)),
               capaEstilo:
                 ((franqueada as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ??
                 undefined,
@@ -459,7 +583,7 @@ export async function gerarPostsDaSemana(
             conteudo: conteudoDaArteUnica(post, item.tipo),
             fotoPropria: fotoKit
               ? fotoKit.buf
-              : tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco() : undefined,
+              : tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco(textoDoPost(post)) : undefined,
           });
           urlImagem = r.url;
           textoArte = [conteudoDaArteUnica(post, item.tipo)];
@@ -1061,6 +1185,21 @@ function lembreteDaInteracao(tipo: string, post: { interacao_sugerida?: unknown 
   return `A arte está pronta. Ponha por cima no Instagram: ${i.slice(0, 200)}`;
 }
 
+/** Baixa uma foto pública do app; falha devolve null e o slide segue sem ela. */
+async function baixarFotoPublica(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" });
+    if (!res.ok) {
+      console.warn(`[semanal] foto não baixou (${res.status}): ${url}`);
+      return null;
+    }
+    return Buffer.from(await res.arrayBuffer());
+  } catch (e) {
+    console.warn("[semanal] foto não baixou:", (e as Error).message);
+    return null;
+  }
+}
+
 /** Baixa a foto do kit do teste; falha devolve null e o post segue sem ela. */
 async function baixarFotoDoKit(
   produto: Parameters<typeof fotoDoKit>[0],
@@ -1078,4 +1217,10 @@ async function baixarFotoDoKit(
     console.warn("[semanal] foto do kit não baixou:", (e as Error).message);
     return null;
   }
+}
+
+/** O texto do post que decide a foto: título, subtítulo e slides. */
+function textoDoPost(post: { headline?: unknown; subtitle?: unknown; slides?: unknown }): string {
+  const slides = Array.isArray(post.slides) ? post.slides.map((x) => String(x ?? "")).join(" ") : "";
+  return [post.headline, post.subtitle].filter((x) => typeof x === "string").join(" ") + " " + slides;
 }

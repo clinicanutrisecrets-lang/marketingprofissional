@@ -114,7 +114,7 @@ export default function BriefingsView({
               <textarea
                 value={tema}
                 onChange={(e) => setTema(e.target.value)}
-                placeholder="Ex.: nutrigenética em mulheres na menopausa, paciente que não emagrece mesmo na dieta, importância do teste genético antes do protocolo..."
+                placeholder="Ex.: nutrigenética em mulheres na menopausa, paciente que não emagrece mesmo na dieta, importância do teste nutrigenético antes do protocolo..."
                 rows={3}
                 maxLength={500}
                 className="w-full rounded-lg border border-brand-text/10 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"

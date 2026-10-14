@@ -23,7 +23,10 @@ test("o post do teste carrega o produto e manda explicar o que é antes do nome"
   assert.ok(p, "semana sem post de produto");
   assert.equal(p!.produto?.scanner_produto_id, "teste_genetico");
   assert.match(p!.instrucao, /NÃO sabe o que é "DNA 360"/);
-  assert.match(p!.instrucao, /cotonete na boca/);
+  // Desde 14/10 o produto é a CONSULTA que inclui o teste, com a coleta
+  // presencial ou o kit em casa.
+  assert.match(p!.instrucao, /uma consulta que lê como o seu corpo funciona/);
+  assert.match(p!.instrucao, /kit vai para a casa/);
 });
 
 test("story sem subtítulo leva a legenda curta pra arte (story não tem legenda)", () => {

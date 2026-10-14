@@ -27,6 +27,7 @@
  */
 import type { AnguloPost, TipoPost } from "@/lib/claude/prompts";
 import type { NivelConsciencia } from "@/lib/claude/consciencia";
+import { COLETA_PRESENCIAL_OU_KIT, estruturaCarrosselConsulta, regraConsultaInclui } from "./consulta-teste.ts";
 
 export const SEMANAS_DA_JORNADA = 4;
 
@@ -78,8 +79,9 @@ const FABRICA =
   "O corpo é uma fábrica com quatro setores: matéria-prima (vitaminas, enzimas, hormônios), maquinário (as variações genéticas, o jeito como as máquinas foram montadas), logística (intestino, detoxificação, inflamação) e funcionários (sistema neuroendócrino e emocional). O maquinário é a parte que ninguém olhou ainda e a única que não muda a vida inteira.";
 const AMPLITUDE =
   "O teste analisa mais de 300 marcadores genéticos, não só os ligados à queixa de hoje. Entre eles podem aparecer pontos de atenção sem relação com o que a pessoa sente agora, e são esses que se prioriza cuidar, pensando em prevenção e longevidade. A coleta é única: o DNA não muda, então se faz uma vez e vale pra sempre. Vira referência permanente: todo exame de sangue futuro passa a ser lido sabendo como o corpo processa cada nutriente.";
-const COMO_FUNCIONA =
-  "O kit de coleta chega em casa, a coleta é simples, e na devolutiva a profissional mostra gene por gene o que aquilo significa no prato e na rotina; o cardápio e a suplementação são desenhados em cima do resultado.";
+// O produto é a CONSULTA, que inclui o teste (Aline, 14/10/2026). A coleta tem
+// dois caminhos e o post diz os dois: a seguidora não sabe qual é o dela.
+const COMO_FUNCIONA = `A consulta inclui o teste. ${COLETA_PRESENCIAL_OU_KIT} Na consulta de interpretação a profissional cruza o resultado com os exames de sangue e com o que a pessoa sente, e mostra gene por gene o que aquilo significa no prato e na rotina; o cardápio e a suplementação são desenhados em cima dessa leitura.`;
 
 const NAO_DIZER_BASE = [
   "nome de doença como conclusão sobre a seguidora",
@@ -91,6 +93,7 @@ const NAO_DIZER_TESTE = [
   "\"você tem o gene X\" ou qualquer resultado antes da coleta",
   "sigla de gene sozinha (sempre pela função: \"a enzima que limpa a histamina\")",
   "qualquer número do teste além de \"mais de 300 marcadores\"",
+  "vender o teste sozinho (\"compre o teste\", \"faça o seu teste\", \"teste por R$\"): o produto é a consulta, que INCLUI o teste",
 ];
 
 /**
@@ -157,7 +160,7 @@ const NIVEIS: Record<Nivel, Modelo[]> = {
       objecao: "Já fiz exame e não deu nada",
       instrucao:
         "Explique que o exame de sangue mede o que está circulando hoje. Abra a pergunta \"e o que não muda?\" sem responder.",
-      nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste genético"],
+      nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste nutrigenético"],
     },
     {
       angulo: "educativo_ciencia",
@@ -216,32 +219,32 @@ const NIVEIS: Record<Nivel, Modelo[]> = {
     {
       angulo: "divulgacao_produto",
       consciencia: "consciente_produto",
-      papel: "O teste entra pelo nome: o que ele investiga sobre {A}.",
-      instrucao: `Assunto: {A}. O nome real do produto entra no corpo do post. Estrutura: a queixa, o que o teste investiga que o caminho comum não investiga, o convite pra entender. Preço ainda não. Material: ${AMPLITUDE}`,
+      papel: "A consulta entra pelo nome: o que a leitura do teste mostra sobre {A}.",
+      instrucao: `Assunto: {A}. O nome real da consulta entra no corpo do post. Estrutura: a queixa, por que um resultado sozinho não responde, o que a consulta cruza (teste, exames e sintomas), e o convite. Preço ainda não. Material: ${AMPLITUDE}`,
       nao_dizer: [...NAO_DIZER_TESTE, "preço", "prazo de laudo ou de kit"],
     },
     {
       angulo: "divulgacao_produto",
       consciencia: "consciente_produto",
-      papel: "O teste entra pelo nome: uma coleta, mais de 300 marcadores, referência pra sempre.",
+      papel: "A consulta entra pelo nome: um teste feito uma vez, lido para {A} e para o resto da vida.",
       objecao: "É caro",
-      instrucao: `O nome real do produto entra no corpo do post. Explique a amplitude com as palavras do material, nessa ordem: mais de 300 marcadores, coleta única, referência permanente, aprofunda a cada consulta. Abra com um gancho que dissolva a objeção de preço sem falar de preço (ex.: "Um exame que se faz uma vez. O resto você refaz todo ano."). Material: ${AMPLITUDE}`,
+      instrucao: `Assunto: {A}. O nome real da consulta entra no corpo do post. A consulta inclui um teste que se faz uma vez na vida: mais de 300 marcadores, coleta única, referência permanente, e a leitura aprofunda a cada consulta. Abra com um gancho sobre {A} que dissolva a objeção de preço sem falar de preço. Material: ${AMPLITUDE}`,
       nao_dizer: [...NAO_DIZER_TESTE, "preço", "nome de laboratório"],
     },
     {
       angulo: "divulgacao_produto",
       consciencia: "consciente_produto",
-      papel: "O teste entra pelo nome: como funciona, do kit à devolutiva.",
+      papel: "A consulta entra pelo nome: como funciona, da coleta à leitura de {A}.",
       objecao: "Demora",
-      instrucao: `O nome real do produto entra no corpo do post. Como funciona na prática: ${COMO_FUNCIONA} Dissolva a objeção "demora" dizendo que o cuidado começa antes do laudo, com o que já existe (exames, rotina, alimentação). Preço ainda não.`,
+      instrucao: `Assunto: {A}. O nome real da consulta entra no corpo do post. Como funciona na prática: ${COMO_FUNCIONA} Dissolva a objeção "demora" dizendo que o cuidado começa antes do resultado, com o que já existe (exames, rotina, alimentação). Preço ainda não.`,
       nao_dizer: [...NAO_DIZER_TESTE, "prazo de kit ou de laudo", "preço"],
     },
     {
       angulo: "divulgacao_produto",
       consciencia: "mais_consciente",
-      papel: "A oferta direta: o que inclui, preço do catálogo e como começar.",
+      papel: "O convite para a consulta: o que ela inclui, preço do catálogo e como começar.",
       instrucao:
-        "Oferta direta e curta: nome do produto, o que inclui, preço e parcelas EXATAMENTE como no catálogo (se não houver preço, \"o valor eu te passo na conversa\"), e como começar hoje. Sem recontar o problema.",
+        "Assunto: {A}. Oferta direta e curta: nome da consulta, o que ela inclui (o teste e a leitura cruzada com os exames), preço e parcelas EXATAMENTE como no catálogo (se não houver preço, \"o valor eu te passo na conversa\"), e como começar hoje. Sem recontar o problema.",
       nao_dizer: [...NAO_DIZER_TESTE, "condição que não esteja no catálogo", "prazo que se renova"],
     },
   ],
@@ -252,7 +255,7 @@ const NIVEIS: Record<Nivel, Modelo[]> = {
       consciencia: "mais_consciente",
       papel: "O próximo passo: como começar, pra quem já decidiu.",
       instrucao:
-        "Bastidor curto: como é o primeiro contato e o que acontece depois que a pessoa decide fazer o teste. Convite pro link da bio.",
+        "Bastidor curto: como é o primeiro contato e o que acontece depois que a pessoa decide marcar a consulta (que inclui o teste). Convite pro link da bio.",
       nao_dizer: [...NAO_DIZER_TESTE, "inventar \"muita gente me pergunta\""],
     },
     {
@@ -346,8 +349,8 @@ const SEMANAS: Array<{
   stories: { papel: string; lembrete: string; instrucao: string };
 }> = [
   {
-    titulo: "O que o teste investiga",
-    foco: "apresenta o teste pelo que ele investiga, sem preço",
+    titulo: "O que a consulta investiga",
+    foco: "apresenta a consulta pelo que ela investiga, sem preço",
     stories: {
       papel: "Enquete: qual dessas você sente?",
       lembrete:
@@ -358,7 +361,7 @@ const SEMANAS: Array<{
   },
   {
     titulo: "Um exame que se faz uma vez",
-    foco: "mostra a amplitude do teste: mais de 300 marcadores e coleta única",
+    foco: "mostra que a consulta inclui um teste feito uma vez na vida: mais de 300 marcadores e coleta única",
     stories: {
       papel: "Caixinha de perguntas sobre o exame que se faz uma vez na vida.",
       lembrete:
@@ -368,23 +371,23 @@ const SEMANAS: Array<{
     },
   },
   {
-    titulo: "Do kit à devolutiva",
-    foco: "mostra como funciona na prática, do kit em casa à devolutiva",
+    titulo: "Da coleta à leitura",
+    foco: "mostra como funciona na prática: coleta na consulta presencial ou kit em casa na online, e a leitura cruzada com os exames",
     stories: {
       papel: "O que está incluído, com o link.",
-      lembrete: "A arte está pronta. Ponha o adesivo de link por cima, apontando pra página do seu teste.",
+      lembrete: "A arte está pronta. Ponha o adesivo de link por cima, apontando pra página da sua consulta.",
       instrucao:
-        "Stories: o que a pessoa leva pra casa com o teste (kit em casa, devolutiva gene a gene, cardápio e suplementação sobre o resultado). Uma frase por tela.",
+        "Stories: o que a consulta inclui (o teste, com coleta na consulta presencial ou kit em casa na online, a leitura cruzada com os exames, cardápio e suplementação sobre o resultado). Uma frase por tela.",
     },
   },
   {
     titulo: "O convite com preço",
     foco: "é a oferta direta, com o preço do seu catálogo",
     stories: {
-      papel: "O link direto do teste.",
+      papel: "O link direto da consulta.",
       lembrete:
         "A arte está pronta. Ponha o adesivo de link por cima. Escassez só se for real (vagas que a sua agenda comporta).",
-      instrucao: "Stories curto: convite direto pro teste, uma frase por tela. Sem contador, sem \"últimas vagas\".",
+      instrucao: "Stories curto: convite direto pra consulta, que inclui o teste, uma frase por tela. Sem contador, sem \"últimas vagas\".",
     },
   },
 ];
@@ -437,7 +440,7 @@ export function queixasDaRodada(queixas: string[] | null | undefined, nicho: str
 }
 
 const FRASE_SEMANA =
-  "Toda semana tem um post pra cada ponto do caminho: quem acabou de chegar se reconhece, quem já se reconheceu entende o mecanismo, quem já entendeu vê o teste pelo nome.";
+  "Toda semana tem um post pra cada ponto do caminho: quem acabou de chegar se reconhece, quem já se reconheceu entende o mecanismo, quem já entendeu conhece a consulta pelo nome.";
 
 const preencher = (s: string, a: string, b: string) => s.replaceAll("{A}", a).replaceAll("{B}", b);
 
@@ -508,17 +511,23 @@ export function planoDaJornada(params: {
       if (comerciais > 1) m = SEM_TESTE[v]!;
     }
     const naoDizer = [...NAO_DIZER_BASE, ...m.nao_dizer];
+    // O post de venda da consulta é SEMPRE carrossel (Aline, 14/10/2026):
+    // explicar o que a consulta inclui não cabe numa imagem só.
+    const ehVenda = m.angulo === "divulgacao_produto" && !!produtoDaSemana;
+    const tipoDoSlot: TipoPost = ehVenda ? "feed_carrossel" : tipoDoFeed(i, dias.length, params.frequenciaReels);
     const instrucao = [
-      `ESTRATÉGIA DA SEMANA ("${modelo.titulo}"): ${FRASE_SEMANA} Nesta semana o post do teste ${modelo.foco}.`,
+      `ESTRATÉGIA DA SEMANA ("${modelo.titulo}"): ${FRASE_SEMANA} Nesta semana o post da consulta ${modelo.foco}.`,
       `PAPEL DESTE POST: ${preencher(m.papel, a, b)}`,
       preencher(m.instrucao, a, b),
       m.angulo === "divulgacao_produto" && produtoDaSemana
         ? `PRODUTO DESTE POST: ${produtoDaSemana.nome}. Nome, preço e link EXATAMENTE como no catálogo; nenhum outro produto entra.\n` +
-          `Quem segue o perfil NÃO sabe o que é "${produtoDaSemana.nome}": o nome sozinho não diz nada. A ARTE (headline e subtitle) e a 1ª linha da legenda dizem O QUE É, em palavras de gente (${
+          `Quem segue o perfil NÃO sabe o que é "${produtoDaSemana.nome}": o nome sozinho não diz nada. A ARTE e a 1ª linha da legenda dizem O QUE É, em palavras de gente (uma consulta que lê ${
             produtoDaSemana.scanner_produto_id === "teste_epigenetico"
-              ? "um teste que mostra como o seu estilo de vida está ligando e desligando os seus genes"
-              : "um teste genético feito em casa, com um cotonete na boca, que mostra como o seu corpo funciona"
-          }) e o que a pessoa ganha com ele. O nome do produto entra DEPOIS, como o nome desse teste, nunca como título.`
+              ? "como o seu estilo de vida está ligando e desligando os seus genes"
+              : "como o seu corpo funciona a partir do seu DNA"
+          }, cruzando com os seus exames e com o que você sente) e o que a pessoa ganha. O nome entra DEPOIS, nunca como título.\n` +
+          `${regraConsultaInclui(produtoDaSemana)}\n` +
+          (tipoDoSlot === "feed_carrossel" ? estruturaCarrosselConsulta(produtoDaSemana, a) : "")
         : "",
       m.objecao
         ? `Objeção a dissolver no GANCHO, sem dizer que é uma objeção e sem post de "resposta": "${m.objecao}".`
@@ -529,7 +538,7 @@ export function planoDaJornada(params: {
       .join("\n");
     return {
       dia,
-      tipo: tipoDoFeed(i, dias.length, params.frequenciaReels),
+      tipo: tipoDoSlot,
       angulo: m.angulo,
       consciencia: m.consciencia,
       papel: preencher(m.papel, a, b),
@@ -574,7 +583,7 @@ export function planoDaJornada(params: {
       semana,
       total: SEMANAS_DA_JORNADA,
       titulo: modelo.titulo,
-      frase: `${FRASE_SEMANA} Nesta semana o post do teste ${modelo.foco}.`,
+      frase: `${FRASE_SEMANA} Nesta semana o post da consulta ${modelo.foco}.`,
       // Um passo por post do feed: o que cada um faz no caminho.
       passos: slots.filter((s) => s.tipo !== "stories").map((s) => s.papel),
       queixas: a === b ? [a] : [a, b],
@@ -583,7 +592,7 @@ export function planoDaJornada(params: {
   };
 }
 
-export type ProdutoDaJornada = { nome: string; scanner_produto_id?: string | null };
+export type ProdutoDaJornada = { nome: string; scanner_produto_id?: string | null; checkout_url?: string | null };
 
 /**
  * Qual teste o post de produto nomeia. Semana 3 apresenta o mapa genético

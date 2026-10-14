@@ -55,8 +55,8 @@ test("só carrossel e feed levam foto; logo e depoimento não entram no banco", 
 
 test("o pacote da semana passa a foto do banco pra capa e pro feed", () => {
   const s = fonte("./semanal.ts");
-  assert.match(s, /fotoCapa: kitCapa \? kitCapa\.buf : await proximaFotoDoBanco\(\)/);
-  assert.match(s, /: tipoLevaFotoDoBanco\(item\.tipo\) \? await proximaFotoDoBanco\(\)/);
+  assert.match(s, /fotoCapa: kitCapa \? kitCapa\.buf : await proximaFotoDoBanco\(textoDoPost\(post\)\)/);
+  assert.match(s, /: tipoLevaFotoDoBanco\(item\.tipo\) \? await proximaFotoDoBanco\(textoDoPost\(post\)\)/);
   assert.match(s, /\.in\("tipo", \[\.\.\.TIPOS_FOTO_BANCO\]\)/);
 });
 
@@ -66,4 +66,47 @@ test("a tela Minhas fotos e o aviso em Aprovar semana existem", () => {
   assert.match(aprovar, /Suba fotos suas e dos seus pratos para os posts ganharem vida\./);
   assert.match(aprovar, /href="\/dashboard\/fotos"/);
   assert.match(fonte("../../app/dashboard/SidebarNav.tsx"), /\/dashboard\/fotos/);
+});
+
+// ————— Escolha da foto pelo assunto (Aline, 14/10/2026) —————
+import { assuntosDoTexto, assuntosDaFoto, melhorFotoParaTexto, focoDaFoto } from "./fotos-banco.ts";
+
+test("o tipo escolhido no envio já dá assunto (nível 1)", () => {
+  assert.deepEqual(assuntosDaFoto({ id: "1", url_storage: "x", tipo: "foto_atendimento" }), ["atendimento", "profissional"]);
+  assert.deepEqual(assuntosDaFoto({ id: "1", url_storage: "x", tipo: "foto_clinica", assuntos: ["consultorio", "inventado"] }), ["consultorio"]);
+});
+
+test("o slide pega a foto que combina com o texto; sem nenhuma, null", () => {
+  const banco = [
+    { id: "prato", url_storage: "a", tipo: "foto_post", assuntos: ["prato", "ingrediente"] },
+    { id: "consulta", url_storage: "b", tipo: "foto_atendimento", assuntos: ["atendimento"] },
+    { id: "kit", url_storage: "c", tipo: "foto_post", assuntos: ["kit", "coleta"] },
+  ];
+  assert.equal(melhorFotoParaTexto(banco, "Gene, exame e sintoma lidos juntos na consulta.")?.id, "consulta");
+  assert.equal(melhorFotoParaTexto(banco, "O café da manhã que segura a fome até o almoço.")?.id, "prato");
+  assert.equal(melhorFotoParaTexto(banco, "A coleta é com um cotonete na bochecha.")?.id, "kit");
+  assert.equal(melhorFotoParaTexto(banco, "Uma frase que não pede foto nenhuma."), null);
+  // Já usada na semana não repete.
+  assert.equal(melhorFotoParaTexto(banco, "consulta", new Set(["consulta"]))?.id, undefined);
+  // Exigir assunto: a foto do prato nunca vai pro slide da coleta.
+  assert.equal(melhorFotoParaTexto([banco[0]!], "A coleta é simples.", new Set(), ["coleta", "kit"]), null);
+  assert.ok(assuntosDoTexto("Exames de sangue").includes("exame"));
+});
+
+test("foco do rosto só vale entre 0 e 1", () => {
+  assert.equal(focoDaFoto({ id: "1", url_storage: "x", foco_y: "0.35" }), 0.35);
+  assert.equal(focoDaFoto({ id: "1", url_storage: "x", foco_y: 2 }), undefined);
+  assert.equal(focoDaFoto({ id: "1", url_storage: "x", foco_y: null }), undefined);
+});
+
+test("ligação: o envio descreve a foto, a semana descreve as antigas e escolhe pelo texto", () => {
+  const acoes = readFileSync("src/lib/arquivos/actions.ts", "utf8");
+  assert.match(acoes, /descreverEGravarFoto\(/);
+  const sem = readFileSync("src/lib/geracao/semanal.ts", "utf8");
+  assert.match(sem, /filter\(\(x\) => !x\.descrito_em\)/);
+  assert.match(sem, /proximaFotoDoBanco\(textoDoPost\(post\)\)/);
+  assert.match(sem, /fotoDelaParaTexto\(/);
+  const desc = readFileSync("src/lib/arquivos/descrever-foto.ts", "utf8");
+  assert.match(desc, /tool_choice/);
+  assert.match(desc, /enum: \[\.\.\.ASSUNTOS_FOTO\]/, "o descritor só usa o vocabulário fechado");
 });

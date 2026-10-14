@@ -374,7 +374,7 @@ export function LPViewNutri({
               {
                 marco: "Dia 45",
                 titulo: "Retorno com o Teste",
-                desc: "Leitura completa do seu teste genético. Entendimento real de como seu corpo responde a alimentos e nutrientes.",
+                desc: "Leitura completa do seu teste nutrigenético. Entendimento real de como seu corpo responde a alimentos e nutrientes.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="h-5 w-5">
                     <circle cx="12" cy="12" r="9" />

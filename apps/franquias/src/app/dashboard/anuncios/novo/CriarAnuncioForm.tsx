@@ -17,7 +17,7 @@ const OBJETIVOS: Array<{
   { value: "ganhar_seguidores", label: "Ganhar seguidores", descricao: "Crescer perfil Instagram", emoji: "👥" },
   { value: "receber_mensagens", label: "Receber mensagens", descricao: "Pacientes mandam WhatsApp", emoji: "💬" },
   { value: "agendar_consultas", label: "Agendar consultas", descricao: "Lead qualificado pra consulta", emoji: "📅" },
-  { value: "vender_teste_genetico", label: "Vender teste genético", descricao: "Venda direta + comissão", emoji: "🧬" },
+  { value: "vender_teste_genetico", label: "Vender teste nutrigenético", descricao: "Venda direta + comissão", emoji: "🧬" },
   { value: "alcance", label: "Alcance (visualizações)", descricao: "Mais gente vê o conteúdo", emoji: "🎥" },
   { value: "trafego_site", label: "Tráfego pro site", descricao: "Cliques pra landing page", emoji: "🌐" },
 ];

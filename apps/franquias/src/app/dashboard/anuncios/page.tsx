@@ -9,7 +9,7 @@ const OBJETIVO_LABEL: Record<string, { emoji: string; label: string }> = {
   ganhar_seguidores: { emoji: "👥", label: "Ganhar seguidores" },
   receber_mensagens: { emoji: "💬", label: "Receber mensagens" },
   agendar_consultas: { emoji: "📅", label: "Agendar consultas" },
-  vender_teste_genetico: { emoji: "🧬", label: "Vender teste genético" },
+  vender_teste_genetico: { emoji: "🧬", label: "Vender teste nutrigenético" },
   alcance: { emoji: "🎥", label: "Alcance" },
   trafego_site: { emoji: "🌐", label: "Tráfego site" },
 };
