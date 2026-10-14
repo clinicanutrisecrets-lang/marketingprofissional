@@ -17,6 +17,18 @@ import {
   validarArte,
   type ArteGerada,
 } from "./molde";
+import {
+  FERRAMENTA_PAUTA,
+  MOLDE_TEMA_EM_ALTA,
+  PILAR_TEMA_EM_ALTA,
+  agendamentoDoDia,
+  gravarTemaEmAlta,
+  legendaProvisoria,
+  segundaDaSemana,
+  temaEmAltaDoPost,
+  validarPauta,
+  validarTemaDigitado,
+} from "./tema-em-alta";
 
 /**
  * "Montar a arte deste post" no feed do Studio (Aline, 12/10/2026).
@@ -110,13 +122,14 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
 
     const { data: postData, error: postErr } = await aline
       .from("posts")
-      .select("id, perfil_id, tipo, status, copy_legenda, copy_cta, hashtags, pilar, angulo")
+      .select("id, perfil_id, tipo, status, copy_legenda, copy_cta, hashtags, pilar, angulo, prompt_usado")
       .eq("id", postId)
       .maybeSingle();
     if (postErr || !postData) return { ok: false, erro: "Post não encontrado." };
     const post = postData as {
       id: string; perfil_id: string; tipo: string; status: string; copy_legenda: string | null;
       copy_cta: string | null; hashtags: string[] | null; pilar: string | null; angulo: string | null;
+      prompt_usado: string | null;
     };
     if (post.status === "postado") return { ok: false, erro: "Este post já foi ao ar." };
     if (post.status === "gerando") return { ok: false, erro: "Este post está sendo montado." };
@@ -146,7 +159,8 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
       return { ok: false, erro: `O Scanner não tem curadoria sobre "${(post.angulo ?? capa).slice(0, 60)}". Ajuste o cruzamento do post pelo nome do gene, exame ou nutriente.` };
     }
 
-    const ehReceita = /receita/i.test(post.pilar ?? "");
+    const temaEmAlta = post.pilar === PILAR_TEMA_EM_ALTA ? temaEmAltaDoPost(post.prompt_usado) : null;
+    const ehReceita = !temaEmAlta && /receita/i.test(post.pilar ?? "");
     const receita = ehReceita ? await receitaComFoto(tema, `${post.id}`) : null;
 
     const publicoProfissional = perfil.slug === "scannerdasaude";
@@ -155,7 +169,8 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
         capa,
         cruzamento: post.angulo,
         pilar: post.pilar,
-        envio_do_calendario: (post.copy_legenda ?? "").split("\n").slice(1).join(" ").slice(0, 400) || null,
+        envio_do_calendario: temaEmAlta ? null : (post.copy_legenda ?? "").split("\n").slice(1).join(" ").slice(0, 400) || null,
+        ...(temaEmAlta ? { tema_em_alta: temaEmAlta } : {}),
         publico: perfil.publico_alvo,
         tom: perfil.tom,
         assinatura: perfil.nome,
@@ -163,7 +178,7 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
       publicoProfissional
         ? "PÚBLICO: PROFISSIONAL DA SAÚDE. Fale de colega pra colega; o gancho é a situação de consultório. O molde vale igual, com a mini solução virando o que ela faz na próxima consulta."
         : "PÚBLICO: PACIENTE. Linguagem simples; gene sempre explicado pela função na Fábrica da Saúde.",
-      MOLDE_SETE_PASSOS,
+      temaEmAlta ? MOLDE_TEMA_EM_ALTA : MOLDE_SETE_PASSOS,
       REGRAS_TEXTO,
       "CURADORIA DO SCANNER (a ÚNICA fonte permitida pra gene, marcador, faixa, alimento, quantidade e dose):",
       cur.blocos.slice(0, 14000),
@@ -254,6 +269,86 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
     return { ok: true, slides: resultado.urls.length, comFoto: !!fotoCapa };
   } catch (e) {
     console.error("[arte-post] erro", e);
+    return { ok: false, erro: e instanceof Error ? e.message : "não deu certo" };
+  }
+}
+
+/**
+ * "Post de tema em alta": ela escreve o assunto que está todo mundo comentando,
+ * o modelo faz a capa e acha o assunto de saúde que liga ao Scanner, o post
+ * nasce no feed e a arte é montada na hora pelo mesmo caminho dos outros.
+ * Se a arte falhar, o post fica no feed com o botão de montar (nada se perde).
+ */
+export async function criarPostTemaEmAlta(entrada: {
+  perfilSlug: string;
+  tema: string;
+  assunto?: string;
+  dia: string;
+}): Promise<{ ok: true; postId: string; arte: boolean; aviso?: string } | { ok: false; erro: string }> {
+  try {
+    await assertSuperAdmin();
+    const vt = validarTemaDigitado(entrada.tema);
+    if (!vt.ok) return { ok: false, erro: vt.motivo };
+    const quando = agendamentoDoDia(entrada.dia);
+    if (!quando) return { ok: false, erro: "Escolha o dia da publicação." };
+
+    const aline = createAlineClient();
+    const { data: perfilData } = await aline
+      .from("perfis").select("id, slug, publico_alvo, tom").eq("slug", entrada.perfilSlug).maybeSingle();
+    if (!perfilData) return { ok: false, erro: "Perfil não encontrado." };
+    const perfil = perfilData as { id: string; slug: string; publico_alvo: string | null; tom: string | null };
+
+    const assuntoDela = (entrada.assunto ?? "").replace(/\s+/g, " ").trim().slice(0, 120);
+    const pedido = [
+      JSON.stringify({ tema_em_alta: vt.tema, assunto_sugerido: assuntoDela || null, publico: perfil.publico_alvo, tom: perfil.tom }),
+      "Escreva a CAPA do carrossel e o ASSUNTO de saúde que liga esse tema à curadoria do Scanner.",
+      "A capa fala com quem viu ou ouviu falar do assunto e puxa pra vida dela, com a palavra que a pessoa usa. Não afirme nada sobre o assunto que não esteja no tema dado.",
+      assuntoDela ? `Use como assunto o que a profissional sugeriu: "${assuntoDela}" (pode reescrever em palavras de curadoria).` : "",
+      "Zero travessão. Português do Brasil com acentos.",
+    ].filter(Boolean).join("\n\n");
+
+    const anthropic = createClaude();
+    let pauta: { capa: string; assunto: string } | null = null;
+    let ultimo = "";
+    for (let t = 0; t < TENTATIVAS && !pauta; t++) {
+      const msg = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 600,
+        tools: [FERRAMENTA_PAUTA as unknown as Anthropic.Tool],
+        tool_choice: { type: "tool", name: FERRAMENTA_PAUTA.name },
+        messages: [{ role: "user", content: ultimo ? `${pedido}\n\nA RESPOSTA ANTERIOR FOI RECUSADA: ${ultimo}. Corrija só isso.` : pedido }],
+      });
+      const bloco = msg.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
+      if (!bloco) { ultimo = "a ferramenta não foi usada"; continue; }
+      const v = validarPauta(semTravessoesFundo(bloco.input));
+      if (v.ok) pauta = { capa: v.capa, assunto: v.assunto };
+      else ultimo = v.motivo;
+    }
+    if (!pauta) return { ok: false, erro: `A capa não saiu (${ultimo}). Tente de novo.` };
+
+    const { data: novo, error: insErr } = await aline.from("posts").insert({
+      perfil_id: perfil.id,
+      tipo: "feed_carrossel",
+      status: "aguardando_midia",
+      origem: "manual_aline",
+      aprovacao_tipo: "individual",
+      midia_pendente: true,
+      pilar: PILAR_TEMA_EM_ALTA,
+      angulo: pauta.assunto,
+      copy_legenda: legendaProvisoria(pauta.capa, vt.tema),
+      prompt_usado: gravarTemaEmAlta(vt.tema),
+      data_hora_agendada: quando,
+      semana_ref: segundaDaSemana(quando.slice(0, 10)),
+    }).select("id").single();
+    if (insErr || !novo) return { ok: false, erro: `O post não foi criado: ${insErr?.message ?? "sem resposta do banco"}` };
+    const postId = (novo as { id: string }).id;
+
+    const arte = await montarArteDoPost(postId);
+    revalidatePath(`/perfis/${perfil.slug}/feed`);
+    if (!arte.ok) return { ok: true, postId, arte: false, aviso: `O post entrou no feed, mas a arte não saiu: ${arte.erro} Abra o post e use "Montar a arte deste post".` };
+    return { ok: true, postId, arte: true };
+  } catch (e) {
+    console.error("[tema-em-alta] erro", e);
     return { ok: false, erro: e instanceof Error ? e.message : "não deu certo" };
   }
 }
