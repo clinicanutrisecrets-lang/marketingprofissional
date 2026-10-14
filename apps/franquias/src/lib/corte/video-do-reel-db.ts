@@ -17,7 +17,7 @@ export async function enfileirarVideoDoReel(
     franqueadaId: string;
     email: string | null;
     postId: string;
-    post: { headline?: unknown; roteiro?: unknown };
+    post: { frase?: unknown; headline?: unknown; roteiro?: unknown };
     assunto: string[];
   },
 ): Promise<{ ok: boolean; motivo: string }> {
@@ -49,8 +49,8 @@ export async function enfileirarVideoDoReel(
       ...((meus ?? []) as ClipeCandidato[]).map((c) => ({ ...c, origem: "biblioteca" as const })),
       ...((acervo ?? []) as ClipeCandidato[]).map((c) => ({ ...c, origem: "acervo" as const })),
     ];
-    const clipe = escolherClipe(clipes, palavrasDoAssunto([frase, ...p.assunto]), jaUsados);
-    if (!clipe) return { ok: false, motivo: "biblioteca sem clipe" };
+    const clipe = escolherClipe(clipes, palavrasDoAssunto([frase]), jaUsados, palavrasDoAssunto(p.assunto));
+    if (!clipe) return { ok: false, motivo: "nenhum clipe mostra o que a frase diz" };
 
     const { data: row, error } = await admin
       .from("cortes_ia")

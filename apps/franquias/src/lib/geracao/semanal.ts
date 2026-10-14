@@ -4,6 +4,8 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { gerarPost, type SlotSemana } from "@/lib/claude/generate";
 import { planoDaJornada } from "@/lib/geracao/jornada";
 import { enfileirarVideoDoReel } from "@/lib/corte/video-do-reel-db";
+import { assuntosVisuais } from "@/lib/corte/video-do-reel";
+import { fotoDoKit } from "@/lib/geracao/foto-kit";
 import { produzirReelAnimado, type FranqueadaReel } from "@/lib/conteudo/reel-animado";
 import { diaDoReelAnimado, temaDoReelAnimado } from "@/lib/geracao/reel-animado-semanal";
 import type { ContextoFranqueada } from "@/lib/claude/prompts";
@@ -61,6 +63,7 @@ import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
 import { revisarCopy, resumoRevisao } from "@/lib/claude/revisor-copy";
+import { semAbreviacaoFundo } from "@/lib/texto/sem-abreviacao";
 
 const MODELO_CLAUDE_DEFAULT = CLAUDE_MODEL_COPY;
 
@@ -284,23 +287,43 @@ export async function gerarPostsDaSemana(
   let gerados = 0;
   const erros: string[] = [];
 
+  // O que a biblioteca de vídeos mostra: a frase do vídeo curto do reel fala
+  // de um desses assuntos, senão não há imagem que combine com ela. Falha ao
+  // ler só tira a lista do prompt.
+  let blocoAssuntosVisuais = "";
+  if (planoCasado.some((i) => i.tipo === "reels")) {
+    const [{ data: meusV }, { data: acervoV }] = await Promise.all([
+      admin.from("videos_franqueada").select("titulo").eq("franqueada_id", franqueadaId).eq("ativo", true).limit(100),
+      admin.from("acervo_videos").select("titulo").eq("ativo", true).limit(200),
+    ]);
+    const assuntos = assuntosVisuais([...((meusV ?? []) as { titulo: string | null }[]), ...((acervoV ?? []) as { titulo: string | null }[])]);
+    if (assuntos.length) {
+      blocoAssuntosVisuais = `ASSUNTOS QUE A BIBLIOTECA DE VÍDEOS MOSTRA (a "frase_video" fala de UM deles):\n- ${assuntos.join("\n- ")}`;
+    }
+  }
+
   for (const item of planoCasado) {
     try {
       // Pedido da nutri vence a estratégia (é ela trocando o assunto); sem
       // pedido, o post recebe o papel e o material da semana da jornada.
-      const contextoComBriefing = item.briefing
+      const contextoBase = item.briefing
         ? montarContextoComBriefing(blocoContextoExtra, item.briefing)
         : [item.instrucao, blocoContextoExtra].filter(Boolean).join("\n\n");
+      const contextoComBriefing = item.tipo === "reels" && blocoAssuntosVisuais
+        ? `${contextoBase}\n\n${blocoAssuntosVisuais}`
+        : contextoBase;
 
       const tInicio = Date.now();
-      const post = await gerarPost(
+      // Português por extenso ("está", nunca "tá"): a trava vale antes de
+      // qualquer uso do texto (arte, vídeo, legenda, roteiro).
+      const post = semAbreviacaoFundo(await gerarPost(
         contexto,
         item.tipo,
         item.angulo,
         semanaRef,
         contextoComBriefing,
         item.consciencia,
-      );
+      ));
       const latenciaMs = Date.now() - tInicio;
 
       // O revisor relê a copy PRONTA. Aqui ele só vai pro log: quem decide é a
@@ -373,11 +396,13 @@ export async function gerarPostsDaSemana(
         const slides = slidesDoCarrosselSemanal(post);
         if (slides.length >= 2) {
           try {
+            // Carrossel do teste genético: a capa mostra o kit.
+            const kitCapa = !item.briefing ? await baixarFotoDoKit(item.produto) : null;
             const r = await gerarCarrosselEUpload({
               franqueadaId,
               brand: brandArte,
               slides,
-              fotoCapa: await proximaFotoDoBanco(),
+              fotoCapa: kitCapa ? kitCapa.buf : await proximaFotoDoBanco(),
               capaEstilo:
                 ((franqueada as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ??
                 undefined,
@@ -386,7 +411,7 @@ export async function gerarPostsDaSemana(
               urlImagem = r.urls[0]!;
               urlsSlides = r.urls;
               textoArte = slides;
-              fotoArteRef = ultimaFotoRef;
+              fotoArteRef = kitCapa ? kitCapa.url : ultimaFotoRef;
             }
             await logarCusto({
               franqueadaId,
@@ -422,18 +447,23 @@ export async function gerarPostsDaSemana(
         (item.tipo === "feed_imagem" || item.tipo === "stories") &&
         (process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
 
+      // Post do teste genético: a foto é a do kit, não a do banco dela.
+      const fotoKit = item.tipo === "feed_imagem" && !item.briefing ? await baixarFotoDoKit(item.produto) : null;
+
       if (podeTentarAiImagem) {
         try {
           const r = await gerarEUploadImagem({
             franqueadaId,
             tipo: item.tipo as "feed_imagem" | "stories",
             brand: brandArte,
-            conteudo: conteudoDaArteUnica(post),
-            fotoPropria: tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco() : undefined,
+            conteudo: conteudoDaArteUnica(post, item.tipo),
+            fotoPropria: fotoKit
+              ? fotoKit.buf
+              : tipoLevaFotoDoBanco(item.tipo) ? await proximaFotoDoBanco() : undefined,
           });
           urlImagem = r.url;
-          textoArte = [conteudoDaArteUnica(post)];
-          fotoArteRef = tipoLevaFotoDoBanco(item.tipo) ? ultimaFotoRef : null;
+          textoArte = [conteudoDaArteUnica(post, item.tipo)];
+          fotoArteRef = fotoKit ? fotoKit.url : tipoLevaFotoDoBanco(item.tipo) ? ultimaFotoRef : null;
           await logarCusto({
             franqueadaId,
             servico: "gemini",
@@ -643,7 +673,7 @@ export async function gerarPostsDaSemana(
             franqueadaId,
             email: (franqueada.email as string | null) ?? null,
             postId: (postInserted as { id: string }).id,
-            post: { headline: post.headline, roteiro: post.script_reels },
+            post: { frase: post.frase_video, headline: post.headline, roteiro: post.script_reels },
             assunto: estrategia.queixas,
           });
           if (!v.ok) console.warn(`[semanal] vídeo do reel não enfileirado: ${v.motivo}`);
@@ -1029,4 +1059,23 @@ function lembreteDaInteracao(tipo: string, post: { interacao_sugerida?: unknown 
   const i = typeof post.interacao_sugerida === "string" ? post.interacao_sugerida.trim() : "";
   if (!i) return null;
   return `A arte está pronta. Ponha por cima no Instagram: ${i.slice(0, 200)}`;
+}
+
+/** Baixa a foto do kit do teste; falha devolve null e o post segue sem ela. */
+async function baixarFotoDoKit(
+  produto: Parameters<typeof fotoDoKit>[0],
+): Promise<{ buf: Buffer; url: string } | null> {
+  const url = fotoDoKit(produto);
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" });
+    if (!res.ok) {
+      console.warn(`[semanal] foto do kit não baixou (${res.status}): ${url}`);
+      return null;
+    }
+    return { buf: Buffer.from(await res.arrayBuffer()), url };
+  } catch (e) {
+    console.warn("[semanal] foto do kit não baixou:", (e as Error).message);
+    return null;
+  }
 }

@@ -451,7 +451,7 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
     // Logo também vale aqui (slides de carrossel) — a marca aparece em todos.
     const buffer = await renderConteudo({
       W, H, scheme, conteudo, handle, fonteTitulo,
-      logoComposite: await prepararLogo(input, brand, W, H),
+      logoComposite: await prepararLogo(input, brand, W, H, scheme.bg),
     });
     return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
   }
@@ -469,7 +469,10 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
       corMarca: brand.corPrimariaHex || "#2F5D50",
       corDestaque: corValida(brand.corDestaqueHex),
       corTexto: corValida(brand.corTextoHex),
-      logoComposite: await prepararLogo(input, brand, W, H),
+      logoComposite: await prepararLogo(
+        input, brand, W, H,
+        layout === "capa_escura" ? (corValida(brand.corPrimariaHex) ?? "#2F5D50") : CREME,
+      ),
     });
     return { buffer, fotoDesenhada: false, avisoFoto: foto ? AVISO_LAYOUT_SEM_FOTO : null };
   }
@@ -483,7 +486,7 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
   // hero / foto: a mesma pilha — "hero" com foto vira "foto".
   return renderPilha({
     W, H, scheme, conteudo, handle, foto, fonteTitulo,
-    logoComposite: await prepararLogo(input, brand, W, H),
+    logoComposite: await prepararLogo(input, brand, W, H, scheme.bg),
   });
 }
 
@@ -652,6 +655,7 @@ async function prepararLogo(
   brand: CardInput["brand"],
   W: number,
   H: number,
+  bgHex: string,
 ): Promise<{ buf: Buffer; w: number; h: number } | null> {
   let logoBruta: Buffer | undefined = input.logoBuffer;
   if (!logoBruta && brand.logoUrl) {
@@ -672,9 +676,77 @@ async function prepararLogo(
       .png()
       .toBuffer();
     const meta = await sharp(logoPng).metadata();
-    return { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
+    const pronta = { buf: logoPng, w: meta.width ?? maxLogoW, h: meta.height ?? maxLogoH };
+    return await comPlacaSeSumir(pronta, bgHex);
   } catch {
     return null; // logo inválida — segue sem
+  }
+}
+
+/**
+ * Lê a logo contra um fundo: luminância média dos pixels visíveis e a fração
+ * deles que se confunde com o fundo (diferença de luminância abaixo de
+ * CONTRASTE_MINIMO_LOGO). Média sozinha engana: na Limiar o símbolo dourado é
+ * claro e as letras finas é que somem no verde.
+ */
+export async function lerLogoContraFundo(
+  png: Buffer,
+  bgHex: string,
+): Promise<{ media: number; fracaoApagada: number } | null> {
+  const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const lumFundo = luminancia(bgHex);
+  let soma = 0;
+  let peso = 0;
+  let apagado = 0;
+  for (let i = 0; i < info.width * info.height; i++) {
+    const a = data[i * 4 + 3] / 255;
+    if (a < 0.4) continue;
+    const l = (0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2]) / 255;
+    soma += a * l;
+    peso += a;
+    if (Math.abs(l - lumFundo) < CONTRASTE_MINIMO_LOGO) apagado += a;
+  }
+  return peso > 0 ? { media: soma / peso, fracaoApagada: apagado / peso } : null;
+}
+
+/** Diferença de luminância abaixo da qual um pixel da logo some no fundo. */
+export const CONTRASTE_MINIMO_LOGO = 0.25;
+/** Fração da logo apagada a partir da qual ela ganha a placa. */
+export const FRACAO_APAGADA_MAXIMA = 0.2;
+
+/**
+ * Logo que some no fundo (caso Mariana, 14/10: letras finas da Limiar sobre
+ * o verde escuro) ganha uma placa arredondada: clara quando a logo é escura,
+ * escura quando ela é clara. Com contraste suficiente, sai como sempre saiu.
+ */
+async function comPlacaSeSumir(
+  logo: { buf: Buffer; w: number; h: number },
+  bgHex: string,
+): Promise<{ buf: Buffer; w: number; h: number }> {
+  try {
+    const leitura = await lerLogoContraFundo(logo.buf, bgHex);
+    if (!leitura || leitura.fracaoApagada < FRACAO_APAGADA_MAXIMA) return logo;
+    // A placa é a que MENOS apaga a logo; se nenhuma melhora, sai sem placa.
+    const [clara, escura] = await Promise.all([
+      lerLogoContraFundo(logo.buf, "#FFFFFF"),
+      lerLogoContraFundo(logo.buf, "#1A1A2E"),
+    ]);
+    const fClara = clara?.fracaoApagada ?? 1;
+    const fEscura = escura?.fracaoApagada ?? 1;
+    const placa = fClara <= fEscura ? "#FFFFFF" : "#1A1A2E";
+    if (Math.min(fClara, fEscura) >= leitura.fracaoApagada) return logo;
+    const padX = Math.round(logo.h * 0.45);
+    const padY = Math.round(logo.h * 0.3);
+    const w = logo.w + padX * 2;
+    const h = logo.h + padY * 2;
+    const raio = Math.round(h * 0.28);
+    const svg = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${raio}" ry="${raio}" fill="${placa}" fill-opacity="0.94"/></svg>`,
+    );
+    const buf = await sharp(svg).composite([{ input: logo.buf, left: padX, top: padY }]).png().toBuffer();
+    return { buf, w, h };
+  } catch {
+    return logo;
   }
 }
 
@@ -1203,10 +1275,13 @@ async function renderCapa(params: {
   }
 
   if (handle) {
-    const fsH = Math.round(W * 0.021);
-    const hBloco = blocoDeTexto(handle.toUpperCase(), "sans", tintaHandle, fsH, W, {
-      letterSpacing: Math.round(fsH * 0.22),
-      opacidade: 0.62,
+    // Mesmo desenho do @ dos slides internos (minúsculo, mesmo corpo e mesmo
+    // espaçamento): no mesmo carrossel, a capa em CAIXA ALTA e o resto em
+    // minúsculo pareciam duas fontes (Aline, 14/10/2026).
+    const fsH = Math.round(W * 0.019);
+    const hBloco = blocoDeTexto(handle, "sans", tintaHandle, fsH, W, {
+      letterSpacing: Math.round(fsH * 0.18),
+      peso: 0.5,
     });
     composites.push(
       ...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.05) - hBloco.altura),

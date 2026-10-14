@@ -53,6 +53,12 @@ export type SlotJornada = {
   objecao?: string;
   /** Instrução completa que entra no prompt deste post. */
   instrucao: string;
+  /**
+   * O teste que este post apresenta (só no post de produto). É ele que decide
+   * a foto do kit na arte: quem nunca viu o teste precisa VER o que chega em
+   * casa (Aline, 14/10/2026).
+   */
+  produto?: ProdutoDaJornada;
 };
 
 type Modelo = {
@@ -507,7 +513,12 @@ export function planoDaJornada(params: {
       `PAPEL DESTE POST: ${preencher(m.papel, a, b)}`,
       preencher(m.instrucao, a, b),
       m.angulo === "divulgacao_produto" && produtoDaSemana
-        ? `PRODUTO DESTE POST: ${produtoDaSemana.nome}. Nome, preço e link EXATAMENTE como no catálogo; nenhum outro produto entra.`
+        ? `PRODUTO DESTE POST: ${produtoDaSemana.nome}. Nome, preço e link EXATAMENTE como no catálogo; nenhum outro produto entra.\n` +
+          `Quem segue o perfil NÃO sabe o que é "${produtoDaSemana.nome}": o nome sozinho não diz nada. A ARTE (headline e subtitle) e a 1ª linha da legenda dizem O QUE É, em palavras de gente (${
+            produtoDaSemana.scanner_produto_id === "teste_epigenetico"
+              ? "um teste que mostra como o seu estilo de vida está ligando e desligando os seus genes"
+              : "um teste genético feito em casa, com um cotonete na boca, que mostra como o seu corpo funciona"
+          }) e o que a pessoa ganha com ele. O nome do produto entra DEPOIS, como o nome desse teste, nunca como título.`
         : "",
       m.objecao
         ? `Objeção a dissolver no GANCHO, sem dizer que é uma objeção e sem post de "resposta": "${m.objecao}".`
@@ -524,6 +535,7 @@ export function planoDaJornada(params: {
       papel: preencher(m.papel, a, b),
       objecao: m.objecao,
       instrucao,
+      ...(m.angulo === "divulgacao_produto" && produtoDaSemana ? { produto: produtoDaSemana } : {}),
     };
   });
 

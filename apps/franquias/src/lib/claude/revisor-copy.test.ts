@@ -77,7 +77,7 @@ test("copy boa não dispara nada", () => {
     "O seu exame pode estar normal e você seguir cansada.\n\n" +
     "A faixa do laboratório é estatística: ela diz onde está a maioria, não onde " +
     "está o seu melhor. Por isso duas pessoas com o mesmo número se sentem " +
-    "diferente.\n\nSe isso faz sentido pra você, me chama no direct.";
+    "diferente.\n\nSe isso faz sentido para você, o link está na bio.";
   assert.deepEqual(revisarCopy(boa), []);
 });
 
@@ -169,7 +169,7 @@ test("sem catálogo carregado, o revisor não acusa preço", () => {
 test('"aí" e "ia" em português não são a sigla IA', () => {
   // 🔴 Casar a palavra sem olhar a caixa deu 16 falsos positivos em 60 posts
   // reais, e ZERO verdadeiros: "E aí", "Foi aí que", "nunca ia mostrar".
-  assert.deepEqual(regras("E aí, finalmente dá pra nutrir o que tá pedindo."), []);
+  assert.deepEqual(regras("E aí, finalmente dá para nutrir o que está pedindo."), []);
   assert.deepEqual(regras("Foi aí que eu entendi o problema."), []);
   assert.deepEqual(regras("Exame básico nunca ia mostrar isso."), []);
   assert.deepEqual(regras("A nutrição age exatamente aí: na causa."), []);
@@ -232,4 +232,13 @@ test("o ponto final da frase não transforma preço certo em preço inventado", 
   assert.deepEqual(regras("São R$ 3.500,00, no cartão.", ctx), []);
   // e o preço que não existe segue sendo pego
   assert.ok(regras("Sai por R$ 1.550,00. Link na bio.", ctx).includes("preco_fora_do_catalogo"));
+});
+
+
+test("abreviação vira erro, com a forma por extenso (Aline, 14/10)", () => {
+  const a = revisarCopy("Seu exame tá normal e você tava cansada pra caramba.", {});
+  const ab = a.filter((x) => x.regra === "abreviado");
+  assert.equal(ab.length, 3);
+  assert.match(ab[0]!.motivo, /está/);
+  assert.equal(revisarCopy("Está tudo bem, para você e para o seu corpo. Pró-atividade.", {}).filter((x) => x.regra === "abreviado").length, 0);
 });

@@ -37,13 +37,27 @@ function slideDoMeio(t: string): ConteudoPeca {
   return t.length <= MAX_CHARS_TITULO_SLIDE ? { headline: t } : { headline: "", corpo: t };
 }
 
-/** Arte de peça única (feed e stories): só título e subtítulo. */
-export function conteudoDaArteUnica(post: {
-  headline?: string | null;
-  subtitle?: string | null;
-}): ConteudoPeca {
+/** Até quanto a legenda de um story cabe na arte como subtítulo. */
+export const MAX_LEGENDA_NA_ARTE_STORY = 180;
+
+/**
+ * Arte de peça única (feed e stories): só título e subtítulo.
+ *
+ * Story não tem legenda no Instagram (Aline, 14/10/2026: "quando é stories não
+ * tem como add legenda, essa escrita deveria estar na arte"). O prompt pede a
+ * mensagem inteira em headline + subtitle; se o modelo ainda assim escreveu o
+ * texto na legenda e deixou o subtítulo vazio, a legenda curta entra na arte.
+ */
+export function conteudoDaArteUnica(
+  post: { headline?: string | null; subtitle?: string | null; copy_legenda?: string | null },
+  tipo?: string,
+): ConteudoPeca {
   const headline = semLink(post.headline);
-  const subtitle = semLink(post.subtitle);
+  let subtitle = semLink(post.subtitle);
+  if (tipo === "stories" && !subtitle) {
+    const legenda = semLink(post.copy_legenda).replace(/\s+/g, " ").trim();
+    if (legenda && legenda.length <= MAX_LEGENDA_NA_ARTE_STORY) subtitle = legenda;
+  }
   return subtitle ? { headline, subtitle } : { headline };
 }
 

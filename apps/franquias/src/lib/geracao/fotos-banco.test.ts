@@ -55,8 +55,8 @@ test("só carrossel e feed levam foto; logo e depoimento não entram no banco", 
 
 test("o pacote da semana passa a foto do banco pra capa e pro feed", () => {
   const s = fonte("./semanal.ts");
-  assert.match(s, /fotoCapa: await proximaFotoDoBanco\(\)/);
-  assert.match(s, /fotoPropria: tipoLevaFotoDoBanco\(item\.tipo\) \? await proximaFotoDoBanco\(\)/);
+  assert.match(s, /fotoCapa: kitCapa \? kitCapa\.buf : await proximaFotoDoBanco\(\)/);
+  assert.match(s, /: tipoLevaFotoDoBanco\(item\.tipo\) \? await proximaFotoDoBanco\(\)/);
   assert.match(s, /\.in\("tipo", \[\.\.\.TIPOS_FOTO_BANCO\]\)/);
 });
 
