@@ -18,6 +18,13 @@
  * ignorar o aviso, e aí passa junto o que importa. Cada regra aqui ou é
  * mecânica (`erro`) ou é explicitamente um pedido de conferência (`confira`).
  */
+/**
+ * Frases que vendem o TESTE em vez da consulta. Regra de todas as contas (Aline 14/10/2026). Usado pelo revisor da copy
+ * (sinaliza, nunca apaga) e pelo teste.
+ */
+export const RE_VENDE_TESTE =
+  /\b(compr[ea]|garant[ae]|fa[çc]a|adquir[ae]|pe[çc]a)\s+(j[áa]\s+)?(o\s+)?(seu\s+)?teste\b|\bteste\s+(gen[ée]tico\s+|epigen[ée]tico\s+)?(por|a partir de|apenas)\s+r\$/i;
+
 
 export type Gravidade = "erro" | "confira";
 
@@ -352,6 +359,17 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
       // dedup por trecho juntaria "tá" e "tava" num aviso só.
       trecho: m[0],
       motivo: `Escreva por extenso: "${m[0]}" vira "${certo[forma] ?? "a forma completa"}".`,
+    });
+  }
+
+  // Vender o TESTE em vez da CONSULTA (Aline, 14/10/2026): o produto é
+  // sempre a consulta, que INCLUI o teste. Erro, porque é regra de todas.
+  for (const m of texto.matchAll(new RegExp(RE_VENDE_TESTE.source, "giu"))) {
+    add({
+      regra: "vende_teste",
+      gravidade: "erro",
+      trecho: m[0],
+      motivo: "O post vende a CONSULTA, nunca o teste. Troque por \"a consulta inclui o teste\".",
     });
   }
 

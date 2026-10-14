@@ -21,7 +21,8 @@ import {
   resolveTemplateCreatomate,
 } from "@/lib/creatomate/client";
 import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
-import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
+import { gerarEUploadImagem, gerarCarrosselEUpload, gerarCarrosselEditorialEUpload } from "@/lib/ai-image/render";
+import { slidesDaConsulta, fotoDaConsultaUrl } from "@/lib/geracao/consulta-teste";
 import type { ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 import {
   conteudoDaArteUnica,
@@ -392,7 +393,51 @@ export async function gerarPostsDaSemana(
       // 1a. Carrossel: desenhador tipográfico (mesmo estilo do feed e dos
       //     stories, custo zero, sem foto de IA). Antes ele só tinha o
       //     Creatomate, que foi zerado de propósito, e saía sem arte.
-      if (item.tipo === "feed_carrossel") {
+      // 1a'. Post de VENDA da consulta (Aline, 14/10/2026): carrossel no
+      //      estilo aprovado, com a foto de consulta na capa inteira e as
+      //      fotos de coleta e de consulta do Drive nos slides do meio. Falhou,
+      //      cai no desenho de sempre logo abaixo.
+      if (item.tipo === "feed_carrossel" && item.produto && !item.briefing) {
+        try {
+          const brutos = (post as { slides?: unknown }).slides;
+          const textos = Array.isArray(brutos) ? brutos.map((t) => String(t ?? "")) : [];
+          const giro = Math.floor(Date.parse(semanaRef) / (7 * 24 * 60 * 60 * 1000)) || 0;
+          const plano = slidesDaConsulta(textos, item.produto, giro);
+          if (plano.length >= 2) {
+            const fotos = new Map<string, Buffer>();
+            for (const nome of new Set(plano.map((x) => x.fotoNome).filter(Boolean) as string[])) {
+              const b = await baixarFotoPublica(fotoDaConsultaUrl(nome));
+              if (b) fotos.set(nome, b);
+            }
+            const capa = plano[0]!;
+            const slidesEd = plano.map((x) => {
+              const { fotoNome, ...resto } = x;
+              if (resto.tipo === "meio" && fotoNome && fotos.has(fotoNome)) return { ...resto, foto: fotos.get(fotoNome) };
+              return resto;
+            });
+            const handle = ((franqueada as { instagram_handle?: string | null }).instagram_handle ?? "").trim();
+            const r = await gerarCarrosselEditorialEUpload({
+              franqueadaId,
+              slides: slidesEd,
+              fotoCapa: capa.fotoNome ? fotos.get(capa.fotoNome) : undefined,
+              destaqueHex: brandArte.corPrimariaHex,
+              fundoFecho: brandArte.corPrimariaHex,
+              logoUrl: logoUrl ?? null,
+              assinatura: handle ? (handle.startsWith("@") ? handle : `@${handle}`) : undefined,
+            });
+            if (r.urls.length) {
+              urlImagem = r.urls[0]!;
+              urlsSlides = r.urls;
+            }
+          } else {
+            console.warn("[geracao] carrossel da consulta sem texto pra 2 slides; segue no desenho de sempre");
+          }
+        } catch (edErr) {
+          console.warn("[geracao] carrossel da consulta falhou; segue no desenho de sempre:", edErr);
+        }
+      }
+
+      if (item.tipo === "feed_carrossel" && !urlsSlides) {
         const slides = slidesDoCarrosselSemanal(post);
         if (slides.length >= 2) {
           try {
@@ -1059,6 +1104,21 @@ function lembreteDaInteracao(tipo: string, post: { interacao_sugerida?: unknown 
   const i = typeof post.interacao_sugerida === "string" ? post.interacao_sugerida.trim() : "";
   if (!i) return null;
   return `A arte está pronta. Ponha por cima no Instagram: ${i.slice(0, 200)}`;
+}
+
+/** Baixa uma foto pública do app; falha devolve null e o slide segue sem ela. */
+async function baixarFotoPublica(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" });
+    if (!res.ok) {
+      console.warn(`[semanal] foto não baixou (${res.status}): ${url}`);
+      return null;
+    }
+    return Buffer.from(await res.arrayBuffer());
+  } catch (e) {
+    console.warn("[semanal] foto não baixou:", (e as Error).message);
+    return null;
+  }
 }
 
 /** Baixa a foto do kit do teste; falha devolve null e o post segue sem ela. */

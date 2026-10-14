@@ -9,6 +9,8 @@ import {
   type BrandGuidelines,
   type ConteudoPeca,
   type EstiloCapa,
+  renderCarrosselEditorial,
+  type SlideEditorial,
 } from "@scanner/ai-image";
 import { createAdminClient } from "@/lib/supabase/server";
 
@@ -140,6 +142,50 @@ export async function gerarCarrosselEUpload(input: {
     urls,
     meta: { custoTotalUsd: custoTotal, tempoTotalMs: tempoTotal, provider },
   };
+}
+
+/**
+ * Carrossel EDITORIAL (o do post de venda da consulta, Aline 14/10/2026):
+ * foto inteira na capa, foto nos slides do meio quando o texto deixa espaço,
+ * fecho na cor da marca. Custo zero, sem modelo de imagem.
+ */
+export async function gerarCarrosselEditorialEUpload(input: {
+  franqueadaId: string;
+  slides: SlideEditorial[];
+  fotoCapa?: Buffer;
+  destaqueHex: string;
+  fundoFecho?: string;
+  logoUrl?: string | null;
+  assinatura?: string;
+}): Promise<{ urls: string[] }> {
+  let logoPlaca: Buffer | undefined;
+  if (input.logoUrl && /^https?:/.test(input.logoUrl)) {
+    try {
+      const res = await fetch(input.logoUrl, { signal: AbortSignal.timeout(8000), cache: "no-store" });
+      if (res.ok) logoPlaca = Buffer.from(await res.arrayBuffer());
+    } catch {
+      // logo indisponível: a capa sai com o @
+    }
+  }
+  const buffers = await renderCarrosselEditorial(input.slides, {
+    destaqueHex: input.destaqueHex,
+    fotoCapa: input.fotoCapa,
+    logoPlaca,
+    fundoFecho: input.fundoFecho,
+    assinatura: input.assinatura,
+  });
+  const admin = createAdminClient();
+  const urls: string[] = [];
+  for (let i = 0; i < buffers.length; i++) {
+    const path = `${input.franqueadaId}/ai-image/${Date.now()}_editorial_${i + 1}.png`;
+    const { error } = await admin.storage
+      .from(BUCKET)
+      .upload(path, buffers[i]!, { contentType: "image/png", upsert: false });
+    if (error) throw new Error(`upload slide ${i + 1}: ${error.message}`);
+    const { data: signed } = await admin.storage.from(BUCKET).createSignedUrl(path, 365 * 24 * 60 * 60);
+    urls.push(signed?.signedUrl ?? path);
+  }
+  return { urls };
 }
 
 /** Gera sem upload — usado pelo endpoint de preview admin. */

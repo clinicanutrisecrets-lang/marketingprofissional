@@ -31,7 +31,23 @@ export const CORES_EDITORIAL = {
 
 export type SlideEditorial =
   | { tipo: "capa"; titulo: string; kicker?: string; subtitulo?: string }
-  | { tipo: "meio"; titulo: string; corpo?: string; rotulo?: string }
+  | {
+      tipo: "meio";
+      titulo: string;
+      corpo?: string;
+      rotulo?: string;
+      /**
+       * Foto embaixo do texto (post de venda da consulta, Aline 14/10/2026).
+       * Só entra quando o texto deixa espaço: slide com muito texto sai sem
+       * foto ("os que têm muito texto não precisam ter foto em todos").
+       */
+      foto?: Buffer;
+      /**
+       * Altura (0 a 1) do ponto que não pode sair do corte: o rosto, a mão com
+       * o cotonete. Sem ela o corte procura a região de interesse sozinho.
+       */
+      fotoFocoY?: number;
+    }
   | { tipo: "fecho"; titulo: string; chamada?: string; rotulo?: string };
 
 export type OpcoesEditorial = {
@@ -47,6 +63,17 @@ export type OpcoesEditorial = {
   assinatura?: string;
   /** Frase de rodapé do fecho. */
   aviso?: string;
+  /**
+   * Logo de uma marca qualquer (colorida, com ou sem fundo). Vai numa PLACA
+   * BRANCA na capa com foto, e no fecho quando não há logoClaro. É o caminho
+   * do app de Marketing, que não tem a versão branca da logo de cada uma.
+   */
+  logoPlaca?: Buffer;
+  /**
+   * Fecho na COR DA MARCA (texto branco), como no exemplo aprovado. Sem ela,
+   * o fecho segue claro. Cor clara demais pra letra branca é ignorada.
+   */
+  fundoFecho?: string;
 };
 
 type Camada = { input: Buffer; left: number; top: number };
@@ -107,6 +134,47 @@ async function logoCamada(logo: Buffer | undefined, left: number, top: number, a
   return { input, left, top };
 }
 
+/** Logo numa placa branca arredondada (capa com foto). */
+async function logoNaPlaca(logo: Buffer | undefined, left: number, top: number, altura: number): Promise<Camada | null> {
+  if (!logo) return null;
+  try {
+    const png = await sharp(logo).trim({ threshold: 10 }).resize({ height: altura }).png().toBuffer();
+    const m = await sharp(png).metadata();
+    const w = m.width ?? altura;
+    const padX = Math.round(altura * 0.45);
+    const padY = Math.round(altura * 0.3);
+    const pw = w + padX * 2;
+    const ph = altura + padY * 2;
+    const svg = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${pw}" height="${ph}"><rect width="${pw}" height="${ph}" rx="${Math.round(ph / 2)}" fill="#FFFFFF" fill-opacity="0.94"/></svg>`,
+    );
+    const input = await sharp(svg).composite([{ input: png, left: padX, top: padY }]).png().toBuffer();
+    return { input, left, top };
+  } catch {
+    return null;
+  }
+}
+
+/** Luminância relativa (0..1) de um #RRGGBB. */
+function luminanciaHex(hex: string): number {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => v / 255);
+  return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
+}
+
+/** O fecho pode ir na cor da marca só se a letra branca ler sobre ela. */
+export function fundoFechoUsavel(hex: string | undefined): string | null {
+  if (!hex || !HEX.test(hex)) return null;
+  return luminanciaHex(hex) <= 0.45 ? hex : null;
+}
+
+/**
+ * Altura da foto no slide do meio. Abaixo do mínimo a foto não entra: foto
+ * espremida numa faixa fina corta a pessoa e não mostra nada.
+ */
+export const FOTO_MEIO_MIN = 380;
+export const FOTO_MEIO_MAX = 560;
+
 function assinaturaCamada(assinatura: string | undefined, cor: string, left: number, top: number): Camada[] {
   if (!assinatura) return [];
   const r = texto(assinatura, "inter", 26, cor, { letterSpacing: 2, lineHeight: 1.2 });
@@ -119,7 +187,7 @@ async function base(fundo: string): Promise<sharp.Sharp> {
 
 async function capaComFoto(s: Extract<SlideEditorial, { tipo: "capa" }>, i: number, total: number, o: OpcoesEditorial): Promise<Buffer> {
   // Foto INTEIRA no card, cortada só o necessário pra cobrir 4:5 (centro).
-  const foto = await sharp(o.fotoCapa!).rotate().resize(W, H, { fit: "cover", position: "centre" }).toBuffer();
+  const foto = await sharp(o.fotoCapa!).rotate().resize(W, H, { fit: "cover", position: sharp.strategy.attention }).toBuffer();
   const veu = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">` +
       `<stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".22" stop-color="#000" stop-opacity="0"/>` +
@@ -128,7 +196,7 @@ async function capaComFoto(s: Extract<SlideEditorial, { tipo: "capa" }>, i: numb
   );
   const camadas: Camada[] = [{ input: veu, left: 0, top: 0 }];
 
-  const logo = await logoCamada(o.logoEscuro, MARGEM, 80, 70);
+  const logo = (await logoCamada(o.logoEscuro, MARGEM, 80, 70)) ?? (await logoNaPlaca(o.logoPlaca, MARGEM, 72, 52));
   if (logo) camadas.push(logo);
   else camadas.push(...assinaturaCamada(o.assinatura, "#FFFFFF", MARGEM, 100));
   const pag = texto(numeroPagina(i, total), "inter", 24, "#FFFFFF", { letterSpacing: 3, lineHeight: 1.2 });
@@ -204,6 +272,40 @@ async function meio(s: Extract<SlideEditorial, { tipo: "meio" }>, i: number, tot
       corpo = texto(s.corpo, "inter", fs, c.corpo, { lineHeight: 1.55 });
     }
     camadas.push(...camadasDe(corpo.pedacos, MARGEM, y));
+    y += corpo.altura;
+  }
+  // Foto embaixo do texto, só se sobrar espaço. O corte procura a região de
+  // interesse (rosto, mãos), nunca o centro cego: centro cortava a cabeça das
+  // pessoas sentadas (Aline, 14/10/2026).
+  if (s.foto) {
+    const topo = y + 48;
+    const altura = Math.min(FOTO_MEIO_MAX, H - 150 - topo);
+    if (altura >= FOTO_MEIO_MIN) {
+      const raio = 28;
+      const mascara = Buffer.from(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${LARGURA}" height="${altura}"><rect width="${LARGURA}" height="${altura}" rx="${raio}" ry="${raio}" fill="#fff"/></svg>`,
+      );
+      try {
+        const foco = s.fotoFocoY;
+        let recorte: Buffer;
+        if (typeof foco === "number" && foco >= 0 && foco <= 1) {
+          const larga = await sharp(s.foto).rotate().resize({ width: LARGURA }).toBuffer({ resolveWithObject: true });
+          const h = larga.info.height;
+          recorte =
+            h > altura
+              ? await sharp(larga.data)
+                  .extract({ left: 0, top: Math.max(0, Math.min(h - altura, Math.round(foco * h - altura / 2))), width: LARGURA, height: altura })
+                  .toBuffer()
+              : await sharp(larga.data).resize(LARGURA, altura, { fit: "cover", position: "centre" }).toBuffer();
+        } else {
+          recorte = await sharp(s.foto).rotate().resize(LARGURA, altura, { fit: "cover", position: sharp.strategy.attention }).toBuffer();
+        }
+        const foto = await sharp(recorte).composite([{ input: mascara, blend: "dest-in" }]).png().toBuffer();
+        camadas.push({ input: foto, left: MARGEM, top: topo });
+      } catch {
+        // foto ilegível: o slide segue só com o texto
+      }
+    }
   }
   const ass = o.assinatura ? rotulo(o.assinatura.replace(/^@/, ""), c.pagina, 22) : null;
   if (ass) camadas.push(...camadasDe(ass.pedacos, MARGEM, H - 72 - ass.altura));
@@ -211,6 +313,8 @@ async function meio(s: Extract<SlideEditorial, { tipo: "meio" }>, i: number, tot
 }
 
 async function fecho(s: Extract<SlideEditorial, { tipo: "fecho" }>, i: number, total: number, o: OpcoesEditorial): Promise<Buffer> {
+  const corFundo = fundoFechoUsavel(o.fundoFecho);
+  if (corFundo) return fechoNaCor(s, i, total, o, corFundo);
   const c = CORES_EDITORIAL;
   const camadas: Camada[] = [];
   const rot = rotulo(s.rotulo || "Para levar com você", c.rotulo);
@@ -231,7 +335,7 @@ async function fecho(s: Extract<SlideEditorial, { tipo: "fecho" }>, i: number, t
 
   // Rodapé: aviso + logo.
   let yb = H - 80;
-  const logo = await logoCamada(o.logoClaro, MARGEM, yb - 70, 70);
+  const logo = (await logoCamada(o.logoClaro, MARGEM, yb - 70, 70)) ?? (await logoNaPlaca(o.logoPlaca, MARGEM, yb - 76, 52));
   if (logo) {
     camadas.push(logo);
     yb -= 70 + 28;
@@ -249,6 +353,33 @@ async function fecho(s: Extract<SlideEditorial, { tipo: "fecho" }>, i: number, t
   }
   camadas.push({ input: retangulo(LARGURA, 2, c.linha), left: MARGEM, top: yb });
   return (await base(c.fundo)).composite(camadas).png().toBuffer();
+}
+
+/** Fecho na cor da marca, letra branca (o slide verde do exemplo aprovado). */
+async function fechoNaCor(
+  s: Extract<SlideEditorial, { tipo: "fecho" }>,
+  i: number,
+  total: number,
+  o: OpcoesEditorial,
+  cor: string,
+): Promise<Buffer> {
+  const camadas: Camada[] = [];
+  const pag = texto(numeroPagina(i, total), "inter", 24, "#FFFFFF", { letterSpacing: 3, lineHeight: 1.2 });
+  camadas.push(...camadasDe(pag.pedacos, W - MARGEM - pag.largura, 100));
+  const rot = rotulo(s.rotulo || "Para levar com você", "#FFFFFF");
+  const tit = tituloQueCabe(s.titulo, "#FFFFFF", 92, 460);
+  const ch = s.chamada ? texto(s.chamada, "inter", 34, "#FFFFFF", { lineHeight: 1.5, opacidade: 0.92 }) : null;
+  const bloco = rot.altura + 36 + tit.altura + (ch ? 44 + ch.altura : 0);
+  let y = Math.max(220, Math.round((H - bloco) / 2) - 40);
+  camadas.push(...camadasDe(rot.pedacos, MARGEM, y));
+  y += rot.altura + 36;
+  camadas.push(...camadasDe(tit.pedacos, MARGEM, y));
+  y += tit.altura + 44;
+  if (ch) camadas.push(...camadasDe(ch.pedacos, MARGEM, y));
+  const logo = await logoNaPlaca(o.logoPlaca, MARGEM, H - 80 - 52 - 32, 52);
+  if (logo) camadas.push(logo);
+  else camadas.push(...assinaturaCamada(o.assinatura, "#FFFFFF", MARGEM, H - 110));
+  return (await base(cor)).composite(camadas).png().toBuffer();
 }
 
 /** Desenha um slide. `i`/`total` numeram o canto ("03/07"). */
