@@ -160,7 +160,7 @@ const NIVEIS: Record<Nivel, Modelo[]> = {
       objecao: "Já fiz exame e não deu nada",
       instrucao:
         "Explique que o exame de sangue mede o que está circulando hoje. Abra a pergunta \"e o que não muda?\" sem responder.",
-      nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste genético"],
+      nao_dizer: ["depreciar o exame de sangue ou o médico", "citar o teste nutrigenético"],
     },
     {
       angulo: "educativo_ciencia",

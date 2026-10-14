@@ -69,8 +69,8 @@ export function postLiberado(
 /** Título e explicação de cada coleção (posts fora da grade de meses). */
 export const COLECOES: Record<string, { titulo: string; descricao: string }> = {
   nutrigenetica: {
-    titulo: "🧬 Teste genético — DNA 360 e Consulta Nutrigenética",
+    titulo: "🧬 Teste nutrigenético — DNA 360 e Consulta Nutrigenética",
     descricao:
-      "Stories prontos pra vender o seu teste genético. Baixe a arte, poste e mande o interessado pro seu link de checkout — o mesmo que está na sua Loja do Scanner Tratamentos.",
+      "Stories prontos pra vender o seu teste nutrigenético. Baixe a arte, poste e mande o interessado pro seu link de checkout — o mesmo que está na sua Loja do Scanner Tratamentos.",
   },
 };

@@ -42,7 +42,7 @@ export function nomeDaConsulta(p: ProdutoConsulta): string {
 
 /** O que a consulta inclui, em palavras de gente. */
 export function oQueInclui(p: ProdutoConsulta): string {
-  return p.scanner_produto_id === "teste_epigenetico" ? "o teste epigenético" : "o teste genético";
+  return p.scanner_produto_id === "teste_epigenetico" ? "o teste epigenético" : "o teste nutrigenético";
 }
 
 export const COLETA_PRESENCIAL_OU_KIT =
@@ -61,6 +61,7 @@ export function regraConsultaInclui(p: ProdutoConsulta): string {
     `O teste entra SEMPRE pela palavra "inclui": "a ${/^consulta/i.test(nome) ? nome : "consulta"} inclui ${teste}". Nunca "compre o teste", "faça o seu teste", "garanta o seu teste" nem "teste por R$".`,
     "O foco é a consulta de INTERPRETAÇÃO: a leitura do teste cruzada com os exames de sangue e com o que a pessoa sente hoje (correlação). Um resultado sozinho não diz o que fazer; quem decide é a correlação feita na consulta.",
     `Coleta: ${COLETA_PRESENCIAL_OU_KIT} Diga as duas formas, porque a seguidora não sabe qual é a dela.`,
+    'Escreva sempre "teste nutrigenético", nunca "teste genético".',
   ].join("\n");
 }
 

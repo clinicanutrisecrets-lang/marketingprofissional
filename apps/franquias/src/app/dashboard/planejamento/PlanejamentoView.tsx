@@ -92,7 +92,7 @@ export function PlanejamentoView({
         };
       } else {
         input = {
-          produto: "Consulta + teste genético",
+          produto: "Consulta + teste nutrigenético",
           publico: franqueada.publico_alvo_descricao,
           ticket: s5Ticket,
           consciencia_audiencia: s5Consciencia,

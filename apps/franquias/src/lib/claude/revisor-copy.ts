@@ -373,6 +373,16 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
     });
   }
 
+  // "Teste nutrigenético", nunca "teste genético" (Aline, 14/10/2026).
+  for (const m of texto.matchAll(/(?<![\p{L}\p{N}])testes?\s+gen[ée]ticos?(?![\p{L}\p{N}])/giu)) {
+    add({
+      regra: "teste_genetico",
+      gravidade: "erro",
+      trecho: m[0],
+      motivo: 'Escreva "teste nutrigenético", nunca "teste genético".',
+    });
+  }
+
   // Gancho morto: só conta na ABERTURA, que é onde ele mata o post. No meio
   // do texto "você sabia" é conversa normal.
   const abertura = texto.trim().slice(0, 120);

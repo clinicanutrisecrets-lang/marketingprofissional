@@ -66,7 +66,7 @@ const TEXTOS = [
   "Gene, exame e sintoma na mesma mesa.\nEu leio cada variante junto dos seus exames.",
   "A coleta é simples.\nNa consulta presencial a coleta é feita ali; na online o kit vai pra sua casa.",
   "O que você leva.\nA leitura, a correlação, as prioridades e o plano.",
-  "A consulta inclui o teste genético.\nO link está na bio.",
+  "A consulta inclui o teste nutrigenético.\nO link está na bio.",
 ];
 
 test("capa com foto de CONSULTA; slide da coleta com foto de coleta só no genético", () => {
@@ -100,7 +100,7 @@ test("jornada: o post de venda é SEMPRE carrossel e leva a regra e a estrutura"
 test("revisor: vender o teste é erro; 'a consulta inclui o teste' passa", () => {
   const ruim = revisarCopy("Compre o seu teste genético hoje. Teste genético por R$ 3.500.");
   assert.ok(ruim.some((a) => a.regra === "vende_teste" && a.gravidade === "erro"));
-  const bom = revisarCopy("A Consulta Nutrigenética inclui o teste genético, com a leitura cruzada com os seus exames.");
+  const bom = revisarCopy("A Consulta Nutrigenética inclui o teste nutrigenético, com a leitura cruzada com os seus exames.");
   assert.ok(!bom.some((a) => a.regra === "vende_teste"));
 });
 
@@ -110,4 +110,14 @@ test("ligação: a semana desenha a venda no carrossel editorial com fotos, e po
   assert.match(sem, /gerarCarrosselEditorialEUpload\(/);
   const pr = readFileSync(new URL("../claude/prompts.ts", import.meta.url), "utf8");
   assert.match(pr, /regraConsultaInclui\(produto\)/);
+});
+
+test("sempre 'teste nutrigenético': a geração troca e o revisor acusa", async () => {
+  const { semAbreviacao } = await import("../texto/sem-abreviacao.ts");
+  assert.equal(semAbreviacao("A consulta inclui o teste genético."), "A consulta inclui o teste nutrigenético.");
+  assert.equal(semAbreviacao("Testes genéticos e TESTE GENÉTICO"), "Testes nutrigenéticos e TESTE NUTRIGENÉTICO");
+  assert.equal(semAbreviacao("o teste epigenético"), "o teste epigenético", "epigenético não muda");
+  assert.ok(revisarCopy("Faça um teste genético.").some((a) => a.regra === "teste_genetico"));
+  assert.ok(!revisarCopy("A consulta inclui o teste nutrigenético.").some((a) => a.regra === "teste_genetico"));
+  assert.match(regraConsultaInclui(DAIANE), /teste nutrigenético/);
 });

@@ -47,9 +47,26 @@ function comCaixa(original: string, troca: string): string {
   return troca;
 }
 
+/**
+ * "Teste nutrigenético", nunca "teste genético" (Aline, 14/10/2026: "sempre
+ * fala, deixa como regra teste nutrigenético ao invés de genético"). Mora
+ * aqui porque esta é a passada que já roda em todo texto gerado.
+ */
+const RE_TESTE_GENETICO = /(?<![\p{L}\p{N}])(testes?)\s+(gen[ée]tic(?:o|os))(?![\p{L}\p{N}])/giu;
+
+function comoNutrigenetico(palavra: string): string {
+  const plural = /s$/i.test(palavra);
+  const troca = plural ? "nutrigenéticos" : "nutrigenético";
+  if (palavra === palavra.toUpperCase()) return troca.toUpperCase();
+  if (palavra[0] === palavra[0]!.toUpperCase()) return troca[0]!.toUpperCase() + troca.slice(1);
+  return troca;
+}
+
 export function semAbreviacao(texto: string): string {
   if (!texto) return texto;
-  return texto.replace(RE, (m) => comCaixa(m, MAPA.get(m.toLowerCase()) ?? m));
+  return texto
+    .replace(RE, (m) => comCaixa(m, MAPA.get(m.toLowerCase()) ?? m))
+    .replace(RE_TESTE_GENETICO, (_m, t: string, g: string) => `${t} ${comoNutrigenetico(g)}`);
 }
 
 /** Aplica semAbreviacao em TODAS as strings de um valor (arrays e objetos). */
