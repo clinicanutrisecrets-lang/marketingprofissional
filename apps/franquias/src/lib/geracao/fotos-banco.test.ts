@@ -103,10 +103,46 @@ test("ligação: o envio descreve a foto, a semana descreve as antigas e escolhe
   const acoes = readFileSync("src/lib/arquivos/actions.ts", "utf8");
   assert.match(acoes, /descreverEGravarFoto\(/);
   const sem = readFileSync("src/lib/geracao/semanal.ts", "utf8");
-  assert.match(sem, /filter\(\(x\) => !x\.descrito_em\)/);
+  assert.match(sem, /filter\(\(x\) => !x\.descrito_em && precisaLeituraAutomatica\(x\.tipo\)\)/);
   assert.match(sem, /proximaFotoDoBanco\(textoDoPost\(post\)\)/);
   assert.match(sem, /fotoDelaParaTexto\(/);
   const desc = readFileSync("src/lib/arquivos/descrever-foto.ts", "utf8");
   assert.match(desc, /tool_choice/);
   assert.match(desc, /enum: \[\.\.\.ASSUNTOS_FOTO\]/, "o descritor só usa o vocabulário fechado");
+});
+
+// ————— Foto de comida com o nome que ela escreve (Aline, 14/10/2026) —————
+import { melhorFotoParaTexto as melhor, palavrasDoNome, precisaLeituraAutomatica, assuntosDaFoto as assuntosDe } from "./fotos-banco.ts";
+
+test("foto de comida não passa pela leitura automática; as dela e do consultório passam", () => {
+  assert.equal(precisaLeituraAutomatica("foto_comida"), false);
+  assert.equal(precisaLeituraAutomatica("foto_post"), true);
+  assert.equal(precisaLeituraAutomatica("foto_clinica"), true);
+  assert.ok(TIPOS_FOTO_BANCO.includes("foto_comida"));
+  assert.ok(assuntosDe({ id: "1", url_storage: "x", tipo: "foto_comida" }).includes("prato"));
+});
+
+test("o slide que cita o alimento pega a foto que ela nomeou", () => {
+  const banco = [
+    { id: "tomate", url_storage: "a", tipo: "foto_comida", descricao: "salada de tomate" },
+    { id: "acerola", url_storage: "b", tipo: "foto_comida", descricao: "Suco de acerola" },
+  ];
+  assert.equal(melhor(banco, "A acerola tem mais vitamina C que a laranja.")?.id, "acerola");
+  assert.equal(melhor(banco, "Tomates maduros e o licopeno")?.id, "tomate");
+  // Palavras curtas e genéricas do nome não contam.
+  assert.deepEqual(palavrasDoNome("Suco de acerola com gengibre"), ["suco", "acerola", "gengibre"]);
+  assert.deepEqual(palavrasDoNome("receita do prato"), []);
+});
+
+test("ligação: o envio da foto de comida não chama a leitura, e a tela grava o nome", () => {
+  const acoes = fonte("../arquivos/actions.ts");
+  assert.match(acoes, /tipo === "foto_comida"/);
+  assert.match(acoes, /export async function nomearFoto/);
+  assert.match(acoes, /\.eq\("franqueada_id", franqueada\.id\)/, "só renomeia foto da própria conta");
+  const sem = fonte("./semanal.ts");
+  assert.match(sem, /precisaLeituraAutomatica\(x\.tipo\)/);
+  assert.match(sem, /descrito_em, descricao"\)/);
+  const tela = fonte("../../app/dashboard/fotos/FotosBanco.tsx");
+  assert.match(tela, /tipo="foto_comida"/);
+  assert.match(tela, /nomearFoto\(/);
 });
