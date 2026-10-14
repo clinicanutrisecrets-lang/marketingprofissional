@@ -9,6 +9,7 @@ import { PostCard, type MidiaCard, type PostCardDados } from "./PostCard";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 import { MontarArtesQueFaltam } from "./MontarArteButton";
 import { TemaEmAltaForm } from "./TemaEmAltaForm";
+import { EmAltaRadar, type TemaRadar } from "./EmAltaRadar";
 import { dataPadraoAmanha } from "@/lib/arte-post/tema-em-alta";
 import { precisaArteNova } from "@/lib/arte-post/molde";
 
@@ -53,6 +54,22 @@ export default async function FeedPage({ params }: PageProps) {
 
   const todos = (postsData ?? []) as PostFeed[];
 
+  // Radar de temas em alta: o que está em aberto dos últimos 10 dias.
+  const desde = new Date(Date.now() - 10 * 86400 * 1000).toISOString().slice(0, 10);
+  const { data: temasData, error: erroTemas } = await aline
+    .from("temas_em_alta")
+    .select("id, manchete, fonte, url, fato, angulo, data_ref")
+    .eq("perfil_id", perfil.id)
+    .is("post_id", null)
+    .is("descartado_em", null)
+    .gte("data_ref", desde)
+    .order("data_ref", { ascending: false })
+    .order("relevancia", { ascending: false })
+    .limit(8);
+  if (erroTemas) console.error("[feed] radar de temas não carregou:", erroTemas.message);
+  const temasRadar: TemaRadar[] = ((temasData ?? []) as Array<{ id: string; manchete: string; fonte: string | null; url: string | null; fato: string; angulo: string; data_ref: string }>)
+    .map((t) => ({ id: t.id, manchete: t.manchete, fonte: t.fonte, url: t.url, fato: t.fato, angulo: t.angulo, data: t.data_ref.split("-").reverse().join("/") }));
+
   const midiaPorPost = new Map<string, string>();
   const videoPorPost = new Map<string, string>();
   const todasMidias = new Map<string, MidiaCard[]>();
@@ -94,6 +111,7 @@ export default async function FeedPage({ params }: PageProps) {
     <Moldura perfil={perfil} cor={cor}>
       <div className="space-y-6">
         <LimparAcervoButton perfilId={perfil.id} quantos={antigos.length} />
+        <EmAltaRadar perfilSlug={perfil.slug} temas={temasRadar} diaPadrao={dataPadraoAmanha()} />
         <TemaEmAltaForm perfilSlug={perfil.slug} diaPadrao={dataPadraoAmanha()} />
         <MontarArtesQueFaltam
           postIds={naGrade

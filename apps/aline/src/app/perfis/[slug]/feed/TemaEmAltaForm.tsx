@@ -41,8 +41,8 @@ export function TemaEmAltaForm({ perfilSlug, diaPadrao }: { perfilSlug: string; 
         onClick={() => setAberto(true)}
         className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm hover:bg-slate-50"
       >
-        <span className="font-semibold text-slate-900">Post de tema em alta</span>
-        <span className="block text-slate-500">Algo que todo mundo está comentando vira um carrossel pela sua leitura.</span>
+        <span className="font-semibold text-slate-900">Escrever um tema eu mesma</span>
+        <span className="block text-slate-500">Se você viu algo que o radar ainda não pegou.</span>
       </button>
     );
   }
