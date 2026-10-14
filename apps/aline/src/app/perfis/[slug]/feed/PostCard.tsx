@@ -57,7 +57,7 @@ export function PostCard({ post, formato }: { post: PostCardDados; formato: "gra
             <p className="text-[11px] font-medium leading-snug text-white line-clamp-2">{post.titulo}</p>
             <p className="mt-0.5 text-[10px] text-white/75">
               {post.data}
-              {post.pilar ? ` · ${post.pilar}` : ""}
+              {post.pilar ? ` · ${post.pilar.replace(/_/g, " ")}` : ""}
             </p>
           </div>
         </button>

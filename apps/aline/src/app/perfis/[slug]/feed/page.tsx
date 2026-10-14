@@ -8,6 +8,8 @@ import {
 import { PostCard, type MidiaCard, type PostCardDados } from "./PostCard";
 import { LimparAcervoButton } from "./LimparAcervoButton";
 import { MontarArtesQueFaltam } from "./MontarArteButton";
+import { TemaEmAltaForm } from "./TemaEmAltaForm";
+import { dataPadraoAmanha } from "@/lib/arte-post/tema-em-alta";
 import { precisaArteNova } from "@/lib/arte-post/molde";
 
 export const dynamic = "force-dynamic";
@@ -92,6 +94,7 @@ export default async function FeedPage({ params }: PageProps) {
     <Moldura perfil={perfil} cor={cor}>
       <div className="space-y-6">
         <LimparAcervoButton perfilId={perfil.id} quantos={antigos.length} />
+        <TemaEmAltaForm perfilSlug={perfil.slug} diaPadrao={dataPadraoAmanha()} />
         <MontarArtesQueFaltam
           postIds={naGrade
             .filter((p) => p.tipo !== "reels" && p.status !== "postado" && p.status !== "gerando" && precisaArteNova(todasMidias.get(p.id) ?? []))
