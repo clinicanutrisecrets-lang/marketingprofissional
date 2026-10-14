@@ -35,7 +35,7 @@ export default async function NarrarPage({
   let aviso: string | null = null;
 
   if (origem === "metodologia") {
-    const v = VIDEOS_METODOLOGIA.find((x) => x.id === ref && !x.temVoz);
+    const v = VIDEOS_METODOLOGIA.find((x) => x.id === ref);
     if (v) {
       titulo = v.titulo;
       videoUrl = v.arquivo;

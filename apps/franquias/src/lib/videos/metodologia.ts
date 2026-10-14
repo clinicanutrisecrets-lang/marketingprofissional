@@ -107,7 +107,7 @@ export const VIDEOS_METODOLOGIA: VideoMetodologia[] = [
       "Intestino, gene e prato numa história só: as bifidobactérias, o gene COMT e um omelete que junta quatro caminhos. Já vem narrado e termina com \"Agende sua consulta\", sem marca de ninguém.",
     comoUsar: [
       "Baixe o vídeo e poste como está: a narração já vem nele.",
-      "Prefere a sua voz? No editor do Instagram, baixe o volume do áudio original pra zero e grave a narração lendo o roteiro abaixo.",
+      "Prefere a sua voz? Toque em Gravar com a minha voz: o roteiro passa na tela junto com o vídeo, e a sua voz entra no lugar da narração original.",
       "Poste com a legenda sugerida.",
     ],
     roteiro: [

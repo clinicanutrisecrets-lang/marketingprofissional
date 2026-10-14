@@ -70,14 +70,12 @@ function CartaoVideo({ v }: { v: VideoMetodologia }) {
       </ol>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {!v.temVoz && (
-          <a
-            href={`/dashboard/narrar?origem=metodologia&ref=${v.id}`}
-            className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white"
-          >
-            🎙️ Gravar narração
-          </a>
-        )}
+        <a
+          href={`/dashboard/narrar?origem=metodologia&ref=${v.id}`}
+          className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white"
+        >
+          🎙️ {v.temVoz ? "Gravar com a minha voz" : "Gravar narração"}
+        </a>
         <a
           href={v.arquivo}
           download

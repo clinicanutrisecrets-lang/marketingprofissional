@@ -52,7 +52,8 @@ async function videoDaOrigem(
   if (origem === "metodologia") {
     const v = VIDEOS_METODOLOGIA.find((x) => x.id === ref);
     if (!v) return { ok: false, msg: "vídeo não encontrado" };
-    if (v.temVoz) return { ok: false, msg: "este vídeo já vem narrado" };
+    // Vídeo já narrado também aceita a voz dela: o worker (narrar-video.yml)
+    // usa só a imagem do vídeo e põe a narração nova no lugar do áudio original.
     const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.scannerdasaude.com";
     return { ok: true, videoUrl: `${base}${v.arquivo}` };
   }
