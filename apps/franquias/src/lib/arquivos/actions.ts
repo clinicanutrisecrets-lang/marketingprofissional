@@ -2,6 +2,8 @@
 
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { descreverEGravarFoto } from "./descrever-foto";
+import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
 
 export type TipoArquivo =
   | "logo_principal"
@@ -105,6 +107,17 @@ export async function uploadArquivo(
     // pra não quebrar o fluxo. Eles serão adicionados em migration separada.
   }
 
+  // Foto do banco: o sistema descreve o que aparece nela pra escolher o slide
+  // em que ela combina (Aline, 14/10/2026). Espera no máximo 20 s: sem
+  // `after()` neste Next, promessa solta seria descartada. Se não der tempo,
+  // a montagem da semana descreve depois.
+  if ((TIPOS_FOTO_BANCO as readonly string[]).includes(tipo) && registro?.id) {
+    await Promise.race([
+      descreverEGravarFoto({ id: registro.id as string, url_storage: url, franqueada_id: franqueadaId }),
+      new Promise((r) => setTimeout(r, 20000)),
+    ]).catch(() => null);
+  }
+
   revalidatePath("/onboarding");
   revalidatePath("/dashboard");
 
@@ -167,7 +180,7 @@ export async function listarArquivos(tipo?: TipoArquivo) {
 
   let query = supabase
     .from("arquivos_franqueada")
-    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em")
+    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em, descricao_auto, assuntos")
     .eq("franqueada_id", franqueada.id)
     .order("criado_em", { ascending: false });
 
