@@ -332,6 +332,29 @@ export function revisarCopy(texto: string, ctx: ContextoRevisao = {}): AchadoRev
     });
   }
 
+  // Português por extenso (Aline, 14/10/2026: "não é pra nada ficar
+  // abreviado, tipo tá ao invés de está"). A geração já troca sozinha; aqui
+  // pega o que entrar pela edição. Casa no texto ORIGINAL (com acento): sem
+  // acento, "pró" viraria "pro".
+  const reAbrev = new RegExp(`${ANTES}(tá|tás|tava|tavam|tô|pra|pras|pro|pros|cê|vc|vcs|tb|tbm|né|pq)${DEPOIS}`, "giu");
+  for (const m of texto.matchAll(reAbrev)) {
+    const forma = m[0].toLowerCase();
+    const certo: Record<string, string> = {
+      "tá": "está", "tás": "estás", tava: "estava", tavam: "estavam", "tô": "estou",
+      pra: "para", pras: "para as", pro: "para o", pros: "para os",
+      "cê": "você", vc: "você", vcs: "vocês", tb: "também", tbm: "também",
+      "né": "(tire ou reescreva a frase)", pq: "porque / por que",
+    };
+    add({
+      regra: "abreviado",
+      gravidade: "erro",
+      // A palavra sozinha: num texto curto as janelas se sobrepõem e o
+      // dedup por trecho juntaria "tá" e "tava" num aviso só.
+      trecho: m[0],
+      motivo: `Escreva por extenso: "${m[0]}" vira "${certo[forma] ?? "a forma completa"}".`,
+    });
+  }
+
   // Gancho morto: só conta na ABERTURA, que é onde ele mata o post. No meio
   // do texto "você sabia" é conversa normal.
   const abertura = texto.trim().slice(0, 120);

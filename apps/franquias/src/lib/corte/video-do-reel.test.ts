@@ -26,8 +26,35 @@ test("o clipe mais ligado ao assunto vence; empate vai pro clipe em pé e da bib
     palavras,
   );
   assert.equal(r?.id, "c");
-  const empate = escolherClipe([c("x", {}), c("y", { origem: "biblioteca" })], palavras);
+  const empate = escolherClipe([c("x", { tags: ["sono"] }), c("y", { tags: ["sono"], origem: "biblioteca" })], palavras);
   assert.equal(empate?.id, "y");
+});
+
+test("a frase do vídeo escolhe a imagem: bactéria pede o clipe de bactérias (Aline, 14/10)", () => {
+  const clipes = [
+    c("pao", { titulo: "Mãos sovando massa de pão" }),
+    c("bac", { titulo: "Bactérias ao microscópio", tags: ["microbiota", "intestino"] }),
+  ];
+  const r = escolherClipe(clipes, palavrasDoAssunto(["Essa bactéria no seu intestino pode ser a causa do seu cansaço"]));
+  assert.equal(r?.id, "bac");
+});
+
+test("clipe que não mostra nada da frase NÃO entra: melhor sem vídeo que vídeo sem sentido", () => {
+  const clipes = [c("pao", { titulo: "Mãos sovando massa de pão" }), c("dna", { titulo: "Hélice de DNA dourada" })];
+  assert.equal(escolherClipe(clipes, palavrasDoAssunto(["Você não está exagerando."])), null);
+});
+
+test("clipe já usado só perde o EMPATE, nunca passa na frente de um que mostra a frase", () => {
+  const clipes = [c("usado", { titulo: "Bactérias ao microscópio" }), c("novo", { titulo: "Mãos sovando massa de pão" })];
+  const r = escolherClipe(clipes, palavrasDoAssunto(["Bactéria no intestino"]), new Set(["usado"]));
+  assert.equal(r?.id, "usado");
+});
+
+test("a frase escrita para o vídeo vence o gancho do reel", () => {
+  assert.equal(
+    fraseDoReel({ frase: "Essa bactéria no seu intestino pode ser a causa do seu cansaço", headline: "Você não está exagerando." }),
+    "Essa bactéria no seu intestino pode ser a causa do seu cansaço",
+  );
 });
 
 test("clipe curto demais fica de fora; biblioteca vazia devolve null", () => {

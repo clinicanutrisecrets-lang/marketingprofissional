@@ -88,9 +88,13 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "- A headline é o que faz a pessoa PARAR. A legenda é o que faz ela FICAR.",
     "",
     "CTAs:",
-    "- CTA fraco: 'Agende sua consulta'. CTA forte: 'Seu corpo tá pedindo essa avaliação.'",
+    "- CTA fraco: 'Agende sua consulta'. CTA forte: 'Seu corpo está pedindo essa avaliação.'",
     "- Conecte o CTA com a DOR ou o DESEJO que o post despertou.",
-    "- Varie: nem todo post precisa vender. Alguns CTAs são 'salva pra lembrar', 'manda pra alguém que precisa ouvir isso', 'comenta se você também'.",
+    "- Varie: nem todo post precisa vender. Alguns CTAs são 'salve para lembrar', 'mande para alguém que precisa ouvir isso', 'comente se você também'.",
+    "- Quando o CTA convida a agir (agendar, conhecer o teste, baixar o material), o caminho é o LINK NA BIO: ele leva às páginas da profissional. Prefira 'link na bio' a 'me chama no direct' (o direct fica para pedido explícito da semana, como caixinha de perguntas). NUNCA nomeie a ferramenta do link (linktree ou qualquer outra): é só 'link na bio'.",
+    "",
+    "PORTUGUÊS POR EXTENSO (inegociável):",
+    "- Nada abreviado nem coloquial: 'está' (nunca 'tá'), 'estava' (nunca 'tava'), 'estou' (nunca 'tô'), 'para' (nunca 'pra'/'pro'), 'você' (nunca 'cê'/'vc'), 'também' (nunca 'tb'). Vale para arte, legenda, roteiro e CTA. O tom é próximo pela escolha das palavras, não pela grafia.",
     "",
     "CARROSSEIS (tipo feed_carrossel):",
     "- Slide 1: hook IMPACTANTE e ÉTICO — é a capa, tem que parar o scroll. Nunca comece com título explicativo.",
@@ -108,8 +112,8 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "",
     "STORIES:",
     "- Intimidade, bastidor, enquete, caixa de perguntas.",
-    "- Tom ainda mais informal que feed.",
-    "- Máximo 2 frases por story. Visual clean.",
+    "- Tom ainda mais próximo que no feed (sem abreviar palavra).",
+    "- Story NÃO tem legenda: TODO o texto que a pessoa lê está na ARTE (headline + subtitle). Máximo 2 frases por story. Visual clean.",
     "",
     "ÉTICA PROFISSIONAL (inegociável):",
     "- Somos profissionais de SAÚDE. Cada palavra tem peso clínico e ético.",
@@ -182,7 +186,7 @@ function blocoProdutos(produtos: ProdutoContexto[]): string[] {
     "- NUNCA inventar produto, preço, desconto, condição de pagamento ou link. Só o que está listado abaixo, exatamente como está.",
     "- Se o preço não estiver listado, NÃO citar preço.",
     "- O NOME do produto é marca própria registrada da nutri: quando citar, cite VERBATIM — nome próprio de produto não conta como vocabulário comercial proibido (ex.: um produto chamado 'Protocolo X' pode ser citado pelo nome, mas a palavra 'protocolo' segue proibida fora do nome do produto).",
-    "- Em legenda de Instagram, link não é clicável: chame pro 'link na bio' ou direct. O checkout_url exato só entra quando o formato pedir o link por extenso (copy_cta, bio, stories com link).",
+    "- Em legenda de Instagram, link não é clicável: chame para o 'link na bio' (nunca nomeie a ferramenta do link). O checkout_url exato só entra quando o formato pedir o link por extenso (copy_cta, bio, stories com link).",
     "",
     ...produtos.map((p) => {
       const partes = [p.nome];
@@ -318,12 +322,15 @@ INSTRUÇÕES REELS:
 - Script conversacional, como se falasse com uma amiga inteligente.
 - Ritmo: afirmação forte → contexto rápido → virada → CTA falado.
 - 30 a 45 segundos de fala (80 a 120 palavras). Nada de "[pausa]", marcação de cena, numeração ou rótulo de bloco: tudo que estiver no campo vai ser lido em voz alta.
-- A legenda (copy_legenda) é outro texto, pra ir escrita embaixo do vídeo: não repita o roteiro nela.`
+- A legenda (copy_legenda) é outro texto, pra ir escrita embaixo do vídeo: não repita o roteiro nela.
+- O campo "frase_video" é a frase escrita por cima de um vídeo curto de 6 segundos, SEM áudio, que a pessoa lê sem ter visto nada antes. Ela precisa se explicar sozinha e NOMEAR o que aparece na imagem. Ex.: "Essa bactéria no seu intestino pode ser a causa do seu cansaço". Nunca frase que depende de contexto ("Você não está exagerando.", "Isso muda tudo."). Até 90 caracteres, sem abreviar palavra. Se o contexto trouxer "ASSUNTOS QUE A BIBLIOTECA DE VÍDEOS MOSTRA", a frase fala de UM deles.`
       : isStories
         ? `
 INSTRUÇÕES STORIES:
-- Tom íntimo, bastidor, informal.
-- Máx 2 frases. Visual clean.
+- Tom íntimo, bastidor, próximo (sem abreviar palavra).
+- Story NÃO tem legenda no Instagram: a mensagem INTEIRA vai na arte. "headline" é a frase principal (até 50 caracteres) e "subtitle" completa a ideia (até 140 caracteres). Quem lê só a arte entende tudo.
+- "copy_legenda" fica VAZIO ("") no story. Nada que a pessoa precise ler pode ficar fora da arte.
+- Máx 2 frases no total. Visual clean.
 - Pode sugerir enquete ou caixa de perguntas no campo "interacao_sugerida".`
         : `
 INSTRUÇÕES FEED IMAGEM:
@@ -335,7 +342,8 @@ INSTRUÇÕES FEED IMAGEM:
   "slides": ["texto slide 1 (capa/hook)", "texto slide 2", "texto slide 3", "...", "texto slide final (CTA)"]`
     : isReels
       ? `,
-  "script_reels": "o texto corrido que a profissional fala no teleprompter (80 a 120 palavras, sem marcação de cena)"`
+  "script_reels": "o texto corrido que a profissional fala no teleprompter (80 a 120 palavras, sem marcação de cena)",
+  "frase_video": "a frase do vídeo curto de 6 segundos: se explica sozinha e nomeia o que aparece na imagem (até 90 caracteres)"`
       : isStories
         ? `,
   "interacao_sugerida": "enquete, caixa de perguntas, ou quiz (opcional)"`

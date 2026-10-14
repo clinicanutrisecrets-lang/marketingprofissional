@@ -11,7 +11,6 @@ import {
   aprovarSemanaToda,
   atualizarCopyPost,
   cancelarPost,
-  gerarSemanaManual,
   gerarPostSubstituto,
 } from "@/lib/posts/actions";
 import { formatDate } from "@/lib/utils";
@@ -76,7 +75,6 @@ export function AprovacaoView({
   const [isPending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [gerando, setGerando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
   const [aprovadaAgora, setAprovadaAgora] = useState(false);
   const [baixandoTudo, setBaixandoTudo] = useState<string | null>(null);
@@ -90,40 +88,15 @@ export function AprovacaoView({
         <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
           <div className="mb-3 text-5xl">📭</div>
           <h2 className="mb-2 text-xl font-semibold">
-            Nenhuma semana pra revisar agora
+            Nenhuma semana para revisar agora
           </h2>
-          <p className="mb-6 text-sm text-brand-text/60">
-            Todo domingo de manhã o Scanner monta o pacote da semana e ele
-            aparece aqui. Se quiser antecipar, monte agora.
+          {/* Sem botão de "montar agora" (Aline, 14/10/2026): o pacote é
+              preparado e chega no domingo, não sai na hora com um clique.
+              Quando precisa antecipar, o time monta pelo admin. */}
+          <p className="text-sm text-brand-text/60">
+            Todo domingo de manhã o pacote da semana chega aqui, pronto para
+            você revisar.
           </p>
-          <button
-            type="button"
-            disabled={gerando}
-            onClick={async () => {
-              setGerando(true);
-              setErro(null);
-              setMsg(null);
-              const r = await gerarSemanaManual();
-              setGerando(false);
-              if (r.ok) {
-                setMsg(`${r.total} posts gerados! Carregando...`);
-                setTimeout(() => window.location.reload(), 500);
-              } else if (r.jaExiste) {
-                // Semana já montada não é erro: é a semana dela, em outro
-                // lugar da tela. Manda ela pra lá em vez de acusar falha.
-                setErro(null);
-                setMsg(r.erro ?? null);
-                setTimeout(() => window.location.reload(), 2500);
-              } else {
-                setErro(r.erro ?? "Não deu pra montar a semana agora.");
-              }
-            }}
-            className="rounded-lg bg-brand-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-primary/90 disabled:opacity-60"
-          >
-            {gerando ? "Montando a semana (1 a 3 min)..." : "📅 Montar a semana agora"}
-          </button>
-          {msg && <div className="mt-3 text-sm text-brand-text/70">{msg}</div>}
-          {erro && <div className="mt-3 text-sm text-red-600">{erro}</div>}
         </div>
       </>
     );

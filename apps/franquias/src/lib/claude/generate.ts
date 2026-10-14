@@ -21,6 +21,8 @@ export type PostGerado = {
   subtitle?: string;
   /** Reels: o roteiro falado que o modelo escreveu (lido no teleprompter). */
   script_reels?: string;
+  /** A frase do vídeo curto de 6 s (b-roll): se explica sozinha e nomeia a imagem. */
+  frase_video?: string;
   /** Stories: enquete/caixinha que o modelo sugeriu (ela põe por cima). */
   interacao_sugerida?: string;
   copy_legenda: string;

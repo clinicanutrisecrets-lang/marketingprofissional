@@ -60,7 +60,7 @@ test("só post em revisão, ainda não publicado e com arte do desenhador", () =
 test("ligação: a geração guarda o texto, a ação confere dono e a tela mostra o botão", () => {
   const semanal = readFileSync("src/lib/geracao/semanal.ts", "utf8");
   assert.match(semanal, /textoArte = slides;/);
-  assert.match(semanal, /textoArte = \[conteudoDaArteUnica\(post\)\];/);
+  assert.match(semanal, /textoArte = \[conteudoDaArteUnica\(post, item\.tipo\)\];/);
   assert.match(semanal, /texto_arte: textoArte, foto_arte_ref: fotoArteRef/);
   const actions = readFileSync("src/lib/posts/actions.ts", "utf8");
   const acao = actions.slice(actions.indexOf("export async function redesenharArteComTexto"));
