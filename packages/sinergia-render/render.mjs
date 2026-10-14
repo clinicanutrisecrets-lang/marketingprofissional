@@ -52,6 +52,54 @@ const browser = await puppeteer().launch({
   args: ['--no-sandbox', '--allow-file-access-from-files'],
 })
 const page = await browser.newPage()
+
+// Logo com margem vazia (PNG quadrado de 2160 px com a marca numa faixa do
+// meio, caso Mariana 14/10/2026) encolhia até sumir no selo da capa. Corta a
+// margem transparente ou branca antes de montar os quadros. Falha em qualquer
+// passo mantém a logo original: logo pequena é melhor que post sem logo.
+if (payload.marca?.logo_url && /^https?:/.test(payload.marca.logo_url)) {
+  try {
+    const r = await fetch(payload.marca.logo_url)
+    if (r.ok) {
+      const tipo = r.headers.get('content-type') || 'image/png'
+      const dataUri = `data:${tipo};base64,${Buffer.from(await r.arrayBuffer()).toString('base64')}`
+      await page.goto('about:blank')
+      const aparada = await page.evaluate(async (src) => {
+        const img = new Image()
+        img.src = src
+        await img.decode()
+        const c = document.createElement('canvas')
+        c.width = img.naturalWidth
+        c.height = img.naturalHeight
+        const ctx = c.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const { data, width: w, height: h } = ctx.getImageData(0, 0, c.width, c.height)
+        let x0 = w, y0 = h, x1 = -1, y1 = -1
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const i = (y * w + x) * 4
+            const vazio = data[i + 3] < 16 || (data[i] > 245 && data[i + 1] > 245 && data[i + 2] > 245)
+            if (!vazio) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
+          }
+        }
+        if (x1 < 0) return null
+        const m = Math.round(Math.max(x1 - x0, y1 - y0) * 0.04)
+        x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m)
+        x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m)
+        if (x1 - x0 > w * 0.9 && y1 - y0 > h * 0.9) return null
+        const o = document.createElement('canvas')
+        o.width = x1 - x0 + 1
+        o.height = y1 - y0 + 1
+        o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height)
+        return o.toDataURL('image/png')
+      }, dataUri)
+      if (aparada) payload.marca.logo_url = aparada
+    }
+  } catch (e) {
+    console.warn('logo sem corte de margem:', e.message)
+  }
+}
+
 const tmp = path.join(saida, '_quadro.html')
 const feitos = []
 try {
