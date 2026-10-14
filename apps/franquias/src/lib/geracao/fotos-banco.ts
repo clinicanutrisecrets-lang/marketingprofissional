@@ -21,7 +21,18 @@ export const TIPOS_FOTO_BANCO = [
   "foto_clinica",
   "foto_atendimento",
   "foto_profissional",
+  "foto_comida",
 ] as const;
+
+/**
+ * Foto de comida não passa pela leitura automática (Aline, 14/10/2026): é ali
+ * que ela erra (acerola lida como tomate), não há rosto pra proteger no corte,
+ * e quem sabe o que é o prato é a profissional, que escreve o nome. As fotos
+ * dela e do consultório continuam sendo lidas: é a leitura que acha o rosto.
+ */
+export function precisaLeituraAutomatica(tipo: string | null | undefined): boolean {
+  return tipo !== "foto_comida";
+}
 
 export type FotoDoBanco = { id: string; url_storage: string };
 
@@ -89,6 +100,7 @@ export function assuntosDoTipo(tipo: string | null | undefined): AssuntoFoto[] {
   if (tipo === "foto_atendimento") return ["atendimento", "profissional"];
   if (tipo === "foto_profissional") return ["profissional"];
   if (tipo === "foto_clinica") return ["consultorio"];
+  if (tipo === "foto_comida") return ["prato", "ingrediente", "cozinha"];
   return [];
 }
 
@@ -124,7 +136,22 @@ export type FotoComAssuntos = {
   tipo?: string | null;
   assuntos?: string[] | null;
   foco_y?: number | string | null;
+  /** O que a profissional escreveu sobre a foto ("suco de acerola"). */
+  descricao?: string | null;
 };
+
+const PALAVRAS_VAZIAS = new Set(["com", "sem", "para", "pra", "uma", "umas", "uns", "dos", "das", "meu", "minha", "feito", "feita", "receita", "prato"]);
+
+/** As palavras do nome que ela escreveu e que valem pra casar com o texto. */
+export function palavrasDoNome(nome: string | null | undefined): string[] {
+  return [
+    ...new Set(
+      semAcento(nome ?? "")
+        .split(/[^a-z0-9]+/)
+        .filter((p) => p.length >= 4 && !PALAVRAS_VAZIAS.has(p)),
+    ),
+  ];
+}
 
 /** Todos os assuntos de uma foto: os do tipo + os da descrição. */
 export function assuntosDaFoto(f: FotoComAssuntos): AssuntoFoto[] {
@@ -145,7 +172,8 @@ export function melhorFotoParaTexto<T extends FotoComAssuntos>(
   exigir?: AssuntoFoto[],
 ): T | null {
   const pede = assuntosDoTexto(texto);
-  if (pede.length === 0 && !exigir?.length) return null;
+  const algumNome = fotos.some((f) => palavrasDoNome(f.descricao).length > 0);
+  if (pede.length === 0 && !exigir?.length && !algumNome) return null;
   let melhor: T | null = null;
   let melhorNota = 0;
   for (const f of fotos) {
@@ -157,6 +185,10 @@ export function melhorFotoParaTexto<T extends FotoComAssuntos>(
       if (tem.includes(a)) nota += pede.length - i;
     });
     if (exigir?.length) nota += 1;
+    // O texto do slide cita o que está na foto ("acerola"): essa foto vence.
+    const t = ` ${semAcento(texto ?? "").replace(/[^a-z0-9]+/g, " ")} `;
+    const citadas = palavrasDoNome(f.descricao).filter((p) => t.includes(` ${p} `) || t.includes(` ${p}s `)).length;
+    if (citadas) nota += 10 * citadas;
     if (nota > melhorNota) {
       melhor = f;
       melhorNota = nota;

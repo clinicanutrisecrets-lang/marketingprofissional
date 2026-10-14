@@ -61,6 +61,7 @@ import {
   tipoLevaFotoDoBanco,
   melhorFotoParaTexto,
   focoDaFoto,
+  precisaLeituraAutomatica,
   type FotoDoBanco,
   type FotoComAssuntos,
   type AssuntoFoto,
@@ -250,7 +251,7 @@ export async function gerarPostsDaSemana(
   // Falha ao ler ou baixar nunca derruba o pacote: o post sai sem foto.
   const { data: bancoRaw, error: bancoErr } = await admin
     .from("arquivos_franqueada")
-    .select("id, url_storage, tipo, assuntos, foco_y, descrito_em")
+    .select("id, url_storage, tipo, assuntos, foco_y, descrito_em, descricao")
     .eq("franqueada_id", franqueadaId)
     .in("tipo", [...TIPOS_FOTO_BANCO])
     .order("criado_em", { ascending: true });
@@ -259,7 +260,7 @@ export async function gerarPostsDaSemana(
   const banco = (bancoRaw ?? []) as FotoBanco[];
   // Foto sem descrição (subida antes de 14/10, ou que estourou o tempo no
   // envio) é descrita agora, uma vez só: no máximo 6 por montagem.
-  for (const f of banco.filter((x) => !x.descrito_em).slice(0, 6)) {
+  for (const f of banco.filter((x) => !x.descrito_em && precisaLeituraAutomatica(x.tipo)).slice(0, 6)) {
     const d = await descreverEGravarFoto({ id: f.id, url_storage: f.url_storage, franqueada_id: franqueadaId });
     if (d) Object.assign(f, { assuntos: d.assuntos, foco_y: d.foco_y, descrito_em: new Date().toISOString() });
   }

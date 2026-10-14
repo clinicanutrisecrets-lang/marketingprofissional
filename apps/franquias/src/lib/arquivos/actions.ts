@@ -14,6 +14,7 @@ export type TipoArquivo =
   | "foto_clinica"
   | "foto_atendimento"
   | "foto_post"
+  | "foto_comida"
   | "depoimento_print"
   | "depoimento_video"
   | "certificado"
@@ -111,7 +112,15 @@ export async function uploadArquivo(
   // em que ela combina (Aline, 14/10/2026). Espera no máximo 20 s: sem
   // `after()` neste Next, promessa solta seria descartada. Se não der tempo,
   // a montagem da semana descreve depois.
-  if ((TIPOS_FOTO_BANCO as readonly string[]).includes(tipo) && registro?.id) {
+  // Foto de comida não é lida (precisaLeituraAutomatica): fica marcada como
+  // vista, e o nome que ela escrever é o que vale.
+  if (tipo === "foto_comida" && registro?.id) {
+    const { error: marcaErr } = await createAdminClient()
+      .from("arquivos_franqueada")
+      .update({ descrito_em: new Date().toISOString() } as never)
+      .eq("id", registro.id as string);
+    if (marcaErr) console.warn("[arquivos] foto de comida não marcada:", marcaErr.message);
+  } else if ((TIPOS_FOTO_BANCO as readonly string[]).includes(tipo) && registro?.id) {
     await Promise.race([
       descreverEGravarFoto({ id: registro.id as string, url_storage: url, franqueada_id: franqueadaId }),
       new Promise((r) => setTimeout(r, 20000)),
@@ -180,7 +189,7 @@ export async function listarArquivos(tipo?: TipoArquivo) {
 
   let query = supabase
     .from("arquivos_franqueada")
-    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em, descricao_auto, assuntos")
+    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em, descricao_auto, assuntos, descricao")
     .eq("franqueada_id", franqueada.id)
     .order("criado_em", { ascending: false });
 
@@ -188,4 +197,38 @@ export async function listarArquivos(tipo?: TipoArquivo) {
 
   const { data } = await query;
   return data ?? [];
+}
+
+/**
+ * O nome que a profissional dá a uma foto ("suco de acerola"). Vale mais que a
+ * leitura automática: aparece na tela e faz a foto ir pro slide que cita o
+ * que ela mostra. Texto vazio apaga o nome.
+ */
+export async function nomearFoto(
+  arquivoId: string,
+  nome: string,
+): Promise<{ ok: boolean; erro?: string }> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Não autenticado" };
+  const { data: franqueada } = await supabase
+    .from("franqueadas")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (!franqueada?.id) return { ok: false, erro: "Conta não encontrada" };
+
+  const limpo = String(nome ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
+  const { data, error } = await createAdminClient()
+    .from("arquivos_franqueada")
+    .update({ descricao: limpo || null } as never)
+    .eq("id", arquivoId)
+    .eq("franqueada_id", franqueada.id)
+    .select("id");
+  if (error) return { ok: false, erro: "Não consegui salvar. Tente de novo." };
+  if (!data?.length) return { ok: false, erro: "Foto não encontrada" };
+  revalidatePath("/dashboard/fotos");
+  return { ok: true };
 }
