@@ -46,53 +46,58 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do emagrecimento (FTO)",
     molde: `${BASE}/fto.html`,
     poster: `${BASE}/fto.jpg`,
-    versao: 1,
-    duracaoSeg: 103.6,
+    versao: 2,
+    duracaoSeg: 110.1,
     resumo:
       "O gene FTO explicado de um jeito simples: a letrinha de risco, a proteína que mexe no apetite e como a alimentação ajuda a deixar o gene mais quieto.",
     roteiro: [
-      { de: 0, ate: 5, texto: "Você sabia que existe um gene ligado ao emagrecimento? Ele se chama FTO." },
       {
-        de: 5,
-        ate: 20.7,
+        de: 0,
+        ate: 11.5,
+        texto:
+          "Por que algumas pessoas sentem que nunca se saciam? A resposta pode estar num gene, o FTO, o gene do emagrecimento. E a alimentação ajuda a ligar ou desligar esse gene.",
+      },
+      {
+        de: 11.5,
+        ate: 27.2,
         texto:
           "Este é o gene FTO. Ele tem uma letrinha que muda de uma pessoa para outra. A letra A é a de risco. Mas ter a letra A não é sentença: o corpo pode colar etiquetinhas no gene.",
       },
       {
-        de: 20.7,
-        ate: 36.4,
+        de: 27.2,
+        ate: 42.9,
         texto:
           "Para trabalhar, o gene precisa ser lido. Uma leitora passa por ele e faz uma cópia, que vira um recadinho. Esse recadinho sai do núcleo e chega numa fábrica, que monta a proteína FTO.",
       },
       {
-        de: 36.4,
-        ate: 47.6,
+        de: 42.9,
+        ate: 54.1,
         texto: "E a proteína FTO mexe no seu apetite. Quanto mais FTO, mais fome e menos saciedade. E mais gordura guardada.",
       },
       {
-        de: 47.6,
-        ate: 56.6,
+        de: 54.1,
+        ate: 63.1,
         texto: "Agora vem a parte boa: a comida ajuda. Folhas verdes, peixes e ovos trazem folato, B12 e colina, a matéria-prima das etiquetas.",
       },
       {
-        de: 56.6,
-        ate: 67.2,
+        de: 63.1,
+        ate: 73.7,
         texto: "Quem cola as etiquetas no gene é a etiquetadora. Ela pega uma etiqueta da caixinha, que a alimentação abasteceu, e cola direto no gene.",
       },
       {
-        de: 67.2,
-        ate: 78.4,
+        de: 73.7,
+        ate: 84.9,
         texto: "Com as etiquetas, a leitora trava. Ela tenta passar, mas não consegue ler. O gene fica quietinho, e a letra A de risco também fica quieta.",
       },
       {
-        de: 78.4,
-        ate: 87.9,
+        de: 84.9,
+        ate: 94.4,
         texto: "Outros alimentos também são aliados: chá verde, cúrcuma, soja, uva e brócolis. Eles ajudam a manter o equilíbrio.",
       },
-      { de: 87.9, ate: 94.6, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      { de: 94.4, ate: 101.1, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
       {
-        de: 94.6,
-        ate: 103.6,
+        de: 101.1,
+        ate: 110.1,
         texto: "E as suas letrinhas, quais são? São mais de vinte genes ligados ao emagrecimento. Faça o seu teste nutrigenético e descubra.",
       },
     ],
@@ -109,7 +114,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do sono (CLOCK)",
     molde: `${BASE}/clock.html`,
     poster: `${BASE}/clock.jpg`,
-    versao: 1,
+    versao: 2,
     duracaoSeg: 118.7,
     resumo:
       "O gene CLOCK e o relógio do corpo: por que a letra de risco atrasa o sono e a fome, e como o horário das refeições, a luz e a alimentação ajudam.",

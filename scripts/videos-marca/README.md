@@ -5,13 +5,13 @@ Os moldes vêm do Claude Design (HTML "bundled": o template mora num
 em base64 + gzip). Antes de ir pra `apps/franquias/public/videos-marca/`
 eles passam por um ajuste:
 
-- `patch_fto.py <FTO_Marca.html> <saida>`: põe a cor padrão no COL (sem ela o
-  molde quebrava ao abrir sem `?primaria=`) e desliga legenda e editor.
-- `patch_clock.py <Gene_CLOCK.html> <saida>`: o CLOCK veio sem marca; copia o
-  prelúdio de marca do FTO (precisa do FTO desempacotado em `fto/res/` com
-  `unpack.py`), troca tiffany/roxo e as tintas pelas cores da marca, troca a
-  logo fixa por `LOGO()` e desliga legenda e editor. Sol, laranja, vermelho e
-  amarelo ficam como estão.
+- `patch_marca.py <entrada.html> <saida.html> <uuid do .jsx standalone>`:
+  adapta um vídeo feito SEM marca (o FTO lúdico e o CLOCK vieram assim).
+  Põe o prelúdio de marca (`preludio_marca.js`: lê `?primaria=&secundaria=&logo=`
+  e deriva as tintas), troca tiffany/roxo, as tintas e os degradês pelas cores
+  da marca, troca a logo fixa por `LOGO()` e desliga legenda e editor. Sol,
+  laranja, vermelho, amarelo e as cores da comida ficam como estão. O uuid é o
+  do `*-standalone.jsx` que aparece no `x-import` do template (`unpack.py` mostra).
 - `repack.py`: lê e regrava o bundle. 🔴 Ao regravar o JSON, `</` vira
   `</`, senão o `</script>` dentro do template fecha o bloco e o molde
   não abre.
