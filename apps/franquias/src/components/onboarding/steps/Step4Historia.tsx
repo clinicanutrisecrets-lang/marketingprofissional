@@ -7,7 +7,7 @@ export function Step4Historia({ dados, atualizar }: StepFormProps) {
   return (
     <FormWrapper
       title="Sua história"
-      descricao="Esses textos viram matéria-prima pra IA gerar copy autêntico."
+      descricao="Esses textos viram matéria-prima pro Scanner escrever um conteúdo com a sua cara."
     >
       <TextArea
         label="Por que você escolheu ser nutricionista?"
