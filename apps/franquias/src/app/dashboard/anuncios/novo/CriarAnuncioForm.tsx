@@ -7,6 +7,7 @@ import { criarAnuncioDraft, buscarBenchmark } from "@/lib/anuncios/actions";
 import type { ObjetivoNegocio } from "@/lib/meta/ads";
 import { gerarRoteiroAnuncio } from "./actions";
 import type { RoteiroVideo } from "@/lib/agentes/roteiro-video";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 const OBJETIVOS: Array<{
   value: ObjetivoNegocio;
@@ -171,7 +172,7 @@ export function CriarAnuncioForm({
           onChange={setFunilId}
           options={funis.map((f) => ({
             value: f.id,
-            label: `${f.nome} (${f.tipo.replace(/_/g, " ")})`,
+            label: `${f.nome} (${rotuloDeId(f.tipo)})`,
           }))}
           hint={
             funilSelecionado?.wa_numero
@@ -289,7 +290,7 @@ export function CriarAnuncioForm({
           <div className="mt-4 space-y-3 rounded-xl bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-brand-text">
-                Roteiro {roteiro.formato.replace(/_/g, " ")} ({roteiro.duracao_segundos}s)
+                Roteiro {rotuloDeId(roteiro.formato)} ({roteiro.duracao_segundos}s)
               </span>
             </div>
             <div>

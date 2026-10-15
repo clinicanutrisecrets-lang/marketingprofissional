@@ -81,7 +81,7 @@ export default async function AprovacaoIndexPage() {
         </Link>
 
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-aline-text">Aprovacao de pacotes semanais</h1>
+          <h1 className="text-3xl font-bold text-aline-text">Aprovação de pacotes semanais</h1>
           <p className="mt-2 text-sm text-aline-text/60">
             Toda quinta o sistema gera automaticamente o pack da semana seguinte.
             Voce tambem pode gerar a qualquer hora pelo botao abaixo (lancamentos,
@@ -105,7 +105,7 @@ export default async function AprovacaoIndexPage() {
             </p>
             <p className="mt-2 text-xs">
               Causa provavel:{" "}
-              <strong>schema &quot;aline&quot; nao esta exposto</strong> na API
+              <strong>schema &quot;aline&quot; não está exposto</strong> na API
               do Supabase. Verifica em: Dashboard Supabase → Project Settings →
               Data API → Exposed schemas → adicionar <code>aline</code> →
               salvar.
@@ -119,7 +119,7 @@ export default async function AprovacaoIndexPage() {
 
         {semanasPendentes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-aline-text/20 bg-white p-10 text-center">
-            <p className="text-aline-text/60">Nenhum pacote aguardando aprovacao agora.</p>
+            <p className="text-aline-text/60">Nenhum pacote aguardando aprovação agora.</p>
             <p className="mt-2 text-xs text-aline-text/40">
               Use o botao acima pra gerar agora ou espere a proxima quinta as 9h.
             </p>

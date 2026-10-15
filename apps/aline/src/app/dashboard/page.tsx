@@ -144,7 +144,7 @@ export default async function DashboardPage() {
           <div className="grid gap-3 md:grid-cols-3">
             <ActionCard
               icone="✅"
-              titulo="Aprovacao semanal"
+              titulo="Aprovação semanal"
               descricao="Revisar e aprovar pack de posts da semana"
               href="/aprovacao"
               disponivel={true}
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
             <ActionCard
               icone="💸"
               titulo="Custos de IA"
-              descricao="Gasto com Claude + OpenAI por mes"
+              descricao="Gasto com Claude + OpenAI por mês"
               href="/dashboard/custos"
               disponivel={true}
             />

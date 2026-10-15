@@ -27,7 +27,7 @@ Saída: APENAS JSON válido.
 
 Schema:
 {
-  "padroes_conteudo_prende": [{"padrao": "texto", "evidencia": "posts X, Y — metrica Z"}],
+  "padroes_conteudo_prende": [{"padrao": "texto", "evidencia": "posts X, Y — métrica Z"}],
   "padroes_conteudo_converte": [{"padrao": "texto", "evidencia": "posts X tiveram muitos saves/compartilhamentos"}],
   "erros_recorrentes": [{"erro": "texto", "impacto": "por que afeta performance"}],
   "temas_saturados": ["tema 1", "tema 2"],

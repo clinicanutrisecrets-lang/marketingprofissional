@@ -28,6 +28,7 @@
 import type { AnguloPost, TipoPost } from "@/lib/claude/prompts";
 import type { NivelConsciencia } from "@/lib/claude/consciencia";
 import { COLETA_PRESENCIAL_OU_KIT, estruturaCarrosselConsulta, regraConsultaInclui } from "./consulta-teste.ts";
+import { rotuloNicho } from "../texto/rotulos.ts";
 
 export const SEMANAS_DA_JORNADA = 4;
 
@@ -430,7 +431,7 @@ function rodadaDaJornada(semanaRef?: string): number {
 export function queixasDaRodada(queixas: string[] | null | undefined, nicho: string, semanaRef?: string): [string, string] {
   const curtas = (queixas ?? []).map((q) => q.trim()).filter((q) => q.length > 0 && q.length <= 60);
   if (curtas.length === 0) {
-    const n = nicho.replace(/_/g, " ");
+    const n = rotuloNicho(nicho);
     return [`a queixa mais comum de quem procura ${n}`, `outra queixa comum de quem procura ${n}`];
   }
   if (curtas.length === 1) return [curtas[0]!, curtas[0]!];

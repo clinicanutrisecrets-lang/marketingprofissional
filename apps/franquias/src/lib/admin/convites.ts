@@ -201,7 +201,7 @@ export async function aceitarConvite(params: {
     email_confirm: true,
   });
   if (authErr || !authData?.user) {
-    return { ok: false, erro: authErr?.message ?? "Erro criando usuario" };
+    return { ok: false, erro: authErr?.message ?? "Erro criando usuário" };
   }
 
   // Cria registro de franqueada vinculado

@@ -72,7 +72,7 @@ export async function POST(req: Request) {
         ok: false,
         motivo: "franqueada_nao_encontrada",
         email: body.email,
-        nota: "Nutri ainda nao finalizou onboarding no Marketing. Reenvie este webhook quando ela completar.",
+        nota: "Nutri ainda não finalizou onboarding no Marketing. Reenvie este webhook quando ela completar.",
       },
       { status: 404 },
     );

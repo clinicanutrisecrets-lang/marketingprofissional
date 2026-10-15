@@ -7,6 +7,7 @@ import { createClaude } from "@/lib/claude/client";
 import { gerarCarrosselEditorialEUpload } from "@/lib/ai-image/render";
 import { LOGO_NUTRISECRETS_BRANCO_B64, LOGO_NUTRISECRETS_TEAL_B64 } from "./logo-nutrisecrets";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import {
   FERRAMENTA_ARTE,
   MOLDE_SETE_PASSOS,
@@ -210,7 +211,7 @@ export async function montarArteDoPost(postId: string): Promise<{ ok: true; slid
         ultimo = msg.stop_reason === "max_tokens" ? "a resposta foi cortada" : "a ferramenta não foi usada";
         continue;
       }
-      const v = validarArte(semTravessoesFundo(bloco.input));
+      const v = validarArte(acentuarFundo(semTravessoesFundo(bloco.input)));
       if (v.ok) arte = v.arte;
       else ultimo = v.motivo;
     }
@@ -320,7 +321,7 @@ export async function criarPostTemaEmAlta(entrada: {
       });
       const bloco = msg.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
       if (!bloco) { ultimo = "a ferramenta não foi usada"; continue; }
-      const v = validarPauta(semTravessoesFundo(bloco.input));
+      const v = validarPauta(acentuarFundo(semTravessoesFundo(bloco.input)));
       if (v.ok) pauta = { capa: v.capa, assunto: v.assunto };
       else ultimo = v.motivo;
     }

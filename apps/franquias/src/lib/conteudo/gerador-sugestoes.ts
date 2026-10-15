@@ -5,6 +5,7 @@ import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render
 import { buscarPautasQuentes } from "./trends";
 import { createClaude, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import { renderCard, renderReceita } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
@@ -360,9 +361,9 @@ export async function gerarSugestoesSemana(params: {
   let sugestoes: SugestaoIA[];
   try {
     // Trava do travessão: vale mesmo quando o modelo ignora a regra do prompt.
-    sugestoes = semTravessoesFundo(
+    sugestoes = acentuarFundo(semTravessoesFundo(
       (JSON.parse(jsonMatch[0]) as { sugestoes: SugestaoIA[] }).sugestoes ?? [],
-    );
+    ));
   } catch {
     return { criadas: 0, erro: "JSON inválido do agente" };
   }

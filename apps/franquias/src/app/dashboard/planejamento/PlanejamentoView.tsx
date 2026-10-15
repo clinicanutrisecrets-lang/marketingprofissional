@@ -6,6 +6,7 @@ import {
   ROTULO_CONSCIENCIA,
   type NivelConsciencia,
 } from "@/lib/claude/consciencia";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type Tipo = "skill_2_mecanismo_unico" | "skill_3_posicionamento_oferta" | "skill_5_funil_organico";
 
@@ -219,7 +220,7 @@ export function PlanejamentoView({
               <li key={p.id as string} className="rounded-lg border border-brand-text/10 p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                    {(p.tipo as string).replace("skill_", "").replace(/_/g, " ")}
+                    {rotuloDeId((p.tipo as string).replace("skill_", ""))}
                   </span>
                   <span className="text-xs text-brand-text/50">
                     {new Date(p.criado_em as string).toLocaleDateString("pt-BR")}
@@ -266,7 +267,7 @@ function OutputGenerico({ output }: { output: Record<string, unknown> }) {
         {Object.entries(output).map(([k, v]) => (
           <div key={k}>
             <div className="mb-1 text-xs font-medium uppercase tracking-wider text-brand-text/60">
-              {k.replace(/_/g, " ")}
+              {rotuloDeId(k)}
             </div>
             {typeof v === "string" ? (
               <p className="whitespace-pre-wrap rounded-lg bg-brand-muted/30 p-3 text-sm text-brand-text/85 leading-relaxed">{v}</p>

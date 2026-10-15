@@ -4,6 +4,7 @@ import { GuiaDaSemana } from "./GuiaDaSemana";
 import { TextoDaArte } from "./TextoDaArte";
 import { VisorArtes } from "./VisorArtes";
 import { lerEstrategia } from "@/lib/aprovacao/estrategia";
+import { acentuarVisivel } from "@/lib/texto/acentos-visivel";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -452,8 +453,10 @@ function PostCard({
       ? (post.roteiro_reels as string).trim()
       : null;
 
-  const papel = textoOuNulo(post.papel_estrategia);
-  const lembrete = textoOuNulo(post.lembrete_execucao);
+  // Acento na leitura: post gravado antes de 15/10/2026 tem "procura
+  // nutricao funcional" (o rótulo do nicho saía do id sem acento).
+  const papel = acentuarOuNulo(post.papel_estrategia);
+  const lembrete = acentuarOuNulo(post.lembrete_execucao);
   const objecao = textoOuNulo(post.objecao_dissolvida);
   // Vídeo curto que nasceu junto com o reel (frase sobre clipe da biblioteca).
   const videoPronto = ehReels ? textoOuNulo(post.url_video_final) : null;
@@ -834,6 +837,11 @@ function AvisosRevisao({ achados }: { achados: AchadoRevisao[] }) {
       )}
     </div>
   );
+}
+
+function acentuarOuNulo(v: unknown): string | null {
+  const t = textoOuNulo(v);
+  return t ? acentuarVisivel(t) : null;
 }
 
 function textoOuNulo(v: unknown): string | null {

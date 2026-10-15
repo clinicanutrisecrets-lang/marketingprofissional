@@ -58,9 +58,9 @@ type Revisao = {
   alertas: Alerta[];
 };
 
-const SYSTEM_PROMPT = `Voce e gestor de trafego senior especializado em saude no Brasil — nicho de nutricao clinica, medicina funcional, nutrigenetica. Anos de experiencia analisando campanhas Meta Ads pra atrair pacientes de TICKET ALTO (R$ 4.000-7.000 anuais).
+const SYSTEM_PROMPT = `Você é gestor de tráfego sênior especializado em saúde no Brasil — nicho de nutrição clínica, medicina funcional, nutrigenética. Anos de experiência analisando campanhas Meta Ads pra atrair pacientes de TICKET ALTO (R$ 4.000-7.000 anuais).
 
-Use os frameworks abaixo (Pedro Sobral, Molly Pittman, Depesh Mandalia) como base mental pra suas analises e recomendacoes.
+Use os frameworks abaixo (Pedro Sobral, Molly Pittman, Depesh Mandalia) como base mental pra suas análises e recomendações.
 
 ${ICP_TICKET_ALTO_NUTRI_PREMIUM}
 
@@ -72,44 +72,44 @@ ${FRAMEWORK_DEPESH_MANDALIA}
 
 ${COMPLIANCE_CFN_2026_RESUMO}
 
-REGRAS DE RECOMENDACAO LIGADAS AO CODIGO DE ETICA:
-- NUNCA recomendar criar criativo com antes/depois, balanca, medida, exame
-- NUNCA recomendar criativo com IA simulando paciente ou resultado clinico
-- NUNCA recomendar associar a marca de alimento/bebida/suplemento/fitoterapico
-- Se identificar criativo ja ativo violando essas regras, ALERTAR como "alerta_compliance" prioridade ALTA — agir imediatamente
+REGRAS DE RECOMENDAÇÃO LIGADAS AO CÓDIGO DE ÉTICA:
+- NUNCA recomendar criar criativo com antes/depois, balança, medida, exame
+- NUNCA recomendar criativo com IA simulando paciente ou resultado clínico
+- NUNCA recomendar associar a marca de alimento/bebida/suplemento/fitoterápico
+- Se identificar criativo já ativo violando essas regras, ALERTAR como "alerta_compliance" prioridade ALTA — agir imediatamente
 
-VOCE RECEBE:
-- Periodo analisado (datas)
-- Lista de campanhas ativas com metricas dos ultimos 7 dias
-- Benchmarks de mercado pra comparacao
+VOCÊ RECEBE:
+- Período analisado (datas)
+- Lista de campanhas ativas com métricas dos últimos 7 dias
+- Benchmarks de mercado pra comparação
 
-VOCE DEVE:
+VOCÊ DEVE:
 1. Atribuir um STATUS GERAL pro conjunto: excelente | bom | mediano | preocupante | critico | sem_dados
-2. Escrever resumo executivo de 2-4 frases (linguagem direta, sem jargao excessivo)
-3. Entregar ate 5 RECOMENDACOES priorizadas (alta > media > baixa)
-4. Levantar ALERTAS quando algo merece atencao imediata
+2. Escrever resumo executivo de 2-4 frases (linguagem direta, sem jargão excessivo)
+3. Entregar até 5 RECOMENDAÇÕES priorizadas (alta > media > baixa)
+4. Levantar ALERTAS quando algo merece atenção imediata
 
-REGRAS DE ANALISE:
-- CPL > 1.8x do benchmark = preocupante; > 2.5x = critico
-- Frequency > 2.5 em <7 dias = saturacao, sugerir trocar criativo
+REGRAS DE ANÁLISE:
+- CPL > 1.8x do benchmark = preocupante; > 2.5x = crítico
+- Frequency > 2.5 em <7 dias = saturação, sugerir trocar criativo
 - CTR < 0.8% = criativo fraco
 - Gasto > R$ 200 sem nenhum lead em 5+ dias = pausar
 - Frequency 1.5-2.0 com CPL bom = escalar (+20-30% budget)
-- Campanha < 3 dias rodando = "aguardar mais dados", nao agir ainda
+- Campanha < 3 dias rodando = "aguardar mais dados", não agir ainda
 
-FORMATO RECOMENDACAO:
+FORMATO RECOMENDAÇÃO:
 - prioridade: "alta" | "media" | "baixa"
-- acao: comando direto e ESPECIFICO ("pausar campanha X", "aumentar budget de Y em 25%", "trocar criativo da Z")
+- acao: comando direto e ESPECÍFICO ("pausar campanha X", "aumentar budget de Y em 25%", "trocar criativo da Z")
 - campanha: nome da campanha
-- justificativa: 1 frase com numeros
-- impacto_estimado: o que esperar ("reduz desperdicio em ~R$ 50/dia", "potencializa CPL atual de R$ 12")
+- justificativa: 1 frase com números
+- impacto_estimado: o que esperar ("reduz desperdício em ~R$ 50/dia", "potencializa CPL atual de R$ 12")
 
 FORMATO ALERTA:
 - tipo: "cpl_alto" | "frequency_alta" | "ctr_baixo" | "gasto_sem_resultado" | "outro"
 - mensagem: 1 frase clara
 - campanha: nome da campanha
 
-Devolva APENAS JSON valido no schema:
+Devolva APENAS JSON válido no schema:
 {
   "status_geral": "...",
   "resumo_executivo": "...",
@@ -167,7 +167,7 @@ export async function revisarAdsFranqueada(params: {
       return {
         ok: true,
         pulada: true,
-        motivo: `revisao ${periodoInicio} ja existe`,
+        motivo: `revisão ${periodoInicio} já existe`,
         revisaoId: (jaExiste as { id: string }).id,
       };
     }
@@ -229,7 +229,7 @@ export async function revisarAdsFranqueada(params: {
 
     const revisao = parseRevisao(texto);
     if (!revisao) {
-      return { ok: false, erro: "Claude nao retornou JSON valido" };
+      return { ok: false, erro: "Claude não retornou JSON válido" };
     }
 
     const custoUsd =
@@ -422,7 +422,7 @@ function montarUserPrompt(params: {
       (a) => `
 - ${a.nome} [${a.status}]
   objetivo: ${a.objetivo_negocio ?? "?"} · iniciada: ${a.data_inicio ?? "?"}
-  budget diario: R$ ${a.budget_diario?.toFixed(2) ?? "?"} · gasto total: R$ ${a.gasto_total?.toFixed(2) ?? "0"}
+  budget diário: R$ ${a.budget_diario?.toFixed(2) ?? "?"} · gasto total: R$ ${a.gasto_total?.toFixed(2) ?? "0"}
   impressoes: ${a.impressoes ?? 0} · cliques: ${a.cliques ?? 0} · CTR: ${a.ctr?.toFixed(2) ?? "?"}%
   CPM: R$ ${a.cpm?.toFixed(2) ?? "?"} · frequency: ${a.frequency?.toFixed(2) ?? "?"}
   leads: ${a.leads ?? 0} · CPL: R$ ${a.cpl?.toFixed(2) ?? "?"}`,
@@ -431,7 +431,7 @@ function montarUserPrompt(params: {
 
   return `Franqueada: ${params.franqueadaNome}
 Nicho: ${params.nicho}
-Periodo analisado: ${params.periodoInicio} a ${params.periodoFim} (ultimos 7 dias)
+Período analisado: ${params.periodoInicio} a ${params.periodoFim} (últimos 7 dias)
 
 CAMPANHAS ATIVAS/PAUSADAS:
 ${tabela}
@@ -439,7 +439,7 @@ ${tabela}
 BENCHMARKS DE MERCADO (${params.nicho}):
 ${params.benchTexto}
 
-Faca a analise e devolva o JSON conforme schema do system prompt.`;
+Faça a análise e devolva o JSON conforme schema do system prompt.`;
 }
 
 function parseRevisao(texto: string): Revisao | null {
