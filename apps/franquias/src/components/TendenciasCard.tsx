@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { urlCarrosselNoScanner } from "@/lib/scanner-url";
 import { listarTendenciasRecentes } from "@/lib/tendencias/orquestrar";
 import { buscarDatasProximas, filtrarPorNicho } from "@/lib/tendencias/datas-comemorativas";
 
@@ -48,9 +48,10 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
           </div>
           <div className="space-y-2">
             {datas.map((d) => (
-              <Link
+              <a
                 key={d.id}
-                href={`/dashboard/posts/novo?tema=${encodeURIComponent(d.nome)}&data=${d.data_dia}-${d.data_mes}`}
+                href={urlCarrosselNoScanner(d.ideias_angulo ? `${d.nome}: ${d.ideias_angulo}` : d.nome)}
+                target="_top"
                 className="flex items-start gap-3 rounded-lg border border-brand-text/5 bg-brand-muted/30 p-3 transition hover:border-brand-primary hover:bg-brand-muted"
               >
                 <div
@@ -74,7 +75,7 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
                     </div>
                   )}
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
@@ -87,9 +88,10 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
           </div>
           <div className="space-y-2">
             {tendencias.map((t) => (
-              <Link
+              <a
                 key={t.id as string}
-                href={`/dashboard/posts/novo?tema=${encodeURIComponent(t.tema as string)}&angulo=${encodeURIComponent((t.angulo_sugerido as string) ?? "")}`}
+                href={urlCarrosselNoScanner(t.tema as string)}
+                target="_top"
                 className="flex items-start gap-3 rounded-lg border border-brand-text/5 p-3 transition hover:border-brand-primary hover:bg-brand-muted/30"
               >
                 <div className="flex shrink-0 items-center gap-1 text-xs font-bold">
@@ -117,14 +119,14 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
                     ))}
                   </div>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
       )}
 
       <p className="mt-3 text-[11px] text-brand-text/40">
-        Clica em qualquer item pra criar post com esse tema já pré-preenchido.
+        Clique num tema e o carrossel completo (capa, slides e legenda) abre no Scanner com ele já escrito. É só escolher o ângulo e gerar.
       </p>
     </div>
   );
