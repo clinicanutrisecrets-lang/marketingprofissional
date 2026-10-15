@@ -445,8 +445,10 @@ function PostCard({
   // Reels: o produto é o roteiro que ela grava no teleprompter. Sem roteiro
   // gravado (post anterior a 01/10/2026), o card segue como era.
   const ehReels = post.tipo_post === "reels";
+  // Stories falados (15/10/2026) também trazem roteiro: o card mostra o
+  // teleprompter pra qualquer post que tenha roteiro gravado.
   const roteiro =
-    ehReels && typeof post.roteiro_reels === "string" && post.roteiro_reels.trim()
+    typeof post.roteiro_reels === "string" && post.roteiro_reels.trim()
       ? (post.roteiro_reels as string).trim()
       : null;
 

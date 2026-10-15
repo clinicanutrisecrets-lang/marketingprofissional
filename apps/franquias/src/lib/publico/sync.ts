@@ -2,6 +2,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { PublicoDaCopy } from "@/lib/claude/copy-agent";
 import { validarPublico } from "./publico";
+import { validarPreferenciasScanner } from "@/lib/geracao/preferencias-scanner";
 
 /**
  * Espelha aqui o PÚBLICO que a profissional declarou no onboarding do Scanner.
@@ -40,7 +41,7 @@ export async function sincronizarPublicoDoHub(
   if (!scannerUserId) return { ok: false, motivo: "sem_vinculo_scanner" };
 
   const scannerUrl = process.env.SCANNER_SAAS_URL ?? "https://scannerdasaude.com";
-  let payload: { publico?: unknown; origem?: string | null };
+  let payload: { publico?: unknown; origem?: string | null; preferencias?: unknown };
 
   try {
     const res = await fetch(
@@ -72,6 +73,12 @@ export async function sincronizarPublicoDoHub(
     publico_briefing: publico,
     publico_briefing_em: new Date().toISOString(),
   };
+  // Respostas do painel do Scanner (grava vídeos? / datas comemorativas).
+  // Só grava quando o Scanner manda a chave: resposta de uma versão antiga do
+  // Scanner, sem ela, não pode apagar o que já está espelhado.
+  if ("preferencias" in payload) {
+    patch.preferencias_scanner = validarPreferenciasScanner(payload.preferencias);
+  }
   const { error } = await admin.from("franqueadas").update(patch).eq("id", franqueadaId);
 
   if (error) {

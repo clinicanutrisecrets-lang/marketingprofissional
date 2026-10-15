@@ -70,6 +70,14 @@ import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import { mensagemSemanaJaMontada } from "@/lib/aprovacao/semana";
 import { revalidatePath } from "next/cache";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
+import {
+  validarPreferenciasScanner,
+  dataDaSemana,
+  aplicarDataComemorativa,
+  frequenciaReelsComVideo,
+} from "@/lib/geracao/preferencias-scanner";
+import { escreverStoriesFalados } from "@/lib/geracao/stories-falados-gerar";
+import { PAPEIS_STORIES } from "@/lib/geracao/stories-falados";
 import { revisarCopy, resumoRevisao } from "@/lib/claude/revisor-copy";
 import { semAbreviacaoFundo } from "@/lib/texto/sem-abreviacao";
 
@@ -212,9 +220,13 @@ export async function gerarPostsDaSemana(
   ]);
   const datasComemorativas = filtrarPorNicho(datasRaw, nicho);
 
+  // As respostas que ela deu no Scanner (grava vídeos? / data comemorativa),
+  // espelhadas pelo sync do público. Torto ou ausente = não respondeu.
+  const prefsScanner = validarPreferenciasScanner(franqueada.preferencias_scanner);
   const { estrategia, slots: planoBase } = planoDaJornada({
     diasPostSemana: (franqueada.dias_post_semana as number[]) ?? [1, 3, 5],
-    frequenciaReels: (franqueada.frequencia_reels as string) ?? "semanal",
+    // Quem grava vídeos ganha ao menos um reel de câmera com roteiro.
+    frequenciaReels: frequenciaReelsComVideo(franqueada.frequencia_reels as string | null, prefsScanner?.grava_videos ?? null),
     frequenciaStories: (franqueada.frequencia_stories as string) ?? "diario",
     semanaRef,
     produtos: (contexto.produtos ?? []).map((pr) => ({
@@ -227,11 +239,17 @@ export async function gerarPostsDaSemana(
   // O tema em alta vira ASSUNTO de um post de conteúdo (Viviane, 06/10/2026:
   // "adorei os temas em alta, mas não vi eles nos posts"). Antes entrava em
   // todos os prompts como "inspiração, não force encaixe" e nunca aparecia.
-  const { slots: plano, usado: temaEmAlta } = aplicarTemaEmAlta(
+  const { slots: planoComTema, usado: temaEmAlta } = aplicarTemaEmAlta(
     planoBase,
     escolherTemaEmAlta(tendencias, contexto.publico?.nao_atende ?? null),
   );
-  if (temaEmAlta) {
+  // Data comemorativa que ela escolheu no painel do Scanner (Aline, 15/10/2026):
+  // ação especial com a condição DELA, ou só posts com a data.
+  const { slots: plano, usada: dataComemorativa } = aplicarDataComemorativa(
+    planoComTema,
+    dataDaSemana(prefsScanner, semanaRef),
+  );
+  if (temaEmAlta || dataComemorativa) {
     estrategia.passos = plano.filter((p) => p.tipo !== "stories").map((p) => p.papel);
   }
   {
@@ -890,6 +908,52 @@ export async function gerarPostsDaSemana(
     });
     if (sin.ok) gerados += sin.gerados;
     else console.warn("[semanal] carrossel de sinergia não saiu:", sin.motivo);
+  }
+
+  // 5d. Stories FALADOS (Aline, 15/10/2026): quem disse no Scanner que grava
+  //     vídeos ganha uma sequência de 3 stories de 30 s, com roteiro pro
+  //     teleprompter. Best-effort: o pacote nunca falha por ela.
+  if (prefsScanner?.grava_videos === true) {
+    try {
+      const r = await escreverStoriesFalados({
+        franqueadaId,
+        publico: contexto.publico ?? null,
+        nicho: (franqueada.nicho_principal as string) ?? null,
+        queixas: (estrategia.queixas ?? []).join(", ") || null,
+      });
+      if (!r.ok) {
+        console.warn("[semanal] stories falados não saíram:", r.motivo);
+      } else {
+        const dias = ((franqueada.dias_post_semana as number[]) ?? [1, 3, 5]).slice().sort((a, b) => a - b);
+        const dia = dias[Math.floor(dias.length / 2)] ?? 3;
+        const linhas = r.sequencia.stories.map((st, i) => ({
+          franqueada_id: franqueadaId,
+          aprovacao_semanal_id: aprovacaoId,
+          semana_ref: semanaRef,
+          tipo_post: "stories",
+          status: "aguardando_aprovacao",
+          origem: "ia_automatico",
+          copy_legenda: st.texto_na_tela,
+          copy_legenda_ia_original: st.texto_na_tela,
+          papel_estrategia: `Stories falados ${i + 1} de 3 (${r.sequencia.titulo}). ${PAPEIS_STORIES[i]}.`,
+          lembrete_execucao:
+            "Grave no celular lendo o roteiro no teleprompter (até 30 segundos). Escreva o texto na tela por cima do vídeo e poste os três em sequência.",
+          roteiro_reels: st.fala,
+          data_hora_agendada: calcularDataHora(
+            semanaRef,
+            dia,
+            `12:${String(i * 5).padStart(2, "0")}`,
+          ),
+          ia_model_usado: MODELO_CLAUDE_DEFAULT,
+          legenda_gerada_ia: true,
+        }));
+        const { error: stErr } = await admin.from("posts_agendados").insert(linhas);
+        if (stErr) console.warn("[semanal] stories falados não gravados:", stErr.message);
+        else gerados += 3;
+      }
+    } catch (e) {
+      console.warn("[semanal] stories falados falharam:", (e as Error).message);
+    }
   }
 
   // 6. Atualiza total no registro de aprovação
