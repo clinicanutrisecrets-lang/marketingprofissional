@@ -47,6 +47,27 @@ export type SlideEditorial =
        * o cotonete. Sem ela o corte procura a região de interesse sozinho.
        */
       fotoFocoY?: number;
+      /**
+       * Linhas com rótulo à esquerda e texto à direita (o slide "o que é a
+       * consulta" do post fixo, Aline 15/10/2026). Entram no lugar do corpo.
+       */
+      linhas?: { rotulo: string; texto: string }[];
+      /** Frase curta em caixa alta no pé do slide. */
+      rodape?: string;
+    }
+  | {
+      /**
+       * FOTO INTEIRA no card, rótulo no topo e título embaixo, sobre o véu
+       * escuro (slides 3 a 8 do carrossel da consulta integrativa). Com
+       * `itens`, o título sobe e entra uma lista numerada no lugar do apoio.
+       */
+      tipo: "foto";
+      titulo: string;
+      foto: Buffer;
+      rotulo?: string;
+      subtitulo?: string;
+      itens?: string[];
+      rodape?: string;
     }
   | { tipo: "fecho"; titulo: string; chamada?: string; rotulo?: string };
 
@@ -249,6 +270,59 @@ async function capaClara(s: Extract<SlideEditorial, { tipo: "capa" }>, i: number
   return (await base(c.fundo)).composite(camadas).png().toBuffer();
 }
 
+async function slideFoto(s: Extract<SlideEditorial, { tipo: "foto" }>, i: number, total: number, o: OpcoesEditorial): Promise<Buffer> {
+  const comLista = !!s.itens?.length;
+  const foto = await sharp(s.foto).rotate().resize(W, H, { fit: "cover", position: sharp.strategy.attention }).toBuffer();
+  // Com lista o véu cobre o card quase inteiro: a lista precisa ler do meio pra baixo.
+  const paradas = comLista
+    ? `<stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity=".7"/>`
+    : `<stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".22" stop-color="#000" stop-opacity="0"/>` +
+      `<stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity=".72"/>` +
+      `<stop offset="1" stop-color="#000" stop-opacity=".84"/>`;
+  const veu = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">${paradas}</linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`,
+  );
+  const camadas: Camada[] = [{ input: veu, left: 0, top: 0 }];
+  if (s.rotulo) camadas.push(...camadasDe(rotulo(s.rotulo, "#FFFFFF").pedacos, MARGEM, 100));
+  const pag = texto(numeroPagina(i, total), "inter", 24, "#FFFFFF", { letterSpacing: 3, lineHeight: 1.2 });
+  camadas.push(...camadasDe(pag.pedacos, W - MARGEM - pag.largura, 100));
+
+  if (comLista) {
+    let y = 330;
+    const tit = tituloQueCabe(s.titulo, "#FFFFFF", 88, 220);
+    camadas.push(...camadasDe(tit.pedacos, MARGEM, y));
+    y += tit.altura + 24;
+    const numLarg = 110;
+    for (const [k, item] of s.itens!.entries()) {
+      camadas.push({ input: retangulo(LARGURA, 1, "#FFFFFF"), left: MARGEM, top: y });
+      y += 26;
+      // Branco: a cor da marca some sobre o véu escuro quando ela é escura.
+      const num = texto(String(k + 1).padStart(2, "0"), "serif", 40, "#FFFFFF", { lineHeight: 1.2, opacidade: 0.75 });
+      const t = texto(item, "inter", 38, "#FFFFFF", { lineHeight: 1.3, maxWidth: LARGURA - numLarg });
+      camadas.push(...camadasDe(num.pedacos, MARGEM, y));
+      camadas.push(...camadasDe(t.pedacos, MARGEM + numLarg, y));
+      y += Math.max(num.altura, t.altura) + 26;
+    }
+    if (s.rodape) {
+      const r = rotulo(s.rodape, "#FFFFFF", 22);
+      camadas.push(...camadasDe(r.pedacos, MARGEM, H - 76 - r.altura));
+    }
+    return sharp(foto).composite(camadas).png().toBuffer();
+  }
+
+  let y = H - 76;
+  if (s.subtitulo) {
+    const sub = texto(s.subtitulo, "inter", 32, "#FFFFFF", { opacidade: 0.95 });
+    y -= sub.altura;
+    camadas.push(...camadasDe(sub.pedacos, MARGEM, y));
+    y -= 22;
+  }
+  const tit = tituloQueCabe(s.titulo, "#FFFFFF", 84, 320);
+  y -= tit.altura;
+  camadas.push(...camadasDe(tit.pedacos, MARGEM, y));
+  return sharp(foto).composite(camadas).png().toBuffer();
+}
+
 async function meio(s: Extract<SlideEditorial, { tipo: "meio" }>, i: number, total: number, o: OpcoesEditorial): Promise<Buffer> {
   const c = CORES_EDITORIAL;
   const camadas: Camada[] = [];
@@ -263,7 +337,21 @@ async function meio(s: Extract<SlideEditorial, { tipo: "meio" }>, i: number, tot
   y += tit.altura + 34;
   camadas.push({ input: retangulo(LARGURA, 2, c.linha), left: MARGEM, top: y });
   y += 44;
-  if (s.corpo) {
+  if (s.linhas?.length) {
+    // Rótulo em caixa alta à esquerda, texto à direita, traço entre as linhas.
+    const colRot = 282;
+    for (const [k, l] of s.linhas.entries()) {
+      if (k > 0) {
+        camadas.push({ input: retangulo(LARGURA, 2, c.linha), left: MARGEM, top: y });
+        y += 34;
+      }
+      const r = rotulo(l.rotulo, o.destaqueHex, 22);
+      const t = texto(l.texto, "inter", 34, c.titulo, { lineHeight: 1.5, maxWidth: LARGURA - colRot });
+      camadas.push(...camadasDe(r.pedacos, MARGEM, y + 12));
+      camadas.push(...camadasDe(t.pedacos, MARGEM + colRot, y));
+      y += Math.max(r.altura + 12, t.altura) + 34;
+    }
+  } else if (s.corpo) {
     // Corpo grande e legível; encolhe se o texto for longo.
     let fs = 36;
     let corpo = texto(s.corpo, "inter", fs, c.corpo, { lineHeight: 1.55 });
@@ -307,7 +395,8 @@ async function meio(s: Extract<SlideEditorial, { tipo: "meio" }>, i: number, tot
       }
     }
   }
-  const ass = o.assinatura ? rotulo(o.assinatura.replace(/^@/, ""), c.pagina, 22) : null;
+  const pe = s.rodape || (o.assinatura ? o.assinatura.replace(/^@/, "") : "");
+  const ass = pe ? rotulo(pe, c.pagina, 22) : null;
   if (ass) camadas.push(...camadasDe(ass.pedacos, MARGEM, H - 72 - ass.altura));
   return (await base(c.fundo)).composite(camadas).png().toBuffer();
 }
@@ -387,6 +476,7 @@ export async function renderSlideEditorial(s: SlideEditorial, i: number, total: 
   const o = { ...opcoes, destaqueHex: HEX.test(opcoes.destaqueHex) ? opcoes.destaqueHex : "#0ABAB5" };
   if (s.tipo === "capa") return o.fotoCapa ? capaComFoto(s, i, total, o) : capaClara(s, i, total, o);
   if (s.tipo === "fecho") return fecho(s, i, total, o);
+  if (s.tipo === "foto") return slideFoto(s, i, total, o);
   return meio(s, i, total, o);
 }
 
