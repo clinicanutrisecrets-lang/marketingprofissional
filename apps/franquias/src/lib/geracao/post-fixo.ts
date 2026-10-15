@@ -67,6 +67,23 @@ export function combinacaoDeFotos(semente: string): Record<FotoPostFixo, Conjunt
   return out;
 }
 
+/**
+ * O assunto de cada foto do post fixo (Aline, 15/10/2026: "se a pessoa subiu
+ * fotos dela na biblioteca, dá pra usar dali pra ficar mais personalizado?").
+ * Quando "Minhas fotos" tem uma foto com um destes assuntos, ela entra no
+ * slide no lugar da foto do nosso banco. Sem nenhuma, fica a do banco.
+ * O vocabulário é o de lib/geracao/fotos-banco.ts (ASSUNTOS_FOTO).
+ */
+export const ASSUNTOS_POR_FOTO_FIXO: Record<FotoPostFixo, string[]> = {
+  "01-capa": ["profissional"],
+  "03-nutrigenetica": ["coleta", "kit", "exame"],
+  "04-nutrigenomica": ["prato", "ingrediente", "cozinha"],
+  "05-emocoes": ["bem_estar"],
+  "06-atividade-fisica": ["atividade"],
+  "07-estilo-de-vida": ["bem_estar", "cozinha", "ingrediente"],
+  "08-como-funciona": ["atendimento", "consultorio", "profissional"],
+};
+
 /** O arquivo de uma foto em public/post-fixo. */
 export function arquivoDaFoto(conjunto: ConjuntoPostFixo, foto: FotoPostFixo): string {
   return `${conjunto}-${foto}.jpg`;

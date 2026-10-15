@@ -12,6 +12,7 @@ import {
   combinacaoDeFotos,
   arquivoDaFoto,
   fotoDoPostFixoUrl,
+  ASSUNTOS_POR_FOTO_FIXO,
   type FotoPostFixo,
 } from "@/lib/geracao/post-fixo";
 
@@ -33,6 +34,11 @@ export async function montarPostFixoDaSemana(p: {
   aprovacaoId: string;
   semanaRef: string;
   logoUrl: string | null;
+  /**
+   * A foto DELA (de "Minhas fotos") com um dos assuntos pedidos, ainda não
+   * usada na semana. null quando ela não tem: o slide fica com a do banco.
+   */
+  fotoDela?: (assuntos: string[]) => Promise<Buffer | null>;
 }): Promise<{ ok: true; gerados: number } | { ok: false; motivo: string }> {
   const { admin, franqueadaId, franqueada, aprovacaoId, semanaRef } = p;
   try {
@@ -46,7 +52,14 @@ export async function montarPostFixoDaSemana(p: {
 
     const combo = combinacaoDeFotos(franqueadaId);
     const fotos = new Map<FotoPostFixo, Buffer>();
+    let dela = 0;
     for (const f of Object.keys(combo) as FotoPostFixo[]) {
+      const propria = p.fotoDela ? await p.fotoDela(ASSUNTOS_POR_FOTO_FIXO[f]).catch(() => null) : null;
+      if (propria) {
+        fotos.set(f, propria);
+        dela++;
+        continue;
+      }
       const url = fotoDoPostFixoUrl(arquivoDaFoto(combo[f], f));
       const res = await fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" });
       if (!res.ok) return { ok: false, motivo: `foto ${f} não baixou (${res.status})` };
@@ -74,6 +87,7 @@ export async function montarPostFixoDaSemana(p: {
       aviso: AVISO_POST_FIXO,
     });
     if (r.urls.length < 2) return { ok: false, motivo: "o carrossel não saiu" };
+    if (dela) console.log(`[semanal] post fixo com ${dela} foto(s) de Minhas fotos`, franqueadaId);
 
     const { error } = await admin.from("posts_agendados").insert({
       franqueada_id: franqueadaId,
