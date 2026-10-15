@@ -67,7 +67,8 @@ jobs:
               try:
                   urllib.request.urlretrieve(logo, "/tmp/logo_original")
                   subprocess.run(["python3", "packages/video-marca/logo_sem_fundo.py", "/tmp/logo_original",
-                                  "apps/franquias/public/videos-marca/_logo.png"], check=True)
+                                  "apps/franquias/public/videos-marca/_logo.png"], check=True,
+                                 stdout=__import__("sys").stderr)  # 🔴 stdout aqui vira parâmetro do molde
                   q["logo"] = ["http://localhost:8765/_logo.png"]
               except Exception as e:
                   print(f"logo original mantida: {e}", file=__import__("sys").stderr)

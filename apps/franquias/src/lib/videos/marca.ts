@@ -46,7 +46,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do emagrecimento (FTO)",
     molde: `${BASE}/fto.html`,
     poster: `${BASE}/fto.jpg`,
-    versao: 3,
+    versao: 4,
     duracaoSeg: 110.1,
     resumo:
       "O gene FTO explicado de um jeito simples: a letrinha de risco, a proteína que mexe no apetite e como a alimentação ajuda a deixar o gene mais quieto.",
@@ -114,7 +114,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do sono (CLOCK)",
     molde: `${BASE}/clock.html`,
     poster: `${BASE}/clock.jpg`,
-    versao: 3,
+    versao: 4,
     duracaoSeg: 118.7,
     resumo:
       "O gene CLOCK e o relógio do corpo: por que a letra de risco atrasa o sono e a fome, e como o horário das refeições, a luz e a alimentação ajudam.",
