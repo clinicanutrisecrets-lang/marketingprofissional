@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sincronizarProdutosScanner } from "@/lib/produtos/sync";
 import { sincronizarPublicoDoHub } from "@/lib/publico/sync";
+import { videosMarcaDaFranqueada } from "@/lib/videos/marca-servidor";
+import { videosMarcaLiberadosPara } from "@/lib/videos/marca";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
 
   const { data: franqueadas, error } = await admin
     .from("franqueadas")
-    .select("id, nome_completo")
+    .select("id, nome_completo, email")
     .not("scanner_saas_user_id", "is", null)
     .in("status", ["ativo", "onboarding"]);
 
@@ -50,6 +52,26 @@ export async function GET(request: Request) {
       ok: rp.ok,
       detalhe: rp.ok ? (rp.tem ? "público espelhado" : "sem público declarado") : `publico: ${rp.motivo}`,
     });
+  }
+
+  // Vídeos de marca JÁ PRONTOS pras contas da fase de teste (Aline,
+  // 15/10/2026): elas abrem a aba Vídeos e o vídeo está lá, com as cores
+  // delas. A função só dispara o worker quando falta o vídeo daquela cor,
+  // logo e versão; nos outros dias é só leitura. Falha aqui não derruba nada.
+  for (const f of franqueadas ?? []) {
+    const fr = f as { id: string; email: string | null };
+    if (!videosMarcaLiberadosPara(fr.email)) continue;
+    try {
+      const estados = await videosMarcaDaFranqueada({ id: fr.id, email: fr.email });
+      const disparados = (estados ?? []).filter((e) => e.status === "gerando").length;
+      resultados.push({
+        franqueada_id: fr.id,
+        ok: estados !== null,
+        detalhe: estados === null ? "videos_marca: não li" : `videos_marca: ${disparados} gerando`,
+      });
+    } catch (e) {
+      resultados.push({ franqueada_id: fr.id, ok: false, detalhe: `videos_marca: ${(e as Error).message}` });
+    }
   }
 
   const falhas = resultados.filter((r) => !r.ok && r.detalhe !== "sem_vinculo_scanner");

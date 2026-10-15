@@ -134,3 +134,11 @@ test("o recorte da logo não escreve no stdout (ele vira os parâmetros do molde
   }
   assert.match(ler(".github/workflows/render-video-marca.yml"), /logo_sem_fundo\.py[\s\S]{0,200}stdout=__import__\("sys"\)\.stderr/);
 });
+
+test("vídeos de marca: o cron diário deixa os vídeos prontos pras contas da fase de teste", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rota = readFileSync(new URL("../../app/api/cron/sincronizar-produtos/route.ts", import.meta.url), "utf8");
+  assert.match(rota, /videosMarcaLiberadosPara\(fr\.email\)/);
+  assert.match(rota, /await videosMarcaDaFranqueada\(/);
+  assert.match(rota, /select\("id, nome_completo, email"\)/);
+});
