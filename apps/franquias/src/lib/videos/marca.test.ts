@@ -123,3 +123,14 @@ test("ligação: tela, narração e worker usam o catálogo", () => {
   // 🔴 os quadros vão pro ffmpeg pela entrada padrão (em disco passariam de 5 GB)
   assert.match(ler("packages/video-marca/render.cjs"), /image2pipe/);
 });
+
+test("o recorte da logo não escreve no stdout (ele vira os parâmetros do molde)", () => {
+  const ler = (p: string) => readFileSync(join(RAIZ, p), "utf8");
+  // Caso Juliana (15/10/2026): "logo pronta (…)" grudou em "primaria" e a cor
+  // primária caiu no tiffany padrão, com a secundária trocando normalmente.
+  const py = ler("packages/video-marca/logo_sem_fundo.py");
+  for (const linha of py.split("\n").filter((l) => /^\s*print\(/.test(l))) {
+    assert.match(linha, /file=sys\.stderr/, `print no stdout: ${linha.trim()}`);
+  }
+  assert.match(ler(".github/workflows/render-video-marca.yml"), /logo_sem_fundo\.py[\s\S]{0,200}stdout=__import__\("sys"\)\.stderr/);
+});

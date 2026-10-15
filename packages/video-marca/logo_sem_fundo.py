@@ -55,4 +55,7 @@ if __name__ == "__main__":
     if bbox:
         out = out.crop(bbox)  # sem margem vazia: a logo ocupa a altura reservada
     out.save(sys.argv[2])
-    print("logo pronta", out.size)
+    # 🔴 stderr, nunca stdout: o worker captura o stdout do passo como os
+    # parâmetros do molde, e um texto aqui grudava em "primaria" (a cor
+    # primária caía no tiffany padrão; caso Juliana, 15/10/2026).
+    print("logo pronta", out.size, file=sys.stderr)
