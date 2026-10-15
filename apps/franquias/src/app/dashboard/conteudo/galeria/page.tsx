@@ -41,7 +41,7 @@ export default async function GaleriaPage() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">Minha galeria</h1>
           <p className="mt-1 text-sm text-brand-text/60">
-            Todas as artes que você salvou no editor — baixe quando quiser.
+            Todas as artes que você salvou no editor de arte e no Carrossel por tema. Baixe quando quiser.
           </p>
         </header>
 

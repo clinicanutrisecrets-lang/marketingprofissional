@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { urlCarrosselNoScanner } from "@/lib/scanner-url";
 
 type Item = { href: string; icone: string; label: string; exato?: boolean; externo?: boolean };
 
 /**
- * O Carrossel por tema mora no Scanner (Juliana 14/10: em tela cheia ele
- * sumia, porque a porta dele estava só na página "Posts e Conteúdo" do
- * Scanner). Abre no topo da aba (`_top`): dentro do iframe, abrir o Scanner
- * dentro do próprio Scanner seria uma tela dentro da outra.
+ * O Carrossel por tema mora no Scanner e abre DENTRO do "Posts e Conteúdo"
+ * de lá (Aline 15/10), no lugar deste iframe e com botão de voltar. Abre no
+ * topo da aba (`_top`): dentro do iframe, abrir o Scanner no próprio iframe
+ * seria uma tela dentro da outra.
  */
-export const URL_CARROSSEL_TEMA = "https://scannerdasaude.com/nutri/conteudo/carrossel";
+export const URL_CARROSSEL_TEMA = urlCarrosselNoScanner();
 
 /**
  * O caminho da semana fica à mostra; o resto vai pra "Mais ferramentas"

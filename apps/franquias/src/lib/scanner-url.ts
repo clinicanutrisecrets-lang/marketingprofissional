@@ -19,11 +19,17 @@ export function urlEbookNoScanner(tema: string): string {
 }
 
 /**
- * Carrossel por tema do Scanner já com o tema preenchido. É o caminho de um
- * tema em alta virar post COMPLETO (capa, slides e legenda); o "Post manual"
- * deste app só escreve a legenda, e era pra lá que o tema em alta mandava
- * (Juliana 14/10: "aperta o botão e ele só gera a legenda").
+ * Carrossel por tema do Scanner, aberto DENTRO do "Posts e Conteúdo" do
+ * Scanner (Aline/Juliana 15/10: "deve abrir dentro do Marketing, e não sair
+ * pro Scanner"). A página do Scanner troca o iframe pela tela do carrossel,
+ * com a mesma moldura e um botão de voltar; o tema (dos temas em alta e das
+ * datas) vai junto. Sem tema, abre o carrossel em branco.
+ *
+ * O link é sempre `target="_top"`: dentro do iframe, abrir o Scanner no
+ * próprio iframe colocaria o Scanner dentro do Scanner.
  */
-export function urlCarrosselNoScanner(tema: string): string {
-  return `${SCANNER_SAAS_URL}/nutri/conteudo/carrossel?tema=${encodeURIComponent(tema.trim())}`;
+export function urlCarrosselNoScanner(tema?: string): string {
+  const t = (tema ?? "").trim();
+  const base = `${SCANNER_SAAS_URL}/nutri/marketing/posts?abrir=carrossel`;
+  return t ? `${base}&tema=${encodeURIComponent(t)}` : base;
 }
