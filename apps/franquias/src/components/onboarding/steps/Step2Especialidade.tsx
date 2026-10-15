@@ -8,7 +8,7 @@ export function Step2Especialidade({ dados, atualizar }: StepFormProps) {
   return (
     <FormWrapper
       title="Sua especialidade"
-      descricao="Isso guia a IA na hora de gerar conteúdo com o tom e ângulo certos."
+      descricao="Isso orienta o Scanner a escrever seu conteúdo com o tom e o ângulo certos."
     >
       <Select
         label="Nicho principal"

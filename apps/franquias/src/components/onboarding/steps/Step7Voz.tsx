@@ -8,7 +8,7 @@ export function Step7Voz({ dados, atualizar }: StepFormProps) {
   return (
     <FormWrapper
       title="Voz e comunicação"
-      descricao="Define como a IA escreve no seu tom."
+      descricao="Define como o Scanner escreve no seu tom."
     >
       <CardPicker
         label="Tom de comunicação"

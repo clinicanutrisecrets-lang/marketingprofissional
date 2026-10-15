@@ -55,7 +55,7 @@ export function Step8ProvaSocial({ dados, atualizar }: StepFormProps) {
           <FileUpload
             label="Prints de conversas / depoimentos em texto"
             tipo="depoimento_print"
-            descricao="Pode subir múltiplos — a IA analisa e usa como prova social nos posts"
+            descricao="Pode subir vários: o Scanner usa como prova social nos seus posts"
             multiplos
             arquivosExistentes={prints}
             onUploadSucess={recarregar}
