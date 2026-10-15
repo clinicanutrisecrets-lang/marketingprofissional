@@ -173,6 +173,169 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "O CLOCK é um entre mais de quinze genes ligados ao sono. Quer saber quais são as suas letrinhas? Me chama no direct.",
     ].join("\n\n"),
   },
+  {
+    id: "gene-cyp1a2",
+    titulo: "Como funciona o gene da cafeína (CYP1A2)",
+    molde: `${BASE}/cyp1a2.html`,
+    poster: `${BASE}/cyp1a2.jpg`,
+    versao: 1,
+    duracaoSeg: 92,
+    resumo:
+      "O gene CYP1A2 e a cafeína: por que quem tem a letra C desmonta o café devagar, o que isso tem a ver com ansiedade, coração e estrogênio, e como ajustar o café na medida da sua letra.",
+    roteiro: [
+      { de: 0, ate: 9, texto: "Sabe aquele seu café turbinado? O CYP1A2, o gene da cafeína, decide o que ele faz com você." },
+      {
+        de: 9,
+        ate: 24.7,
+        texto:
+          "Este é o gene CYP1A2, que monta a enzima que desmonta a cafeína. Quem é AA é rápido. Quem tem a letra C, a de risco, é lento. Mas a letra C não é sentença: saber a letra muda a conduta.",
+      },
+      {
+        de: 24.7,
+        ate: 40.4,
+        texto: "Para trabalhar, o gene precisa ser lido. A leitora faz uma cópia, que vira um recadinho. O recadinho chega numa fábrica, que monta a enzima CYP1A2.",
+      },
+      {
+        de: 40.4,
+        ate: 64.5,
+        texto:
+          "No fígado, a CYP1A2 desmonta a cafeína. Com AA, a esteira é rápida. Com a letra C, ela anda devagar e a cafeína se acumula: mais ansiedade, agitação e tremedeira. Em quem é lento, duas a três xícaras ou mais por dia foram ligadas a mais risco de infarto precoce. A CYP1A2 também ajuda a reciclar o estrogênio, por isso conversa com a TPM e a menopausa.",
+      },
+      {
+        de: 64.5,
+        ate: 76.3,
+        texto: "Não é proibir, é ajustar. Com a letra C, menos café, só até a tarde, e cuidado com o café turbinado. Triglicerídeos acima de 90? O resveratrol entra como aliado.",
+      },
+      { de: 76.3, ate: 83, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 83,
+        ate: 92,
+        texto: "E as suas letrinhas, quais são? São mais de trezentos genes ligados ao seu metabolismo. Faça o seu teste nutrigenético e descubra.",
+      },
+    ],
+    legenda: [
+      "Você sabia que o seu café também tem um gene?",
+      "O gene CYP1A2 monta a enzima que desmonta a cafeína no fígado. Quem é AA desmonta rápido. Quem tem a letra C desmonta devagar, e a cafeína fica mais tempo no corpo: mais ansiedade, agitação e tremedeira.",
+      "A mesma enzima ajuda a reciclar o estrogênio, por isso ela conversa com a TPM e a menopausa.",
+      "Não é proibir o café, é ajustar a dose e o horário à sua letra.",
+      "Quer saber qual é a sua? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
+    ].join("\n\n"),
+  },
+  {
+    id: "gene-il6",
+    titulo: "Como funciona o gene da inflamação (IL6)",
+    molde: `${BASE}/il6.html`,
+    poster: `${BASE}/il6.jpg`,
+    versao: 1,
+    duracaoSeg: 118.5,
+    resumo:
+      "O gene IL6 e o alarme da inflamação: por que a letra G tende a deixar o alarme mais alto, e como a alimentação ajuda a baixar o termômetro.",
+    roteiro: [
+      { de: 0, ate: 8.5, texto: "Como funciona o IL6, o gene da inflamação? E como a alimentação ajuda a ligar ou desligar esse gene da tomada." },
+      {
+        de: 8.5,
+        ate: 24.2,
+        texto:
+          "Este é o gene IL6, que comanda o alarme da inflamação. Ele tem uma letrinha que muda de pessoa para pessoa. A letra G é a de risco. Mas ter a letra G não é sentença: o corpo pode colar etiquetinhas no gene.",
+      },
+      {
+        de: 24.2,
+        ate: 39.9,
+        texto: "Para trabalhar, o gene precisa ser lido. A leitora faz uma cópia, que vira um recadinho. O recadinho chega numa fábrica, que monta a IL6.",
+      },
+      {
+        de: 39.9,
+        ate: 55.6,
+        texto:
+          "A IL6 é um alarme: avisa o corpo que algo precisa de defesa. Quando o alarme não desliga, a inflamação fica acesa: mais dores e a imunidade desregulada. Ela também pode influenciar a fertilidade e está ligada à endometriose.",
+      },
+      {
+        de: 55.6,
+        ate: 64.6,
+        texto: "Agora vem a parte boa: a comida ajuda. Beterraba, feijão e brócolis trazem betaína e folato, a matéria-prima das etiquetas.",
+      },
+      {
+        de: 64.6,
+        ate: 75.2,
+        texto: "Quem cola as etiquetas no gene é a etiquetadora. Ela pega uma etiqueta da caixinha e cola no gene. Isso se chama metilação.",
+      },
+      {
+        de: 75.2,
+        ate: 86.4,
+        texto: "As etiquetas baixam o volume da letra G de risco. Ela fica com um capacetinho, e o alarme toca na hora certa.",
+      },
+      {
+        de: 86.4,
+        ate: 102.8,
+        texto:
+          "A comida ajuda a baixar o termômetro. Acerola, com vitamina C de montão. O ômega-3 dos peixes acalma o alarme. O ômega-6 em excesso atiça o fogo: não precisa cortar, só equilibrar. E castanha-do-pará, abacate e azeite também acalmam a inflamação.",
+      },
+      { de: 102.8, ate: 109.5, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 109.5,
+        ate: 118.5,
+        texto: "E as suas letrinhas, quais são? São mais de vinte genes ligados à inflamação. Faça o seu teste nutrigenético e descubra.",
+      },
+    ],
+    legenda: [
+      "Você sabia que a inflamação também tem um gene?",
+      "O gene IL6 comanda um alarme do corpo. Quem tem a letra G tende a ter esse alarme tocando mais alto, e quando ele não desliga a inflamação fica acesa.",
+      "Mas gene não é sentença. A alimentação traz a matéria-prima das etiquetinhas que ajudam a regular o gene, e alimentos como acerola, peixes, castanha-do-pará, abacate e azeite ajudam a baixar o termômetro.",
+      "O IL6 é um entre mais de vinte genes ligados à inflamação. Quer saber quais são as suas letrinhas? Me chama no direct.",
+    ].join("\n\n"),
+  },
+  {
+    id: "gene-glp1r-gipr",
+    titulo: "Os genes da saciedade e a canetinha (GLP1R e GIPR)",
+    molde: `${BASE}/glp1r-gipr.html`,
+    poster: `${BASE}/glp1r-gipr.jpg`,
+    versao: 1,
+    duracaoSeg: 95.5,
+    resumo:
+      "Os genes GLP1R e GIPR montam as fechaduras das chaves da saciedade: por que a canetinha não funciona igual para todo mundo e como o prato certo ajuda.",
+    roteiro: [
+      { de: 0, ate: 9, texto: "A canetinha funciona igual para todo mundo? Os genes GLP1R e GIPR respondem." },
+      {
+        de: 9,
+        ate: 24,
+        texto:
+          "Quando você come, o intestino libera chaves: o GLP1 e o GIP. Elas abrem fechaduras no cérebro e no pâncreas, trazendo saciedade e açúcar no sangue sob controle. Os genes GLP1R e GIPR são a receita dessas fechaduras.",
+      },
+      {
+        de: 24,
+        ate: 35,
+        texto: "A canetinha imita essas chaves e entrega direto no corpo: a fome diminui e a saciedade dura mais. Mas a fechadura de cada pessoa é um pouquinho diferente.",
+      },
+      {
+        de: 35,
+        ate: 47,
+        texto: "No GLP1R, algumas pessoas têm G, outras têm A. Quem tem A tende a perder mais peso com a canetinha. Quem tem G tende a responder menos.",
+      },
+      {
+        de: 47,
+        ate: 59,
+        texto: "No GIPR, a letra C é a de risco, ligada a mais peso. Quem tem T responde melhor a um prato com fibras, com menos gordura e mais vegetais.",
+      },
+      {
+        de: 59,
+        ate: 79,
+        texto:
+          "A comida também fabrica chaves naturais: proteína, fibras, azeite e comer devagar. As fibras alimentam a microbiota, que faz o intestino liberar mais GLP1. A canetinha não faz tudo sozinha: o prato certo ajuda a chave e a fechadura a trabalharem juntas.",
+      },
+      { de: 79, ate: 86, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 86,
+        ate: 95.5,
+        texto: "E as suas letrinhas, quais são? São mais de vinte genes ligados ao emagrecimento. Faça o seu teste nutrigenético e descubra.",
+      },
+    ],
+    legenda: [
+      "A canetinha funciona igual para todo mundo?",
+      "Quando você come, o intestino libera duas chaves, o GLP1 e o GIP, que abrem fechaduras no cérebro e no pâncreas e trazem saciedade. Os genes GLP1R e GIPR são a receita dessas fechaduras, e elas mudam um pouquinho de pessoa para pessoa.",
+      "Por isso a resposta à canetinha não é igual para todo mundo, e o prato certo também ajuda: proteína, fibras, azeite e comer devagar fazem o intestino liberar mais chaves naturais.",
+      "O uso de medicamentos é decisão do médico. Quer saber quais são as suas letrinhas? Me chama no direct.",
+    ].join("\n\n"),
+  },
 ];
 
 /** Fase de teste (Aline, 15/10/2026): só estas contas veem a seção. */
