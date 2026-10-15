@@ -1,0 +1,110 @@
+name: Render Carrossel Fábrica da Saúde
+
+# O 2º post fixo do perfil (apps/franquias/src/lib/geracao/fabrica.ts): abre o
+# molde do Claude Design (apps/franquias/public/fabrica/carrossel.html) com a
+# marca, os sintomas e os genes da profissional e tira um PNG por slide. Sem
+# modelo nenhum. Disparado por apps/franquias/src/lib/geracao/fabrica-da-semana.ts,
+# que já gravou o post em 'gerando'; aqui ele vira 'aguardando_aprovacao' com
+# os slides, ou 'erro'.
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: "id em posts_agendados"
+        required: true
+      spec_b64:
+        description: "PersonalizacaoFabrica em JSON, base64"
+        required: true
+      destino_prefix:
+        description: "pasta no bucket franqueadas-assets"
+        required: true
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+      PID: ${{ inputs.post_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependências
+        run: |
+          pip install -q pillow numpy
+          mkdir -p /tmp/cf && cd /tmp/cf && npm init -y >/dev/null && npm i puppeteer-core@23.11.1 --silent
+          google-chrome --version
+
+      - name: Desenhar
+        env:
+          SPEC_B64: ${{ inputs.spec_b64 }}
+        run: |
+          set -e
+          case "$PID" in *[!a-f0-9-]*) echo "post_id inválido"; exit 1;; esac
+          echo "$SPEC_B64" | base64 -d > /tmp/spec_entrada.json
+          # Logo e foto viram arquivos locais. A logo perde o fundo branco
+          # (no slide claro ele vira um quadrado). Sem conseguir baixar, o slide
+          # sai sem elas: nunca com a logo de outra pessoa.
+          python3 - <<'PY'
+          import json, urllib.request, subprocess, sys
+          s = json.load(open("/tmp/spec_entrada.json"))
+          for campo, destino in (("logo", "/tmp/logo_original"), ("foto", "/tmp/foto")):
+              url = s.get(campo)
+              s[campo] = None
+              if not (isinstance(url, str) and url.startswith("https://")):
+                  continue
+              try:
+                  urllib.request.urlretrieve(url, destino)
+                  if campo == "logo":
+                      subprocess.run(["python3", "packages/video-marca/logo_sem_fundo.py", destino, "/tmp/logo.png"],
+                                     check=True, stdout=sys.stderr)
+                      s["logo"] = "/tmp/logo.png"
+                  else:
+                      s["foto"] = destino
+              except Exception as e:
+                  print(f"{campo} não entrou: {e}", file=sys.stderr)
+          json.dump(s, open("/tmp/spec.json", "w"), ensure_ascii=False)
+          PY
+          NODE_PATH=/tmp/cf/node_modules CHROME_PATH=/usr/bin/google-chrome \
+            node packages/video-marca/carrossel-fabrica.cjs apps/franquias/public/fabrica/carrossel.html /tmp/spec.json /tmp/slides
+          ls -la /tmp/slides
+
+      - name: Subir e marcar pronto
+        env:
+          PREFIXO: ${{ inputs.destino_prefix }}
+        run: |
+          set -e
+          URLS=""
+          for i in 1 2 3 4 5 6 7 8 9; do
+            DESTINO="$PREFIXO/slide-$i.png"
+            curl -sf -X POST "$SB_URL/storage/v1/object/franqueadas-assets/$DESTINO" \
+              -H "Authorization: Bearer $SB_KEY" -H "Content-Type: image/png" -H "x-upsert: true" \
+              --data-binary @/tmp/slides/s$i.png > /dev/null
+            SIGNED=$(curl -sf -X POST "$SB_URL/storage/v1/object/sign/franqueadas-assets/$DESTINO" \
+              -H "Authorization: Bearer $SB_KEY" -H "Content-Type: application/json" \
+              -d '{"expiresIn":31536000}' | python3 -c "import json,sys;print(json.load(sys.stdin)['signedURL'])")
+            URLS="$URLS $SB_URL/storage/v1$SIGNED"
+          done
+          CORPO=$(python3 -c "import json,sys; u=sys.argv[1:]; print(json.dumps({'status':'aguardando_aprovacao','url_imagem_final':u[0],'urls_slides':u}))" $URLS)
+          curl -sf -X PATCH "$SB_URL/rest/v1/posts_agendados?id=eq.$PID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d "$CORPO"
+
+      - name: Marcar erro
+        if: failure()
+        run: |
+          curl -s -X PATCH "$SB_URL/rest/v1/posts_agendados?id=eq.$PID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"status":"erro"}' || true
