@@ -49,9 +49,9 @@ export default async function NovoPostPage() {
             você</strong>.
             <br />
             <span className="text-brand-text/50">
-              Quer que o conteúdo seja criado do zero, com arte e tudo? Isso é o{" "}
-              <Link href="/dashboard/conteudo" className="text-brand-primary underline">
-                Estúdio de conteúdo
+              Quer que o post seja criado do zero, com arte e tudo? Use o{" "}
+              <Link href="/dashboard/criar-post" className="text-brand-primary underline">
+                Criar post
               </Link>
               .
             </span>

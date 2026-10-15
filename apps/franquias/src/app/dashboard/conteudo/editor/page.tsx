@@ -27,10 +27,10 @@ export default async function EditorPage({
     <main className="min-h-screen bg-brand-muted">
       <div className="mx-auto max-w-6xl p-6 lg:p-8">
         <Link
-          href="/dashboard/conteudo"
+          href="/dashboard/criar-post"
           className="mb-4 inline-block text-sm text-brand-text/60 hover:text-brand-primary"
         >
-          ← Voltar pro estúdio
+          ← Voltar pra Criar post
         </Link>
 
         <header className="mb-6 flex flex-wrap items-end justify-between gap-4">

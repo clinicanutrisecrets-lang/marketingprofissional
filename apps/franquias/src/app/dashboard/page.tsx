@@ -91,7 +91,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Sem semana esperando: uma linha só, sem banda de "gerar". O pacote da
-          semana chega sozinho; o Estúdio continua no menu pra quem quiser
+          semana chega sozinho; pra um post a mais há o Criar post no menu
           (Aline, 02/10/2026: "mais clean, mais objetivo possível"). */}
       {!aviso && (
         <div className="mb-6 rounded-2xl bg-white p-4 text-sm text-brand-text/70 shadow-sm">
