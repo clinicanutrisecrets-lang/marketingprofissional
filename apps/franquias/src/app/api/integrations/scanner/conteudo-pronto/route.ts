@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/server";
 import { montarAvisoPronto } from "@/lib/conteudo/aviso-pronto-db";
+import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 20;
@@ -30,7 +31,12 @@ export const maxDuration = 20;
  * `x-scanner-signature`.
  *
  * Body: { scanner_user_id: string, email: string }
- * Resposta: { aviso: { titulo, detalhe, acao, href, estrategia? } | null }
+ * Resposta: { aviso: { titulo, detalhe, acao, href, estrategia? } | null,
+ *             fotos: { suas: number, total: number } | null }
+ *
+ * `fotos` (Aline 15/10/2026): quantas fotos ela tem em "Minhas fotos". O
+ * Scanner usa pra pedir mais fotos no dashboard enquanto ela tiver poucas
+ * fotos suas. null = não deu pra ler (o Scanner não desenha nada).
  */
 export async function POST(req: Request) {
   const secret = process.env.SCANNER_WEBHOOK_SECRET;
@@ -81,10 +87,30 @@ export async function POST(req: Request) {
 
   // Nutri que ainda não entrou no Marketing não tem conteúdo esperando —
   // e não é erro: é o estado normal de quem acabou de assinar.
-  if (!franqueadaId) return NextResponse.json({ aviso: null });
+  if (!franqueadaId) return NextResponse.json({ aviso: null, fotos: null });
 
-  const aviso = await montarAvisoPronto(admin, franqueadaId);
-  return NextResponse.json({ aviso });
+  const [aviso, fotos] = await Promise.all([montarAvisoPronto(admin, franqueadaId), contarFotos(admin, franqueadaId)]);
+  return NextResponse.json({ aviso, fotos });
+}
+
+async function contarFotos(
+  admin: ReturnType<typeof createAdminClient>,
+  franqueadaId: string,
+): Promise<{ suas: number; total: number } | null> {
+  const { data, error } = await admin
+    .from("arquivos_franqueada")
+    .select("tipo")
+    .eq("franqueada_id", franqueadaId)
+    .in("tipo", [...TIPOS_FOTO_BANCO]);
+  if (error) {
+    console.error("[conteudo-pronto] fotos não lidas", franqueadaId, error.message);
+    return null;
+  }
+  const tipos = ((data ?? []) as { tipo: string }[]).map((r) => r.tipo);
+  return {
+    suas: tipos.filter((t) => t === "foto_post" || t === "foto_profissional" || t === "foto_atendimento").length,
+    total: tipos.length,
+  };
 }
 
 function assinaturaConfere(corpo: string, recebida: string, secret: string): boolean {

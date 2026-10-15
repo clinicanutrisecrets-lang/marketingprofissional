@@ -55,7 +55,7 @@ export function FotosBanco() {
       <FileUpload
         label="Fotos suas"
         tipo="foto_post"
-        descricao="Você atendendo, no consultório, no seu dia a dia. Quanto mais fotos, menos a mesma aparece. Foto em pé ou quadrada, com boa luz."
+        descricao="Você atendendo, no consultório, se exercitando, no seu dia a dia. Suba de preferência mais de uma: as artes vão alternando entre elas, inclusive os posts para fixar no perfil. Foto em pé ou quadrada, com boa luz."
         multiplos
         arquivosExistentes={fotosPost}
         onUploadSucess={recarregar}
@@ -64,7 +64,7 @@ export function FotosBanco() {
       <FileUpload
         label="Fotos de comida e das suas receitas"
         tipo="foto_comida"
-        descricao="Pratos, sucos e receitas que você fez. Depois de subir, escreva embaixo o que é cada uma (ex.: suco de acerola): é por esse nome que a foto vai pro post certo."
+        descricao="Pratos de que você gosta, sucos e receitas que você fez. Depois de subir, escreva embaixo o que é cada uma (ex.: suco de acerola): é por esse nome que a foto vai pro post certo."
         multiplos
         arquivosExistentes={fotosComida}
         onUploadSucess={recarregar}

@@ -60,3 +60,21 @@ test("post fixo: ligado na semana, uma vez por conta pelo papel", () => {
   assert.match(mont, /if \(cErr\) return \{ ok: false/);
   assert.ok(PAPEL_POST_FIXO.length < 300);
 });
+
+test("post fixo: cada foto pede assuntos que existem no vocabulário de Minhas fotos", async () => {
+  const { ASSUNTOS_POR_FOTO_FIXO } = await import("./post-fixo.ts");
+  const { ASSUNTOS_FOTO } = await import("./fotos-banco.ts");
+  for (const f of FOTOS_POST_FIXO) {
+    const pede = ASSUNTOS_POR_FOTO_FIXO[f];
+    assert.ok(pede.length > 0, f);
+    for (const a of pede) assert.ok((ASSUNTOS_FOTO as readonly string[]).includes(a), `${f}: ${a}`);
+  }
+});
+
+test("post fixo: a foto dela vem antes da do banco, e o pacote passa a função", () => {
+  const mont = readFileSync(new URL("./post-fixo-da-semana.ts", import.meta.url), "utf8");
+  assert.ok(mont.indexOf("p.fotoDela(") < mont.indexOf("fotoDoPostFixoUrl(arquivoDaFoto("));
+  const semanal = readFileSync(new URL("./semanal.ts", import.meta.url), "utf8");
+  assert.match(semanal, /fotoDela: async \(assuntos\)/);
+  assert.match(semanal, /fotoUrl: \(await outraFotoDela\(\)\) \?\? fotoUrl/);
+});

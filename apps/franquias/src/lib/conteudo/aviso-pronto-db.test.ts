@@ -55,7 +55,7 @@ test("a rota do Scanner é SOMENTE LEITURA", () => {
 });
 
 test("franqueada inexistente devolve aviso null, não erro", () => {
-  assert.match(ROTA, /if \(!franqueadaId\) return NextResponse\.json\(\{ aviso: null \}\)/);
+  assert.match(ROTA, /if \(!franqueadaId\) return NextResponse\.json\(\{ aviso: null, fotos: null \}\)/);
 });
 
 test("acha por vínculo primeiro e por e-mail depois, como o /sso", () => {

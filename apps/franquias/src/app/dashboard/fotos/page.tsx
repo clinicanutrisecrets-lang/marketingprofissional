@@ -19,7 +19,8 @@ export default function MinhasFotosPage() {
           <p className="mt-1 text-sm text-brand-text/60">
             Suba fotos suas, do consultório e das suas receitas para os posts ganharem vida. O
             pacote da semana usa uma foto daqui na capa do carrossel e no post
-            de feed, trocando a cada post. Sem fotos, a arte sai só com o texto
+            de feed, trocando a cada post, e os posts para fixar no perfil
+            usam as suas fotos no lugar das do nosso banco. Sem fotos, a arte sai só com o texto
             na cor da sua marca.
           </p>
         </header>

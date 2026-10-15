@@ -958,6 +958,7 @@ export async function gerarPostsDaSemana(
     }
   }
 
+  const usadasFixo = new Set<string>();
   // 5e. O POST FIXO do perfil (lib/geracao/post-fixo.ts, Aline 15/10/2026):
   //     uma vez por conta, na primeira semana montada. Best-effort.
   {
@@ -968,11 +969,33 @@ export async function gerarPostsDaSemana(
       aprovacaoId,
       semanaRef,
       logoUrl: logoUrl ?? null,
+      // Conjunto PRÓPRIO de usadas: o post fixo é o que fica no topo do perfil,
+      // então pode repetir uma foto que um post da semana já usou.
+      fotoDela: async (assuntos) => {
+        const f = melhorFotoParaTexto(banco, "", usadasFixo, assuntos as AssuntoFoto[]);
+        if (!f) return null;
+        const buf = await baixarDoBanco(f);
+        if (buf) usadasFixo.add(f.id);
+        return buf ?? null;
+      },
     });
     if (fixo.ok) gerados += fixo.gerados;
     else console.warn("[semanal] post fixo do perfil não saiu:", fixo.motivo);
   }
 
+  /**
+   * Uma foto dela diferente da do perfil, quando ela subiu mais de uma
+   * (Aline 15/10: "ir mesclando diferentes fotos da pessoa ao invés de sempre
+   * usar a mesma"). Link assinado de 1 h: quem baixa é o worker.
+   */
+  const outraFotoDela = async (): Promise<string | null> => {
+    const outras = banco.filter((f) => f.url_storage !== fotoUrl);
+    const f = melhorFotoParaTexto(filaDaSemana(outras, semanaRef), "", new Set(), ["profissional"]);
+    const local = f ? caminhoNoBucket(f.url_storage) : null;
+    if (!local) return null;
+    const { data } = await admin.storage.from(local.bucket).createSignedUrl(local.path, 3600);
+    return data?.signedUrl ?? null;
+  };
   // 5f. O 2º post fixo, o carrossel da Fábrica da Saúde (lib/geracao/fabrica.ts),
   //     na semana seguinte à do 1º. Best-effort.
   {
@@ -983,7 +1006,7 @@ export async function gerarPostsDaSemana(
       aprovacaoId,
       semanaRef,
       logoUrl: logoUrl ?? null,
-      fotoUrl: fotoUrl ?? null,
+      fotoUrl: (await outraFotoDela()) ?? fotoUrl ?? null,
     });
     if (fab.ok) gerados += fab.gerados;
     else console.warn("[semanal] carrossel da Fábrica não saiu:", fab.motivo);
