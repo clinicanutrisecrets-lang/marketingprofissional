@@ -54,6 +54,7 @@ import { roteiroDoReelGerado } from "@/lib/geracao/roteiro-reels";
 import { brandDaFranqueada } from "@/lib/ai-image/brand";
 import { montarSinergiaDaSemana } from "@/lib/geracao/sinergia-da-semana";
 import { cardDeSinergiaSemArte } from "@/lib/geracao/sinergia";
+import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
 import {
   TIPOS_FOTO_BANCO,
   caminhoNoBucket,
@@ -954,6 +955,21 @@ export async function gerarPostsDaSemana(
     } catch (e) {
       console.warn("[semanal] stories falados falharam:", (e as Error).message);
     }
+  }
+
+  // 5e. O POST FIXO do perfil (lib/geracao/post-fixo.ts, Aline 15/10/2026):
+  //     uma vez por conta, na primeira semana montada. Best-effort.
+  {
+    const fixo = await montarPostFixoDaSemana({
+      admin,
+      franqueadaId,
+      franqueada,
+      aprovacaoId,
+      semanaRef,
+      logoUrl: logoUrl ?? null,
+    });
+    if (fixo.ok) gerados += fixo.gerados;
+    else console.warn("[semanal] post fixo do perfil não saiu:", fixo.motivo);
   }
 
   // 6. Atualiza total no registro de aprovação

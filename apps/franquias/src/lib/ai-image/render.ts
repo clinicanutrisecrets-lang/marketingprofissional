@@ -157,6 +157,8 @@ export async function gerarCarrosselEditorialEUpload(input: {
   fundoFecho?: string;
   logoUrl?: string | null;
   assinatura?: string;
+  /** Frase de rodapé do fecho (ex.: "Conteúdo informativo..."). */
+  aviso?: string;
 }): Promise<{ urls: string[] }> {
   let logoPlaca: Buffer | undefined;
   if (input.logoUrl && /^https?:/.test(input.logoUrl)) {
@@ -173,6 +175,7 @@ export async function gerarCarrosselEditorialEUpload(input: {
     logoPlaca,
     fundoFecho: input.fundoFecho,
     assinatura: input.assinatura,
+    aviso: input.aviso,
   });
   const admin = createAdminClient();
   const urls: string[] = [];
