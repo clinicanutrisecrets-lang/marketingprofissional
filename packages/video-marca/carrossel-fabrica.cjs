@@ -28,8 +28,10 @@ const K = [0, 0, 0];
 // Cor clara demais some como letra sobre o fundo claro: escurece antes.
 const legivel = (h) => (luz(rgb(h)) > 0.6 ? mix(rgb(h), K, 0.45) : h.toUpperCase());
 
+// Secundária quase branca ou cinza (sem cor) vira cinza ao escurecer: aí vale a principal.
+const semCor = (h) => { const c = rgb(h); return Math.max(...c) - Math.min(...c) < 24; };
 const P = rgb(legivel(spec.primaria));
-const S = rgb(legivel(spec.secundaria));
+const S = rgb(legivel(semCor(spec.secundaria) ? spec.primaria : spec.secundaria));
 const corP = hx(P);
 
 // 1. O molde, com a marca e os textos dela, ANTES de carregar: a página é um
