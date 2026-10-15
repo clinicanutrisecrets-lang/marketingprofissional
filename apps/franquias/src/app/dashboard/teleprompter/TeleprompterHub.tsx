@@ -102,14 +102,14 @@ export function TeleprompterHub({
         roteiros.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-brand-text/20 bg-white p-8 text-center">
             <p className="text-sm text-brand-text/60">
-              Nenhum roteiro gerado ainda. Os roteiros são criados junto com as
-              sugestões da semana, com pauta do seu nicho.
+              Nenhum roteiro ainda. Os roteiros chegam todo domingo, junto com
+              a sua semana de posts.
             </p>
             <Link
-              href="/dashboard/conteudo"
+              href="/dashboard/aprovar"
               className="mt-4 inline-block rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
             >
-              📝 Gerar sugestões da semana
+              Ver a minha semana
             </Link>
           </div>
         ) : (

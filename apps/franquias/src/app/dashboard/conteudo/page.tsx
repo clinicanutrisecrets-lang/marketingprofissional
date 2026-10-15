@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { semanaAlvo, formatarSemana } from "@/lib/conteudo/semana";
-import { GerarSugestoesButton } from "./GerarSugestoesButton";
+import { formatarSemana } from "@/lib/conteudo/semana";
 import { SugestaoCard, type Sugestao } from "./SugestaoCard";
 import { ReelAnimadoSection, type ReelAnimado } from "./ReelAnimadoSection";
 
@@ -42,11 +41,6 @@ export default async function ConteudoPage() {
     .limit(10);
   const reels = (reelsData ?? []) as ReelAnimado[];
 
-  // A semana que o botão gera/regera é a MESMA que o painel conta — e o botão
-  // precisa saber, de saída, se ela já tem pacote (senão o Regerar não aparece).
-  const alvo = semanaAlvo();
-  const jaTemPacote = sugestoes.some((s) => s.semana_ref === alvo);
-
   // Agrupa por semana
   const porSemana = new Map<string, Sugestao[]>();
   for (const s of sugestoes) {
@@ -69,7 +63,7 @@ export default async function ConteudoPage() {
           <div>
             <h1 className="text-3xl font-bold text-brand-text">Estúdio de conteúdo</h1>
             <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
-              Sugestões semanais baseadas no que está em alta no seu nicho: arte
+              Sugestões extras, montadas todo domingo, baseadas no que está em alta no seu nicho: arte
               pronta pra baixar, legenda pra copiar e roteiro de reels com
               teleprompter — é só gravar e postar.
             </p>
@@ -87,10 +81,6 @@ export default async function ConteudoPage() {
             >
               📚 Posts prontos
             </Link>
-            <GerarSugestoesButton
-              jaTemPacote={jaTemPacote}
-              rotuloSemana={formatarSemana(alvo)}
-            />
           </div>
         </header>
 
@@ -99,8 +89,12 @@ export default async function ConteudoPage() {
         {porSemana.size === 0 ? (
           <div className="rounded-2xl border border-dashed border-brand-text/20 bg-white p-10 text-center">
             <p className="text-brand-text/60">
-              Nenhuma sugestão ainda. Clique em <strong>Gerar sugestões da semana</strong>{" "}
-              pra criar seu primeiro calendário.
+              Nenhuma sugestão ainda. As sugestões são montadas sozinhas todo
+              domingo de manhã. O seu pacote principal da semana fica em{" "}
+              <Link href="/dashboard/aprovar" className="font-semibold text-brand-primary underline">
+                Aprovar semana
+              </Link>
+              .
             </p>
           </div>
         ) : (

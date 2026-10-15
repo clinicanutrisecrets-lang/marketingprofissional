@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
  * "❓ Tutorial". Carrossel didático com progresso e ações diretas.
  */
 
-const CHAVE = "tutorial_plataforma_v2";
+const CHAVE = "tutorial_plataforma_v3";
 
 type Passo = {
   emoji: string;
@@ -28,51 +28,58 @@ const PASSOS: Passo[] = [
     dica: "Você pode reabrir este tutorial quando quiser no botão ❓ Tutorial.",
   },
   {
-    emoji: "🎨",
-    titulo: "Estúdio de conteúdo",
+    emoji: "✅",
+    titulo: "Aprovar semana",
     texto:
-      "Todo domingo o sistema gera sugestões da semana pra você: posts com arte pronta na SUA marca, legenda pra copiar e roteiros de reels. As pautas vêm do que está em alta no seu nicho — é só baixar, copiar e postar.",
-    href: "/dashboard/conteudo",
-    hrefLabel: "Abrir o Estúdio",
+      "Todo domingo o sistema monta a sua semana sozinho: posts com arte na SUA marca, legenda pronta, stories e reel, seguindo uma estratégia que leva quem te segue até o teste nutrigenético. Você só revisa, ajusta o que quiser e aprova. Aprovado, é baixar as artes e copiar as legendas.",
+    dica: "O guia da semana, no topo da tela, explica o papel de cada post.",
+    href: "/dashboard/aprovar",
+    hrefLabel: "Abrir Aprovar semana",
   },
   {
-    emoji: "🎥",
-    titulo: "Teleprompter de reels",
+    emoji: "📝",
+    titulo: "Pedir conteúdo",
     texto:
-      "O roteiro rola na tela enquanto a câmera te filma — você lê olhando pra câmera, baixa o vídeo e posta. Dois caminhos: os roteiros prontos da semana ficam no Estúdio (cards com etiqueta REEL), e no menu 'Teleprompter' você cola qualquer roteiro seu e grava na hora.",
-    dica: "Grave na vertical, com luz de frente pra você (janela ou ring light). Dá pra ajustar velocidade e tamanho da letra.",
-    href: "/dashboard/teleprompter",
-    hrefLabel: "Abrir o Teleprompter",
+      "Quer um assunto específico na próxima semana? Peça aqui. O pedido entra no pacote do domingo seguinte.",
+    href: "/dashboard/briefings",
+    hrefLabel: "Pedir conteúdo",
   },
   {
-    emoji: "🖼️",
-    titulo: "Editor de arte",
+    emoji: "🛍️",
+    titulo: "Posts de venda",
     texto:
-      "Quer criar um post do zero? No editor você escreve o texto, escolhe cor (ou usa as da sua marca), suba sua foto e sua logo — e baixa a arte pronta em segundos. Tem layout clássico, citação e lista.",
-    href: "/dashboard/conteudo/editor",
-    hrefLabel: "Abrir o Editor",
+      "Posts prontos pra cada produto que você vende, com a arte na sua marca e o link de compra na legenda.",
+    href: "/dashboard/posts-venda",
+    hrefLabel: "Ver posts de venda",
   },
   {
-    emoji: "📚",
-    titulo: "Posts prontos",
+    emoji: "🎬",
+    titulo: "Vídeos",
     texto:
-      "Uma biblioteca de posts profissionais criados pela equipe Scanner, com legenda completa. Toque em 'Personalizar aqui' pra adaptar à sua marca no editor, ou abra o modelo original no Canva.",
-    href: "/dashboard/biblioteca-posts",
-    hrefLabel: "Ver a biblioteca",
+      "Teleprompter (o roteiro rola na tela enquanto você grava pelo celular), vídeo curto com uma frase escrita em cima de um clipe, e edição automática do vídeo que você gravou.",
+    dica: "Grave na vertical, com luz de frente pra você (janela ou ring light).",
+    href: "/dashboard/videos",
+    hrefLabel: "Abrir Vídeos",
+  },
+  {
+    emoji: "🧰",
+    titulo: "Mais ferramentas",
+    texto:
+      "No menu, em 'Mais ferramentas', ficam o Estúdio de conteúdo (sugestões extras de domingo), o Editor de arte, Minhas fotos, Minha galeria, Posts prontos e o Post manual.",
   },
   {
     emoji: "📲",
     titulo: "Como postar no Instagram",
     texto:
-      "É simples: baixe a arte (vai pra galeria do seu celular), toque em 'Copiar legenda', abra o Instagram, crie o post com a arte e cole a legenda. Menos de 1 minuto por post.",
+      "Baixe a arte (vai pra galeria do seu celular), toque em 'Copiar legenda', abra o Instagram, crie o post com a arte e cole a legenda. Menos de 1 minuto por post.",
     dica: "Salve as artes da semana de uma vez e agende no próprio Instagram se quiser.",
   },
   {
     emoji: "🚀",
     titulo: "Tudo pronto pra começar!",
     texto:
-      "Sugestão de primeiro passo: abra o Estúdio de conteúdo e clique em '✨ Gerar sugestões da semana'. Em 1 minuto você terá seus primeiros posts prontos.",
-    href: "/dashboard/conteudo",
+      "Primeiro passo: abra Aprovar semana e veja o que já está montado pra você.",
+    href: "/dashboard/aprovar",
     hrefLabel: "Começar agora",
   },
 ];
