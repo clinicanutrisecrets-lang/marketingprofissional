@@ -55,6 +55,7 @@ import { brandDaFranqueada } from "@/lib/ai-image/brand";
 import { montarSinergiaDaSemana } from "@/lib/geracao/sinergia-da-semana";
 import { cardDeSinergiaSemArte } from "@/lib/geracao/sinergia";
 import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
+import { montarFabricaDaSemana } from "@/lib/geracao/fabrica-da-semana";
 import {
   TIPOS_FOTO_BANCO,
   caminhoNoBucket,
@@ -970,6 +971,22 @@ export async function gerarPostsDaSemana(
     });
     if (fixo.ok) gerados += fixo.gerados;
     else console.warn("[semanal] post fixo do perfil não saiu:", fixo.motivo);
+  }
+
+  // 5f. O 2º post fixo, o carrossel da Fábrica da Saúde (lib/geracao/fabrica.ts),
+  //     na semana seguinte à do 1º. Best-effort.
+  {
+    const fab = await montarFabricaDaSemana({
+      admin,
+      franqueadaId,
+      franqueada,
+      aprovacaoId,
+      semanaRef,
+      logoUrl: logoUrl ?? null,
+      fotoUrl: fotoUrl ?? null,
+    });
+    if (fab.ok) gerados += fab.gerados;
+    else console.warn("[semanal] carrossel da Fábrica não saiu:", fab.motivo);
   }
 
   // 6. Atualiza total no registro de aprovação
