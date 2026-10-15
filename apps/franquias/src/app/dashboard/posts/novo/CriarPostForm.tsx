@@ -55,7 +55,7 @@ export function CriarPostForm() {
 
   async function handleGerarIA() {
     if (!briefing.trim()) {
-      setErro("Escreva um briefing curto antes de pedir IA");
+      setErro("Escreva o assunto em 1 ou 2 linhas antes de gerar");
       return;
     }
     setGerandoIA(true);
@@ -66,7 +66,7 @@ export function CriarPostForm() {
       setLegenda(r.legenda ?? "");
       setCta(r.cta ?? "");
       setHashtags(r.hashtags ?? []);
-      setMsg("IA gerou a legenda! Revise e ajuste se quiser.");
+      setMsg("Legenda pronta. Revise e ajuste se quiser.");
     } else {
       setErro(r.erro ?? "Erro ao gerar");
     }
@@ -142,13 +142,13 @@ export function CriarPostForm() {
       </div>
 
       <TextArea
-        label="Briefing pra IA (1-2 linhas)"
+        label="Assunto do post (1 ou 2 linhas)"
         name="briefing"
         value={briefing}
         onChange={setBriefing}
         placeholder="Ex: quero falar sobre vitamina D e K2 juntas — explicando a sinergia de forma acessível"
         rows={2}
-        hint="Preencha só se for usar a IA. Se for escrever manualmente, pule."
+        hint="Preencha só se quiser que o Scanner escreva a legenda. Se for escrever você mesma, pule."
       />
       <button
         type="button"
@@ -156,7 +156,7 @@ export function CriarPostForm() {
         disabled={!briefing || gerandoIA}
         className="w-full rounded-lg border border-brand-primary bg-brand-primary/5 px-4 py-2 text-sm font-medium text-brand-primary hover:bg-brand-primary/10 disabled:opacity-60"
       >
-        {gerandoIA ? "Gerando..." : "✨ Gerar legenda com IA"}
+        {gerandoIA ? "Gerando..." : "Escrever a legenda pra mim"}
       </button>
 
       <TextArea

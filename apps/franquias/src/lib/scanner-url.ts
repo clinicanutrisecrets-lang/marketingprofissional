@@ -17,3 +17,13 @@ export const SCANNER_SAAS_URL = (
 export function urlEbookNoScanner(tema: string): string {
   return `${SCANNER_SAAS_URL}/nutri/ebook?tema=${encodeURIComponent(tema.trim())}&origem=marketing`;
 }
+
+/**
+ * Carrossel por tema do Scanner já com o tema preenchido. É o caminho de um
+ * tema em alta virar post COMPLETO (capa, slides e legenda); o "Post manual"
+ * deste app só escreve a legenda, e era pra lá que o tema em alta mandava
+ * (Juliana 14/10: "aperta o botão e ele só gera a legenda").
+ */
+export function urlCarrosselNoScanner(tema: string): string {
+  return `${SCANNER_SAAS_URL}/nutri/conteudo/carrossel?tema=${encodeURIComponent(tema.trim())}`;
+}

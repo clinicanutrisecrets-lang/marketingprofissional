@@ -4,7 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-type Item = { href: string; icone: string; label: string; exato?: boolean };
+type Item = { href: string; icone: string; label: string; exato?: boolean; externo?: boolean };
+
+/**
+ * O Carrossel por tema mora no Scanner (Juliana 14/10: em tela cheia ele
+ * sumia, porque a porta dele estava só na página "Posts e Conteúdo" do
+ * Scanner). Abre no topo da aba (`_top`): dentro do iframe, abrir o Scanner
+ * dentro do próprio Scanner seria uma tela dentro da outra.
+ */
+export const URL_CARROSSEL_TEMA = "https://scannerdasaude.com/nutri/conteudo/carrossel";
 
 /**
  * O caminho da semana fica à mostra; o resto vai pra "Mais ferramentas"
@@ -17,6 +25,7 @@ const PRINCIPAIS: Item[] = [
   { href: "/dashboard/briefings", icone: "📝", label: "Pedir conteúdo" },
   { href: "/dashboard/posts-venda", icone: "🛍️", label: "Posts de venda" },
   { href: "/dashboard/videos", icone: "🎬", label: "Vídeos" },
+  { href: URL_CARROSSEL_TEMA, icone: "🧩", label: "Carrossel por tema", externo: true },
 ];
 
 const FERRAMENTAS: Item[] = [
@@ -53,9 +62,9 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
       <div className="sticky top-0 z-30 -mx-4 mb-4 border-b border-brand-text/8 bg-white/90 px-4 py-2 backdrop-blur">
         <div className="flex flex-wrap gap-2">
           {itens.map((item) => (
-            <Link
+            <ItemLink
               key={item.href}
-              href={item.href}
+              item={item}
               className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
                 ativo(item)
                   ? "bg-brand-primary text-white"
@@ -63,7 +72,7 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
               }`}
             >
               {item.icone} {item.label}
-            </Link>
+            </ItemLink>
           ))}
           <BotaoMais aberto={mostrarMais} onClick={() => setMaisAberto(!mostrarMais)} chip />
         </div>
@@ -99,9 +108,9 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {[...PRINCIPAIS, ...(mostrarMais ? FERRAMENTAS : [])].map((item) => (
-            <Link
+            <ItemLink
               key={item.href}
-              href={item.href}
+              item={item}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                 ativo(item)
                   ? "bg-brand-primary text-white shadow-sm"
@@ -110,7 +119,7 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
             >
               <span className="w-5 text-center">{item.icone}</span>
               {item.label}
-            </Link>
+            </ItemLink>
           ))}
           <BotaoMais aberto={mostrarMais} onClick={() => setMaisAberto(!mostrarMais)} />
         </nav>
@@ -139,9 +148,9 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
       <div className="sticky top-0 z-30 -mx-4 mb-4 overflow-x-auto border-b border-brand-text/8 bg-white/90 px-4 py-2 backdrop-blur lg:hidden">
         <div className="flex w-max gap-2">
           {[...PRINCIPAIS, ...(mostrarMais ? FERRAMENTAS : [])].map((item) => (
-            <Link
+            <ItemLink
               key={item.href}
-              href={item.href}
+              item={item}
               className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
                 ativo(item)
                   ? "bg-brand-primary text-white"
@@ -149,7 +158,7 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
               }`}
             >
               {item.icone} {item.label}
-            </Link>
+            </ItemLink>
           ))}
           <BotaoMais aberto={mostrarMais} onClick={() => setMaisAberto(!mostrarMais)} chip />
         </div>
@@ -180,5 +189,20 @@ function BotaoMais(props: { aberto: boolean; onClick: () => void; chip?: boolean
       <span className="w-5 text-center">{props.aberto ? "▴" : "▾"}</span>
       {texto}
     </button>
+  );
+}
+
+function ItemLink(props: { item: Item; className: string; children: React.ReactNode }) {
+  if (props.item.externo) {
+    return (
+      <a href={props.item.href} target="_top" className={props.className}>
+        {props.children}
+      </a>
+    );
+  }
+  return (
+    <Link href={props.item.href} className={props.className}>
+      {props.children}
+    </Link>
   );
 }
