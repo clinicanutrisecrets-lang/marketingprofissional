@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { VIDEOS_METODOLOGIA } from "@/lib/videos/metodologia";
+import { VIDEOS_MARCA } from "@/lib/videos/marca";
+import { pathVideoMarcaPronto } from "@/lib/videos/marca-servidor";
 import { trechosDoReel, type Trecho } from "@/lib/narracao/roteiro";
 import { listarNarracoesAction, type OrigemNarracao } from "@/lib/narracao/actions";
 import { GravadorNarracao } from "./GravadorNarracao";
@@ -26,7 +28,8 @@ export default async function NarrarPage({
   const { data: f } = await supabase.from("franqueadas").select("id").eq("auth_user_id", user.id).maybeSingle();
   if (!f) redirect("/onboarding");
 
-  const origem: OrigemNarracao = searchParams.origem === "metodologia" ? "metodologia" : "reel";
+  const origem: OrigemNarracao =
+    searchParams.origem === "metodologia" ? "metodologia" : searchParams.origem === "marca" ? "marca" : "reel";
   const ref = (searchParams.ref ?? "").slice(0, 80);
 
   let titulo = "";
@@ -39,6 +42,15 @@ export default async function NarrarPage({
     if (v) {
       titulo = v.titulo;
       videoUrl = v.arquivo;
+      trechos = v.roteiro.map((t) => ({ de: t.de, ate: t.ate, texto: t.texto }));
+    }
+  } else if (origem === "marca") {
+    const v = VIDEOS_MARCA.find((x) => x.id === ref);
+    if (v) {
+      titulo = v.titulo;
+      const pronto = await pathVideoMarcaPronto((f as { id: string }).id, v.id);
+      videoUrl = pronto?.url ?? null;
+      if (!pronto) aviso = "O seu vídeo ainda está sendo montado. Volte em alguns minutos.";
       trechos = v.roteiro.map((t) => ({ de: t.de, ate: t.ate, texto: t.texto }));
     }
   } else if (ref) {

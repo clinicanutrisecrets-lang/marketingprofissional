@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { VIDEOS_METODOLOGIA } from "@/lib/videos/metodologia";
+import { VIDEOS_MARCA } from "@/lib/videos/marca";
+import { pathVideoMarcaPronto } from "@/lib/videos/marca-servidor";
 
 /**
  * Narração gravada por cima do vídeo (Aline, 13/10/2026). Fluxo:
@@ -21,7 +23,7 @@ const REPO = "clinicanutrisecrets-lang/marketingprofissional";
 const BUCKET = "franqueadas-assets";
 const MAX_BYTES = 30 * 1024 * 1024; // 2 min de voz cabem com folga
 
-export type OrigemNarracao = "reel" | "metodologia";
+export type OrigemNarracao = "reel" | "metodologia" | "marca";
 
 export type Narracao = {
   id: string;
@@ -57,6 +59,13 @@ async function videoDaOrigem(
     const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.scannerdasaude.com";
     return { ok: true, videoUrl: `${base}${v.arquivo}` };
   }
+  if (origem === "marca") {
+    // Vídeo na marca dela: o MP4 é dela, no Storage (o molde nunca serve).
+    if (!VIDEOS_MARCA.some((x) => x.id === ref)) return { ok: false, msg: "vídeo não encontrado" };
+    const pronto = await pathVideoMarcaPronto(fid, ref);
+    if (!pronto) return { ok: false, msg: "o vídeo ainda não ficou pronto" };
+    return { ok: true, videoPath: pronto.path };
+  }
   const { data, error } = await createAdminClient()
     .from("reels_animados")
     .select("id, franqueada_id, status, path")
@@ -77,7 +86,7 @@ export async function prepararNarracaoAction(p: {
 }): Promise<{ ok: true; id: string; path: string; token: string } | { ok: false; msg: string }> {
   const fid = await franqueadaId();
   if (!fid) return { ok: false, msg: "sessão inválida, entre de novo" };
-  if (p.origem !== "reel" && p.origem !== "metodologia") return { ok: false, msg: "origem inválida" };
+  if (p.origem !== "reel" && p.origem !== "metodologia" && p.origem !== "marca") return { ok: false, msg: "origem inválida" };
   if (!(p.tamanhoBytes > 0)) return { ok: false, msg: "a gravação veio vazia, grave de novo" };
   if (p.tamanhoBytes > MAX_BYTES) return { ok: false, msg: "gravação grande demais, grave de novo" };
   const v = await videoDaOrigem(fid, p.origem, p.ref);

@@ -9,6 +9,8 @@ import { VideoCurtoSection, type ClipeEscolhivel } from "./VideoCurtoSection";
 import { listarBiblioteca } from "@/lib/videos/actions";
 import { listarAcervo } from "@/lib/videos/acervo";
 import { VideosMetodologiaSection } from "./VideosMetodologiaSection";
+import { VideosMarcaSection } from "./VideosMarcaSection";
+import { videosMarcaDaFranqueada } from "@/lib/videos/marca-servidor";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +50,7 @@ export default async function VideosHubPage() {
     .order("criado_em", { ascending: false })
     .limit(10);
   const reels = (reelsData ?? []) as ReelAnimado[];
+  const videosMarca = await videosMarcaDaFranqueada(franqueada as { id: string; email: string | null });
 
   return (
     <main className="mx-auto max-w-5xl py-6 lg:py-10 lg:pl-6">
@@ -112,6 +115,7 @@ export default async function VideosHubPage() {
         )}
       </div>
 
+      {videosMarca && videosMarca.length > 0 && <VideosMarcaSection videos={videosMarca} />}
       <VideosMetodologiaSection />
 
       {corteIa && <VideoCurtoSection biblioteca={biblioteca} acervo={acervo} />}
