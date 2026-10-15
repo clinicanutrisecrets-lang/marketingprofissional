@@ -37,6 +37,17 @@ const limpo = (v: unknown, max: number): string | null => {
 };
 
 /** Aceita só o que tem forma; o resto vira "não respondeu". */
+/**
+ * Código de ética (Aline, 15/10/2026): a ação da data é BÔNUS, nunca promoção
+ * nem desconto. Mesma régua do Scanner (`termoDePromocao`), repetida aqui como
+ * rede: bônus com palavra de promoção não vira post.
+ */
+const RE_PROMOCAO =
+  /promo[cç](ã|a)o|promo[cç](õ|o)es|(?<![\p{L}])promo(?![\p{L}])|desconto|liquida[cç]|%|(?<![\p{L}])off(?![\p{L}])|r\$\s*\d|(?<![\p{L}])pre[cç]os?(?![\p{L}])|pela metade|(?<![\p{L}])barat/iu;
+export function temPalavraDePromocao(texto: string | null | undefined): boolean {
+  return !!texto && RE_PROMOCAO.test(texto);
+}
+
 export function validarPreferenciasScanner(bruto: unknown): PreferenciasScanner | null {
   if (!bruto || typeof bruto !== "object") return null;
   const o = bruto as Record<string, unknown>;
@@ -71,9 +82,9 @@ const DIA_MS = 86_400_000;
 
 /**
  * A data que entra no pacote desta semana: a mais próxima com escolha
- * (promoção ou só posts) entre o início da semana e 13 dias depois. Assim a
- * data aparece nas duas semanas que a antecedem. Promoção sem condição não
- * entra (o post nunca inventa a condição).
+ * (bônus ou só posts) entre o início da semana e 13 dias depois. Assim a
+ * data aparece nas duas semanas que a antecedem. Bônus vazio ou escrito como
+ * promoção não entra (o post nunca inventa o bônus).
  */
 export function dataDaSemana(
   prefs: PreferenciasScanner | null,
@@ -83,7 +94,9 @@ export function dataDaSemana(
   const ini = Date.parse(`${semanaRef}T00:00:00Z`);
   if (!Number.isFinite(ini)) return null;
   const candidatas = prefs.datas
-    .filter((d) => d.escolha === "so_posts" || (d.escolha === "promocao" && !!d.condicao))
+    .filter(
+      (d) => d.escolha === "so_posts" || (d.escolha === "promocao" && !!d.condicao && !temPalavraDePromocao(d.condicao)),
+    )
     .map((d) => ({ d, delta: Math.round((Date.parse(`${d.data}T00:00:00Z`) - ini) / DIA_MS) }))
     .filter((x) => x.delta >= 0 && x.delta <= 13)
     .sort((a, b) => a.delta - b.delta);
@@ -102,7 +115,7 @@ const COMERCIAIS = new Set(["divulgacao_produto", "chamada_direta"]);
 const ehTemaEmAlta = (s: SlotMinimo) => s.papel.startsWith("Tema em alta:");
 
 /**
- * O post que recebe a data. Promoção: o post comercial da semana (é ele que
+ * O post que recebe a data. Bônus: o post comercial da semana (é ele que
  * fala de oferta); sem ele, o carrossel. Só posts: o carrossel de conteúdo,
  * que explica a consulta voltado pro tema da data. Nunca stories e nunca o post
  * que já carrega o tema em alta.
@@ -136,13 +149,14 @@ export function aplicarDataComemorativa<S extends SlotMinimo>(
     data.escolha === "promocao"
       ? [
           `DATA COMEMORATIVA DESTA SEMANA (ASSUNTO OBRIGATÓRIO deste post, não é sugestão): ${data.nome}, dia ${dataBR(data.data)}.`,
-          `A profissional escolheu fazer uma AÇÃO ESPECIAL com ${produto}. A condição é exatamente esta: "${data.condicao}".`,
-          "Escreva a condição como ela está, sem acrescentar desconto, prazo, brinde ou número que não estejam nela.",
-          `O post liga a data ao cuidado com a saúde (presentear quem você ama com saúde) e convida a conhecer ${produto}.`,
+          `A profissional escolheu oferecer um BÔNUS com ${produto}. O bônus é exatamente este: "${data.condicao}".`,
+          "Escreva o bônus como ela escreveu, sem acrescentar outro bônus, prazo ou número que não estejam nele.",
+          "Pelo código de ética, NUNCA use as palavras promoção, desconto, oferta, preço, porcentagem, 'off' nem valor em reais: é sempre bônus (ex.: \"Consulta Epigenética com bônus de uma consulta de retorno\").",
+          `O post liga a data ao cuidado com a saúde (presentear quem você ama com saúde) e convida a conhecer ${produto} com o bônus.`,
         ].join("\n")
       : [
           `DATA COMEMORATIVA DESTA SEMANA (ASSUNTO OBRIGATÓRIO deste post, não é sugestão): ${data.nome}, dia ${dataBR(data.data)}.`,
-          "A profissional escolheu SÓ POSTS COM A DATA, sem condição especial: não fale de desconto, promoção, oferta nem prazo.",
+          "A profissional escolheu SÓ POSTS COM A DATA, sem bônus: não fale de bônus, desconto, promoção, oferta, preço nem prazo.",
           "O post liga a data ao cuidado com a saúde (ex.: quem você ama merece toda a saúde do mundo pra continuar colecionando sorrisos) e termina convidando a conhecer a Consulta Nutrigenética.",
         ].join("\n");
   const novo: S = {

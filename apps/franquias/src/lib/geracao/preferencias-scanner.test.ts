@@ -10,6 +10,7 @@ import {
   dataDaSemana,
   aplicarDataComemorativa,
   frequenciaReelsComVideo,
+  temPalavraDePromocao,
 } from "./preferencias-scanner.ts";
 import { conferirStoriesFalados } from "./stories-falados.ts";
 
@@ -23,7 +24,7 @@ const slots = () => [
 const prefs = validarPreferenciasScanner({
   grava_videos: true,
   datas: [
-    { chave: "dia_das_maes-2027", nome: "Dia das Mães", data: "2027-05-09", escolha: "promocao", condicao: "10% até\n dia 8", produto: "Consulta Nutrigenética" },
+    { chave: "dia_das_maes-2027", nome: "Dia das Mães", data: "2027-05-09", escolha: "promocao", condicao: "bônus de uma consulta\n de retorno", produto: "Consulta Nutrigenética" },
     { chave: "natal-2026", nome: "Natal", data: "2026-12-25", escolha: "so_posts" },
     { chave: "x", nome: "y", data: "2026-12-01", escolha: "inventada" },
   ],
@@ -31,7 +32,7 @@ const prefs = validarPreferenciasScanner({
 
 test("validação: escolha inventada sai, condição perde a quebra de linha", () => {
   assert.equal(prefs!.datas.length, 2);
-  assert.equal(prefs!.datas[0]!.condicao, "10% até dia 8");
+  assert.equal(prefs!.datas[0]!.condicao, "bônus de uma consulta de retorno");
   assert.equal(validarPreferenciasScanner(null), null);
 });
 
@@ -42,13 +43,13 @@ test("a data entra nas duas semanas antes dela, nunca depois", () => {
   assert.equal(dataDaSemana(prefs, "2026-12-14")?.chave, "natal-2026");
 });
 
-test("promoção vai no post comercial com a condição dela; só posts no carrossel, sem oferta", () => {
+test("bônus vai no post comercial com o texto dela; só posts no carrossel, sem oferta", () => {
   const promo = aplicarDataComemorativa(slots(), dataDaSemana(prefs, "2027-05-03"));
-  assert.match(promo.slots[2]!.instrucao, /"10% até dia 8"/);
-  assert.match(promo.slots[2]!.instrucao, /sem acrescentar desconto/);
+  assert.match(promo.slots[2]!.instrucao, /"bônus de uma consulta de retorno"/);
+  assert.match(promo.slots[2]!.instrucao, /NUNCA use as palavras promoção, desconto/);
   const so = aplicarDataComemorativa(slots(), dataDaSemana(prefs, "2026-12-14"));
   assert.match(so.slots[1]!.papel, /^Data comemorativa: Natal/);
-  assert.match(so.slots[1]!.instrucao, /não fale de desconto/);
+  assert.match(so.slots[1]!.instrucao, /não fale de bônus, desconto/);
   // Nunca o post do tema em alta nem stories.
   assert.equal(so.slots[0]!.instrucao, "i0");
   assert.equal(so.slots[3]!.instrucao, "i3");
@@ -85,4 +86,19 @@ test("ligação: semanal usa a data e grava os stories; sync espelha; card mostr
   assert.match(sync, /preferencias_scanner/);
   const card = readFileSync(new URL("../../app/dashboard/aprovar/AprovacaoView.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(card, /ehReels && typeof post\.roteiro_reels/);
+});
+
+test("código de ética: bônus escrito como promoção ou desconto não vira post", () => {
+  for (const ruim of ["10% até dia 8", "desconto de 100 reais", "promoção de Black Friday", "R$ 200 a menos"]) {
+    assert.ok(temPalavraDePromocao(ruim), ruim);
+    const p = validarPreferenciasScanner({
+      datas: [{ chave: "black_friday-2026", nome: "Black Friday", data: "2026-11-27", escolha: "promocao", condicao: ruim, produto: "Consulta Epigenética" }],
+    });
+    assert.equal(dataDaSemana(p, "2026-11-16"), null, ruim);
+  }
+  assert.equal(temPalavraDePromocao("bônus de um e-book de receitas saudáveis para sobremesa"), false);
+  const bf = validarPreferenciasScanner({
+    datas: [{ chave: "black_friday-2026", nome: "Black Friday", data: "2026-11-27", escolha: "promocao", condicao: "bônus de um retorno", produto: "Consulta Epigenética" }],
+  });
+  assert.equal(dataDaSemana(bf, "2026-11-16")?.nome, "Black Friday");
 });
