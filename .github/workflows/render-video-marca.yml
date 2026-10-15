@@ -1,0 +1,85 @@
+name: Render Vídeo de Marca
+
+# Vídeo animado na marca da profissional: abre o molde do Claude Design
+# (apps/franquias/public/videos-marca/) com ?primaria=&secundaria=&logo=,
+# avança a animação quadro a quadro num Chrome sem tela e monta o MP4 com
+# ffmpeg. Sem modelo nenhum. Disparado por apps/franquias/src/lib/videos/marca-servidor.ts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      registro_id:
+        description: "id na tabela videos_marca"
+        required: true
+      molde:
+        description: "arquivo do molde em public/videos-marca (ex.: fto.html)"
+        required: true
+      parametros:
+        description: "query string com primaria, secundaria e logo"
+        required: true
+      destino_path:
+        description: "caminho no bucket franqueadas-assets"
+        required: true
+      supabase_url:
+        required: false
+        default: ""
+      supabase_key:
+        required: false
+        default: ""
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
+      SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
+      RID: ${{ inputs.registro_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependências
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          mkdir -p /tmp/vm && cd /tmp/vm && npm init -y >/dev/null && npm i puppeteer-core@23.11.1 --silent
+          google-chrome --version
+
+      - name: Renderizar
+        env:
+          MOLDE: ${{ inputs.molde }}
+          PARAMS: ${{ inputs.parametros }}
+        run: |
+          set -e
+          case "$MOLDE" in *[!a-z0-9._-]*) echo "molde inválido"; exit 1;; esac
+          test -f "apps/franquias/public/videos-marca/$MOLDE"
+          (cd apps/franquias/public/videos-marca && python3 -m http.server 8765 >/dev/null 2>&1 &)
+          sleep 2
+          NODE_PATH=/tmp/vm/node_modules CHROME_PATH=/usr/bin/google-chrome \
+            node packages/video-marca/render.cjs "http://localhost:8765/$MOLDE?$PARAMS" /tmp/video.mp4 --fps 30
+          ls -la /tmp/video.mp4
+
+      - name: Subir e marcar pronto
+        env:
+          DESTINO: ${{ inputs.destino_path }}
+        run: |
+          set -e
+          curl -sf -X POST "$SB_URL/storage/v1/object/franqueadas-assets/$DESTINO" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: video/mp4" -H "x-upsert: true" \
+            --data-binary @/tmp/video.mp4
+          SIGNED=$(curl -sf -X POST "$SB_URL/storage/v1/object/sign/franqueadas-assets/$DESTINO" \
+            -H "Authorization: Bearer $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"expiresIn":31536000}' | python3 -c "import json,sys;print(json.load(sys.stdin)['signedURL'])")
+          curl -sf -X PATCH "$SB_URL/rest/v1/videos_marca?id=eq.$RID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d "{\"status\":\"pronto\",\"path\":\"$DESTINO\",\"url\":\"$SB_URL/storage/v1$SIGNED\",\"atualizado_em\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Marcar erro
+        if: failure()
+        run: |
+          curl -s -X PATCH "$SB_URL/rest/v1/videos_marca?id=eq.$RID" \
+            -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+            -d '{"status":"erro","erro_msg":"o vídeo não ficou pronto"}' || true
