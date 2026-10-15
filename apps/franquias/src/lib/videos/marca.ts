@@ -292,9 +292,9 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     versao: 1,
     duracaoSeg: 95.5,
     resumo:
-      "Os genes GLP1R e GIPR montam as fechaduras das chaves da saciedade: por que a canetinha não funciona igual para todo mundo e como o prato certo ajuda.",
+      "Os genes GLP1R e GIPR montam as fechaduras das chaves da saciedade: por que a semaglutida e a tirzepatida não funcionam igual para todo mundo e como o prato certo ajuda.",
     roteiro: [
-      { de: 0, ate: 9, texto: "A canetinha funciona igual para todo mundo? Os genes GLP1R e GIPR respondem." },
+      { de: 0, ate: 9, texto: "A semaglutida e a tirzepatida funcionam igual para todo mundo? Os genes GLP1R e GIPR respondem." },
       {
         de: 9,
         ate: 24,
@@ -304,12 +304,12 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       {
         de: 24,
         ate: 35,
-        texto: "A canetinha imita essas chaves e entrega direto no corpo: a fome diminui e a saciedade dura mais. Mas a fechadura de cada pessoa é um pouquinho diferente.",
+        texto: "A semaglutida e a tirzepatida, as canetinhas, imitam essas chaves no corpo: a fome diminui e a saciedade dura mais. Mas a fechadura de cada pessoa é um pouquinho diferente.",
       },
       {
         de: 35,
         ate: 47,
-        texto: "No GLP1R, algumas pessoas têm G, outras têm A. Quem tem A tende a perder mais peso com a canetinha. Quem tem G tende a responder menos.",
+        texto: "No GLP1R, algumas pessoas têm G, outras têm A. Quem tem A tende a perder mais peso com a semaglutida. Quem tem G tende a responder menos.",
       },
       {
         de: 47,
@@ -320,7 +320,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
         de: 59,
         ate: 79,
         texto:
-          "A comida também fabrica chaves naturais: proteína, fibras, azeite e comer devagar. As fibras alimentam a microbiota, que faz o intestino liberar mais GLP1. A canetinha não faz tudo sozinha: o prato certo ajuda a chave e a fechadura a trabalharem juntas.",
+          "A comida também fabrica chaves naturais: proteína, fibras, azeite e comer devagar. As fibras alimentam a microbiota, que faz o intestino liberar mais GLP1. O medicamento não faz tudo sozinho: o prato certo ajuda a chave e a fechadura a trabalharem juntas.",
       },
       { de: 79, ate: 86, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
       {
@@ -330,9 +330,9 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       },
     ],
     legenda: [
-      "A canetinha funciona igual para todo mundo?",
+      "A semaglutida e a tirzepatida funcionam igual para todo mundo?",
       "Quando você come, o intestino libera duas chaves, o GLP1 e o GIP, que abrem fechaduras no cérebro e no pâncreas e trazem saciedade. Os genes GLP1R e GIPR são a receita dessas fechaduras, e elas mudam um pouquinho de pessoa para pessoa.",
-      "Por isso a resposta à canetinha não é igual para todo mundo, e o prato certo também ajuda: proteína, fibras, azeite e comer devagar fazem o intestino liberar mais chaves naturais.",
+      "Por isso a resposta à semaglutida e à tirzepatida não é igual para todo mundo, e o prato certo também ajuda: proteína, fibras, azeite e comer devagar fazem o intestino liberar mais chaves naturais.",
       "O uso de medicamentos é decisão do médico. Quer saber quais são as suas letrinhas? Me chama no direct.",
     ].join("\n\n"),
   },
