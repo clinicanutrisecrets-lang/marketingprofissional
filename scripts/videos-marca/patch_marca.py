@@ -1,11 +1,11 @@
+"""Adapta um vídeo do Claude Design SEM marca pro molde de marca.
+Uso: python3 patch_marca.py <entrada.html> <saida.html> <uuid do jsx standalone>"""
 import re,sys
 sys.path.insert(0,'.')
 from repack import editar,tpl_padrao,load
-fto=load([__import__('glob').glob('fto/res/dbc8b25f*.js')][0][0]).split('\n')
-# prelúdio de marca do FTO (das helpers até o fim de applyBrand), sem a linha COL
-ini=next(i for i,l in enumerate(fto) if l.startswith('// ---- Marca'))
-fim=next(i for i,l in enumerate(fto) if l.strip()=='BASE.C = COL.tiff; BASE.G = COL.purple;')+1
-PRE='\n'.join(fto[ini:fim+1])
+import os
+# prelúdio de marca (helpers de cor + leitura do endereço + applyBrand), tirado do FTO Marca
+PRE=open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'preludio_marca.js'),encoding='utf-8').read().rstrip('\n')
 def jsx(s):
     L=s.split('\n')
     assert L[1].startswith('const COL')
@@ -34,5 +34,5 @@ def tpl(t):
     t=t.replace('"spin": 0.5}','"spin": 0.5, "primaria": "#0ABFBC", "secundaria": "#7B5EA7"}')
     assert '"primaria"' in t
     return t
-editar(sys.argv[1],sys.argv[2],'71161fc3-a621-4a2f-8141-09c70cd973f9',jsx,tpl)
+editar(sys.argv[1],sys.argv[2],sys.argv[3],jsx,tpl)
 print('ok')

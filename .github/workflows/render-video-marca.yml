@@ -45,6 +45,7 @@ jobs:
       - name: Instalar dependências
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install -q pillow numpy
           mkdir -p /tmp/vm && cd /tmp/vm && npm init -y >/dev/null && npm i puppeteer-core@23.11.1 --silent
           google-chrome --version
 
@@ -56,6 +57,23 @@ jobs:
           set -e
           case "$MOLDE" in *[!a-z0-9._-]*) echo "molde inválido"; exit 1;; esac
           test -f "apps/franquias/public/videos-marca/$MOLDE"
+          # A logo entra SEM o fundo branco (o vídeo tem fundo cinza-azulado e
+          # o branco virava um quadrado): baixa, recorta e serve daqui mesmo.
+          PARAMS=$(python3 - <<'PY'
+          import os, urllib.parse, urllib.request, subprocess
+          q = urllib.parse.parse_qs(os.environ["PARAMS"], keep_blank_values=True)
+          logo = (q.get("logo") or [""])[0]
+          if logo.startswith("https://"):
+              try:
+                  urllib.request.urlretrieve(logo, "/tmp/logo_original")
+                  subprocess.run(["python3", "packages/video-marca/logo_sem_fundo.py", "/tmp/logo_original",
+                                  "apps/franquias/public/videos-marca/_logo.png"], check=True)
+                  q["logo"] = ["http://localhost:8765/_logo.png"]
+              except Exception as e:
+                  print(f"logo original mantida: {e}", file=__import__("sys").stderr)
+          print(urllib.parse.urlencode({k: v[0] for k, v in q.items()}))
+          PY
+          )
           (cd apps/franquias/public/videos-marca && python3 -m http.server 8765 >/dev/null 2>&1 &)
           sleep 2
           NODE_PATH=/tmp/vm/node_modules CHROME_PATH=/usr/bin/google-chrome \
