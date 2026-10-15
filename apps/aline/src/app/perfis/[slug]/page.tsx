@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient, createAlineClient } from "@/lib/supabase/server";
 import { formatK, formatDate } from "@/lib/utils";
 import { GerarReelButton } from "@/components/GerarReelButton";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 export const dynamic = "force-dynamic";
 
@@ -163,7 +164,7 @@ export default async function PerfilPage({ params, searchParams }: PageProps) {
               {pilares.map((p, i) => (
                 <div key={i}>
                   <div className="mb-1 flex justify-between text-xs">
-                    <span className="font-medium">{p.nome.replace(/_/g, " ")}</span>
+                    <span className="font-medium">{acentuar(p.nome.replace(/_/g, " "))}</span>
                     <span className="text-aline-text/60">{p.pct}%</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-aline-text/5">
@@ -211,7 +212,7 @@ export default async function PerfilPage({ params, searchParams }: PageProps) {
                           <>
                             <span className="text-aline-text/40">·</span>
                             <span className="text-aline-text/60">
-                              {(post.origem as string).replace(/_/g, " ")}
+                              {acentuar((post.origem as string).replace(/_/g, " "))}
                             </span>
                           </>
                         )}

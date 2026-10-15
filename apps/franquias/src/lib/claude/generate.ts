@@ -1,5 +1,6 @@
 import { createClaude, CLAUDE_MODEL } from "./client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import {
   buildSystemPrompt,
   buildPromptPost,
@@ -195,8 +196,9 @@ function parseJSON<T>(raw: string): T {
     .trim();
   try {
     // Travessão nunca sai daqui, mesmo que o modelo ignore a regra do prompt
-    // (pedido da Aline, 26/08/2026).
-    return semTravessoesFundo(JSON.parse(cleaned)) as T;
+    // (pedido da Aline, 26/08/2026). Acento também (15/10/2026): "voce",
+    // "nao", "saude" não chegam ao post; link e hashtag ficam como estão.
+    return acentuarFundo(semTravessoesFundo(JSON.parse(cleaned))) as T;
   } catch (e) {
     throw new Error(`JSON inválido do Claude: ${(e as Error).message}\nRaw: ${raw.slice(0, 300)}`);
   }

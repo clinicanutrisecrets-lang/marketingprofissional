@@ -11,7 +11,7 @@ export const maxDuration = 120;
 export async function GET(request: Request) {
   const auth = request.headers.get("authorization");
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ erro: "Nao autorizado" }, { status: 401 });
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
   }
   const fila = await processarFila();
   const tokens = await renovarTokensVencendo();

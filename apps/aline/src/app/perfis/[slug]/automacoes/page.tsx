@@ -16,6 +16,7 @@ import {
 } from "@/lib/automacao/actions";
 import { SimuladorRobo } from "./SimuladorRobo";
 import { MapearVoz } from "./MapearVoz";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 export const dynamic = "force-dynamic";
 
@@ -329,7 +330,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
                           · entendeu o pedido sem a palavra-chave
                         </span>
                       ) : (
-                        m.origem && <span>· {m.origem.replace(/_/g, " ")}</span>
+                        m.origem && <span>· {acentuar(m.origem.replace(/_/g, " "))}</span>
                       )}
                       <span>· {quando(m.criado_em)}</span>
                     </div>

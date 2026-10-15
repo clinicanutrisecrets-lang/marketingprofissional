@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClaude, REGRA_SEM_TRAVESSAO, CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
 import { semAbreviacaoFundo } from "@/lib/texto/sem-abreviacao";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 
 const MODEL = CLAUDE_MODEL_AGENTES;
 const REPO = "clinicanutrisecrets-lang/marketingprofissional";
@@ -111,7 +112,7 @@ function limitarDuracoes(cenas: Record<string, unknown>[]): Record<string, unkno
 
 function normalizarSpecReel(spec: Record<string, unknown>): Record<string, unknown> {
   // Travessão fora de TODO texto do vídeo (pedido da Aline, 26/08/2026)
-  const s = semAbreviacaoFundo(semTravessoesFundo(spec));
+  const s = acentuarFundo(semAbreviacaoFundo(semTravessoesFundo(spec)));
   const cenas = Array.isArray(s.cenas) ? (s.cenas as Record<string, unknown>[]) : [];
   s.cenas = cenas
     .filter((c) => TIPOS_CENA.has(String(c.tipo)))
@@ -266,7 +267,7 @@ export async function produzirReelAnimado(
 
 /** Legenda que o agente devolveu junto do SPEC, limpa de travessão. */
 export function legendaDoSpec(bruto: Record<string, unknown>): { texto: string; cta: string; hashtags: string[] } | null {
-  const limpo = semAbreviacaoFundo(semTravessoesFundo({ l: bruto.legenda, c: bruto.cta, h: bruto.hashtags })) as Record<string, unknown>;
+  const limpo = acentuarFundo(semAbreviacaoFundo(semTravessoesFundo({ l: bruto.legenda, c: bruto.cta, h: bruto.hashtags }))) as Record<string, unknown>;
   const textoL = typeof limpo.l === "string" ? limpo.l.trim() : "";
   if (!textoL) return null;
   const hashtags = Array.isArray(limpo.h)

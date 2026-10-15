@@ -4,6 +4,7 @@ import { createClaude } from "@/lib/claude/client";
 import { createAlineClient } from "@/lib/supabase/server";
 import { CLAUDE_MODEL } from "@/lib/claude/scripts";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import { gerarEUploadImagem, gerarCarrosselEUpload } from "@/lib/ai-image/render";
 import {
   FRAMEWORK_EUGENE_SCHWARTZ,
@@ -67,7 +68,7 @@ export async function gerarPackSemanal(params: {
       .eq("slug", params.perfilSlug)
       .maybeSingle();
 
-    if (!perfilData) return { ok: false, erro: `Perfil ${params.perfilSlug} nao existe` };
+    if (!perfilData) return { ok: false, erro: `Perfil ${params.perfilSlug} não existe` };
     const perfil = perfilData as Record<string, unknown>;
 
     const semanaRef = params.semanaRef ?? proximaSegunda();
@@ -82,7 +83,7 @@ export async function gerarPackSemanal(params: {
     if (existentes && existentes.length > 0) {
       return {
         ok: false,
-        erro: `Pack semanal ${semanaRef} ja existe (${existentes.length} posts). Cancele/delete antes de gerar de novo.`,
+        erro: `Pack semanal ${semanaRef} já existe (${existentes.length} posts). Cancele/delete antes de gerar de novo.`,
       };
     }
 
@@ -90,7 +91,7 @@ export async function gerarPackSemanal(params: {
     const distribuicao = distribuirPilares(pilares, qtd);
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return { ok: false, erro: "ANTHROPIC_API_KEY nao configurada" };
+    if (!apiKey) return { ok: false, erro: "ANTHROPIC_API_KEY não configurada" };
     const claude = createClaude();
 
     const systemPrompt = montarSystemPrompt(perfil);
@@ -110,7 +111,7 @@ export async function gerarPackSemanal(params: {
 
     const posts = parsePostsJson(texto);
     if (posts.length === 0) {
-      return { ok: false, erro: "Claude nao retornou posts validos" };
+      return { ok: false, erro: "Claude não retornou posts válidos" };
     }
 
     const custoCopy =
@@ -251,7 +252,7 @@ export async function regenerarArtePost(
       .select("*")
       .eq("id", postId)
       .maybeSingle();
-    if (!postData) return { ok: false, erro: "Post nao encontrado" };
+    if (!postData) return { ok: false, erro: "Post não encontrado" };
     const post = postData as Record<string, unknown>;
 
     const { data: perfilData } = await aline
@@ -259,7 +260,7 @@ export async function regenerarArtePost(
       .select("*")
       .eq("id", post.perfil_id as string)
       .maybeSingle();
-    if (!perfilData) return { ok: false, erro: "Perfil nao encontrado" };
+    if (!perfilData) return { ok: false, erro: "Perfil não encontrado" };
     const perfil = perfilData as Record<string, unknown>;
 
     const brand = {
@@ -457,15 +458,15 @@ function montarSystemPrompt(perfil: Record<string, unknown>): string {
     ?.map((p) => `  - ${p.nome}: ${p.pct}%`)
     .join("\n");
 
-  return `Voce e estrategista de conteudo Instagram do perfil @${perfil.instagram_handle}.
+  return `Você é estrategista de conteúdo Instagram do perfil @${perfil.instagram_handle}.
 
 Use os frameworks abaixo como base mental — escolha consciente por post:
 - Schwartz pra escolher abordagem (estagio de awareness)
 - Caples pra construir headline_arte
-- Cialdini pra incluir 1-2 gatilhos psicologicos QUANDO couber
-- Miller (StoryBrand) APENAS quando for caso/storytelling/sobre — NAO em todo post
+- Cialdini pra incluir 1-2 gatilhos psicológicos QUANDO couber
+- Miller (StoryBrand) APENAS quando for caso/storytelling/sobre — NÃO em todo post
 
-LEIA A MATRIZ ABAIXO ANTES DE GERAR — varie tipos pra nao saturar.
+LEIA A MATRIZ ABAIXO ANTES DE GERAR — varie tipos pra não saturar.
 
 ${FRAMEWORKS_MATRIZ_USO}
 
@@ -486,28 +487,28 @@ PERFIL:
 - Tom: ${perfil.tom}
 ${perfil.regras_especiais ? `- Regra especial: ${perfil.regras_especiais}` : ""}
 
-PILARES DE CONTEUDO (peso semanal):
+PILARES DE CONTEÚDO (peso semanal):
 ${pilaresStr ?? "  (sem pilares definidos)"}
 
 REGRAS DE COPY:
 - Hook nos primeiros 3-5 segundos (1a linha precisa parar o scroll).
-- Sem clickbait sensacionalista. Autoridade > viralizacao barata.
-- Sem "voce sabia que" / "hoje vou falar" / "nesse post".
+- Sem clickbait sensacionalista. Autoridade > viralização barata.
+- Sem "você sabia que" / "hoje vou falar" / "nesse post".
 - CTA claro no final (salvar, comentar, agendar etc.).
 - 5-15 hashtags por post, mistura nicho + amplo.
 - Legenda 80-180 palavras.
 - Banir a palavra "protocolo" (use "plano", "trilha", "rotina").
 
 REGRAS DE ARTE (campos arte_*):
-- Sao o que vai ser ESTAMPADO na imagem do post.
-- arte_headline: frase principal, 3-8 palavras, MAXIMO 60 caracteres. Forte, direta, sem clickbait. Vai ser texto grande na imagem.
-- arte_subtitle (opcional): frase de apoio que complementa, MAXIMO 80 caracteres.
-- arte_eyebrow (opcional): pequena tag/categoria em cima do headline, MAXIMO 30 caracteres. Ex: "DICA RAPIDA", "MITO OU VERDADE", "ATENCAO".
+- São o que vai ser ESTAMPADO na imagem do post.
+- arte_headline: frase principal, 3-8 palavras, MÁXIMO 60 caracteres. Forte, direta, sem clickbait. Vai ser texto grande na imagem.
+- arte_subtitle (opcional): frase de apoio que complementa, MÁXIMO 80 caracteres.
+- arte_eyebrow (opcional): pequena tag/categoria em cima do headline, MÁXIMO 30 caracteres. Ex: "DICA RÁPIDA", "MITO OU VERDADE", "ATENÇÃO".
 - O conjunto headline+subtitle precisa fazer sentido SOZINHO (quem ve a imagem sem ler legenda entende).
 - Banir emoji nos campos arte_*.
 
-PONTUACAO — REGRA ABSOLUTA:
-- NUNCA use travessao ("—") nem meia-risca ("–") em nenhum texto. Use virgula, ponto, dois-pontos ou parenteses curtos. Hifen de palavra composta ("anti-inflamatorio") e permitido.`;
+PONTUAÇÃO — REGRA ABSOLUTA:
+- NUNCA use travessão ("—") nem meia-risca ("–") em nenhum texto. Use vírgula, ponto, dois-pontos ou parênteses curtos. Hífen de palavra composta ("anti-inflamatório") é permitido.`;
 }
 
 function montarUserPrompt(
@@ -523,13 +524,13 @@ function montarUserPrompt(
   return `Gere ${qtd} posts pro Instagram @${perfil.instagram_handle} pra semana iniciando em ${semanaRef}.
 
 TIPOS DE POST:
-- feed_imagem: post unico com 1 imagem (maioria dos posts)
-- stories: vertical 9:16, impacto visual forte, conteudo rapido/direto
-- feed_carrossel: carrossel com 3-5 slides — use pra listas, passo-a-passo, mitos vs verdade, comparacoes
+- feed_imagem: post único com 1 imagem (maioria dos posts)
+- stories: vertical 9:16, impacto visual forte, conteúdo rápido/direto
+- feed_carrossel: carrossel com 3-5 slides — use pra listas, passo-a-passo, mitos vs verdade, comparações
 
-DISTRIBUICAO DESTA SEMANA:
+DISTRIBUIÇÃO DESTA SEMANA:
 - ${nCarrossel} post(s) do tipo "feed_carrossel" — escolha o pilar mais adequado a formato de lista/slides
-- ${nStories} post(s) do tipo "stories" — escolha conteudo impactante e direto
+- ${nStories} post(s) do tipo "stories" — escolha conteúdo impactante e direto
 - Restante: "feed_imagem"
 
 PILARES DA SEMANA (na ordem):
@@ -547,7 +548,7 @@ Pra cada post, defina:
 - arte_eyebrow: tag opcional em cima (max 30 chars)
 - slides: APENAS pra tipo "feed_carrossel" — array de 3-5 objetos com { headline, subtitle } pra cada slide
 
-Devolva APENAS um JSON valido no formato:
+Devolva APENAS um JSON válido no formato:
 {
   "posts": [
     {
@@ -560,9 +561,9 @@ Devolva APENAS um JSON valido no formato:
       "copy_legenda": "...", "copy_cta": "...", "hashtags": ["..."],
       "arte_headline": "...", "arte_subtitle": "...", "arte_eyebrow": "...",
       "slides": [
-        { "headline": "Slide 1 titulo", "subtitle": "descricao slide 1" },
-        { "headline": "Slide 2 titulo", "subtitle": "descricao slide 2" },
-        { "headline": "Slide 3 titulo", "subtitle": "descricao slide 3" }
+        { "headline": "Slide 1 título", "subtitle": "descrição slide 1" },
+        { "headline": "Slide 2 título", "subtitle": "descrição slide 2" },
+        { "headline": "Slide 3 título", "subtitle": "descrição slide 3" }
       ]
     }
   ]
@@ -580,8 +581,9 @@ function parsePostsJson(texto: string): PostGerado[] {
     if (!match) return [];
     const parsed = JSON.parse(match[0]) as { posts?: PostGerado[] };
     // Trava do travessão (pedido da Aline, 26/08/2026): nenhum post sai
-    // com "—"/"–", mesmo que o modelo ignore a regra do prompt.
-    return semTravessoesFundo(parsed.posts ?? []);
+    // com "—"/"–", mesmo que o modelo ignore a regra do prompt. Acento
+    // também (15/10/2026); link e hashtag ficam como estão.
+    return acentuarFundo(semTravessoesFundo(parsed.posts ?? []));
   } catch {
     return [];
   }

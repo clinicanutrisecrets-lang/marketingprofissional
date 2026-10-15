@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClaude, CLAUDE_MODEL_COPY, COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { comAgenteDeCopy, type PublicoDaCopy } from "@/lib/claude/copy-agent";
 import { logarCusto } from "@/lib/custos/log";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import {
   TAREFA_STORIES_FALADOS,
   FERRAMENTA_STORIES,
@@ -44,7 +45,8 @@ export async function escreverStoriesFalados(p: {
     const bloco = msg.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
     if (!bloco) { ultimo = "sem resposta estruturada"; continue; }
     const c = conferirStoriesFalados(bloco.input);
-    if (c.ok) return c;
+    // Acento: texto falado e texto na tela viram post (15/10/2026).
+    if (c.ok) return { ...c, sequencia: acentuarFundo(c.sequencia) };
     ultimo = c.motivo;
   }
   return { ok: false, motivo: ultimo };

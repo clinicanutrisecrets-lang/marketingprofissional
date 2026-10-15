@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 type Depoimento = {
   id: string;
@@ -193,7 +194,7 @@ export function StorytellingView({
             {Object.entries(output).map(([k, v]) => (
               <div key={k}>
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  {k.replace(/_/g, " ")}
+                  {acentuar(k.replace(/_/g, " "))}
                 </div>
                 {typeof v === "string" ? (
                   <p className="whitespace-pre-wrap rounded-lg bg-zinc-50 p-3 text-sm text-zinc-800 leading-relaxed">

@@ -1,5 +1,6 @@
 import { createClaude } from "@/lib/claude/client";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 export const CLAUDE_MODEL = "claude-sonnet-4-5";
 
@@ -65,7 +66,7 @@ CONTEXTO DO PERFIL:
 - Nome: ${params.perfil.nome}
 - Objetivo: ${params.perfil.objetivo}
 - Tom: ${params.perfil.tom}
-- Pilares: ${params.perfil.pilares.map((p) => `${p.nome.replace(/_/g, " ")} (${p.pct}%)`).join(", ")}
+- Pilares: ${params.perfil.pilares.map((p) => `${acentuar(p.nome.replace(/_/g, " "))} (${p.pct}%)`).join(", ")}
 ${params.perfil.regras_especiais ? `- Regras especiais: ${params.perfil.regras_especiais}` : ""}
 ${params.perfil.instrucoes_ia ? `\n=== INSTRUÇÕES ESPECÍFICAS DESTE PERFIL ===\n${params.perfil.instrucoes_ia}` : ""}
 
@@ -75,7 +76,7 @@ REGRAS DO SCRIPT (vai ser falado pelo avatar HeyGen):
 3. SEM hashtags dentro do script
 4. Hook impactante nos primeiros 3 segundos (ético, profissional)
 5. CTA implícito no final, NÃO comercial direto
-6. Tom: ${params.perfil.tom.replace(/_/g, " ")}
+6. Tom: ${acentuar(params.perfil.tom.replace(/_/g, " "))}
 
 COMPLIANCE CFN BR (obrigatório):
 - Nunca prometer cura

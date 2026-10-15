@@ -1,4 +1,5 @@
 import { createClaude, CLAUDE_MODEL } from "@/lib/claude/client";
+import { rotuloNicho } from "@/lib/texto/rotulos";
 
 export type SinalBruto = {
   fonte: string;
@@ -66,7 +67,7 @@ Só retorne itens com relevancia_icp >= 6.`;
  */
 function regraDeNicho(nicho: string): string {
   return `
-NICHO DA PROFISSIONAL QUE VAI RECEBER ESTES TEMAS: "${nicho.replace(/_/g, " ")}"
+NICHO DA PROFISSIONAL QUE VAI RECEBER ESTES TEMAS: "${rotuloNicho(nicho)}"
 
 REGRA DE DESCARTE POR NICHO (vale mais que a relevância geral):
 - Se a manchete não conversa com esse nicho, DESCARTE. Não force adaptação, não

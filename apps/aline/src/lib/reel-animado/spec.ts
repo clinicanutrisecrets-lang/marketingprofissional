@@ -10,6 +10,7 @@
  * Sem server-only nem Supabase: só o contrato com o renderizador.
  */
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import { semAbreviacaoFundo } from "@/lib/texto/sem-abreviacao";
 
 export const REGRA_SEM_TRAVESSAO = `
@@ -111,7 +112,7 @@ function limitarDuracoes(cenas: Record<string, unknown>[]): Record<string, unkno
 
 export function normalizarSpecReel(spec: Record<string, unknown>): Record<string, unknown> {
   // Travessão fora de TODO texto do vídeo (pedido da Aline, 26/08/2026)
-  const s = semAbreviacaoFundo(semTravessoesFundo(spec));
+  const s = acentuarFundo(semAbreviacaoFundo(semTravessoesFundo(spec)));
   const cenas = Array.isArray(s.cenas) ? (s.cenas as Record<string, unknown>[]) : [];
   s.cenas = cenas
     .filter((c) => TIPOS_CENA.has(String(c.tipo)))
@@ -151,7 +152,7 @@ ALÉM DAS CENAS, devolva no MESMO JSON:
 
 /** Legenda que o agente devolveu junto do SPEC, limpa de travessão. */
 export function legendaDoSpec(bruto: Record<string, unknown>): { texto: string; cta: string; hashtags: string[] } | null {
-  const limpo = semTravessoesFundo({ l: bruto.legenda, c: bruto.cta, h: bruto.hashtags }) as Record<string, unknown>;
+  const limpo = acentuarFundo(semTravessoesFundo({ l: bruto.legenda, c: bruto.cta, h: bruto.hashtags })) as Record<string, unknown>;
   const textoL = typeof limpo.l === "string" ? limpo.l.trim() : "";
   if (!textoL) return null;
   const hashtags = Array.isArray(limpo.h)

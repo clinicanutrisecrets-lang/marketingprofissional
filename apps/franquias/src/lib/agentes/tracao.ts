@@ -87,10 +87,10 @@ Output JSON:
       "ordem": 1,
       "texto": "hook de 5-12 palavras, stop-scroll garantido",
       "formato_ideal": "reels | carrossel | post",
-      "emocao_gatilho": "curiosidade | indignacao | surpresa | medo | reconhecimento",
+      "emocao_gatilho": "curiosidade | indignação | surpresa | medo | reconhecimento",
       "score_viralidade": "alto | medio",
       "explicacao": "1 frase sobre por que esse hook para o scroll",
-      "cta_sugerido": "que acao o post convida (salvar, compartilhar, comentar)"
+      "cta_sugerido": "que ação o post convida (salvar, compartilhar, comentar)"
     }
   ]
 }
@@ -135,15 +135,15 @@ Output JSON:
     {
       "semana": 1,
       "posts": [
-        { "dia": "segunda", "tipo": "feed_carrossel", "categoria": "autoridade | tracao", "pilar": "nome", "hook_sugerido": "" }
+        { "dia": "segunda", "tipo": "feed_carrossel", "categoria": "autoridade | tração", "pilar": "nome", "hook_sugerido": "" }
       ]
     }
   ],
   "regras_execucao": ["regras do tipo 'não publicar 2 posts de tração seguidos', 'responder todo comentário em até 2h', etc"],
-  "metricas_tracao_a_acompanhar": ["shares por post", "saves por post", "followers ganhos por post", "alcance organico medio"]
+  "metricas_tracao_a_acompanhar": ["shares por post", "saves por post", "followers ganhos por post", "alcance orgânico médio"]
 }
 
-4 semanas de calendario completo. Respeita dias declarados.
+4 semanas de calendário completo. Respeita dias declarados.
 `.trim(),
 
   "7d_bio_destaques": `
@@ -152,15 +152,15 @@ Input: { perfil_tipo, posicionamento, oferta_principal, diferenciais, proposta_u
 Output JSON:
 {
   "bio_opcoes": [
-    { "ordem": 1, "texto": "bio max 150 chars", "angulo": "curiosidade | autoridade | transformacao", "converte_para": "follow | lead" }
+    { "ordem": 1, "texto": "bio max 150 chars", "angulo": "curiosidade | autoridade | transformação", "converte_para": "follow | lead" }
   ],
   "destaques_sugeridos": [
     {
       "ordem": 1,
       "nome_destaque": "max 15 chars",
       "tema": "o que vai dentro",
-      "tipo": "isca_de_save (vira follow) | autoridade | prova | servico",
-      "sequencia_stories_inicial": ["story 1 descricao", "story 2 descricao"]
+      "tipo": "isca_de_save (vira follow) | autoridade | prova | serviço",
+      "sequencia_stories_inicial": ["story 1 descrição", "story 2 descrição"]
     }
   ],
   "cta_link_bio": "que link/CTA priorizar (WhatsApp, LP, site, etc)",
@@ -171,7 +171,7 @@ Output JSON:
 `.trim(),
 
   "7e_analise_viralidade": `
-Input: { ultimos_30_posts (com metricas: alcance, saves, shares, comentarios) }
+Input: { ultimos_30_posts (com métricas: alcance, saves, shares, comentários) }
 
 Output JSON:
 {
@@ -193,7 +193,7 @@ Contexto crítico no input: perfil_tipo = "B2C_nutri_secrets" OU "B2B_scanner_nu
 
 Input: {
   perfil_tipo,
-  dor_ou_assunto_especifico,   // ex: "ansiedade + intestino", "anamnese que escala consultorio"
+  dor_ou_assunto_especifico,   // ex: "ansiedade + intestino", "anamnese que escala consultório"
   formato_alvo,                 // "carrossel" | "reels" | "post_longo"
   contexto_compartilhamento     // "mulher manda pra amiga" | "nutri posta no grupo WhatsApp"
 }
@@ -203,7 +203,7 @@ Output JSON:
   "titulo_do_post": "nome interno do material",
   "hook_magnetico": "frase de 5-12 palavras que faz parar scroll — testada contra nicho",
   "por_que_vao_compartilhar": "frase direta — o que essa pessoa ganha compartilhando",
-  "para_quem_sera_compartilhado": "arquétipo do destinatário (ex: 'amiga que reclama de cansaço', 'colega nutri que tá começando consultorio')",
+  "para_quem_sera_compartilhado": "arquétipo do destinatário (ex: 'amiga que reclama de cansaço', 'colega nutri que tá começando consultório')",
   "estrutura_conteudo": {
     "abertura_3s": "",
     "desenvolvimento_core": "",
@@ -252,12 +252,12 @@ Output JSON:
     }
   ],
   "acoes_diarias_paralelas": [
-    "responder TODO comentario nas primeiras 2h",
-    "comentar nos ultimos 5 posts de cada um que antes comentava aqui",
+    "responder TODO comentário nas primeiras 2h",
+    "comentar nos últimos 5 posts de cada um que antes comentava aqui",
     "3 stories por dia — 1 pessoal, 1 utilidade, 1 call-to-action suave"
   ],
-  "meta_14_dias": "aumentar alcance medio em X%, saves em Y%",
-  "post_ancora_recomendado": "descrição de 1 post especifico que deve ser o 'âncora' dos 14 dias — mais valioso, preso no topo do feed"
+  "meta_14_dias": "aumentar alcance médio em X%, saves em Y%",
+  "post_ancora_recomendado": "descrição de 1 post específico que deve ser o 'âncora' dos 14 dias — mais valioso, preso no topo do feed"
 }
 `.trim(),
 };

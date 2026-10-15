@@ -77,7 +77,7 @@ Output JSON:
       "ordem": 1,
       "texto": "hook 5-12 palavras stop-scroll",
       "formato_ideal": "reels | carrossel | post",
-      "emocao_gatilho": "curiosidade | reconhecimento | indignacao | surpresa",
+      "emocao_gatilho": "curiosidade | reconhecimento | indignação | surpresa",
       "score_viralidade": "alto | medio",
       "explicacao": "por que para o scroll",
       "cta_sugerido": "salvar | compartilhar | comentar"
@@ -121,7 +121,7 @@ Output JSON:
     {
       "semana": 1,
       "posts": [
-        { "dia": "segunda", "tipo": "", "categoria": "autoridade | tracao", "pilar": "", "hook_sugerido": "" }
+        { "dia": "segunda", "tipo": "", "categoria": "autoridade | tração", "pilar": "", "hook_sugerido": "" }
       ]
     }
   ],
@@ -143,7 +143,7 @@ Output JSON:
       "ordem": 1,
       "nome_destaque": "max 15 chars",
       "tema": "",
-      "tipo": "isca_de_save | autoridade | prova | servico",
+      "tipo": "isca_de_save | autoridade | prova | serviço",
       "sequencia_stories_inicial": []
     }
   ],
@@ -154,7 +154,7 @@ Output JSON:
 `.trim(),
 
   "7e_analise_viralidade": `
-Input: { ultimos_30_posts (com metricas) }
+Input: { ultimos_30_posts (com métricas) }
 Output JSON:
 {
   "top_posts_por_share": [{ "post_ref": "", "por_que_funcionou": "" }],
@@ -174,7 +174,7 @@ Output JSON:
   "titulo_do_post": "",
   "hook_magnetico": "5-12 palavras",
   "por_que_vao_compartilhar": "",
-  "para_quem_sera_compartilhado": "arquetipo do destinatario",
+  "para_quem_sera_compartilhado": "arquetipo do destinatário",
   "estrutura_conteudo": {
     "abertura_3s": "",
     "desenvolvimento_core": "",

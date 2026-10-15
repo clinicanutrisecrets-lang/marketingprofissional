@@ -17,7 +17,7 @@ export const maxDuration = 60;
  */
 export async function GET(request: Request) {
   if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ erro: "Nao autorizado" }, { status: 401 });
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
   }
   const aline = createAlineClient();
   const desde = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

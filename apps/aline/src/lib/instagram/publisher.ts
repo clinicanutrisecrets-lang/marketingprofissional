@@ -30,7 +30,7 @@ export async function publicarPost(
     .eq("id", postId)
     .maybeSingle();
 
-  if (!postData) return { ok: false, erro: "Post nao encontrado" };
+  if (!postData) return { ok: false, erro: "Post não encontrado" };
   const post = postData as Record<string, unknown>;
 
   if (post.status !== "aprovado" && post.status !== "agendado") {
@@ -40,7 +40,7 @@ export async function publicarPost(
   // Perfil + token decifrado no app (as RPCs de 006 dependem de pgsodium que
   // não existe em produção — ver migração aline/009).
   const perfil = await carregarPerfilPorId(post.perfil_id as string);
-  if (!perfil) return { ok: false, erro: "Perfil nao encontrado" };
+  if (!perfil) return { ok: false, erro: "Perfil não encontrado" };
   const acesso = await credenciaisDoPerfil(perfil);
   if (!acesso.cred) return { ok: false, erro: acesso.motivo };
 
@@ -65,7 +65,7 @@ export async function publicarPost(
 
     if (tipo === "feed_imagem") {
       const img = midias.find((m) => m.tipo === "imagem");
-      if (!img) throw new Error("feed_imagem precisa de 1 midia tipo imagem");
+      if (!img) throw new Error("feed_imagem precisa de 1 mídia tipo imagem");
       const c = await criarContainerImagem({
         igUserId,
         pageToken,
@@ -76,7 +76,7 @@ export async function publicarPost(
       containerId = c.id;
     } else if (tipo === "reels") {
       const video = midias.find((m) => m.tipo === "video");
-      if (!video) throw new Error("reels precisa de 1 midia tipo video");
+      if (!video) throw new Error("reels precisa de 1 mídia tipo vídeo");
       const cover = midias.find((m) => m.tipo === "imagem")?.url;
       const c = await criarContainerReels({
         igUserId,
@@ -91,7 +91,7 @@ export async function publicarPost(
     } else if (tipo === "stories") {
       const img = midias.find((m) => m.tipo === "imagem")?.url;
       const video = midias.find((m) => m.tipo === "video")?.url;
-      if (!img && !video) throw new Error("stories precisa de imagem ou video");
+      if (!img && !video) throw new Error("stories precisa de imagem ou vídeo");
       const c = await criarContainerStories({
         igUserId,
         pageToken,
@@ -113,7 +113,7 @@ export async function publicarPost(
       });
       containerId = c.id;
     } else {
-      return { ok: false, erro: `Tipo nao suportado: ${tipo}` };
+      return { ok: false, erro: `Tipo não suportado: ${tipo}` };
     }
 
     const published = await publicarContainer({

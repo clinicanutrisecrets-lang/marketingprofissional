@@ -9,6 +9,7 @@ import {
   editarPostAprovacao,
   regenerarArteAction,
 } from "@/lib/posts/aprovacao-actions";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 type Props = {
   perfilSlug: string;
@@ -88,7 +89,7 @@ export function AprovacaoView({
   }
 
   function handleRegenerar(postId: string) {
-    if (!confirm("Regenerar arte deste post? A imagem atual sera substituida.")) return;
+    if (!confirm("Regenerar arte deste post? A imagem atual será substituída.")) return;
     setRegenerandoId(postId);
     setFeedback("Gerando nova arte… (10-30s)");
     setFeedbackPost((cur) => ({
@@ -198,7 +199,7 @@ export function AprovacaoView({
                   </span>
                   {Boolean(post.pilar) && (
                     <span className="text-aline-text/50">
-                      {(post.pilar as string).replace(/_/g, " ")}
+                      {acentuar((post.pilar as string).replace(/_/g, " "))}
                     </span>
                   )}
                   {Boolean(post.midia_pendente) && (

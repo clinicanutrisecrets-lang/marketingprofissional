@@ -6,7 +6,7 @@ export function createClient() {
 
   if (!url || !anon) {
     throw new Error(
-      "Configuracao pendente: NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY ausentes. Verifique a configuracao na Vercel e faca um redeploy.",
+      "Configuração pendente: NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY ausentes. Verifique a configuração na Vercel e faça um redeploy.",
     );
   }
 

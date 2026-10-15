@@ -7,6 +7,7 @@ import { carregarProdutosContexto } from "@/lib/produtos/contexto";
 import { normalizarNivelConsciencia } from "@/lib/claude/consciencia";
 import { traduzirErroClaude } from "@/lib/claude/erros";
 import { semTravessoesFundo } from "@/lib/texto/sem-travessoes";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import { revalidatePath } from "next/cache";
 
 type ContextoFranqueada = Parameters<typeof buildSystemPrompt>[0];
@@ -100,13 +101,13 @@ Responda APENAS JSON:
       .replace(/\n?```$/i, "")
       .trim();
 
-    const parsed = semTravessoesFundo(
+    const parsed = acentuarFundo(semTravessoesFundo(
       JSON.parse(cleaned) as {
         copy_legenda: string;
         copy_cta: string;
         hashtags: string[];
       },
-    );
+    ));
 
     return {
       ok: true,

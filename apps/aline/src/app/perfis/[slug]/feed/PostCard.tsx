@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DesenharVideoButton } from "./DesenharVideoButton";
 import { MontarArteButton } from "./MontarArteButton";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 /**
  * O card do feed que ABRE (Aline, 12/10/2026: "não dá pra clicar pra ver, nem
@@ -57,7 +58,7 @@ export function PostCard({ post, formato }: { post: PostCardDados; formato: "gra
             <p className="text-[11px] font-medium leading-snug text-white line-clamp-2">{post.titulo}</p>
             <p className="mt-0.5 text-[10px] text-white/75">
               {post.data}
-              {post.pilar ? ` · ${post.pilar.replace(/_/g, " ")}` : ""}
+              {post.pilar ? ` · ${acentuar(post.pilar.replace(/_/g, " "))}` : ""}
             </p>
           </div>
         </button>

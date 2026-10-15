@@ -989,7 +989,7 @@ export async function gerarPostsDaSemana(
         texto: tpl.texto,
       });
     } catch (emailErr) {
-      console.warn("[semanal] email nao enviado:", emailErr);
+      console.warn("[semanal] email não enviado:", emailErr);
     }
   }
 
@@ -1150,7 +1150,7 @@ function montarBlocoContextoExtra(
 ): string | undefined {
   if (datas.length === 0) return undefined;
   const partes: string[] = [
-    "DATAS COMEMORATIVAS NAS PROXIMAS 2 SEMANAS (use se fizer sentido no calendario da semana):",
+    "DATAS COMEMORATIVAS NAS PRÓXIMAS 2 SEMANAS (use se fizer sentido no calendário da semana):",
   ];
   datas.slice(0, 5).forEach((d) => {
     partes.push(
@@ -1159,7 +1159,7 @@ function montarBlocoContextoExtra(
   });
   partes.push("");
   partes.push(
-    "IMPORTANTE: use essas datas SOMENTE se forem realmente relevantes pra franqueada e pro publico-alvo dela. Nao force encaixe.",
+    "IMPORTANTE: use essas datas SOMENTE se forem realmente relevantes pra franqueada e pro público-alvo dela. Não force encaixe.",
   );
   return partes.join("\n");
 }
