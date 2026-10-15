@@ -72,8 +72,8 @@ export default async function VideosHubPage() {
           <div className="text-3xl">🎥</div>
           <h2 className="mt-3 font-bold text-brand-text">Roteiro + Teleprompter</h2>
           <p className="mt-1 text-sm text-brand-text/60">
-            Grave você lendo o roteiro que rola na tela do celular. Roteiros
-            prontos toda semana no Estúdio, ou escreva o seu.
+            Grave você lendo o roteiro que rola na tela do celular. Os roteiros
+            da semana chegam no Aprovar semana, ou escreva o seu.
           </p>
           <span className="mt-3 inline-block text-sm font-semibold text-brand-primary">
             Abrir teleprompter →

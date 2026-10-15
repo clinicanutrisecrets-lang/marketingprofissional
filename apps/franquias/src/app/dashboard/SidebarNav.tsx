@@ -4,33 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-type Item = { href: string; icone: string; label: string; exato?: boolean; externo?: boolean };
-
-/**
- * O Carrossel por tema mora no Scanner (Juliana 14/10: em tela cheia ele
- * sumia, porque a porta dele estava só na página "Posts e Conteúdo" do
- * Scanner). Abre no topo da aba (`_top`): dentro do iframe, abrir o Scanner
- * dentro do próprio Scanner seria uma tela dentro da outra.
- */
-export const URL_CARROSSEL_TEMA = "https://scannerdasaude.com/nutri/conteudo/carrossel";
+/** `tambem`: outras rotas que acendem o item (o Editor de arte é parte do Criar post). */
+type Item = { href: string; icone: string; label: string; exato?: boolean; externo?: boolean; tambem?: string[] };
 
 /**
  * O caminho da semana fica à mostra; o resto vai pra "Mais ferramentas"
- * (Aline, 02/10: "muita informação, muito botão"). Nada foi tirado do app:
- * só deixou de disputar atenção com o que ela faz toda semana.
+ * (Aline, 02/10: "muita informação, muito botão").
+ *
+ * Aline 15/10 (vídeo da Juliana): o menu tinha coisas que pareciam a mesma.
+ * "Criar post" junta o carrossel por tema e o post único (Editor de arte),
+ * "Vídeos" já junta tudo de vídeo, e o Estúdio saiu do menu (a página segue
+ * existindo pra quem tiver o link).
  */
 const PRINCIPAIS: Item[] = [
   { href: "/dashboard", icone: "▦", label: "Início", exato: true },
   { href: "/dashboard/aprovar", icone: "✅", label: "Aprovar semana" },
   { href: "/dashboard/briefings", icone: "📝", label: "Pedir conteúdo" },
+  { href: "/dashboard/criar-post", icone: "🧩", label: "Criar post", tambem: ["/dashboard/conteudo/editor"] },
   { href: "/dashboard/posts-venda", icone: "🛍️", label: "Posts de venda" },
   { href: "/dashboard/videos", icone: "🎬", label: "Vídeos" },
-  { href: URL_CARROSSEL_TEMA, icone: "🧩", label: "Carrossel por tema", externo: true },
 ];
 
 const FERRAMENTAS: Item[] = [
-  { href: "/dashboard/conteudo", icone: "🎨", label: "Estúdio de conteúdo" },
-  { href: "/dashboard/conteudo/editor", icone: "🖼️", label: "Editor de arte" },
   { href: "/dashboard/fotos", icone: "📷", label: "Minhas fotos" },
   { href: "/dashboard/conteudo/galeria", icone: "🗂️", label: "Minha galeria" },
   { href: "/dashboard/biblioteca-posts", icone: "📚", label: "Posts prontos" },
@@ -82,6 +77,7 @@ export function SidebarNav(props: { nome: string; corPrimaria: string; embutido?
 
   function ativo(item: Item): boolean {
     if (item.exato) return pathname === item.href;
+    if (item.tambem?.some((t) => pathname.startsWith(t))) return true;
     // rota mais específica vence (editor/galeria não acendem o estúdio)
     const maisEspecifica = ITENS.some(
       (o) => o !== item && !o.exato && o.href.startsWith(item.href) && pathname.startsWith(o.href),

@@ -27,3 +27,6 @@ export function urlEbookNoScanner(tema: string): string {
 export function urlCarrosselNoScanner(tema: string): string {
   return `${SCANNER_SAAS_URL}/nutri/conteudo/carrossel?tema=${encodeURIComponent(tema.trim())}`;
 }
+
+/** O Carrossel por tema do Scanner, sem tema (porta da tela Criar post). */
+export const URL_CARROSSEL_TEMA = `${SCANNER_SAAS_URL}/nutri/conteudo/carrossel`;

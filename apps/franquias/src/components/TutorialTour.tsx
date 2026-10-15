@@ -8,7 +8,9 @@ import { useEffect, useState } from "react";
  * "❓ Tutorial". Carrossel didático com progresso e ações diretas.
  */
 
-const CHAVE = "tutorial_plataforma_v3";
+// v4 (15/10/2026): menu novo (Criar post, Estúdio fora). Chave nova pra quem
+// viu o v3 ver o novo uma vez.
+const CHAVE = "tutorial_plataforma_v4";
 
 type Passo = {
   emoji: string;
@@ -53,10 +55,18 @@ const PASSOS: Passo[] = [
     hrefLabel: "Ver posts de venda",
   },
   {
+    emoji: "🧩",
+    titulo: "Criar post",
+    texto:
+      "Quer um post além do pacote da semana? Em Criar post você escolhe o formato: Carrossel (você escreve o tema e o Scanner monta os slides) ou Post único (uma arte só, com o seu texto e uma foto sua se quiser). Os dois saem na sua marca.",
+    href: "/dashboard/criar-post",
+    hrefLabel: "Abrir Criar post",
+  },
+  {
     emoji: "🎬",
     titulo: "Vídeos",
     texto:
-      "Teleprompter (o roteiro rola na tela enquanto você grava pelo celular), vídeo curto com uma frase escrita em cima de um clipe, e edição automática do vídeo que você gravou.",
+      "Tudo de vídeo num lugar só: teleprompter (o roteiro rola na tela enquanto você grava pelo celular), vídeo animado sem você aparecer, vídeo curto com uma frase escrita em cima de um clipe, e edição automática do vídeo que você gravou.",
     dica: "Grave na vertical, com luz de frente pra você (janela ou ring light).",
     href: "/dashboard/videos",
     hrefLabel: "Abrir Vídeos",
@@ -65,7 +75,7 @@ const PASSOS: Passo[] = [
     emoji: "🧰",
     titulo: "Mais ferramentas",
     texto:
-      "No menu, em 'Mais ferramentas', ficam o Estúdio de conteúdo (sugestões extras de domingo), o Editor de arte, Minhas fotos, Minha galeria, Posts prontos e o Post manual.",
+      "No menu, em 'Mais ferramentas', ficam Minhas fotos (suba fotos suas, que entram nas artes), Minha galeria (as artes que você já fez), Posts prontos e o Post manual (pra quando você já tem a foto e só quer a legenda).",
   },
   {
     emoji: "📲",
