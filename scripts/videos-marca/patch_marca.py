@@ -23,6 +23,9 @@ def jsx(s):
         corpo=re.sub(r'="'+hx+'"','={'+v+'}',corpo,flags=re.I)
         corpo=re.sub(r"'"+hx+"'",v,corpo,flags=re.I)
         assert hx.lower() not in corpo.lower(), hx
+    # Texto neutro: o vídeo vai pra conta de médica, fisio, enfermeira (Aline 15/10)
+    corpo=corpo.replace('a avaliação de um nutricionista','a avaliação de um profissional de saúde')
+    assert 'nutricionista' not in corpo.lower(), 'sobrou nutricionista no texto do vídeo'
     corpo=corpo.replace('src={window.__resources.logo} alt="Scanner da Saúde"','src={LOGO()} alt={NOME()}')
     assert 'window.__resources.logo' not in corpo
     corpo=corpo.replace('function MetilacaoApp() {\n  const [tw, setTweak] = useTweaks(window.TWEAK_DEFAULTS);',
