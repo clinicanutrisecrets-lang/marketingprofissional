@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ erro: "Nao autenticado" }, { status: 401 });
+  if (!user) return NextResponse.json({ erro: "Não autenticado" }, { status: 401 });
 
   const { data: admin } = await supabase
     .from("admins")
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     semanaRef?: string;
     qtd?: number;
   };
-  if (!body.slug) return NextResponse.json({ erro: "slug obrigatorio" }, { status: 400 });
+  if (!body.slug) return NextResponse.json({ erro: "slug obrigatório" }, { status: 400 });
 
   const r = await gerarPackSemanal({
     perfilSlug: body.slug,

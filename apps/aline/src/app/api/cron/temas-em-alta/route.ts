@@ -15,7 +15,7 @@ export const maxDuration = 300;
  */
 export async function GET(request: Request) {
   if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ erro: "Nao autorizado" }, { status: 401 });
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
   }
   const aline = createAlineClient();
   const { data: perfis, error } = await aline.from("perfis").select("id, slug, publico_alvo");

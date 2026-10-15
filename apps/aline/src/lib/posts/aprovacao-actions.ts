@@ -9,7 +9,7 @@ async function assertAdmin(): Promise<void> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Nao autenticado");
+  if (!user) throw new Error("Não autenticado");
   const { data, error } = await supabase
     .from("admins")
     .select("papel, email")
@@ -52,7 +52,7 @@ export async function aprovarBlocoSemanal(params: {
       .eq("slug", params.perfilSlug)
       .maybeSingle();
     const perfil = perfilData as { id?: string } | null;
-    if (!perfil?.id) return { ok: false, erro: "Perfil nao encontrado" };
+    if (!perfil?.id) return { ok: false, erro: "Perfil não encontrado" };
 
     const { data: atualizados, error } = await aline
       .from("posts")

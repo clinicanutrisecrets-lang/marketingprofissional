@@ -7,6 +7,7 @@ import { COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "./client";
 import { NUCLEO_AGENTE_COPY, blocoPublicoDaCopy, type PublicoDaCopy } from "./copy-agent";
 import { blocoConsciencia, type NivelConsciencia } from "./consciencia";
 import { regraConsultaInclui } from "../geracao/consulta-teste";
+import { rotuloDeId, rotuloNicho, rotuloTom } from "../texto/rotulos";
 
 /**
  * Produto real da nutri no Scanner Tratamentos (cache produtos_scanner,
@@ -133,12 +134,12 @@ export function buildSystemPrompt(ctx: ContextoFranqueada): string {
     "=== CONTEXTO DA NUTRICIONISTA ===",
     "",
     ctx.nome_comercial && `Nome: ${ctx.nome_comercial}`,
-    ctx.nicho_principal && `Nicho: ${ctx.nicho_principal.replace(/_/g, " ")}`,
+    ctx.nicho_principal && `Nicho: ${rotuloNicho(ctx.nicho_principal)}`,
     ctx.publico_alvo_descricao && `Público-alvo: ${ctx.publico_alvo_descricao}`,
     ctx.diferenciais && `Diferenciais: ${ctx.diferenciais}`,
     ctx.historia_pessoal && `História: ${ctx.historia_pessoal}`,
     ctx.resultado_transformacao && `Caso marcante: ${ctx.resultado_transformacao}`,
-    ctx.tom_comunicacao && `Tom de comunicação: ${ctx.tom_comunicacao.replace(/_/g, " ")}`,
+    ctx.tom_comunicacao && `Tom de comunicação: ${rotuloTom(ctx.tom_comunicacao)}`,
     ctx.modalidade_atendimento && `Modalidade: ${ctx.modalidade_atendimento}`,
     ctx.cidade && ctx.estado && `Local: ${ctx.cidade}/${ctx.estado}`,
     ctx.valor_consulta_inicial && `Consulta inicial: R$${ctx.valor_consulta_inicial}`,
@@ -191,7 +192,7 @@ function blocoProdutos(produtos: ProdutoContexto[]): string[] {
     "",
     ...produtos.map((p) => {
       const partes = [p.nome];
-      if (p.tipo) partes.push(`(${p.tipo.replace(/_/g, " ")})`);
+      if (p.tipo) partes.push(`(${rotuloDeId(p.tipo)})`);
       if (p.preco_texto) partes.push(`— ${p.preco_texto}`);
       partes.push(`— link: ${p.checkout_url}`);
       return `- ${partes.join(" ")}`;
@@ -435,7 +436,7 @@ FORMATO STORIES (sequência):
 
 PRODUTO (dados reais — não altere nada):
 - Nome: ${produto.nome}
-${produto.tipo ? `- Formato: ${produto.tipo.replace(/_/g, " ")}` : ""}
+${produto.tipo ? `- Formato: ${rotuloDeId(produto.tipo)}` : ""}
 ${produto.descricao ? `- Descrição da nutri: ${produto.descricao}` : ""}
 ${incluir_preco && produto.preco_texto ? `- Preço: ${produto.preco_texto}` : "- Preço: NÃO citar preço neste post"}
 - Link de compra (checkout real): ${produto.checkout_url}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CardPicker, Field, TextArea } from "@/components/ui/Field";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 import { gerarLegendaManual, criarPostManual } from "@/lib/posts/manual";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type TipoPost = "feed_imagem" | "feed_carrossel" | "reels" | "stories";
 
@@ -21,7 +22,7 @@ export function CriarPostForm() {
     if (tema) {
       const extras: string[] = [];
       extras.push(`Tema sugerido: ${tema}`);
-      if (angulo) extras.push(`Ângulo: ${angulo.replace(/_/g, " ")}`);
+      if (angulo) extras.push(`Ângulo: ${rotuloDeId(angulo)}`);
       setBriefing(extras.join(" — "));
     }
   }, [searchParams]);

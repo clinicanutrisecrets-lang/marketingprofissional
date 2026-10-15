@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
 import { AprovarVariacaoButton } from "./AprovarVariacaoButton";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type Variacao = {
   letra: string;
@@ -81,7 +82,7 @@ export default async function AprovarAnuncioPage({
             <InfoCell label="Nome" value={(anuncio.nome as string) || "—"} />
             <InfoCell
               label="Objetivo"
-              value={(anuncio.objetivo_negocio as string)?.replace(/_/g, " ") || "—"}
+              value={rotuloDeId(anuncio.objetivo_negocio as string) || "—"}
             />
             <InfoCell
               label="Budget diário"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { acentuar } from "@/lib/acentos-ptbr";
 
 type Tipo =
   | "7a_hooks_alta_tracao"
@@ -191,7 +192,7 @@ export function TracaoView({
             {Object.entries(output).map(([k, v]) => (
               <div key={k}>
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  {k.replace(/_/g, " ")}
+                  {acentuar(k.replace(/_/g, " "))}
                 </div>
                 {typeof v === "string" ? (
                   <p className="whitespace-pre-wrap rounded-lg bg-zinc-50 p-3 text-sm text-zinc-800 leading-relaxed">
@@ -230,7 +231,7 @@ export function TracaoView({
               <li key={h.id as string} className="rounded-lg border border-zinc-200 p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] uppercase">
-                    {(h.tipo as string).replace(/_/g, " ")}
+                    {acentuar((h.tipo as string).replace(/_/g, " "))}
                   </span>
                   <span className="text-xs text-zinc-400">
                     {new Date(h.criado_em as string).toLocaleDateString("pt-BR")}

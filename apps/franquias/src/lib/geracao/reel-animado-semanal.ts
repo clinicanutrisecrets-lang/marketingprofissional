@@ -7,9 +7,11 @@
  * lib/conteudo/reel-animado.ts.
  */
 
+import { rotuloNicho } from "../texto/rotulos.ts";
+
 /** Tema do reel: a primeira queixa da rodada, contada pelo mecanismo. */
 export function temaDoReelAnimado(queixas: readonly string[], nicho: string): string {
-  const q = queixas.map((x) => x.trim()).find(Boolean) || nicho.replace(/_/g, " ");
+  const q = queixas.map((x) => x.trim()).find(Boolean) || rotuloNicho(nicho);
   return `${q}: o mecanismo por trás (sintoma, gene, alimentos que ajudam e o que investigar)`;
 }
 

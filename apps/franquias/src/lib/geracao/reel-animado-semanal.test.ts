@@ -7,7 +7,7 @@ const fonte = (p: string) => readFileSync(new URL(p, import.meta.url), "utf8");
 
 test("tema do reel animado sai da queixa da semana; sem queixa, o nicho", () => {
   assert.match(temaDoReelAnimado(["endometriose", "TPM"], "saude_mulher"), /^endometriose: o mecanismo/);
-  assert.match(temaDoReelAnimado([], "saude_integrativa"), /^saude integrativa: o mecanismo/);
+  assert.match(temaDoReelAnimado([], "saude_integrativa"), /^saúde integrativa: o mecanismo/);
 });
 
 test("o reel animado não cai no mesmo dia do reel de b-roll", () => {

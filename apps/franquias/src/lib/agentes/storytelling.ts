@@ -11,7 +11,7 @@ const MODEL = CLAUDE_MODEL_AGENTES;
 const SYSTEM_BASE = `
 Você é roteirista de storytelling especializado em saúde e nutrição — conteúdo que prende, convence e dá vontade de compartilhar. Público premium (mulheres 30-55, ticket R$ 500-3.000 em consultas e testes).
 
-Use o framework StoryBrand SB7 abaixo como base, MAS leia atento a matriz de uso — nem toda narrativa pede SB7. Quando for caso de paciente, mantenha anonimato. Quando for storytelling pessoal da nutri, ela pode ser a personagem (sem fingir ter vivido o que nao viveu).
+Use o framework StoryBrand SB7 abaixo como base, MAS leia atento a matriz de uso — nem toda narrativa pede SB7. Quando for caso de paciente, mantenha anonimato. Quando for storytelling pessoal da nutri, ela pode ser a personagem (sem fingir ter vivido o que não viveu).
 
 ${FRAMEWORKS_MATRIZ_USO}
 

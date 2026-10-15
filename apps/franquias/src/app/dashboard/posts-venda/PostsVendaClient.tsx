@@ -16,6 +16,7 @@ import { criarPostManual } from "@/lib/posts/manual";
 import { desenharArteDoPostVenda } from "@/lib/posts/arte-venda";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 import { avaliarImagem } from "@/lib/criativo/imagem-upload";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type PostGerado = {
   headline: string;
@@ -277,7 +278,7 @@ export function PostsVendaClient(props: {
           >
             <p className="text-sm font-bold text-brand-text">{p.nome}</p>
             <p className="mt-0.5 text-[11px] uppercase tracking-wide text-brand-text/40">
-              {(p.tipo ?? "produto").replace(/_/g, " ")}
+              {rotuloDeId(p.tipo ?? "produto")}
               {p.preco_texto ? ` · ${p.preco_texto}` : ""}
             </p>
             {p.descricao && (

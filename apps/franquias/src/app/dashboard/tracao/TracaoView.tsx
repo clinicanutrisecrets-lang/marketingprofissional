@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type Tipo =
   | "7a_hooks_alta_tracao"
@@ -185,7 +186,7 @@ export function TracaoView({
             {Object.entries(output).map(([k, v]) => (
               <div key={k}>
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-brand-text/60">
-                  {k.replace(/_/g, " ")}
+                  {rotuloDeId(k)}
                 </div>
                 {typeof v === "string" ? (
                   <p className="whitespace-pre-wrap rounded-lg bg-brand-muted/30 p-3 text-sm text-brand-text/85 leading-relaxed">
@@ -227,7 +228,7 @@ export function TracaoView({
               <li key={h.id as string} className="rounded-lg border border-brand-text/10 p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[10px] uppercase">
-                    {(h.tipo as string).replace(/_/g, " ")}
+                    {rotuloDeId(h.tipo as string)}
                   </span>
                   <span className="text-xs text-brand-text/50">
                     {new Date(h.criado_em as string).toLocaleDateString("pt-BR")}

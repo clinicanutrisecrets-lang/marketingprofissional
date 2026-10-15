@@ -1,4 +1,5 @@
 import { WhatsAppLink } from "./WhatsAppLink";
+import { rotuloNicho } from "@/lib/texto/rotulos";
 
 type Props = {
   franqueada: Record<string, unknown>;
@@ -49,7 +50,7 @@ export function LPViewNutri({
   const estado = (franqueada.estado as string) ?? "";
   const cidadeUF = [cidade, estado].filter(Boolean).join(", ");
   const crn = (franqueada.crn as string) ?? "";
-  const nicho = (franqueada.nicho_principal as string) ?? "nutrição";
+  const nicho = franqueada.nicho_principal ? rotuloNicho(franqueada.nicho_principal as string) : "nutrição";
   const historia =
     (franqueada.historia_pessoal as string) ??
     `Nutricionista com atuação focada em ${nicho}. Atendimento personalizado com base em ciência, escuta clínica e o mapa único do seu corpo.`;

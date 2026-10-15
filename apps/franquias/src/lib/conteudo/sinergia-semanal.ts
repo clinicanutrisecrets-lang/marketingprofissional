@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClaude, CLAUDE_MODEL_COPY, COMPLIANCE_CFN_BR, REGRA_SEM_TRAVESSAO } from "@/lib/claude/client";
 import { comAgenteDeCopy, type PublicoDaCopy } from "@/lib/claude/copy-agent";
 import { logarCusto } from "@/lib/custos/log";
+import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import type { createAdminClient } from "@/lib/supabase/server";
 import {
   conferirConteudo,
@@ -195,7 +196,8 @@ export async function escreverSinergia(p: {
     }
     const bruto: unknown = bloco.input;
     const c = conferirConteudo(bruto, p.receita);
-    if (c.ok) return c;
+    // Acento: o texto dos slides vira post (15/10/2026).
+    if (c.ok) return { ...c, conteudo: acentuarFundo(c.conteudo) };
     ultimo = c.motivo;
   }
   return { ok: false, motivo: ultimo };

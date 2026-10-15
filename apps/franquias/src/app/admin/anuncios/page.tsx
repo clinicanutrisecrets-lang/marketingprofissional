@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { rotuloNicho } from "@/lib/texto/rotulos";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +90,7 @@ export default async function AdminAnunciosPage() {
                       <div>
                         <div className="mb-1 text-xs text-brand-text/60">
                           {fr?.nome_comercial || fr?.nome_completo} ·{" "}
-                          {fr?.nicho_principal?.replace(/_/g, " ")}
+                          {rotuloNicho(fr?.nicho_principal)}
                           {fr?.cidade ? ` · ${fr.cidade}` : ""}
                         </div>
                         <h3 className="text-lg font-semibold text-brand-text">

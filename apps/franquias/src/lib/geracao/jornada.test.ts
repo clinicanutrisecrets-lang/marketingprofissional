@@ -51,7 +51,7 @@ test("queixa de frase livre (longa) nunca vira assunto de post", () => {
 
 test("sem queixa declarada, o assunto é o nicho", () => {
   const [a] = queixasDaRodada(null, "saude_integrativa");
-  assert.match(a, /saude integrativa/);
+  assert.match(a, /saúde integrativa/);
 });
 
 test("a rodada troca o par de queixas a cada 4 semanas", () => {

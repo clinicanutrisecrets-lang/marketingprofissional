@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { rotuloDeId } from "@/lib/texto/rotulos";
 
 type Depoimento = {
   id: string;
@@ -322,7 +323,7 @@ function OutputPanel({ output }: { output: Record<string, unknown> }) {
         {Object.entries(output).map(([k, v]) => (
           <div key={k}>
             <div className="text-xs font-medium uppercase tracking-wider text-brand-text/60 mb-1">
-              {k.replace(/_/g, " ")}
+              {rotuloDeId(k)}
             </div>
             {typeof v === "string" ? (
               <p className="whitespace-pre-wrap rounded-lg bg-brand-muted/30 p-3 text-sm text-brand-text/85 leading-relaxed">
