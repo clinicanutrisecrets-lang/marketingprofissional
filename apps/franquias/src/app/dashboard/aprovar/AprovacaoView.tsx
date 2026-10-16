@@ -591,7 +591,14 @@ function PostCard({
               >
                 ⬇ Baixar o vídeo
               </a>
-              {typeof post._reel_animado_id === "string" ? (
+              {typeof post.video_marca_id === "string" ? (
+                <a
+                  href={`/dashboard/narrar?origem=marca&ref=${post.video_marca_id}`}
+                  className="rounded-md bg-red-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"
+                >
+                  🎙️ Narrar por cima
+                </a>
+              ) : typeof post._reel_animado_id === "string" ? (
                 <a
                   href={`/dashboard/narrar?origem=reel&ref=${post._reel_animado_id}`}
                   className="rounded-md bg-red-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"

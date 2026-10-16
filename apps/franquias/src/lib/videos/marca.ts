@@ -36,6 +36,12 @@ export type VideoMarca = {
   resumo: string;
   roteiro: TrechoRoteiro[];
   legenda: string;
+  /**
+   * Assuntos do vídeo, sem acento e em minúsculo. É por eles que o pacote de
+   * domingo decide se o vídeo cabe no nicho dela ou no tema daquela semana
+   * (lib/geracao/video-marca-semana.ts). Pedaço de palavra vale ("emagrec").
+   */
+  temas: string[];
 };
 
 const BASE = "/videos-marca";
@@ -108,6 +114,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "O FTO é só um entre mais de vinte genes ligados ao emagrecimento. Saber quais letrinhas você tem muda a conduta, porque cada combinação pede um caminho diferente.",
       "Quer descobrir as suas? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
     ].join("\n\n"),
+    temas: ["emagrec", "peso", "obesidade", "gordura", "apetite", "fome", "saciedade", "metabol"],
   },
   {
     id: "gene-clock",
@@ -172,54 +179,64 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "A boa notícia é que o horário também é alimento. Refeições nos mesmos horários, luz da manhã e café só até a tarde ajudam o relógio a voltar ao lugar.",
       "O CLOCK é um entre mais de quinze genes ligados ao sono. Quer saber quais são as suas letrinhas? Me chama no direct.",
     ].join("\n\n"),
+    temas: ["sono", "insonia", "dormir", "melatonina", "relogio biologico", "circadian", "fome noturna", "cansaco"],
   },
   {
     id: "gene-cyp1a2",
     titulo: "Como funciona o gene da cafeína (CYP1A2)",
     molde: `${BASE}/cyp1a2.html`,
     poster: `${BASE}/cyp1a2.jpg`,
-    versao: 1,
-    duracaoSeg: 92,
+    // v2 (16/10/2026): abertura "te ajuda ou te atrapalha" e o fígado porteiro.
+    versao: 2,
+    duracaoSeg: 89.3,
     resumo:
-      "O gene CYP1A2 e a cafeína: por que quem tem a letra C desmonta o café devagar, o que isso tem a ver com ansiedade, coração e estrogênio, e como ajustar o café na medida da sua letra.",
+      "O gene CYP1A2 e a cafeína: o fígado como porteiro do corpo, por que quem tem a letra C desmonta o café devagar, o que isso tem a ver com ansiedade, coração e estrogênio, e como ajustar o café na medida da sua letra.",
     roteiro: [
-      { de: 0, ate: 9, texto: "Sabe aquele seu café turbinado? O CYP1A2, o gene da cafeína, decide o que ele faz com você." },
       {
-        de: 9,
-        ate: 24.7,
+        de: 0,
+        ate: 12.5,
+        texto:
+          "Sabe aquele seu café turbinado? O CYP1A2, o gene da cafeína, decide o que ele faz com você. Descubra se a sua genética te ajuda ou te atrapalha.",
+      },
+      {
+        de: 12.5,
+        ate: 28.2,
         texto:
           "Este é o gene CYP1A2, que monta a enzima que desmonta a cafeína. Quem é AA é rápido. Quem tem a letra C, a de risco, é lento. Mas a letra C não é sentença: saber a letra muda a conduta.",
       },
       {
-        de: 24.7,
-        ate: 40.4,
-        texto: "Para trabalhar, o gene precisa ser lido. A leitora faz uma cópia, que vira um recadinho. O recadinho chega numa fábrica, que monta a enzima CYP1A2.",
-      },
-      {
-        de: 40.4,
-        ate: 64.5,
+        de: 28.2,
+        ate: 37.7,
         texto:
-          "No fígado, a CYP1A2 desmonta a cafeína. Com AA, a esteira é rápida. Com a letra C, ela anda devagar e a cafeína se acumula: mais ansiedade, agitação e tremedeira. Em quem é lento, duas a três xícaras ou mais por dia foram ligadas a mais risco de infarto precoce. A CYP1A2 também ajuda a reciclar o estrogênio, por isso conversa com a TPM e a menopausa.",
+          "A CYP1A2 trabalha no fígado, o porteiro do corpo. Na fase 1 da detox, ela desmonta a cafeína, que sai pelo xixi.",
       },
       {
-        de: 64.5,
-        ate: 76.3,
-        texto: "Não é proibir, é ajustar. Com a letra C, menos café, só até a tarde, e cuidado com o café turbinado. Triglicerídeos acima de 90? O resveratrol entra como aliado.",
+        de: 37.7,
+        ate: 61.8,
+        texto:
+          "Com AA, a esteira é rápida. Com a letra C, ela anda devagar e a cafeína se acumula: o corpo fica ligado no 220, com mais ansiedade, agitação e tremedeira. Em quem é lento, duas a três xícaras ou mais por dia foram ligadas a mais risco de infarto precoce. A CYP1A2 também ajuda a reciclar o estrogênio, por isso conversa com a TPM e a menopausa.",
       },
-      { de: 76.3, ate: 83, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
       {
-        de: 83,
-        ate: 92,
+        de: 61.8,
+        ate: 73.6,
+        texto:
+          "Não é proibir, é ajustar. Com a letra C, menos café e só até a tarde. Café turbinado pesa mais para quem é lento. Triglicerídeos acima de 90? O resveratrol entra como aliado.",
+      },
+      { de: 73.6, ate: 80.3, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 80.3,
+        ate: 89.3,
         texto: "E as suas letrinhas, quais são? São mais de trezentos genes ligados ao seu metabolismo. Faça o seu teste nutrigenético e descubra.",
       },
     ],
     legenda: [
       "Você sabia que o seu café também tem um gene?",
-      "O gene CYP1A2 monta a enzima que desmonta a cafeína no fígado. Quem é AA desmonta rápido. Quem tem a letra C desmonta devagar, e a cafeína fica mais tempo no corpo: mais ansiedade, agitação e tremedeira.",
+      "O gene CYP1A2 monta uma enzima do fígado, o porteiro do corpo, que desmonta a cafeína. Quem é AA desmonta rápido. Quem tem a letra C desmonta devagar, e a cafeína fica mais tempo no corpo: mais ansiedade, agitação e tremedeira.",
       "A mesma enzima ajuda a reciclar o estrogênio, por isso ela conversa com a TPM e a menopausa.",
       "Não é proibir o café, é ajustar a dose e o horário à sua letra.",
-      "Quer saber qual é a sua? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
+      "Quer saber se a sua genética te ajuda ou te atrapalha? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
     ].join("\n\n"),
+    temas: ["cafe", "cafeina", "ansiedade", "tpm", "menopausa", "estrogen", "hormon", "saude feminina", "detox", "figado", "coracao", "cardio"],
   },
   {
     id: "gene-il6",
@@ -283,6 +300,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "Mas gene não é sentença. A alimentação traz a matéria-prima das etiquetinhas que ajudam a regular o gene, e alimentos como acerola, peixes, castanha-do-pará, abacate e azeite ajudam a baixar o termômetro.",
       "O IL6 é um entre mais de vinte genes ligados à inflamação. Quer saber quais são as suas letrinhas? Me chama no direct.",
     ].join("\n\n"),
+    temas: ["inflama", "dor", "imunidade", "autoimun", "endometriose", "fertilidade", "longevidade", "saude feminina"],
   },
   {
     id: "gene-glp1r-gipr",
@@ -335,6 +353,67 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "Por isso a resposta à semaglutida e à tirzepatida não é igual para todo mundo, e o prato certo também ajuda: proteína, fibras, azeite e comer devagar fazem o intestino liberar mais chaves naturais.",
       "O uso de medicamentos é decisão do médico. Quer saber quais são as suas letrinhas? Me chama no direct.",
     ].join("\n\n"),
+    temas: ["emagrec", "peso", "canetinha", "semaglutida", "tirzepatida", "glp", "diabet", "glicemia", "insulina", "saciedade"],
+  },
+  {
+    id: "gene-comt",
+    titulo: "Como funciona o gene do foco e da ansiedade (COMT)",
+    molde: `${BASE}/comt.html`,
+    poster: `${BASE}/comt.jpg`,
+    versao: 1,
+    duracaoSeg: 120,
+    resumo:
+      "O gene COMT e a dopamina: por que GG tende a procrastinar e buscar recompensa, por que AA tende à mente acelerada e à ansiedade, e o ajuste da alimentação e da rotina para cada letra.",
+    roteiro: [
+      {
+        de: 0,
+        ate: 15.4,
+        texto:
+          "Por que algumas pessoas procrastinam e outras não desligam a cabeça? Este é o gene do foco e da ansiedade. E a alimentação ajuda a ligar ou desligar esse gene da tomada.",
+      },
+      {
+        de: 15.4,
+        ate: 28.6,
+        texto:
+          "Mas o que é dopamina? Um mensageiro que passa de um neurônio para o outro. Ela dá energia, disposição e foco. E vai além do cérebro: mexe com o humor, os hormônios e o intestino.",
+      },
+      {
+        de: 28.6,
+        ate: 44.3,
+        texto:
+          "Este é o gene COMT, que regula a dopamina. Com GG, a enzima trabalha rápido e a dopamina vai embora cedo. Com AA, ela trabalha devagar e a dopamina fica mais tempo. Nenhuma letra é sentença: cada perfil pede uma conduta.",
+      },
+      {
+        de: 44.3,
+        ate: 53,
+        texto: "O gene é uma receita. A cópia vira um recadinho, e a fábrica monta a enzima COMT, a recolhedora da dopamina.",
+      },
+      {
+        de: 53,
+        ate: 83,
+        texto:
+          "A COMT recolhe a dopamina depois que ela trabalha, para o cérebro não ficar ligado demais. Quem é GG tende a ter pouca dopamina: fica difícil manter a atenção, a procrastinação aparece, bate o cansaço e vem a vontade de comer por tédio. O cérebro vira um caçador de recompensa. Quem é AA tende a ter a mente acelerada: mais ansiedade, pensamentos que não param e o comer por ansiedade. Mas o AA tem um ponto forte: mais foco e concentração.",
+      },
+      {
+        de: 83,
+        ate: 106,
+        texto:
+          "Agora vem a parte boa: a comida ajuda, e cada letra pede um ajuste. Para GG, proteína no café da manhã, com ovos e carnes, e movimento, que libera dopamina de forma saudável. Vitamina D e complexo B também contam. Para AA, o ajuste é desacelerar: magnésio, abacate e sementes de abóbora, menos café, principalmente à tarde, e pausas para respirar.",
+      },
+      { de: 106, ate: 112, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 112,
+        ate: 120,
+        texto: "E as suas letrinhas, quais são? Para cada gene, uma conduta diferente. Faça o seu teste nutrigenético e descubra.",
+      },
+    ],
+    legenda: [
+      "Por que algumas pessoas procrastinam e outras não desligam a cabeça?",
+      "O gene COMT monta a enzima que recolhe a dopamina, o combustível do foco e do prazer. Com GG, ela recolhe rápido: a dopamina vai embora cedo, a atenção escapa e o cérebro vive procurando recompensa. Com AA, ela recolhe devagar: a mente fica acelerada e a ansiedade aparece.",
+      "Cada letra pede um ajuste diferente na alimentação e na rotina. Para um, proteína logo cedo e movimento. Para o outro, desacelerar, com menos café à tarde e pausas para respirar.",
+      "Quer saber qual é a sua? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
+    ].join("\n\n"),
+    temas: ["ansiedade", "foco", "concentra", "atencao", "procrastin", "dopamina", "saude mental", "estresse", "emocional", "compuls", "humor"],
   },
 ];
 

@@ -56,6 +56,8 @@ import { montarSinergiaDaSemana } from "@/lib/geracao/sinergia-da-semana";
 import { cardDeSinergiaSemArte } from "@/lib/geracao/sinergia";
 import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
 import { montarFabricaDaSemana } from "@/lib/geracao/fabrica-da-semana";
+import { montarVideoMarcaDaSemana } from "@/lib/geracao/video-marca-da-semana";
+import { diaDoVideoMarca } from "@/lib/geracao/video-marca-semana";
 import {
   TIPOS_FOTO_BANCO,
   caminhoNoBucket,
@@ -1010,6 +1012,30 @@ export async function gerarPostsDaSemana(
     });
     if (fab.ok) gerados += fab.gerados;
     else console.warn("[semanal] carrossel da Fábrica não saiu:", fab.motivo);
+  }
+
+  // 5g. O vídeo de MARCA da semana (lib/geracao/video-marca-da-semana.ts,
+  //     Aline 16/10/2026): um por semana, só se cabe no tema da semana ou no
+  //     nicho dela, sem repetir. Best-effort.
+  {
+    const dias = ((franqueada.dias_post_semana as number[]) ?? [1, 3, 5]).slice();
+    const vm = await montarVideoMarcaDaSemana({
+      admin,
+      franqueadaId,
+      franqueada,
+      aprovacaoId,
+      semanaRef,
+      dataHora: calcularDataHora(semanaRef, diaDoVideoMarca(dias), (franqueada.horario_preferido_post as string) ?? "08:00"),
+      logoUrl: logoUrl ?? null,
+      textosDaSemana: [temaEmAlta?.tema, temaEmAlta?.resumo, ...(estrategia.queixas ?? []), ...(estrategia.passos ?? [])],
+      textosDoNicho: [
+        ((franqueada.nicho_principal as string) ?? "").replace(/_/g, " "),
+        (franqueada.publico_alvo_descricao as string) ?? null,
+        ...(contexto.publico?.queixas ?? []),
+      ],
+    });
+    if (vm.ok) gerados += vm.gerados;
+    else console.warn("[semanal] vídeo de marca da semana não saiu:", vm.motivo);
   }
 
   // 6. Atualiza total no registro de aprovação

@@ -18,6 +18,7 @@ def jsx(s):
     corpo=corpo.replace("'linear-gradient(135deg, #0ABFBC, #089896)'",'`linear-gradient(135deg, ${COL.tiffFill}, ${COL.tiffD})`')
     corpo=corpo.replace("'linear-gradient(135deg, #7B5EA7, #5C4080)'",'`linear-gradient(135deg, ${COL.purpleFill}, ${COL.purpleD})`')
     mapa={'#E6F9F9':'COL.tiff50','#F3EFF8':'COL.purple50','#E3DAF0':'COL.purple100','#7FDAD8':'COL.tiffL','#B9A5D6':'COL.purpleL',
+          '#EFE7FA':'COL.purple50','#EDE6F7':'COL.purple50','#DCCFF0':'COL.purple100','#B9A3DA':'COL.purpleL','#9FE6E4':'COL.tiffL','#DDF5F4':'COL.tiff50',
           '#0ABFBC':'COL.tiff','#089896':'COL.tiffD','#7B5EA7':'COL.purple','#5C4080':'COL.purpleD'}
     for hx,v in mapa.items():
         corpo=re.sub(r'="'+hx+'"','={'+v+'}',corpo,flags=re.I)
