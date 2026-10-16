@@ -3,6 +3,7 @@
 import { GuiaDaSemana } from "./GuiaDaSemana";
 import { TextoDaArte } from "./TextoDaArte";
 import { VisorArtes } from "./VisorArtes";
+import { AvisoFaltaVoz } from "../videos/AvisoFaltaVoz";
 import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { acentuarVisivel } from "@/lib/texto/acentos-visivel";
 import { useMemo, useState, useTransition } from "react";
@@ -581,8 +582,13 @@ function PostCard({
 
         {videoPronto && (
           <div className="mb-3 rounded-lg border border-rose-200 bg-white p-2 text-xs">
-            <div className="mb-1 font-semibold text-rose-800">🎞️ Vídeo curto pronto</div>
+            <div className="mb-1 font-semibold text-rose-800">{typeof post.video_marca_id === "string" ? "🧬 Vídeo animado com a sua marca" : "🎞️ Vídeo curto pronto"}</div>
             <video src={videoPronto} controls playsInline className="max-h-80 w-full rounded bg-black" />
+            {typeof post.video_marca_id === "string" && (
+              <div className="mt-1.5">
+                <AvisoFaltaVoz href={`/dashboard/narrar?origem=marca&ref=${post.video_marca_id}`} compacto />
+              </div>
+            )}
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               <a
                 href={videoPronto}
@@ -591,14 +597,7 @@ function PostCard({
               >
                 ⬇ Baixar o vídeo
               </a>
-              {typeof post.video_marca_id === "string" ? (
-                <a
-                  href={`/dashboard/narrar?origem=marca&ref=${post.video_marca_id}`}
-                  className="rounded-md bg-red-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"
-                >
-                  🎙️ Narrar por cima
-                </a>
-              ) : typeof post._reel_animado_id === "string" ? (
+              {typeof post.video_marca_id === "string" ? null : typeof post._reel_animado_id === "string" ? (
                 <a
                   href={`/dashboard/narrar?origem=reel&ref=${post._reel_animado_id}`}
                   className="rounded-md bg-red-600 px-2.5 py-1 font-semibold text-white hover:opacity-90"

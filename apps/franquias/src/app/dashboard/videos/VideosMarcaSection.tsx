@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { roteiroComoTexto, tempoRoteiro } from "@/lib/videos/marca";
 import type { EstadoVideoMarca } from "@/lib/videos/marca-servidor";
+import { AvisoFaltaVoz } from "./AvisoFaltaVoz";
 
 /**
  * Vídeos animados na SUA marca: o mesmo vídeo pra todas, com a cor e a logo
@@ -73,10 +74,13 @@ function CartaoVideoMarca({ e }: { e: EstadoVideoMarca }) {
       <p className="mt-2 text-sm text-brand-text/70">{v.resumo}</p>
 
       {temVideo && (
+        <div className="mt-3">
+          <AvisoFaltaVoz href={`/dashboard/narrar?origem=marca&ref=${v.id}`} />
+        </div>
+      )}
+
+      {temVideo && (
         <div className="mt-4 flex flex-wrap gap-2">
-          <a href={`/dashboard/narrar?origem=marca&ref=${v.id}`} className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white">
-            🎙️ Gravar narração
-          </a>
           <a href={e.url!} download target="_blank" rel="noreferrer" className="rounded-lg bg-brand-primary px-3 py-2 text-sm font-semibold text-white">
             Baixar vídeo
           </a>

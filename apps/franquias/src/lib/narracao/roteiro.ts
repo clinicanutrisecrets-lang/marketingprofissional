@@ -112,3 +112,13 @@ export function palavrasAcesas(tr: Trecho, t: number): number {
   const frac = Math.min(1, Math.max(0, (t - tr.de) / seg));
   return Math.round(frac * total);
 }
+
+/**
+ * Parou a gravação antes do fim do vídeo? A voz cobre só até `ate` e o resto
+ * sai mudo. Folga de 1,5 s porque o "Parar" no último segundo é legítimo.
+ * Sem duração conhecida (metadado ainda não carregou), não acusa.
+ */
+export function paradaAntesDoFim(ate: number, total: number): boolean {
+  if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(ate)) return false;
+  return ate < total - 1.5;
+}
