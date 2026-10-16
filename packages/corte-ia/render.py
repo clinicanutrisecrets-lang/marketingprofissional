@@ -213,8 +213,11 @@ def assinatura(rodape, handle):
     return "   |   ".join(partes)
 
 
-def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None):
+def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None, cores=None):
     est = legenda_estilos.por_nome(estilo)
+    if cores:
+        est = legenda_estilos.com_cor_da_marca(est, *cores)
+    acento = est.get("acento", TIFF)
     chunks, sent_of = blocos_de_legenda(palavras, plano.get("correcoes"))
     ev = eventos_legenda(chunks, sent_of, layout, text_w, est)
 
@@ -228,7 +231,7 @@ def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None
     fs1 = 150 if len(l1) <= 9 else 118
     fs2 = 104 if len(l2) <= 12 else 84
     cover = (f"Dialogue: 2,{ts(0)},{ts(cover_end)},Cover,,0,0,0,,{{\\pos(540,{layout['key_y'] + 60})\\fad(0,200)\\fscx92\\fscy92\\t(0,250,\\fscx100\\fscy100)}}"
-             f"{{\\c{TIFF}\\fs{fs1}}}{l1}\\N{{\\c{WHITE}\\fs{fs2}}}{l2}"
+             f"{{\\c{acento}\\fs{fs1}}}{l1}\\N{{\\c{WHITE}\\fs{fs2}}}{l2}"
              f"\\N{{\\fs50\\b0\\fn{est['fonte_apoio']}\\c&HDDDDDD&}}{apoio}")
 
     keyev = []
@@ -241,11 +244,11 @@ def montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo=None
         keyev.append(f"Dialogue: 2,{ts(a)},{ts(b)},Key,,0,0,0,,{{\\pos(540,{layout['key_y']})\\fad(150,150)\\fs{fs}\\fscx85\\fscy85\\t(0,220,\\fscx100\\fscy100)}}{k}")
         sub = esc(capa.get("linha1", ""))
         if sub:
-            keyev.append(f"Dialogue: 2,{ts(a)},{ts(b)},Tag,,0,0,0,,{{\\pos(540,{layout['key_y'] + 110})\\fad(150,150)\\c{TIFF}}}{sub}")
+            keyev.append(f"Dialogue: 2,{ts(a)},{ts(b)},Tag,,0,0,0,,{{\\pos(540,{layout['key_y'] + 110})\\fad(150,150)\\c{acento}}}{sub}")
 
     tag = f"Dialogue: 0,{ts(0)},{ts(dur)},Tag,,0,0,0,,{{\\pos(540,{layout['tag_y']})}}{assinatura(rodape, handle)}"
     progress = [
-        f"Dialogue: 0,{ts(i / 10)},{ts(i / 10 + 0.1)},Bar,,0,0,0,,{{\\pos(0,1905)\\p1\\c{TIFF}}}m 0 0 l {int(W * (i / 10) / dur)} 0 {int(W * (i / 10) / dur)} 8 0 8{{\\p0}}"
+        f"Dialogue: 0,{ts(i / 10)},{ts(i / 10 + 0.1)},Bar,,0,0,0,,{{\\pos(0,1905)\\p1\\c{acento}}}m 0 0 l {int(W * (i / 10) / dur)} 0 {int(W * (i / 10) / dur)} 8 0 8{{\\p0}}"
         for i in range(int(dur * 10))
     ]
     # Faixas escuras atrás do texto quando o vídeo ocupa a tela toda
@@ -268,7 +271,7 @@ Style: Cap,{est['fonte_cap']},{est['fs_cap']},{WHITE},{WHITE},&H00000000,&H00000
 Style: Pill,Inter,20,&H3A2E2B&,&H3A2E2B&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: PillTxt,{est['fonte_pill']},{est['fs_pill']},{WHITE},{WHITE},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
 Style: Tag,Inter,34,&H00FFFFFF,&H00FFFFFF,&H8C000000,&H8C000000,0,0,0,0,100,100,2,0,1,2,1,5,40,40,0,1
-Style: Bar,Inter,20,{TIFF},{TIFF},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+Style: Bar,Inter,20,{acento},{acento},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: Fundo,Inter,20,&H000000&,&H000000&,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
@@ -353,7 +356,7 @@ def filtro_fonte(label, modo, band_h):
             f"[{label}bgo][{label}fgo]overlay=0:(H-h)/2")
 
 
-def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir, estilo=None):
+def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir, estilo=None, cores=None):
     w0, h0, dur = probe(video)
     retrato = h0 > w0
     palavras = [w for s in transcricao for w in s["palavras"]]
@@ -379,7 +382,7 @@ def render(video, transcricao, plano, broll_files, handle, rodape, out, fontsdir
     text_w = medidor(font)
     ass_path = os.path.join(os.path.dirname(out) or ".", "corte.ass")
     with open(ass_path, "w", encoding="utf-8") as f:
-        f.write(montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo))
+        f.write(montar_ass(plano, palavras, dur, layout, handle, rodape, text_w, estilo, cores))
 
     tl = cadenciar(timeline(plano, dur, broll_files))
     fontes = sorted({s[0] for s in tl if s[0] != "head"})
