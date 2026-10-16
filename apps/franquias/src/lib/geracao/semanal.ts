@@ -56,6 +56,7 @@ import { montarSinergiaDaSemana } from "@/lib/geracao/sinergia-da-semana";
 import { cardDeSinergiaSemArte } from "@/lib/geracao/sinergia";
 import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
 import { montarFabricaDaSemana } from "@/lib/geracao/fabrica-da-semana";
+import { montarQuemEuSouDaSemana } from "@/lib/geracao/quem-eu-sou-da-semana";
 import { montarVideoMarcaDaSemana } from "@/lib/geracao/video-marca-da-semana";
 import { diaDoVideoMarca } from "@/lib/geracao/video-marca-semana";
 import {
@@ -1012,6 +1013,32 @@ export async function gerarPostsDaSemana(
     });
     if (fab.ok) gerados += fab.gerados;
     else console.warn("[semanal] carrossel da Fábrica não saiu:", fab.motivo);
+  }
+
+  // 5f2. O 3º post fixo, "Quem eu sou" (lib/geracao/quem-eu-sou.ts, Aline
+  //      16/10/2026): a história DELA, na semana seguinte à da Fábrica, com
+  //      as fotos dela. Só com a história respondida. Best-effort.
+  {
+    const usadasQuem = new Set<string>();
+    const qs = await montarQuemEuSouDaSemana({
+      admin,
+      franqueadaId,
+      franqueada,
+      aprovacaoId,
+      semanaRef,
+      logoUrl: logoUrl ?? null,
+      palavrasEvitar: contexto.palavras_evitar ?? null,
+      naoAtende: contexto.publico?.nao_atende ?? null,
+      fotoDela: async (assuntos) => {
+        const f = melhorFotoParaTexto(banco, "", usadasQuem, assuntos as AssuntoFoto[]);
+        if (!f) return null;
+        const buf = await baixarDoBanco(f);
+        if (buf) usadasQuem.add(f.id);
+        return buf ?? null;
+      },
+    });
+    if (qs.ok) gerados += qs.gerados;
+    else console.warn("[semanal] post Quem eu sou não saiu:", qs.motivo);
   }
 
   // 5g. O vídeo de MARCA da semana (lib/geracao/video-marca-da-semana.ts,

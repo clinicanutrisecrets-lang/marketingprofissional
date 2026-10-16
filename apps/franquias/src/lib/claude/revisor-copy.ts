@@ -123,7 +123,7 @@ const SUPERLATIVOS = [
   "unico metodo", "metodo unico", "solucao definitiva", "tratamento definitivo",
 ];
 
-const PROMESSA_CURA = ["cura", "curar", "cure", "curam", "curado", "curada"];
+const PROMESSA_CURA = ["cura", "curar", "cure", "curam", "curado", "curada", "curei", "curou"];
 const ACABA_COM = ["acaba com", "acabe com", "elimina de vez", "resolve de vez", "some de vez", "adeus"];
 
 const SENSACIONALISMO = [
