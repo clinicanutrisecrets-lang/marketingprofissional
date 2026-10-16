@@ -53,5 +53,6 @@ export async function marcarStatusSugestao(
     .eq("id", id)
     .eq("franqueada_id", franqueadaId);
   revalidatePath("/dashboard/conteudo");
+  revalidatePath("/dashboard");
   return { ok: !error };
 }

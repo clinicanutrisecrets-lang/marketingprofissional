@@ -30,7 +30,7 @@ export default async function TendenciasCard({ nicho, corPrimaria }: Props) {
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-text/60">
-          📰 Em alta no seu nicho
+          📰 Radar do seu nicho
         </h2>
         {/* Dizia "atualizado diariamente" mesmo quando o dado tinha meses.
             Ou mostra a data do que está na tela, ou não promete nada. */}
