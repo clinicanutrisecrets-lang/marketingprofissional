@@ -68,7 +68,7 @@ test("a geração liga o tema em alta à sinergia, e a sinergia responde por fer
   assert.match(readFileSync(new URL("./semanal.ts", import.meta.url), "utf8"), /temaEmAlta,\n\s*logoUrl/);
   const semanal = readFileSync(new URL("./sinergia-da-semana.ts", import.meta.url), "utf8");
   assert.match(semanal, /temaSinergiaDoTemaEmAlta\(temaEmAlta\)/);
-  assert.match(semanal, /temas: temaSinergia \? \[temaSinergia\]/);
+  assert.match(semanal, /temas: temaDoAlta \? \[temaDoAlta\]/);
   const sin = readFileSync(new URL("../conteudo/sinergia-semanal.ts", import.meta.url), "utf8");
   // 07/10: "JSON inválido" duas vezes, legenda com quebra de linha crua.
   assert.match(sin, /tool_choice/);

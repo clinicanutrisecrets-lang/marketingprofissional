@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FileUpload } from "@/components/ui/FileUpload";
-import { listarArquivos, nomearFoto } from "@/lib/arquivos/actions";
+import { listarArquivos, nomearFoto, salvarReceitaFoto } from "@/lib/arquivos/actions";
 
 // Declarado à mão: o tipo gerado do banco está velho e devolve `never`.
 type Arquivo = {
@@ -13,6 +13,9 @@ type Arquivo = {
   descricao_auto?: string | null;
   assuntos?: string[] | null;
   descricao?: string | null;
+  eh_receita?: boolean | null;
+  receita_ingredientes?: string | null;
+  receita_modo_preparo?: string | null;
 };
 
 // Em palavras dela: em que tipo de post a foto entra.
@@ -64,7 +67,7 @@ export function FotosBanco() {
       <FileUpload
         label="Fotos de comida e das suas receitas"
         tipo="foto_comida"
-        descricao="Pratos de que você gosta, sucos e receitas que você fez. Depois de subir, escreva embaixo o que é cada uma (ex.: suco de acerola): é por esse nome que a foto vai pro post certo."
+        descricao="Pratos de que você gosta, sucos e receitas que você fez. Depois de subir, escreva embaixo o que é cada uma (ex.: suco de acerola): é por esse nome que a foto vai pro post certo. Se for uma receita sua, conte a receita: ela pode virar o carrossel de sinergia da semana."
         multiplos
         arquivosExistentes={fotosComida}
         onUploadSucess={recarregar}
@@ -172,6 +175,7 @@ function LinhaFoto({ f }: { f: Arquivo }) {
           <p className="mt-1 text-gray-500">O Scanner reconheceu: {f.descricao_auto}</p>
         )}
         {!salvo && comida && <p className="mt-1 text-amber-700">Sem nome, esta foto entra em qualquer post de comida.</p>}
+        {comida && <ReceitaDaFoto f={f} titulo={salvo} />}
         {f.assuntos?.length && !comida ? (
           <div className="mt-1 flex flex-wrap gap-1">
             {f.assuntos.map((a) => (
@@ -186,5 +190,108 @@ function LinhaFoto({ f }: { f: Arquivo }) {
         )}
       </div>
     </li>
+  );
+}
+
+/**
+ * "Esta é uma receita sua?" (Aline, 16/10/2026). Sim: ela escreve a receita e
+ * a foto pode virar o carrossel de sinergia da semana (no lugar das receitas
+ * do nosso banco). Não: a foto fica só de ilustração nos posts de alimentação.
+ */
+function ReceitaDaFoto({ f, titulo }: { f: Arquivo; titulo: string }) {
+  const [resposta, setResposta] = useState<boolean | null>(f.eh_receita ?? null);
+  const [ingredientes, setIngredientes] = useState(f.receita_ingredientes ?? "");
+  const [modo, setModo] = useState(f.receita_modo_preparo ?? "");
+  const [estado, setEstado] = useState<"" | "salvando" | "ok" | "erro">("");
+  const [erro, setErro] = useState("");
+  const [salvaComoReceita, setSalvaComoReceita] = useState(f.eh_receita === true);
+
+  async function salvar(ehReceita: boolean) {
+    setEstado("salvando");
+    const r = await salvarReceitaFoto(f.id, { eh_receita: ehReceita, ingredientes, modo_preparo: modo });
+    if (r.ok) {
+      setSalvaComoReceita(ehReceita);
+      setEstado("ok");
+      setTimeout(() => setEstado(""), 2500);
+    } else {
+      setErro(r.erro ?? "Não consegui salvar.");
+      setEstado("erro");
+    }
+  }
+
+  const botao = (ativo: boolean) =>
+    `rounded-full px-3 py-1 text-xs font-semibold ${ativo ? "bg-brand-primary text-white" : "border border-gray-200 bg-white text-gray-700"}`;
+
+  return (
+    <div className="mt-2 rounded-lg bg-gray-50 p-2">
+      <p className="font-medium text-gray-700">Esta é uma receita sua?</p>
+      <div className="mt-1 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setResposta(true);
+            setEstado("");
+          }}
+          className={botao(resposta === true)}
+        >
+          Sim, vou escrever a receita
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setResposta(false);
+            salvar(false);
+          }}
+          className={botao(resposta === false)}
+        >
+          Não, é só uma foto ilustrativa
+        </button>
+      </div>
+      {resposta === false && (
+        <p className="mt-1 text-gray-500">Ela entra como ilustração nos posts que falam de alimentação.</p>
+      )}
+      {resposta === true && (
+        <div className="mt-2 space-y-2">
+          {!titulo && <p className="text-amber-700">Escreva antes o nome da receita no campo &quot;O que é?&quot; acima.</p>}
+          <label className="block">
+            <span className="font-medium text-gray-700">Ingredientes (um por linha)</span>
+            <textarea
+              value={ingredientes}
+              onChange={(e) => setIngredientes(e.target.value)}
+              rows={5}
+              maxLength={2000}
+              placeholder={"1 xícara de lentilha cozida\n1 colher de sopa de azeite\nsuco de meio limão"}
+              className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="font-medium text-gray-700">Modo de preparo</span>
+            <textarea
+              value={modo}
+              onChange={(e) => setModo(e.target.value)}
+              rows={4}
+              maxLength={3000}
+              placeholder="Misture tudo numa tigela e tempere com o limão e o azeite."
+              className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => salvar(true)}
+            disabled={estado === "salvando"}
+            className="rounded-lg bg-brand-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+          >
+            {estado === "salvando" ? "Salvando…" : "Salvar receita"}
+          </button>
+          {salvaComoReceita && estado !== "erro" && (
+            <p className="text-emerald-700">
+              Receita guardada. Ela pode virar o carrossel de sinergia de uma das próximas semanas, com esta foto.
+            </p>
+          )}
+        </div>
+      )}
+      {estado === "ok" && !salvaComoReceita && <p className="mt-1 text-emerald-700">Salvo.</p>}
+      {estado === "erro" && <p className="mt-1 text-red-600">{erro}</p>}
+    </div>
   );
 }

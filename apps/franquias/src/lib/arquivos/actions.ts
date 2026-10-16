@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { descreverEGravarFoto } from "./descrever-foto";
 import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
+import { problemaDaReceita } from "@/lib/geracao/receita-propria";
 
 export type TipoArquivo =
   | "logo_principal"
@@ -189,7 +190,7 @@ export async function listarArquivos(tipo?: TipoArquivo) {
 
   let query = supabase
     .from("arquivos_franqueada")
-    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em, descricao_auto, assuntos, descricao")
+    .select("id, tipo, nome_arquivo, url_storage, formato, tamanho_bytes, criado_em, descricao_auto, assuntos, descricao, eh_receita, receita_ingredientes, receita_modo_preparo")
     .eq("franqueada_id", franqueada.id)
     .order("criado_em", { ascending: false });
 
@@ -224,6 +225,61 @@ export async function nomearFoto(
   const { data, error } = await createAdminClient()
     .from("arquivos_franqueada")
     .update({ descricao: limpo || null } as never)
+    .eq("id", arquivoId)
+    .eq("franqueada_id", franqueada.id)
+    .select("id");
+  if (error) return { ok: false, erro: "Não consegui salvar. Tente de novo." };
+  if (!data?.length) return { ok: false, erro: "Foto não encontrada" };
+  revalidatePath("/dashboard/fotos");
+  return { ok: true };
+}
+
+/**
+ * "Esta é uma receita sua?" (Aline, 16/10/2026). Sim: grava ingredientes e
+ * modo de preparo, e a foto vira candidata à sinergia da semana. Não: a foto
+ * fica só ilustrativa. Recusa receita incompleta ou com adoçante proibido,
+ * dizendo o porquê (lib/geracao/receita-propria.ts).
+ */
+export async function salvarReceitaFoto(
+  arquivoId: string,
+  dados: { eh_receita: boolean; ingredientes?: string; modo_preparo?: string },
+): Promise<{ ok: boolean; erro?: string }> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Não autenticado" };
+  const { data: franqueada } = await supabase
+    .from("franqueadas")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (!franqueada?.id) return { ok: false, erro: "Conta não encontrada" };
+
+  const admin = createAdminClient();
+  const { data: arq, error: lerErr } = await admin
+    .from("arquivos_franqueada")
+    .select("id, tipo, descricao")
+    .eq("id", arquivoId)
+    .eq("franqueada_id", franqueada.id)
+    .maybeSingle();
+  if (lerErr) return { ok: false, erro: "Não consegui salvar. Tente de novo." };
+  const a = arq as { tipo: string; descricao: string | null } | null;
+  if (!a || a.tipo !== "foto_comida") return { ok: false, erro: "Foto não encontrada" };
+
+  let campos: Record<string, unknown>;
+  if (dados.eh_receita) {
+    const ingredientes = String(dados.ingredientes ?? "").trim();
+    const modo = String(dados.modo_preparo ?? "").trim();
+    const problema = problemaDaReceita({ titulo: a.descricao ?? "", ingredientes, modo_preparo: modo });
+    if (problema) return { ok: false, erro: problema };
+    campos = { eh_receita: true, receita_ingredientes: ingredientes, receita_modo_preparo: modo };
+  } else {
+    campos = { eh_receita: false };
+  }
+  const { data, error } = await admin
+    .from("arquivos_franqueada")
+    .update(campos as never)
     .eq("id", arquivoId)
     .eq("franqueada_id", franqueada.id)
     .select("id");
