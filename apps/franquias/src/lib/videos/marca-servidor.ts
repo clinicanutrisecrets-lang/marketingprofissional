@@ -10,6 +10,7 @@ import {
   precisaGerar,
   videosMarcaLiberadosPara,
   type LinhaVideoMarca,
+  type MarcaVideo,
   type VideoMarca,
 } from "./marca";
 
@@ -74,37 +75,8 @@ export async function videosMarcaDaFranqueada(f: { id: string; email: string | n
       continue;
     }
 
-    const { data: nova, error: errIns } = await admin
-      .from("videos_marca")
-      .insert({ franqueada_id: f.id, video_id: v.id, assinatura, status: "gerando" } as never)
-      .select("id")
-      .single();
-    if (errIns || !nova) {
-      console.error("[videos-marca] não registrei a geração", f.id, v.id, errIns?.message);
-      out.push({ video: v, status: "erro", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
-      continue;
-    }
-    const rid = (nova as { id: string }).id;
-    const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/render-video-marca.yml/dispatches`, {
-      method: "POST",
-      cache: "no-store",
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ref: process.env.CORTE_IA_WORKFLOW_REF || "main",
-        inputs: {
-          registro_id: rid,
-          molde: v.molde.split("/").pop(),
-          parametros: parametrosDoMolde(marca),
-          destino_path: `${f.id}/videos-marca/${assinatura}.mp4`,
-          supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-          supabase_key: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
-        },
-      }),
-    });
-    if (!resp.ok) {
-      const corpo = await resp.text().catch(() => "");
-      console.error("[videos-marca] worker recusou", resp.status, corpo.slice(0, 200));
-      await admin.from("videos_marca").update({ status: "erro", erro_msg: `worker ${resp.status}` } as never).eq("id", rid);
+    const disp = await dispararVideoMarca({ franqueadaId: f.id, video: v, marca, assinatura, token });
+    if (!disp.ok) {
       out.push({ video: v, status: "erro", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
       continue;
     }
@@ -112,6 +84,56 @@ export async function videosMarcaDaFranqueada(f: { id: string; email: string | n
     out.push({ video: v, status: "gerando", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
   }
   return out;
+}
+
+/**
+ * Registra a geração em videos_marca e dispara o worker. Com `postId`, o
+ * worker também preenche o post do pacote da semana quando o vídeo fica pronto
+ * (lib/geracao/video-marca-da-semana.ts).
+ */
+export async function dispararVideoMarca(p: {
+  franqueadaId: string;
+  video: VideoMarca;
+  marca: MarcaVideo;
+  assinatura: string;
+  token: string;
+  postId?: string;
+}): Promise<{ ok: true; registroId: string } | { ok: false; motivo: string }> {
+  const admin = createAdminClient();
+  const { data: nova, error: errIns } = await admin
+    .from("videos_marca")
+    .insert({ franqueada_id: p.franqueadaId, video_id: p.video.id, assinatura: p.assinatura, status: "gerando" } as never)
+    .select("id")
+    .single();
+  if (errIns || !nova) {
+    console.error("[videos-marca] não registrei a geração", p.franqueadaId, p.video.id, errIns?.message);
+    return { ok: false, motivo: `registro: ${errIns?.message}` };
+  }
+  const rid = (nova as { id: string }).id;
+  const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/render-video-marca.yml/dispatches`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${p.token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ref: process.env.CORTE_IA_WORKFLOW_REF || "main",
+      inputs: {
+        registro_id: rid,
+        molde: p.video.molde.split("/").pop(),
+        parametros: parametrosDoMolde(p.marca),
+        destino_path: `${p.franqueadaId}/videos-marca/${p.assinatura}.mp4`,
+        post_id: p.postId ?? "",
+        supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+        supabase_key: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+      },
+    }),
+  });
+  if (!resp.ok) {
+    const corpo = await resp.text().catch(() => "");
+    console.error("[videos-marca] worker recusou", resp.status, corpo.slice(0, 200));
+    await admin.from("videos_marca").update({ status: "erro", erro_msg: `worker ${resp.status}` } as never).eq("id", rid);
+    return { ok: false, motivo: `worker ${resp.status}` };
+  }
+  return { ok: true, registroId: rid };
 }
 
 /** Caminho no Storage do vídeo pronto mais recente (pra narração por cima). */

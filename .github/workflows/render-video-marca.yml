@@ -20,6 +20,10 @@ on:
       destino_path:
         description: "caminho no bucket franqueadas-assets"
         required: true
+      post_id:
+        description: "post do pacote da semana a preencher quando ficar pronto (vazio = só a aba Vídeos)"
+        required: false
+        default: ""
       supabase_url:
         required: false
         default: ""
@@ -35,6 +39,7 @@ jobs:
       SB_URL: ${{ inputs.supabase_url != '' && inputs.supabase_url || secrets.SUPABASE_URL }}
       SB_KEY: ${{ inputs.supabase_key != '' && inputs.supabase_key || secrets.SUPABASE_SERVICE_ROLE }}
       RID: ${{ inputs.registro_id }}
+      PID: ${{ inputs.post_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -95,6 +100,14 @@ jobs:
           curl -sf -X PATCH "$SB_URL/rest/v1/videos_marca?id=eq.$RID" \
             -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
             -d "{\"status\":\"pronto\",\"path\":\"$DESTINO\",\"url\":\"$SB_URL/storage/v1$SIGNED\",\"atualizado_em\":\"$(date -u +%FT%TZ)\"}"
+          # Post do pacote da semana: recebe o vídeo e vai pra aprovação. Só mexe
+          # em post ainda 'gerando' (nunca desfaz uma aprovação ou cancelamento).
+          case "$PID" in *[!a-f0-9-]*) echo "post_id inválido"; exit 1;; esac
+          if [ -n "$PID" ]; then
+            curl -sf -X PATCH "$SB_URL/rest/v1/posts_agendados?id=eq.$PID&status=eq.gerando" \
+              -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+              -d "{\"status\":\"aguardando_aprovacao\",\"url_video_final\":\"$SB_URL/storage/v1$SIGNED\"}"
+          fi
 
       - name: Marcar erro
         if: failure()
@@ -102,3 +115,9 @@ jobs:
           curl -s -X PATCH "$SB_URL/rest/v1/videos_marca?id=eq.$RID" \
             -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
             -d '{"status":"erro","erro_msg":"o vídeo não ficou pronto"}' || true
+          case "$PID" in *[!a-f0-9-]*) exit 0;; esac
+          if [ -n "$PID" ]; then
+            curl -s -X PATCH "$SB_URL/rest/v1/posts_agendados?id=eq.$PID&status=eq.gerando" \
+              -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY" -H "Content-Type: application/json" \
+              -d '{"status":"erro"}' || true
+          fi
