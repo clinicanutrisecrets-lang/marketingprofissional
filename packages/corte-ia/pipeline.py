@@ -290,7 +290,7 @@ def processar(corte_id, broll_franqueada_id):
     # A etapa só é anunciada DEPOIS de saber o modo: dizer "transcrevendo"
     # num vídeo que não tem fala é a tela mentindo pra quem está esperando.
     row = rest_get("cortes_ia", {"id": f"eq.{corte_id}", "select": "*"})[0]
-    fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nome_comercial,nicho_principal"})[0]
+    fr = rest_get("franqueadas", {"id": f"eq.{row['franqueada_id']}", "select": "instagram_handle,nome_completo,nome_comercial,nicho_principal,cor_primaria_hex,cor_secundaria_hex"})[0]
     rodape = rodape_da_conta(fr)
     handle = fr.get("instagram_handle") or ""
     handle = handle if not handle or handle.startswith("@") else f"@{handle}"
@@ -367,7 +367,8 @@ def processar(corte_id, broll_franqueada_id):
 
     saida = os.path.join(work, "corte.mp4")
     info = render.render(limpo, transcricao, plano, arquivos, handle, rodape, saida,
-                         os.path.join(work, "fonts"), row.get("estilo_legenda"))
+                         os.path.join(work, "fonts"), row.get("estilo_legenda"),
+                         (fr.get("cor_primaria_hex"), fr.get("cor_secundaria_hex")))
     path = f"{row['franqueada_id']}/cortes/{corte_id}.mp4"
     url = subir_mp4(path, saida)
     patch(corte_id, status="pronto", etapa=None, path=path, url=url, duracao_seg=info["duracao"])
