@@ -421,10 +421,10 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene da disbiose (FUT2)",
     molde: `${BASE}/fut2.html`,
     poster: `${BASE}/fut2.jpg`,
-    versao: 1,
+    versao: 2,
     duracaoSeg: 99.3,
     resumo:
-      "O gene FUT2 e o jardim do intestino: por que quem tem AA dá menos adubo às bactérias boas, o que isso tem a ver com gases, inchaço e intestino preso, e como a alimentação aduba o jardim por fora.",
+      "O gene FUT2 (variante rs601338) e o jardim do intestino: por que quem tem AA dá menos adubo às bactérias boas, o que isso tem a ver com gases, inchaço e intestino preso, e como a alimentação aduba o jardim por fora.",
     roteiro: [
       {
         de: 0,
@@ -435,7 +435,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
         de: 13.5,
         ate: 29.2,
         texto:
-          "O gene FUT2 cuida do jardim do seu intestino. A letra G é a protetora: o jardim é bem regado. Quem tem AA recebe menos adubo para as bactérias boas. Mas não é sentença: saber a letra muda a conduta.",
+          "O gene FUT2 cuida do jardim do seu intestino. Na variante rs601338, a letra G é a protetora: o jardim é bem regado. Quem tem AA recebe menos adubo para as bactérias boas. Mas não é sentença: saber a letra muda a conduta.",
       },
       {
         de: 29.2,
@@ -463,7 +463,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     ],
     legenda: [
       "Por que a barriga incha tanto?",
-      "O gene FUT2 cuida do jardim do seu intestino. Ele espalha na parede um carboidrato que vira adubo para as bactérias boas. Quem tem AA dá menos adubo, e o jardim fica fraquinho: mais gases, inchaço e intestino preso.",
+      "O gene FUT2 cuida do jardim do seu intestino. Ele espalha na parede um carboidrato que vira adubo para as bactérias boas. Quem tem AA na variante rs601338 dá menos adubo, e o jardim fica fraquinho: mais gases, inchaço e intestino preso.",
       "A boa notícia é que dá para adubar por fora: fibras gentis, fermentados e o FODMAP na medida certa para você.",
       "Quer saber qual é a sua letra? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
     ].join("\n\n"),
