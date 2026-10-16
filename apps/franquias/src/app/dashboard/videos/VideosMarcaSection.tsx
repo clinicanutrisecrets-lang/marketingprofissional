@@ -16,7 +16,7 @@ export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {
       <h2 className="text-xl font-bold text-brand-text">🧬 Vídeos animados com a sua marca</h2>
       <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
         Vídeos explicando os genes, montados com a sua logo e as suas cores. Eles vêm sem voz: grave a sua
-        narração lendo o roteiro, ou poste com uma música.
+        narração lendo o roteiro, ou poste só com música, escolhida no próprio Instagram ao publicar.
       </p>
       {videos.some((v) => v.semLogo) && (
         <p className="mt-3 max-w-2xl rounded-lg bg-amber-50 p-3 text-sm text-amber-900">

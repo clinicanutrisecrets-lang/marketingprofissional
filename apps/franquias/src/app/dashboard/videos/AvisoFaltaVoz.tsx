@@ -17,7 +17,7 @@ export function AvisoFaltaVoz({ href, compacto = false }: { href: string; compac
       >
         🎙️ Gravar a minha narração
       </a>
-      <p className="mt-1.5 opacity-80">Se preferir, dá pra postar só com uma música.</p>
+      <p className="mt-1.5 opacity-80">Se preferir, poste só com música: no próprio Instagram, ao publicar, escolha uma música que esteja em alta entre as sugestões dele.</p>
     </div>
   );
 }
