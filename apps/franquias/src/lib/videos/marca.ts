@@ -243,8 +243,9 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene da inflamação (IL6)",
     molde: `${BASE}/il6.html`,
     poster: `${BASE}/il6.jpg`,
-    versao: 1,
-    duracaoSeg: 118.5,
+    // v2 (16/10/2026): a cena 3 virou a sinalização celular (a IL-6 no sangue).
+    versao: 2,
+    duracaoSeg: 112.3,
     resumo:
       "O gene IL6 e o alarme da inflamação: por que a letra G tende a deixar o alarme mais alto, e como a alimentação ajuda a baixar o termômetro.",
     roteiro: [
@@ -257,40 +258,40 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       },
       {
         de: 24.2,
-        ate: 39.9,
-        texto: "Para trabalhar, o gene precisa ser lido. A leitora faz uma cópia, que vira um recadinho. O recadinho chega numa fábrica, que monta a IL6.",
+        ate: 33.7,
+        texto: "O gene IL6 vira um recado no sangue. As células de defesa soltam a IL6, que viaja pelo sangue e acende o alarme em quem recebe.",
       },
       {
-        de: 39.9,
-        ate: 55.6,
+        de: 33.7,
+        ate: 49.4,
         texto:
           "A IL6 é um alarme: avisa o corpo que algo precisa de defesa. Quando o alarme não desliga, a inflamação fica acesa: mais dores e a imunidade desregulada. Ela também pode influenciar a fertilidade e está ligada à endometriose.",
       },
       {
-        de: 55.6,
-        ate: 64.6,
+        de: 49.4,
+        ate: 58.4,
         texto: "Agora vem a parte boa: a comida ajuda. Beterraba, feijão e brócolis trazem betaína e folato, a matéria-prima das etiquetas.",
       },
       {
-        de: 64.6,
-        ate: 75.2,
+        de: 58.4,
+        ate: 69,
         texto: "Quem cola as etiquetas no gene é a etiquetadora. Ela pega uma etiqueta da caixinha e cola no gene. Isso se chama metilação.",
       },
       {
-        de: 75.2,
-        ate: 86.4,
+        de: 69,
+        ate: 80.2,
         texto: "As etiquetas baixam o volume da letra G de risco. Ela fica com um capacetinho, e o alarme toca na hora certa.",
       },
       {
-        de: 86.4,
-        ate: 102.8,
+        de: 80.2,
+        ate: 96.6,
         texto:
           "A comida ajuda a baixar o termômetro. Acerola, com vitamina C de montão. O ômega-3 dos peixes acalma o alarme. O ômega-6 em excesso atiça o fogo: não precisa cortar, só equilibrar. E castanha-do-pará, abacate e azeite também acalmam a inflamação.",
       },
-      { de: 102.8, ate: 109.5, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      { de: 96.6, ate: 103.3, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
       {
-        de: 109.5,
-        ate: 118.5,
+        de: 103.3,
+        ate: 112.3,
         texto: "E as suas letrinhas, quais são? São mais de vinte genes ligados à inflamação. Faça o seu teste nutrigenético e descubra.",
       },
     ],
@@ -414,6 +415,59 @@ export const VIDEOS_MARCA: VideoMarca[] = [
       "Quer saber qual é a sua? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
     ].join("\n\n"),
     temas: ["ansiedade", "foco", "concentra", "atencao", "procrastin", "dopamina", "saude mental", "estresse", "emocional", "compuls", "humor"],
+  },
+  {
+    id: "gene-fut2",
+    titulo: "Como funciona o gene da disbiose (FUT2)",
+    molde: `${BASE}/fut2.html`,
+    poster: `${BASE}/fut2.jpg`,
+    versao: 1,
+    duracaoSeg: 99.3,
+    resumo:
+      "O gene FUT2 e o jardim do intestino: por que quem tem AA dá menos adubo às bactérias boas, o que isso tem a ver com gases, inchaço e intestino preso, e como a alimentação aduba o jardim por fora.",
+    roteiro: [
+      {
+        de: 0,
+        ate: 13.5,
+        texto: "Por que a barriga incha tanto? Este é o FUT2, o gene da disbiose e dos problemas intestinais. E a alimentação ajuda a ligar ou desligar esse gene da tomada.",
+      },
+      {
+        de: 13.5,
+        ate: 29.2,
+        texto:
+          "O gene FUT2 cuida do jardim do seu intestino. A letra G é a protetora: o jardim é bem regado. Quem tem AA recebe menos adubo para as bactérias boas. Mas não é sentença: saber a letra muda a conduta.",
+      },
+      {
+        de: 29.2,
+        ate: 38.7,
+        texto: "Vamos dar um zoom no intestino. A parede é cheia de dobrinhas, e ali mora um jardim de bactérias. Quem cuida dele é o gene FUT2.",
+      },
+      {
+        de: 38.7,
+        ate: 64.1,
+        texto:
+          "O FUT2 espalha na parede um carboidrato especial, a fucose, que o próprio corpo fabrica e que vira adubo. As bifidobactérias chegam para comer e ajudam na digestão, na imunidade e até no humor. Com AA, chega pouca fucose e o jardim fica fraquinho: mais gases, inchaço, intestino preso, e as leguminosas fermentam mais.",
+      },
+      {
+        de: 64.1,
+        ate: 83.6,
+        texto:
+          "Agora vem a parte boa: dá para adubar o jardim por fora. Fibras gentis, como aveia, banana verde e chia. Fermentados, como kefir e iogurte natural. FODMAP na medida certa. A B12 merece atenção: pode ser que você precise da forma sublingual. E água, sempre.",
+      },
+      { de: 83.6, ate: 90.3, texto: "Não mudamos o gene. Mas a alimentação ajuda a deixar ele ligado ou desligado da tomada." },
+      {
+        de: 90.3,
+        ate: 99.3,
+        texto: "E as suas letrinhas, quais são? Para cada gene, uma conduta diferente. Faça o seu teste nutrigenético e descubra.",
+      },
+    ],
+    legenda: [
+      "Por que a barriga incha tanto?",
+      "O gene FUT2 cuida do jardim do seu intestino. Ele espalha na parede um carboidrato que vira adubo para as bactérias boas. Quem tem AA dá menos adubo, e o jardim fica fraquinho: mais gases, inchaço e intestino preso.",
+      "A boa notícia é que dá para adubar por fora: fibras gentis, fermentados e o FODMAP na medida certa para você.",
+      "Quer saber qual é a sua letra? Me chama no direct que eu te explico como funciona o teste nutrigenético.",
+    ].join("\n\n"),
+    temas: ["intestin", "disbiose", "microbiota", "gases", "inchaco", "distensao", "constipa", "intestino preso", "fodmap", "digest", "probiotic", "leguminosa"],
   },
 ];
 
