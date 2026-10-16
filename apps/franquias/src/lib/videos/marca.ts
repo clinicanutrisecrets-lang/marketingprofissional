@@ -11,8 +11,9 @@
  * logo no topo e no fechamento. O que NÃO troca: amarelo, vermelho, sol,
  * laranja e as letras A/T, que fazem parte da explicação ou da ilustração.
  *
- * Os moldes saem SEM legenda escrita na tela: a profissional narra por cima
- * (tela /dashboard/narrar, roteiro em karaokê) ou posta com música.
+ * Os moldes saem COM a legenda escrita na tela, no layout e nas cores do
+ * molde (Aline 16/10: as pessoas gostam de ver escrito). A profissional narra
+ * por cima (tela /dashboard/narrar, roteiro em karaokê) ou posta com música.
  *
  * 🔴 Fase de teste: só as contas de EMAILS_VIDEOS_MARCA veem a seção.
  * 🔴 Texto daqui vai pra legenda da profissional: sem travessão, sem "IA",
@@ -52,7 +53,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do emagrecimento (FTO)",
     molde: `${BASE}/fto.html`,
     poster: `${BASE}/fto.jpg`,
-    versao: 4,
+    versao: 5,
     duracaoSeg: 110.1,
     resumo:
       "O gene FTO explicado de um jeito simples: a letrinha de risco, a proteína que mexe no apetite e como a alimentação ajuda a deixar o gene mais quieto.",
@@ -121,7 +122,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do sono (CLOCK)",
     molde: `${BASE}/clock.html`,
     poster: `${BASE}/clock.jpg`,
-    versao: 4,
+    versao: 5,
     duracaoSeg: 118.7,
     resumo:
       "O gene CLOCK e o relógio do corpo: por que a letra de risco atrasa o sono e a fome, e como o horário das refeições, a luz e a alimentação ajudam.",
@@ -187,7 +188,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     molde: `${BASE}/cyp1a2.html`,
     poster: `${BASE}/cyp1a2.jpg`,
     // v2 (16/10/2026): abertura "te ajuda ou te atrapalha" e o fígado porteiro.
-    versao: 2,
+    versao: 3,
     duracaoSeg: 89.3,
     resumo:
       "O gene CYP1A2 e a cafeína: o fígado como porteiro do corpo, por que quem tem a letra C desmonta o café devagar, o que isso tem a ver com ansiedade, coração e estrogênio, e como ajustar o café na medida da sua letra.",
@@ -244,7 +245,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     molde: `${BASE}/il6.html`,
     poster: `${BASE}/il6.jpg`,
     // v2 (16/10/2026): a cena 3 virou a sinalização celular (a IL-6 no sangue).
-    versao: 2,
+    versao: 3,
     duracaoSeg: 112.3,
     resumo:
       "O gene IL6 e o alarme da inflamação: por que a letra G tende a deixar o alarme mais alto, e como a alimentação ajuda a baixar o termômetro.",
@@ -308,7 +309,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Os genes da saciedade e a canetinha (GLP1R e GIPR)",
     molde: `${BASE}/glp1r-gipr.html`,
     poster: `${BASE}/glp1r-gipr.jpg`,
-    versao: 1,
+    versao: 2,
     duracaoSeg: 95.5,
     resumo:
       "Os genes GLP1R e GIPR montam as fechaduras das chaves da saciedade: por que a semaglutida e a tirzepatida não funcionam igual para todo mundo e como o prato certo ajuda.",
@@ -361,7 +362,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene do foco e da ansiedade (COMT)",
     molde: `${BASE}/comt.html`,
     poster: `${BASE}/comt.jpg`,
-    versao: 1,
+    versao: 2,
     duracaoSeg: 120,
     resumo:
       "O gene COMT e a dopamina: por que GG tende a procrastinar e buscar recompensa, por que AA tende à mente acelerada e à ansiedade, e o ajuste da alimentação e da rotina para cada letra.",
@@ -421,7 +422,7 @@ export const VIDEOS_MARCA: VideoMarca[] = [
     titulo: "Como funciona o gene da disbiose (FUT2)",
     molde: `${BASE}/fut2.html`,
     poster: `${BASE}/fut2.jpg`,
-    versao: 2,
+    versao: 3,
     duracaoSeg: 99.3,
     resumo:
       "O gene FUT2 (variante rs601338) e o jardim do intestino: por que quem tem AA dá menos adubo às bactérias boas, o que isso tem a ver com gases, inchaço e intestino preso, e como a alimentação aduba o jardim por fora.",
