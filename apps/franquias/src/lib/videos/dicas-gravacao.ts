@@ -11,41 +11,40 @@ export type DicaGravacao = { icone: string; titulo: string; texto: string };
 export const DICAS_GRAVACAO: DicaGravacao[] = [
   {
     icone: "🪟",
-    titulo: "Luz de janela, de frente",
+    titulo: "Janela ao seu lado",
     texto:
-      "Fique de frente para uma janela, de preferência de manhã. Nunca de costas para ela: contra a luz o seu rosto fica escuro. Evite sol batendo direto.",
+      "A luz mais bonita vem da janela de lado. Se não der, fique de frente para ela, de preferência de manhã. Nunca de costas: contra a luz o rosto fica escuro.",
+  },
+  {
+    icone: "🛋️",
+    titulo: "O que aparece atrás de você",
+    texto:
+      "Estante de livros, a mesa do consultório ou o sofá ficam lindos. Se tiver bagunça, prefira uma parede lisa, de uma cor só. E confira que ninguém vai passar atrás.",
   },
   {
     icone: "🧽",
     titulo: "Limpe a lente",
-    texto:
-      "Passe um pano macio na câmera da frente do celular. Marca de dedo deixa a imagem embaçada.",
+    texto: "Passe um pano macio na câmera da frente do celular. Marca de dedo deixa a imagem embaçada.",
   },
   {
     icone: "🤫",
     titulo: "Lugar silencioso",
     texto:
-      "Feche a janela se tiver barulho de rua, desligue ventilador e ar condicionado e avise quem está em casa. Cômodo com cortina, sofá ou tapete ecoa menos.",
+      "Feche a janela se tiver barulho de rua, desligue ventilador e ar condicionado e avise quem está em casa.",
   },
   {
     icone: "📱",
     titulo: "Celular firme, em pé",
     texto:
-      "Apoie o celular na vertical, na altura dos olhos, a um braço de distância. Uma pilha de livros já resolve.",
-  },
-  {
-    icone: "👀",
-    titulo: "Olhe para a lentinha",
-    texto:
-      "Olhe para a câmera, não para a sua imagem na tela. O texto passa logo abaixo dela.",
+      "Na vertical, na altura dos olhos, a um braço de distância. Uma pilha de livros já resolve. Olhe para a lentinha, não para a sua imagem.",
   },
   {
     icone: "🎬",
-    titulo: "Faça um teste curto",
+    titulo: "Teste antes, na câmera do celular",
     texto:
-      "Grave 5 segundos e assista antes de valer: confira a luz, o som e se o enquadramento está bom.",
+      "Antes de gravar aqui, grave 5 segundos com a câmera normal do seu celular e assista: confira a luz, o som e o enquadramento.",
   },
 ];
 
 /** Chave do "não mostrar de novo" neste aparelho. Mudou as dicas: suba a versão. */
-export const CHAVE_DICAS_GRAVACAO = "teleprompter:dicas:v1";
+export const CHAVE_DICAS_GRAVACAO = "teleprompter:dicas:v2";

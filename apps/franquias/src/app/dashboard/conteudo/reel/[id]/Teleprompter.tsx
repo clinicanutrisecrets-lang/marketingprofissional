@@ -451,8 +451,8 @@ export function Teleprompter(props: {
       </div>
       {/* Dicas de gravação, antes da câmera */}
       {mostrarDicas && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center overflow-y-auto bg-black/85 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 text-brand-text shadow-xl">
+        <div className="absolute inset-0 z-20 flex overflow-y-auto bg-black/85 p-4">
+          <div className="m-auto w-full max-w-lg rounded-2xl bg-white p-5 text-brand-text shadow-xl">
             <h2 className="text-lg font-bold">Dicas para o seu vídeo ficar ainda melhor</h2>
             <p className="mt-1 text-sm text-brand-text/60">
               Não precisa de equipamento. Com o celular e estes cuidados o vídeo já fica bonito.
