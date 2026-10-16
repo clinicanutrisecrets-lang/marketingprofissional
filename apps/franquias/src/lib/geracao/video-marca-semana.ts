@@ -11,7 +11,7 @@ import type { VideoMarca } from "../videos/marca.ts";
 
 export const PAPEL_VIDEO_MARCA = "Vídeo animado da semana: o gene explicado na sua marca.";
 export const LEMBRETE_VIDEO_MARCA =
-  "O vídeo já sai com a sua logo e as suas cores. Poste com uma música, ou narre por cima em Vídeos, com o roteiro em karaokê.";
+  "O vídeo já sai com a sua logo e as suas cores. Narre por cima com o roteiro em karaokê, ou poste só com música, escolhida no próprio Instagram ao publicar, entre as que estão em alta.";
 
 /** Minúsculo, sem acento, pontuação e sublinhado viram espaço. */
 export function normalizar(t: string | null | undefined): string {

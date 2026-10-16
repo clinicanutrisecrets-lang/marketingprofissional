@@ -72,3 +72,25 @@ test("ligação: o spec é guardado, a página usa a régua e os três lugares t
   assert.match(w, /-shortest/);
   assert.match(w, /if: failure\(\)/);
 });
+
+test("parar antes do fim é avisado; parar no último segundo não", async () => {
+  const { paradaAntesDoFim } = await import("./roteiro.ts");
+  assert.equal(paradaAntesDoFim(20, 60), true);
+  assert.equal(paradaAntesDoFim(59, 60), false);
+  assert.equal(paradaAntesDoFim(60, 60), false);
+  assert.equal(paradaAntesDoFim(10, NaN), false);
+});
+
+test("vídeo animado sem voz tem o recado de que falta a voz, e a narração explica o karaokê", () => {
+  const aviso = fonte("../../app/dashboard/videos/AvisoFaltaVoz.tsx");
+  assert.match(aviso, /falta a sua voz/);
+  assert.match(aviso, /karaokê/);
+  for (const tela of ["../../app/dashboard/videos/VideosMarcaSection.tsx", "../../app/dashboard/aprovar/AprovacaoView.tsx"]) {
+    assert.match(fonte(tela), /<AvisoFaltaVoz/, `${tela} sem o recado`);
+  }
+  const grav = fonte("../../app/dashboard/narrar/GravadorNarracao.tsx");
+  assert.match(grav, /Como funciona a gravação/);
+  assert.match(grav, /Errou no meio\?/);
+  assert.match(grav, /paradaAntesDoFim\(cobertura\.ate, cobertura\.total\)/);
+  assert.match(grav, /beforeunload/);
+});

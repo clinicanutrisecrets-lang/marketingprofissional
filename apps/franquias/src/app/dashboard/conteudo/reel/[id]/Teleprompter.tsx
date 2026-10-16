@@ -6,6 +6,7 @@ import { marcarStatusSugestao } from "@/lib/conteudo/actions";
 import { createClient } from "@/lib/supabase/client";
 import { prepararUploadCorteAction, criarCorteAction } from "@/lib/corte/actions";
 import { CORTE_MAX_SEG } from "@/lib/corte/constantes";
+import { DICAS_GRAVACAO, CHAVE_DICAS_GRAVACAO } from "@/lib/videos/dicas-gravacao";
 import {
   ESTILOS_LEGENDA,
   ESTILO_PADRAO,
@@ -64,8 +65,36 @@ export function Teleprompter(props: {
   const [abrirAjustes, setAbrirAjustes] = useState(false);
   const limiteSeg = props.corteIa ? CORTE_MAX_SEG : null;
 
-  // Liga a câmera frontal
+  // Dicas de gravação ANTES da câmera (Aline 16/10). Quem marcou "não mostrar
+  // de novo" neste aparelho vai direto pra câmera; o botão 💡 reabre.
+  const [mostrarDicas, setMostrarDicas] = useState<boolean | null>(null);
+  const [naoMostrarMais, setNaoMostrarMais] = useState(false);
+  const [cameraLiberada, setCameraLiberada] = useState(false);
   useEffect(() => {
+    let ocultar = false;
+    try {
+      ocultar = localStorage.getItem(CHAVE_DICAS_GRAVACAO) === "ocultar";
+    } catch {
+      /* sem armazenamento: mostra as dicas */
+    }
+    setMostrarDicas(!ocultar);
+    if (ocultar) setCameraLiberada(true);
+  }, []);
+  function fecharDicas() {
+    if (naoMostrarMais) {
+      try {
+        localStorage.setItem(CHAVE_DICAS_GRAVACAO, "ocultar");
+      } catch {
+        /* ignora */
+      }
+    }
+    setMostrarDicas(false);
+    setCameraLiberada(true);
+  }
+
+  // Liga a câmera frontal (só depois das dicas)
+  useEffect(() => {
+    if (!cameraLiberada) return;
     let stream: MediaStream | null = null;
     (async () => {
       try {
@@ -86,7 +115,7 @@ export function Teleprompter(props: {
       stream?.getTracks().forEach((t) => t.stop());
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [cameraLiberada]);
 
   // Rolagem automática
   useEffect(() => {
@@ -250,6 +279,9 @@ export function Teleprompter(props: {
         <button onClick={() => setVelocidade((v) => Math.max(0.2, v - 0.15))} className="rounded bg-white/10 px-2 text-sm">🐢</button>
         <button onClick={() => setVelocidade((v) => Math.min(2, v + 0.15))} className="rounded bg-white/10 px-2 text-sm">🐇</button>
         <button onClick={() => setEspelhado((e) => !e)} className="rounded bg-white/10 px-2 text-sm" title="Espelhar texto">🪞</button>
+        {!gravando && (
+          <button onClick={() => setMostrarDicas(true)} className="rounded bg-white/10 px-2 text-sm" title="Dicas de gravação">💡</button>
+        )}
       </div>
 
       {/* Faixa de filtro, embaixo da câmera (como no Instagram) */}
@@ -417,6 +449,42 @@ export function Teleprompter(props: {
           </p>
         )}
       </div>
+      {/* Dicas de gravação, antes da câmera */}
+      {mostrarDicas && (
+        <div className="absolute inset-0 z-20 flex overflow-y-auto bg-black/85 p-4">
+          <div className="m-auto w-full max-w-lg rounded-2xl bg-white p-5 text-brand-text shadow-xl">
+            <h2 className="text-lg font-bold">Dicas para o seu vídeo ficar ainda melhor</h2>
+            <p className="mt-1 text-sm text-brand-text/60">
+              Não precisa de equipamento. Com o celular e estes cuidados o vídeo já fica bonito.
+            </p>
+            <ul className="mt-4 space-y-3">
+              {DICAS_GRAVACAO.map((d) => (
+                <li key={d.titulo} className="flex gap-3">
+                  <span className="text-xl leading-none">{d.icone}</span>
+                  <div>
+                    <p className="text-sm font-semibold">{d.titulo}</p>
+                    <p className="text-sm leading-snug text-brand-text/70">{d.texto}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <label className="mt-4 flex items-center gap-2 text-xs text-brand-text/60">
+              <input
+                type="checkbox"
+                checked={naoMostrarMais}
+                onChange={(e) => setNaoMostrarMais(e.target.checked)}
+              />
+              Não mostrar de novo neste aparelho (o botão 💡 abre de novo)
+            </label>
+            <button
+              onClick={fecharDicas}
+              className="mt-4 w-full rounded-xl bg-rose-600 px-5 py-3 text-sm font-bold text-white hover:opacity-90"
+            >
+              {cameraLiberada ? "Voltar para a gravação" : "Entendi, abrir a câmera"}
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

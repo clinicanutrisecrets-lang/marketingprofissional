@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   indiceNoTempo,
   palavrasAcesas,
+  paradaAntesDoFim,
   trechoApertado,
   type Trecho,
 } from "@/lib/narracao/roteiro";
@@ -63,6 +64,8 @@ export function GravadorNarracao(props: {
   const [vozUrl, setVozUrl] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  // Até onde a voz chegou na última gravação (parou no meio = resto mudo).
+  const [cobertura, setCobertura] = useState<{ ate: number; total: number } | null>(null);
 
   // Relógio do karaokê: lê o tempo do vídeo a cada quadro.
   useEffect(() => {
@@ -92,6 +95,18 @@ export function GravadorNarracao(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  // Gravação feita e ainda não enviada se perde ao sair: o navegador avisa.
+  const naoSalvo = fase === "contagem" || fase === "gravando" || fase === "revisar" || fase === "enviando";
+  useEffect(() => {
+    if (!naoSalvo) return;
+    const avisar = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", avisar);
+    return () => window.removeEventListener("beforeunload", avisar);
+  }, [naoSalvo]);
 
   // O texto só corre adiantado enquanto o vídeo toca (ensaio ou gravação).
   const tocando = fase === "ensaio" || fase === "gravando";
@@ -178,13 +193,18 @@ export function GravadorNarracao(props: {
 
   function parar() {
     const v = videoRef.current;
+    if (v && fase === "gravando") setCobertura({ ate: v.currentTime, total: v.duration });
     v?.pause();
     if (recRef.current && recRef.current.state !== "inactive") recRef.current.stop();
     else if (fase === "ensaio") setFase("pronta");
   }
 
   function aoTerminarVideo() {
-    if (fase === "gravando") parar();
+    const v = videoRef.current;
+    if (fase === "gravando") {
+      parar();
+      if (v) setCobertura({ ate: v.duration, total: v.duration });
+    }
     else if (fase === "ensaio") setFase("pronta");
   }
 
@@ -201,6 +221,7 @@ export function GravadorNarracao(props: {
     audioRef.current?.pause();
     videoRef.current?.pause();
     blobRef.current = null;
+    setCobertura(null);
     setFase("pronta");
   }
 
@@ -263,6 +284,30 @@ export function GravadorNarracao(props: {
         {props.aviso && (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">{props.aviso}</p>
         )}
+
+        <details open={props.narracoes.length === 0} className="rounded-2xl bg-white p-4 text-sm shadow-sm">
+          <summary className="cursor-pointer font-semibold text-brand-text">Como funciona a gravação</summary>
+          <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-brand-text/80">
+            <li>O vídeo vem sem som de propósito: a voz é a sua.</li>
+            <li>
+              Toque em <b>Ensaiar sem gravar</b> pra pegar o ritmo. O texto acende palavra por palavra, no
+              tempo do vídeo, como num karaokê.
+            </li>
+            <li>
+              Toque em <b>Gravar</b>. Depois do 3, 2, 1, leia acompanhando as palavras que acendem: nem antes,
+              nem depois. Assim a sua voz casa com a cena. O vídeo para sozinho no fim.
+            </li>
+            <li>
+              Toque em <b>Ouvir com o vídeo</b>. Gostou? <b>Usar esta narração</b>, e em uns 2 minutos o vídeo
+              com a sua voz fica pronto aqui embaixo pra baixar.
+            </li>
+          </ol>
+          <p className="mt-3 rounded-lg bg-brand-muted px-3 py-2 text-brand-text/80">
+            <b>Errou no meio?</b> Toque em Parar e depois em Regravar: começa do início e nada fica salvo até
+            você tocar em Usar esta narração. Se sair desta tela no meio, a gravação se perde e é só gravar
+            de novo. Grave num lugar silencioso, com o celular perto da boca.
+          </p>
+        </details>
 
         {props.trechos.length > 0 && (
           <div className="min-h-[180px] rounded-2xl bg-brand-text p-5 text-white">
@@ -339,6 +384,14 @@ export function GravadorNarracao(props: {
               ■ Parar
             </button>
           )}
+          {(fase === "revisar" || fase === "enviando") &&
+            cobertura &&
+            paradaAntesDoFim(cobertura.ate, cobertura.total) && (
+              <p className="w-full rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                Você parou em {Math.floor(cobertura.ate)}s, e o vídeo tem {Math.floor(cobertura.total)}s: o
+                resto vai sair sem voz. Toque em Regravar pra cobrir o vídeo todo.
+              </p>
+            )}
           {(fase === "revisar" || fase === "enviando") && (
             <>
               <button
@@ -397,7 +450,7 @@ export function GravadorNarracao(props: {
                       ⬇ Baixar vídeo com a sua voz
                     </a>
                   ) : n.status === "erro" ? (
-                    <span className="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">não deu certo, envie de novo</span>
+                    <span className="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">não deu certo: grave e envie de novo</span>
                   ) : (
                     <span className="animate-pulse rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                       montando o vídeo (uns 2 min)
