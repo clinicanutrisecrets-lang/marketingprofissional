@@ -1,7 +1,8 @@
 import type { createAdminClient } from "@/lib/supabase/server";
 import type { ContextoFranqueada } from "@/lib/claude/prompts";
 import { chavesUsadas, buscarReceitaSinergia, escreverSinergia, dispararRenderSinergia } from "@/lib/conteudo/sinergia-semanal";
-import { diaDaSinergia } from "@/lib/geracao/sinergia";
+import { diaDaSinergia, type ReceitaSinergia } from "@/lib/geracao/sinergia";
+import { escolherReceitaPropria, type ArquivoReceita } from "@/lib/geracao/receita-propria";
 import { temaSinergiaDoTemaEmAlta, type TemaEmAlta } from "@/lib/geracao/tema-em-alta";
 import { COR_PRIMARIA_PADRAO } from "@/lib/ai-image/brand";
 import { CLAUDE_MODEL_COPY } from "@/lib/claude/client";
@@ -40,14 +41,23 @@ export async function montarSinergiaDaSemana(p: {
     const usadas = await chavesUsadas(admin, franqueadaId);
     // Tema em alta que cai numa área de saúde (ex.: câncer de intestino →
     // intestino) escolhe a receita e o assunto da sinergia (Aline, 07/10).
-    const temaSinergia = temaSinergiaDoTemaEmAlta(temaEmAlta);
-    const r = await buscarReceitaSinergia({
-      texto: textoTema,
-      temas: temaSinergia ? [temaSinergia] : undefined,
-      usadas,
-      semente: `${franqueadaId}:${semanaRef}`,
-    });
+    const temaDoAlta = temaSinergiaDoTemaEmAlta(temaEmAlta);
+    // A receita DELA vem primeiro (Aline, 16/10/2026): foto de comida marcada
+    // como receita em "Minhas fotos", ainda não usada. Com ela, o tema em
+    // alta não puxa a sinergia (a receita não foi escolhida pela área dele).
+    // Erro ao ler as fotos não trava: segue com as receitas do Scanner.
+    const propria = await receitaPropriaDaConta(admin, franqueadaId, usadas);
+    const r: { ok: true; receita: ReceitaSinergia } | { ok: false; motivo: string } = propria
+      ? { ok: true, receita: propria }
+      : await buscarReceitaSinergia({
+          texto: textoTema,
+          temas: temaDoAlta ? [temaDoAlta] : undefined,
+          usadas,
+          semente: `${franqueadaId}:${semanaRef}`,
+        });
     if (!r.ok) return { ok: false, motivo: `receita: ${r.motivo}` };
+    const temaSinergia = propria ? null : temaDoAlta;
+    if (propria) console.log("[sinergia] receita da própria conta", franqueadaId, propria.chave);
     const esc = await escreverSinergia({
       franqueadaId,
       receita: r.receita,
@@ -89,7 +99,9 @@ export async function montarSinergiaDaSemana(p: {
         hashtags_ia_original: c.hashtags,
         papel_estrategia: (temaSinergia && temaEmAlta
           ? `Sinergia da semana, puxada pelo tema em alta "${temaEmAlta.tema}": ${c.titulo_receita}`
-          : `Sinergia da semana: ${c.titulo_receita}`
+          : propria
+            ? `Sinergia da semana com a sua receita: ${c.titulo_receita}`
+            : `Sinergia da semana: ${c.titulo_receita}`
         ).slice(0, 300),
         lembrete_execucao: "Poste o carrossel e, no mesmo dia, os três stories que vêm logo abaixo.",
         ia_model_usado: CLAUDE_MODEL_COPY,
@@ -137,6 +149,22 @@ export async function montarSinergiaDaSemana(p: {
   } catch (e) {
     return { ok: false, motivo: (e as Error).message };
   }
+}
+
+async function receitaPropriaDaConta(admin: Admin, franqueadaId: string, usadas: string[]): Promise<ReceitaSinergia | null> {
+  const { data, error } = await admin
+    .from("arquivos_franqueada")
+    .select("id, tipo, url_storage, descricao, eh_receita, receita_ingredientes, receita_modo_preparo")
+    .eq("franqueada_id", franqueadaId)
+    .eq("tipo", "foto_comida")
+    .eq("eh_receita", true)
+    .order("criado_em", { ascending: true })
+    .limit(200);
+  if (error) {
+    console.warn("[sinergia] não li as receitas da conta:", error.message);
+    return null;
+  }
+  return escolherReceitaPropria((data ?? []) as unknown as ArquivoReceita[], usadas);
 }
 
 function calcularDataHora(semanaRef: string, diaSemana: number, horario: string): string {
