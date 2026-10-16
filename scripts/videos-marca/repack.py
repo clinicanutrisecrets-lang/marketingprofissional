@@ -16,8 +16,8 @@ def editar(src_path, dst_path, uuid_jsx, fn_jsx, fn_tpl):
     s=s[:m.start(2)]+json.dumps(tpl).replace('</','<\\u002F')+s[m.end(2):]
     open(dst_path,'w',encoding='utf-8').write(s)
 def tpl_padrao(tpl):
-    # Legendas e editor desligados: o MP4 é narrado pela profissional.
+    # Editor desligado e legendas LIGADAS (Aline 16/10: a profissional narra
+    # por cima, mas o texto escrito aparece na tela).
     t2=re.sub(r'"motionEditor":\s*true','"motionEditor": false',tpl)
-    t2=re.sub(r'"legendas":\s*true','"legendas": false',t2)
-    assert t2!=tpl
+    t2=re.sub(r'"legendas":\s*false','"legendas": true',t2)
     return t2

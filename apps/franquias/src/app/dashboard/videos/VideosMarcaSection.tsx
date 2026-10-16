@@ -6,7 +6,7 @@ import type { EstadoVideoMarca } from "@/lib/videos/marca-servidor";
 
 /**
  * Vídeos animados na SUA marca: o mesmo vídeo pra todas, com a cor e a logo
- * de cada profissional. Saem sem voz e sem legenda escrita, pra narrar por
+ * de cada profissional. Saem sem voz e com a legenda escrita, pra narrar por
  * cima (roteiro em karaokê) ou postar com música.
  */
 export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {

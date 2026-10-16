@@ -23,10 +23,10 @@ test("todo molde e prévia do catálogo existe em public/", () => {
   }
 });
 
-test("o molde sai sem legenda e sem o editor (a profissional narra por cima)", () => {
+test("o molde sai COM a legenda escrita e sem o editor (Aline 16/10: ela narra por cima e o texto aparece)", () => {
   for (const v of VIDEOS_MARCA) {
     const html = readFileSync(join(PUBLIC, v.molde), "utf8");
-    assert.match(html, /\\"legendas\\": false/, `${v.id}: legendas ligadas`);
+    assert.match(html, /\\"legendas\\": true/, `${v.id}: legendas desligadas`);
     assert.match(html, /\\"motionEditor\\": false/, `${v.id}: editor ligado`);
   }
 });
