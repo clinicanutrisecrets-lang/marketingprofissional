@@ -60,3 +60,13 @@ test("upload do time vai pro acervo compartilhado, com o gate conferido na actio
   assert.match(ui, /acervoPorPadrao = false/);
   assert.match(ui, /Se aparece você ou alguém\s+do time, desmarque/);
 });
+
+test("Temas em alta (16/10): as sugestões de domingo aparecem no início do Marketing", () => {
+  const inicio = ler("app/dashboard/page.tsx");
+  assert.match(inicio, /from\("sugestoes_conteudo"\)/);
+  assert.match(inicio, /Temas em alta/);
+  assert.match(inicio, /<SugestaoCard/);
+  assert.match(inicio, /href="\/dashboard\/conteudo"/);
+  const pagina = ler("app/dashboard/conteudo/page.tsx");
+  assert.match(pagina, />Temas em alta</);
+});

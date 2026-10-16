@@ -53,11 +53,11 @@ export default async function ConteudoPage() {
 
         <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-brand-text">Estúdio de conteúdo</h1>
+            <h1 className="text-3xl font-bold text-brand-text">Temas em alta</h1>
             <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
-              Sugestões extras, montadas todo domingo, baseadas no que está em alta no seu nicho: arte
-              pronta pra baixar, legenda pra copiar e roteiro de reels com
-              teleprompter — é só gravar e postar.
+              O que está sendo pesquisado no seu nicho, montado todo domingo em post
+              pronto: arte pra baixar, legenda pra copiar e roteiro de reels com
+              teleprompter. É só gravar e postar.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">

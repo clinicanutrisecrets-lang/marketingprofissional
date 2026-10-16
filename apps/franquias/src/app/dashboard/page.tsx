@@ -5,6 +5,8 @@ import { montarAvisoPronto } from "@/lib/conteudo/aviso-pronto-db";
 import TendenciasCard from "@/components/TendenciasCard";
 import { TutorialTour } from "@/components/TutorialTour";
 import { GuiaPrimeiraVez } from "./GuiaPrimeiraVez";
+import { SugestaoCard, type Sugestao } from "./conteudo/SugestaoCard";
+import { formatarSemana } from "@/lib/conteudo/semana";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +41,22 @@ export default async function DashboardPage() {
   // `total_posts` (que fica em 0 em quase toda linha), senão uma aprovação
   // vazia viraria aviso e mandaria a nutri pra uma tela sem nada.
   const aviso = await montarAvisoPronto(supabase, fId);
+
+  // "Temas em alta" (Aline, 16/10/2026): as sugestões que o radar monta todo
+  // domingo saíram do menu junto com o Estúdio e ficaram sem porta. Elas
+  // mostram o que está sendo pesquisado no nicho dela e o que entrou na conta,
+  // então moram aqui no início. Só a semana mais recente; o resto em "Ver todos".
+  const { data: sugestoesData } = await supabase
+    .from("sugestoes_conteudo")
+    .select("*")
+    .eq("franqueada_id", fId)
+    .neq("status", "descartado")
+    .order("semana_ref", { ascending: false })
+    .order("ordem", { ascending: true })
+    .limit(12);
+  const sugestoesTodas = (sugestoesData ?? []) as Sugestao[];
+  const semanaTemas = sugestoesTodas[0]?.semana_ref ?? null;
+  const temasEmAlta = sugestoesTodas.filter((s) => s.semana_ref === semanaTemas).slice(0, 4);
 
   return (
     <main className="mx-auto max-w-5xl py-6 lg:py-10 lg:pl-6">
@@ -102,6 +120,28 @@ export default async function DashboardPage() {
           </Link>
           .
         </div>
+      )}
+
+      {temasEmAlta.length > 0 && semanaTemas && (
+        <section className="mb-6">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-bold text-brand-text">🔥 Temas em alta</h2>
+              <p className="text-xs text-brand-text/60">
+                O que está sendo pesquisado no seu nicho na semana de {formatarSemana(semanaTemas)},
+                já em post pronto pra baixar ou gravar.
+              </p>
+            </div>
+            <Link href="/dashboard/conteudo" className="text-sm font-semibold" style={{ color: corPrimaria }}>
+              Ver todos →
+            </Link>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {temasEmAlta.map((s) => (
+              <SugestaoCard key={s.id} sugestao={s} />
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Em alta no nicho */}
