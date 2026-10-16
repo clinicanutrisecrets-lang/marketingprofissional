@@ -35,17 +35,17 @@ export const ESTILOS_LEGENDA = [
   {
     id: "classica",
     rotulo: "Clássica",
-    ajuda: "Letra grossa em caixa alta, palavra falada em âmbar.",
+    ajuda: "Letra grossa em caixa alta, palavra falada na cor da sua marca.",
   },
   {
     id: "editorial",
     rotulo: "Editorial",
-    ajuda: "Serifada, caixa mista, palavra falada em Tiffany. Mais calma.",
+    ajuda: "Serifada, caixa mista, palavra falada na cor da sua marca. Mais calma.",
   },
   {
     id: "impacto",
     rotulo: "Impacto",
-    ajuda: "Tudo em bloco, sem pílula. Pra vídeo curto e direto.",
+    ajuda: "Tudo em bloco, sem pílula, palavra falada na cor da sua marca. Pra vídeo curto e direto.",
   },
 ] as const;
 
