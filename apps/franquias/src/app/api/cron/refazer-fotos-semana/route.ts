@@ -5,6 +5,8 @@ import { lerTextoArte, podeRedesenhar } from "@/lib/criativo/texto-arte-edicao";
 import { desenharArteDoPost } from "@/lib/posts/redesenhar-arte";
 import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
+import { gerarPostsDaSemana } from "@/lib/geracao/semanal";
+import { filhaIndisponivel } from "@/lib/geracao/fila-semanal";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -79,7 +81,13 @@ export async function GET(request: Request) {
           body: JSON.stringify({ franqueadaId: c.id, semanaRef: SEMANA }),
           cache: "no-store",
         });
-        const r = (await res.json().catch(() => ({}))) as { ok?: boolean; total?: number; erro?: string };
+        // A URL da implantação pede login da Vercel (401 em 18/10): gera aqui
+        // mesmo, como o cron de domingo faz quando a filha não responde.
+        const r = (
+          filhaIndisponivel(res.status)
+            ? await gerarPostsDaSemana(c.id as string, SEMANA)
+            : await res.json().catch(() => ({}))
+        ) as { ok?: boolean; total?: number; erro?: string };
         return `${c.email}: ${r.ok ? `ok (${r.total ?? 0})` : r.erro ?? res.status}`;
       } catch (e) {
         return `${c.email}: ${(e as Error).message}`;
