@@ -78,9 +78,9 @@ export async function renderImagemIA(req: RenderRequest): Promise<RenderResult> 
       brand: req.brand,
       conteudo: req.conteudo,
       fotoBuffer,
-      // Foto da própria profissional ganha destaque; a tirinha decorativa de
-      // IA segue no tamanho de sempre.
-      ...(req.fotoPropria ? { fotoTamanho: "grande" as const } : {}),
+      // Foto da própria profissional sai INTEIRA, com a transparência embaixo
+      // (Aline 18/10/2026); a tirinha decorativa de IA segue como sempre.
+      ...(req.fotoPropria ? { fotoInteira: true } : {}),
     });
 
     return {
@@ -169,8 +169,8 @@ export async function renderCarrossel(params: {
   capaEstilo?: EstiloCapa;
   timeoutMs?: number;
   /**
-   * Foto do banco "Minhas fotos" pra CAPA. Com ela a capa sai com a foto (topo,
-   * grande) em vez do estilo tipográfico; os outros slides não mudam.
+   * Foto do banco "Minhas fotos" pra CAPA. Com ela a capa sai com a foto inteira
+   * e a transparência embaixo, em vez do estilo tipográfico; os outros slides não mudam.
    */
   fotoCapa?: Buffer;
 }): Promise<RenderResult[]> {
@@ -206,7 +206,7 @@ export async function renderCarrossel(params: {
         brand: params.brand,
         conteudo,
         schemeIndex,
-        ...(capaComFoto ? { fotoBuffer: params.fotoCapa, fotoTamanho: "grande" as const } : {}),
+        ...(capaComFoto ? { fotoBuffer: params.fotoCapa, fotoInteira: true } : {}),
       });
       resultados.push({
         buffer,

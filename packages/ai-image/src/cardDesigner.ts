@@ -57,6 +57,14 @@ export type CardInput = {
   fotoLugar?: FotoLugar;
   /** Tamanho da foto (default "media" — a tirinha de sempre) */
   fotoTamanho?: FotoTamanho;
+  /**
+   * Foto INTEIRA no card (layouts hero/foto), com a transparência escura
+   * embaixo e o texto branco por cima (Aline, 18/10/2026: "quando for pegar a
+   * foto tem que ser ela inteira e pôr aquela transparência embaixo"). A
+   * faixa de 34% cortava a foto: braço, cerca, o braço do sofá, o topo da
+   * cabeça. É o que a geração automática usa; lugar e tamanho ficam ignorados.
+   */
+  fotoInteira?: boolean;
   /** Força um esquema de cor (0..2); default = hash do headline */
   schemeIndex?: number;
   /** Cor de fundo personalizada (hex) — as cores de texto se adaptam
@@ -484,10 +492,171 @@ export async function renderCardDetalhado(input: CardInput): Promise<CardResulta
   }
 
   // hero / foto: a mesma pilha — "hero" com foto vira "foto".
+  if (foto && input.fotoInteira) {
+    const r = await renderFotoInteira({
+      W, H, conteudo, handle, foto, fonteTitulo,
+      // Sobre foto o fundo muda a cada imagem: a logo vai sempre numa placa.
+      logoComposite: await naPlaca(await prepararLogo(input, brand, W, H, "#FFFFFF")),
+    });
+    if (r) return r;
+    // foto ilegível: cai na pilha, que sai só com o texto e avisa
+  }
   return renderPilha({
     W, H, scheme, conteudo, handle, foto, fonteTitulo,
     logoComposite: await prepararLogo(input, brand, W, H, scheme.bg),
   });
+}
+
+// ————— Layout foto inteira (foto cobre o card, texto sobre o véu) —————
+
+/**
+ * O véu: escurece o topo um pouco (a logo e o @ leem) e a metade de baixo
+ * bastante (o título branco lê). Um template só, sem "+" entre pedaços: o
+ * minificador do Next 14 comia o meio de strings assim (editorial.ts, 18/10).
+ */
+export function svgVeuFotoInteira(W: number, H: number): string {
+  const paradas = [
+    [0, 0.38],
+    [0.2, 0.06],
+    [0.4, 0.1],
+    [0.66, 0.66],
+    [1, 0.88],
+  ]
+    .map(([o, a]) => `<stop offset="${o}" stop-color="#000" stop-opacity="${a}"/>`)
+    .join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="v" x1="0" y1="0" x2="0" y2="1">${paradas}</linearGradient></defs><rect width="${W}" height="${H}" fill="url(#v)"/></svg>`;
+}
+
+/**
+ * Logo sobre foto: sempre numa placa arredondada, clara (ou escura, quando a
+ * logo é clara e sumiria no branco). Logo que já voltou com placa de
+ * prepararLogo (logo clara medida contra o branco) não ganha outra.
+ */
+async function naPlaca(
+  logo: { buf: Buffer; w: number; h: number } | null,
+): Promise<{ buf: Buffer; w: number; h: number } | null> {
+  if (!logo) return null;
+  try {
+    const leitura = await lerLogoContraFundo(logo.buf, "#FFFFFF");
+    if (leitura && leitura.fracaoApagada >= FRACAO_APAGADA_MAXIMA) return logo; // já tem placa escura
+    const padX = Math.round(logo.h * 0.45);
+    const padY = Math.round(logo.h * 0.3);
+    const w = logo.w + padX * 2;
+    const h = logo.h + padY * 2;
+    const raio = Math.round(h * 0.28);
+    const svg = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${raio}" ry="${raio}" fill="#FFFFFF" fill-opacity="0.94"/></svg>`,
+    );
+    const buf = await sharp(svg).composite([{ input: logo.buf, left: padX, top: padY }]).png().toBuffer();
+    return { buf, w, h };
+  } catch {
+    return logo;
+  }
+}
+
+/**
+ * A foto cobrindo o card, cortando só o que sobra pra fechar o formato (uma
+ * foto 4:5 sai inteira). Foto mais ALTA que o card: sobra em cima e embaixo,
+ * e o rosto quase sempre está no terço de cima, então corta 30% da sobra em
+ * cima e 70% embaixo. A "região de interesse" do sharp escolhia a boca e
+ * cortava os olhos (retrato da Juliana, 18/10). Foto mais LARGA: decide a
+ * região de interesse (a pessoa raramente está colada na borda).
+ */
+async function cobrirCard(foto: FotoPedida, W: number, H: number): Promise<Buffer> {
+  if (foto.posicao === "topo" || foto.posicao === "base") {
+    const position = foto.posicao === "topo" ? "top" : "bottom";
+    return sharp(foto.raw).rotate().resize(W, H, { fit: "cover", position }).png().toBuffer();
+  }
+  const girada = await sharp(foto.raw).rotate().toBuffer({ resolveWithObject: true });
+  const { width: w0, height: h0 } = girada.info;
+  if (h0 / w0 > H / W) {
+    const larga = await sharp(girada.data).resize({ width: W }).toBuffer({ resolveWithObject: true });
+    const sobra = larga.info.height - H;
+    return sharp(larga.data)
+      .extract({ left: 0, top: Math.max(0, Math.round(sobra * 0.3)), width: W, height: H })
+      .png()
+      .toBuffer();
+  }
+  return sharp(girada.data).resize(W, H, { fit: "cover", position: sharp.strategy.attention }).png().toBuffer();
+}
+
+async function renderFotoInteira(params: {
+  W: number;
+  H: number;
+  conteudo: ConteudoPeca;
+  handle: string;
+  foto: FotoPedida;
+  fonteTitulo: FamiliaFonte;
+  logoComposite: { buf: Buffer; w: number; h: number } | null;
+}): Promise<CardResultado | null> {
+  const { W, H, conteudo, handle, foto, fonteTitulo, logoComposite } = params;
+  const stories = H / W > 1.5;
+  const BRANCO = "#FFFFFF";
+
+  let base: Buffer;
+  try {
+    base = await cobrirCard(foto, W, H);
+  } catch {
+    return null;
+  }
+
+  const composites: sharp.OverlayOptions[] = [{ input: Buffer.from(svgVeuFotoInteira(W, H)), top: 0, left: 0 }];
+  if (logoComposite) {
+    composites.push({ input: logoComposite.buf, top: Math.round(H * 0.045), left: Math.round((W - logoComposite.w) / 2) });
+  }
+
+  const headline = (conteudo.headline ?? "").trim();
+  const eyebrow = (conteudo.eyebrow ?? "").trim();
+  const subtitle = (conteudo.subtitle ?? "").trim();
+  const kicker = (conteudo.cta ?? "").trim();
+  const contentW = Math.round(W * 0.84);
+  const gap = Math.round(H * (stories ? 0.022 : 0.03));
+
+  type Item = { bloco: Bloco; gapAntes: number };
+  const itens: Item[] = [];
+  if (eyebrow) {
+    const pill = blocoPill(eyebrow, BRANCO, W);
+    if (pill) itens.push({ bloco: pill, gapAntes: 0 });
+  }
+  if (headline) {
+    const titulo = blocoTitulo(headline, BRANCO, contentW, H * (stories ? 0.3 : 0.27), Math.round(W * (stories ? 0.09 : 0.088)), fonteTitulo);
+    itens.push({ bloco: titulo, gapAntes: itens.length ? Math.round(gap * 1.1) : 0 });
+  }
+  if (subtitle) {
+    const sub = blocoDeTexto(subtitle, "sans", BRANCO, Math.round(W * 0.036), Math.round(W * 0.78), {
+      peso: 1.1,
+      lineHeight: 1.42,
+      opacidade: 0.95,
+    });
+    itens.push({ bloco: sub, gapAntes: itens.length ? gap : 0 });
+  }
+  if (kicker) {
+    const k = blocoDeTexto(kicker, "manuscrita", BRANCO, Math.round(W * 0.06), Math.round(W * 0.8), { lineHeight: 1.15 });
+    itens.push({ bloco: k, gapAntes: itens.length ? gap : 0 });
+  }
+
+  // O texto mora na metade de baixo, onde o véu já escureceu, encostado no @.
+  const alturaTexto = itens.reduce((acc, x) => acc + x.gapAntes + x.bloco.altura, 0);
+  const base_ = H - Math.round(H * (stories ? 0.13 : 0.11));
+  let y = Math.max(Math.round(H * 0.45), base_ - alturaTexto);
+  for (const { bloco, gapAntes } of itens) {
+    y += gapAntes;
+    composites.push(...posicionar(bloco, Math.round((W - bloco.largura) / 2), y));
+    y += bloco.altura;
+  }
+
+  if (handle) {
+    const fsH = Math.round(W * 0.02);
+    const hBloco = blocoDeTexto(handle, "sans", BRANCO, fsH, contentW, {
+      letterSpacing: Math.round(fsH * 0.18),
+      peso: 0.5,
+      opacidade: 0.85,
+    });
+    composites.push(...posicionar(hBloco, Math.round((W - hBloco.largura) / 2), H - Math.round(H * 0.055) - hBloco.altura));
+  }
+
+  const buffer = await sharp(base).composite(composites).png().toBuffer();
+  return { buffer, fotoDesenhada: true, avisoFoto: null };
 }
 
 // ————— Layout hero / foto (pilha central) —————

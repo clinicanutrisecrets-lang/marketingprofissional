@@ -206,15 +206,28 @@ async function base(fundo: string): Promise<sharp.Sharp> {
   return sharp({ create: { width: W, height: H, channels: 3, background: fundo } });
 }
 
+/** O véu da capa com foto: claro em cima, escuro embaixo pra letra branca ler. */
+export function svgVeuCapa(): string {
+  const paradas = [
+    [0, 0.35],
+    [0.22, 0],
+    [0.42, 0],
+    [0.76, 0.72],
+    [1, 0.84],
+  ]
+    .map(([o, a]) => `<stop offset="${o}" stop-color="#000" stop-opacity="${a}"/>`)
+    .join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">${paradas}</linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`;
+}
+
 async function capaComFoto(s: Extract<SlideEditorial, { tipo: "capa" }>, i: number, total: number, o: OpcoesEditorial): Promise<Buffer> {
   // Foto INTEIRA no card, cortada só o necessário pra cobrir 4:5 (centro).
   const foto = await sharp(o.fotoCapa!).rotate().resize(W, H, { fit: "cover", position: sharp.strategy.attention }).toBuffer();
-  const veu = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">` +
-      `<stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".22" stop-color="#000" stop-opacity="0"/>` +
-      `<stop offset=".42" stop-color="#000" stop-opacity="0"/><stop offset=".76" stop-color="#000" stop-opacity=".72"/>` +
-      `<stop offset="1" stop-color="#000" stop-opacity=".84"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`,
-  );
+  // 🔴 Um template só, sem "+" entre pedaços: o minificador do Next 14 juntava
+  // os pedaços e comia o meio da string (o <svg> saía sem fechar), a capa com
+  // foto quebrava no servidor e o carrossel caía no desenho antigo, com a foto
+  // recortada numa janela (18/10/2026). editorial-compilado.test.ts trava isso.
+  const veu = Buffer.from(svgVeuCapa());
   const camadas: Camada[] = [{ input: veu, left: 0, top: 0 }];
 
   const logo = (await logoCamada(o.logoEscuro, MARGEM, 80, 70)) ?? (await logoNaPlaca(o.logoPlaca, MARGEM, 72, 52));
@@ -274,11 +287,22 @@ async function slideFoto(s: Extract<SlideEditorial, { tipo: "foto" }>, i: number
   const comLista = !!s.itens?.length;
   const foto = await sharp(s.foto).rotate().resize(W, H, { fit: "cover", position: sharp.strategy.attention }).toBuffer();
   // Com lista o véu cobre o card quase inteiro: a lista precisa ler do meio pra baixo.
-  const paradas = comLista
-    ? `<stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity=".7"/>`
-    : `<stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".22" stop-color="#000" stop-opacity="0"/>` +
-      `<stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity=".72"/>` +
-      `<stop offset="1" stop-color="#000" stop-opacity=".84"/>`;
+  const paradas = (
+    comLista
+      ? [
+          [0, 0.55],
+          [1, 0.7],
+        ]
+      : [
+          [0, 0.35],
+          [0.22, 0],
+          [0.45, 0],
+          [0.78, 0.72],
+          [1, 0.84],
+        ]
+  )
+    .map(([o, a]) => `<stop offset="${o}" stop-color="#000" stop-opacity="${a}"/>`)
+    .join("");
   const veu = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">${paradas}</linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`,
   );
