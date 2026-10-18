@@ -554,6 +554,32 @@ async function naPlaca(
   }
 }
 
+/**
+ * A foto cobrindo o card, cortando só o que sobra pra fechar o formato (uma
+ * foto 4:5 sai inteira). Foto mais ALTA que o card: sobra em cima e embaixo,
+ * e o rosto quase sempre está no terço de cima, então corta 30% da sobra em
+ * cima e 70% embaixo. A "região de interesse" do sharp escolhia a boca e
+ * cortava os olhos (retrato da Juliana, 18/10). Foto mais LARGA: decide a
+ * região de interesse (a pessoa raramente está colada na borda).
+ */
+async function cobrirCard(foto: FotoPedida, W: number, H: number): Promise<Buffer> {
+  if (foto.posicao === "topo" || foto.posicao === "base") {
+    const position = foto.posicao === "topo" ? "top" : "bottom";
+    return sharp(foto.raw).rotate().resize(W, H, { fit: "cover", position }).png().toBuffer();
+  }
+  const girada = await sharp(foto.raw).rotate().toBuffer({ resolveWithObject: true });
+  const { width: w0, height: h0 } = girada.info;
+  if (h0 / w0 > H / W) {
+    const larga = await sharp(girada.data).resize({ width: W }).toBuffer({ resolveWithObject: true });
+    const sobra = larga.info.height - H;
+    return sharp(larga.data)
+      .extract({ left: 0, top: Math.max(0, Math.round(sobra * 0.3)), width: W, height: H })
+      .png()
+      .toBuffer();
+  }
+  return sharp(girada.data).resize(W, H, { fit: "cover", position: sharp.strategy.attention }).png().toBuffer();
+}
+
 async function renderFotoInteira(params: {
   W: number;
   H: number;
@@ -569,10 +595,7 @@ async function renderFotoInteira(params: {
 
   let base: Buffer;
   try {
-    // "cover" só corta o que sobra pra preencher o formato (uma foto 4:5 sai
-    // inteira); a região de interesse decide de que lado sobra.
-    const pos = foto.posicao === "topo" ? "top" : foto.posicao === "base" ? "bottom" : sharp.strategy.attention;
-    base = await sharp(foto.raw).rotate().resize(W, H, { fit: "cover", position: pos }).png().toBuffer();
+    base = await cobrirCard(foto, W, H);
   } catch {
     return null;
   }

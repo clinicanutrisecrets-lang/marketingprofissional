@@ -9,6 +9,10 @@
       "schedule": "0 9 * * 0"
     },
     {
+      "path": "/api/cron/refazer-fotos-semana",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/cron/sugestoes-conteudo",
       "schedule": "0 10 * * 0"
     },

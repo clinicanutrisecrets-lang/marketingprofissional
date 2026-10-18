@@ -357,60 +357,19 @@ export async function redesenharArteComTexto(
     };
   }
 
-  const { data: f } = await admin.from("franqueadas").select("*").eq("id", ctx.franqueadaId).maybeSingle();
-  if (!f) return { ok: false, erro: "Conta não encontrada." };
-  const { brandDaFranqueada } = await import("@/lib/ai-image/brand");
-  const { buscarArquivoUrl } = await import("@/lib/arquivos/url-asset");
-  const { gerarEUploadImagem, gerarCarrosselEUpload } = await import("@/lib/ai-image/render");
-  const { caminhoNoBucket } = await import("@/lib/geracao/fotos-banco");
-
-  const logoUrl = await buscarArquivoUrl(admin, ctx.franqueadaId, "logo_principal");
-  const fotoUrl = await buscarArquivoUrl(admin, ctx.franqueadaId, "foto_profissional");
-  const brand = brandDaFranqueada(f as Parameters<typeof brandDaFranqueada>[0], { logoUrl, fotoUrl });
-
-  // A mesma foto do banco que estava na arte. Se ela não baixar mais, a arte
-  // sai sem foto em vez de travar a correção.
-  let foto: Buffer | undefined;
-  const ref = typeof p.foto_arte_ref === "string" ? p.foto_arte_ref : null;
-  if (ref) {
-    try {
-      const local = caminhoNoBucket(ref);
-      if (local) {
-        const { data } = await admin.storage.from(local.bucket).download(local.path);
-        if (data) foto = Buffer.from(await data.arrayBuffer());
-      } else {
-        const res = await fetch(ref, { signal: AbortSignal.timeout(10000) });
-        if (res.ok) foto = Buffer.from(await res.arrayBuffer());
-      }
-    } catch {
-      console.warn(`[redesenhar] foto ${ref} não baixou; segue sem foto`);
-    }
-  }
-
+  const { desenharArteDoPost } = await import("@/lib/posts/redesenhar-arte");
   let urlImagem: string;
   let urlsSlides: string[] | null = null;
   try {
-    if (p.tipo_post === "feed_carrossel") {
-      const r = await gerarCarrosselEUpload({
-        franqueadaId: ctx.franqueadaId,
-        brand,
-        slides: conferido.pecas,
-        fotoCapa: foto,
-        capaEstilo: ((f as { estilo_capa?: string | null }).estilo_capa ?? undefined) as never,
-      });
-      if (!r.urls.length) throw new Error("carrossel sem slides");
-      urlImagem = r.urls[0]!;
-      urlsSlides = r.urls;
-    } else {
-      const r = await gerarEUploadImagem({
-        franqueadaId: ctx.franqueadaId,
-        tipo: p.tipo_post as "feed_imagem" | "stories",
-        brand,
-        conteudo: conferido.pecas[0]!,
-        fotoPropria: foto,
-      });
-      urlImagem = r.url;
-    }
+    const r = await desenharArteDoPost({
+      admin,
+      franqueadaId: ctx.franqueadaId,
+      tipoPost: p.tipo_post as string,
+      pecas: conferido.pecas,
+      fotoRef: typeof p.foto_arte_ref === "string" ? p.foto_arte_ref : null,
+    });
+    urlImagem = r.urlImagem;
+    urlsSlides = r.urlsSlides;
   } catch (e) {
     console.error("[redesenhar] falhou:", e);
     return { ok: false, erro: "Não consegui redesenhar a arte agora. O texto anterior segue valendo." };
