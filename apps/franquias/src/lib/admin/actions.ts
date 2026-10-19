@@ -107,7 +107,7 @@ export async function listarArquivosParaZip(franqueadaId: string) {
 export type AlertaAdmin = {
   franqueadaId: string;
   nome: string;
-  tipo: "token_expirando" | "token_expirado" | "onboarding_parado" | "status_pausado";
+  tipo: "token_expirando" | "token_expirado" | "onboarding_parado" | "status_pausado" | "revisor_arte";
   mensagem: string;
   urgencia: "urgente" | "normal";
 };
@@ -179,6 +179,39 @@ export async function listarAlertas(): Promise<AlertaAdmin[]> {
         urgencia: "normal",
       });
     }
+  }
+
+  // O revisor da arte (lib/revisor-arte): o que ele refez ou sinalizou nos
+  // últimos 8 dias, por conta. Tabela ausente ou erro: sem o alerta, nunca
+  // sem a lista.
+  const { data: revisoes, error: revErr } = await admin
+    .from("revisoes_arte")
+    .select("franqueada_id, acao, achados")
+    .gte("criado_em", new Date(agora - 8 * umDia).toISOString())
+    .neq("acao", "ok");
+  if (revErr) console.warn("[admin] revisões da arte não lidas:", revErr.message);
+  const nomes = new Map(franqueadas.map((f) => [f.id as string, f.nome_completo as string]));
+  const porConta = new Map<string, { refeitas: number; avisos: Set<string> }>();
+  for (const r of (revisoes ?? []) as Array<{ franqueada_id: string; acao: string; achados: Array<{ regra?: string }> | null }>) {
+    const c = porConta.get(r.franqueada_id) ?? { refeitas: 0, avisos: new Set<string>() };
+    if (r.acao === "refazer_sem_foto") c.refeitas++;
+    for (const a of r.achados ?? []) if (a?.regra) c.avisos.add(a.regra);
+    porConta.set(r.franqueada_id, c);
+  }
+  for (const [id, c] of porConta) {
+    const partes = [
+      c.refeitas ? `${c.refeitas} arte(s) refeita(s) sem foto` : "",
+      c.avisos.has("desenho_reserva") ? "desenho principal falhou" : "",
+      c.avisos.has("foto_nao_combina") ? "foto que não mostra o assunto" : "",
+      [...c.avisos].some((r) => r.startsWith("arte_")) ? "texto da arte a conferir" : "",
+    ].filter(Boolean);
+    alertas.push({
+      franqueadaId: id,
+      nome: nomes.get(id) ?? id,
+      tipo: "revisor_arte",
+      mensagem: `Revisor da arte: ${partes.join(", ") || "avisos na semana"}`,
+      urgencia: c.avisos.has("desenho_reserva") ? "urgente" : "normal",
+    });
   }
 
   return alertas.sort((a, b) => {

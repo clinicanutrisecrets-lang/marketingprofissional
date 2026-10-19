@@ -22,7 +22,7 @@ import {
 } from "@/lib/creatomate/client";
 import { destinoDoRender, formatoPedido } from "@/lib/criativo/destino";
 import { gerarEUploadImagem, gerarCarrosselEUpload, gerarCarrosselEditorialEUpload } from "@/lib/ai-image/render";
-import { slidesDaConsulta, fotoDaConsultaUrl, FOTOS_COLETA } from "@/lib/geracao/consulta-teste";
+import { slidesDaConsulta, fotoDaConsultaUrl, FOTOS_COLETA, nomeDaConsulta } from "@/lib/geracao/consulta-teste";
 import { descreverEGravarFoto } from "@/lib/arquivos/descrever-foto";
 const FOTOS_COLETA_NOMES = new Set<string>(FOTOS_COLETA);
 import type { ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
@@ -83,6 +83,7 @@ import {
 import { escreverStoriesFalados } from "@/lib/geracao/stories-falados-gerar";
 import { PAPEIS_STORIES } from "@/lib/geracao/stories-falados";
 import { revisarCopy, resumoRevisao } from "@/lib/claude/revisor-copy";
+import { revisarArte, registrarRevisaoArte } from "@/lib/revisor-arte/revisar";
 import { semAbreviacaoFundo } from "@/lib/texto/sem-abreviacao";
 
 const MODELO_CLAUDE_DEFAULT = CLAUDE_MODEL_COPY;
@@ -407,15 +408,16 @@ export async function gerarPostsDaSemana(
       // nutri, na tela de aprovação, onde o aviso aparece junto do post e some
       // quando ela corrige. O log é pra sabermos quanto o modelo escorrega, e
       // em qual regra, sem depender de alguém reportar.
+      const ctxRevisao = {
+        nao_atende: contexto.publico?.nao_atende ?? null,
+        palavras_evitar: contexto.palavras_evitar ?? null,
+        precos_reais: (contexto.produtos ?? [])
+          .map((pr) => pr.preco_texto)
+          .filter((v): v is string => !!v),
+      };
       const achados = revisarCopy(
         [post.copy_legenda, post.copy_cta].filter(Boolean).join("\n"),
-        {
-          nao_atende: contexto.publico?.nao_atende ?? null,
-          palavras_evitar: contexto.palavras_evitar ?? null,
-          precos_reais: (contexto.produtos ?? [])
-            .map((pr) => pr.preco_texto)
-            .filter((v): v is string => !!v),
-        },
+        ctxRevisao,
       );
       if (achados.length > 0) {
         console.warn(
@@ -459,6 +461,12 @@ export async function gerarPostsDaSemana(
       // tipográfico, que é o que sabe redesenhar.
       let textoArte: ConteudoPeca[] | null = null;
       let fotoArteRef: string | null = null;
+      // Pro revisor da arte (lib/revisor-arte): o desenho principal falhou?
+      // E o texto da arte do carrossel da consulta, que não vai pra
+      // texto_arte (o "Corrigir" redesenharia noutro estilo).
+      let desenhoReserva = false;
+      let pecasEditorial: ConteudoPeca[] | null = null;
+      let editorialComFoto = false;
 
       // A MESMA marca do post de venda (lib/ai-image/brand.ts): uma fonte.
       const brandArte = brandDaFranqueada(
@@ -530,11 +538,21 @@ export async function gerarPostsDaSemana(
             if (r.urls.length) {
               urlImagem = r.urls[0]!;
               urlsSlides = r.urls;
+              editorialComFoto = !!(fotoCapaDela ?? (capa.fotoNome ? fotos.get(capa.fotoNome) : undefined));
+              pecasEditorial = plano.map((x) => ({
+                headline: x.titulo,
+                ...("subtitulo" in x && x.subtitulo ? { subtitle: x.subtitulo } : {}),
+                ...("chamada" in x && x.chamada ? { subtitle: x.chamada } : {}),
+                ...("corpo" in x && x.corpo ? { corpo: x.corpo } : {}),
+              }));
+            } else {
+              desenhoReserva = true;
             }
           } else {
             console.warn("[geracao] carrossel da consulta sem texto pra 2 slides; segue no desenho de sempre");
           }
         } catch (edErr) {
+          desenhoReserva = true;
           console.warn("[geracao] carrossel da consulta falhou; segue no desenho de sempre:", edErr);
         }
       }
@@ -757,6 +775,34 @@ export async function gerarPostsDaSemana(
         }
       }
 
+      // O revisor da ARTE, antes de o post existir pra ela (Aline, 19/10):
+      // foto cortada ou texto ilegível → a arte é refeita sem foto; o resto
+      // vira aviso no admin. Nunca derruba o post.
+      let revisaoArte: Awaited<ReturnType<typeof revisarArte>> | null = null;
+      if (urlImagem && (item.tipo === "feed_carrossel" || item.tipo === "feed_imagem" || item.tipo === "stories")) {
+        revisaoArte = await revisarArte({
+          franqueadaId,
+          aprovacaoId,
+          tipo: item.tipo,
+          urlImagem,
+          urlsSlides,
+          pecas: textoArte ?? pecasEditorial,
+          temFoto: !!fotoArteRef || editorialComFoto,
+          desenhoReserva,
+          assunto: [post.headline, item.produto ? nomeDaConsulta(item.produto) : ""].filter(Boolean).join(" · "),
+          ctx: ctxRevisao,
+          brand: brandArte,
+          capaEstilo:
+            ((franqueada as { estilo_capa?: string | null }).estilo_capa as EstiloCapa | null) ?? undefined,
+        });
+        if (revisaoArte.acao === "refazer_sem_foto") {
+          urlImagem = revisaoArte.urlImagem;
+          urlsSlides = revisaoArte.urlsSlides;
+          // A arte nova não tem foto: o "Corrigir" não deve buscar a antiga.
+          fotoArteRef = null;
+        }
+      }
+
       // Salva post
       const { data: postInserted, error: postErr } = await admin
         .from("posts_agendados")
@@ -813,6 +859,15 @@ export async function gerarPostsDaSemana(
         erros.push(`${item.angulo}: ${postErr?.message ?? "insert falhou"}`);
       } else {
         gerados += 1;
+        if (revisaoArte) {
+          await registrarRevisaoArte(admin, {
+            ...revisaoArte,
+            postId: (postInserted as { id: string }).id,
+            franqueadaId,
+            semanaRef,
+            tipo: item.tipo,
+          });
+        }
         // Reel da semana: o vídeo curto (gancho sobre um clipe da biblioteca)
         // nasce junto e chega no card quando o worker termina. Best-effort.
         if (item.tipo === "reels") {
