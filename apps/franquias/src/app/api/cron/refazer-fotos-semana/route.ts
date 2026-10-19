@@ -7,6 +7,10 @@ import { montarPostFixoDaSemana } from "@/lib/geracao/post-fixo-da-semana";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import { gerarPostsDaSemana } from "@/lib/geracao/semanal";
 import { filhaIndisponivel } from "@/lib/geracao/fila-semanal";
+import { olharArte } from "@/lib/revisor-arte/olhar";
+import { achadosDoOlhar, decidirAcao, resumoAchados } from "@/lib/revisor-arte/regras";
+import { logarCusto } from "@/lib/custos/log";
+import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -34,6 +38,55 @@ const SEMANA = "2026-10-19";
 const VALE_ATE = Date.parse("2026-10-21T03:00:00Z");
 const MARCA = "arte_foto_inteira";
 const ORCAMENTO_MS = 230_000;
+
+
+/**
+ * PROVA DO REVISOR DA ARTE (19/10/2026), uma vez só: o revisor olha 3 artes
+ * cortadas do pacote de 18/10 (o resultado esperado é refazer) e 3 refeitas
+ * (o esperado é ok). O resultado vai pro log `[prova-revisor-arte]`. Roda só
+ * enquanto não houver custo `prova_revisor_arte` gravado.
+ */
+const PROVA = [
+  { esperado: "refazer", path: "2e8d44ec-065b-4247-b3be-47d2a67f7c3a/ai-image/1792314136342_carrossel_1.png", texto: "O seu DNA não é a resposta. A leitura dele é.", assunto: "Consulta Nutrigenética (inclui o teste de DNA)" },
+  { esperado: "refazer", path: "8af97c61-daed-46be-bdd5-6ffb0def2e70/ai-image/1792314124181_feed_imagem.png", texto: "Seu corpo é uma fábrica / E tem um setor que você nunca olhou", assunto: "Fábrica da Saúde" },
+  { esperado: "refazer", path: "ba61aba1-e1da-4ce5-b2e1-d6c81ce379b8/ai-image/1792314084621_carrossel_1.png", texto: "Seu exame normal não explica o cansaço", assunto: "exame de sangue e genética" },
+  { esperado: "ok", path: "ba61aba1-e1da-4ce5-b2e1-d6c81ce379b8/ai-image/1792353643958_carrossel_1.png", texto: "Seu exame normal não explica o cansaço", assunto: "exame de sangue e genética" },
+  { esperado: "ok", path: "2e8d44ec-065b-4247-b3be-47d2a67f7c3a/ai-image/1792353705261_feed_imagem.png", texto: "Sua dor tem endereço / E ela não está onde você sente", assunto: "inflamação" },
+  { esperado: "ok", path: "8af97c61-daed-46be-bdd5-6ffb0def2e70/ai-image/1792353761480_editorial_1.png", texto: "Consulta integrativa de precisão e excelência", assunto: "consulta integrativa" },
+];
+
+async function provaDoRevisor(admin: ReturnType<typeof createAdminClient>): Promise<string[] | null> {
+  if (!process.env.ANTHROPIC_API_KEY) return null;
+  const { count, error } = await admin
+    .from("custos_geracao")
+    .select("id", { count: "exact", head: true })
+    .eq("operacao", "prova_revisor_arte");
+  if (error || (count ?? 0) > 0) return null;
+  const linhas: string[] = [];
+  for (const c of PROVA) {
+    try {
+      const { data, error: dErr } = await admin.storage.from("franqueadas-assets").download(c.path);
+      if (dErr || !data) {
+        linhas.push(`${c.path}: não baixou`);
+        continue;
+      }
+      const r = await olharArte(Buffer.from(await data.arrayBuffer()), { texto: c.texto, assunto: c.assunto });
+      await logarCusto({ servico: "claude", operacao: "prova_revisor_arte", modelo: CLAUDE_MODEL_AGENTES, uso: r.uso, sucesso: !!r.olhar, metadata: { path: c.path } });
+      if (!r.olhar) {
+        linhas.push(`${c.path}: sem leitura`);
+        continue;
+      }
+      const achados = achadosDoOlhar(r.olhar);
+      const acao = decidirAcao(achados, { temFoto: true, podeRefazer: true });
+      const acertou = (acao === "refazer_sem_foto") === (c.esperado === "refazer");
+      linhas.push(`${acertou ? "ACERTOU" : "ERROU"} esperado=${c.esperado} acao=${acao} nota=${r.olhar.nota} [${resumoAchados(achados)}] foto="${r.olhar.o_que_a_foto_mostra}" ${c.path}`);
+    } catch (e) {
+      linhas.push(`${c.path}: ${(e as Error).message}`);
+    }
+  }
+  console.log("[prova-revisor-arte]", JSON.stringify(linhas));
+  return linhas;
+}
 
 export async function GET(request: Request) {
   const auth = request.headers.get("authorization");
@@ -148,7 +201,8 @@ export async function GET(request: Request) {
     fixos.push(`${f.email}: ${r.ok ? `gerados=${r.gerados}` : r.motivo}`);
   }
 
-  const resumo = { ok: true, refeitos: refeitos.length, falhas, fixos, pacotes: await pacotes };
+  const prova = temTempo() ? await provaDoRevisor(admin).catch(() => null) : null;
+  const resumo = { ok: true, refeitos: refeitos.length, falhas, fixos, pacotes: await pacotes, prova };
   console.log("[refazer-fotos-semana]", JSON.stringify(resumo));
   return NextResponse.json(resumo);
 }

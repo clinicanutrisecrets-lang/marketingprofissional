@@ -41,7 +41,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
   const { data: franqueadas } = await query;
   const alertas = await listarAlertas();
-  const alertasUrgentes = alertas.filter((a) => a.urgencia === "urgente");
+  // O revisor da arte tem bloco próprio: o aviso "normal" dele também
+  // precisa ser visto, e o bloco de urgentes só mostra urgentes.
+  const alertasRevisor = alertas.filter((a) => a.tipo === "revisor_arte");
+  const alertasUrgentes = alertas.filter((a) => a.urgencia === "urgente" && a.tipo !== "revisor_arte");
 
   const list = (franqueadas ?? []) as Array<{
     id: string;
@@ -120,6 +123,24 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                     className="hover:underline"
                   >
                     <strong>{a.nome}</strong> — {a.mensagem}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {alertasRevisor.length > 0 && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-lg">🖼️</span>
+              <h2 className="font-semibold text-amber-900">Revisor da arte, últimos 8 dias</h2>
+            </div>
+            <ul className="space-y-1.5 text-sm text-amber-900">
+              {alertasRevisor.map((a, i) => (
+                <li key={i}>
+                  <Link href={`/admin/franqueadas/${a.franqueadaId}`} className="hover:underline">
+                    <strong>{a.nome}</strong> — {a.mensagem.replace(/^Revisor da arte: /, "")}
                   </Link>
                 </li>
               ))}
