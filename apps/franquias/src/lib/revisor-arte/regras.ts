@@ -105,6 +105,24 @@ export function decidirAcao(achados: AchadoRevisao[], p: { temFoto: boolean; pod
   return achados.length ? "sinalizar" : "ok";
 }
 
+/**
+ * Só conta erro de português quando o revisor diz a correção E ela é
+ * diferente do que está escrito. Na prova de 19/10 ele apontou "cansaço" (que
+ * está certo) como erro: sem a correção comparada, alarme falso vira ruído.
+ */
+function errosReais(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  const out: string[] = [];
+  for (const x of v) {
+    const o = x as { escrito?: unknown; correto?: unknown };
+    const escrito = typeof o?.escrito === "string" ? o.escrito.trim() : "";
+    const correto = typeof o?.correto === "string" ? o.correto.trim() : "";
+    if (!escrito || !correto || escrito.toLocaleLowerCase("pt-BR") === correto.toLocaleLowerCase("pt-BR")) continue;
+    out.push(`${escrito} → ${correto}`.slice(0, 120));
+  }
+  return out;
+}
+
 /** Valida a saída da ferramenta. Qualquer campo torto = sem leitura. */
 export function validarOlhar(entrada: unknown): OlharArte | null {
   const e = entrada as Record<string, unknown> | null;
@@ -119,9 +137,7 @@ export function validarOlhar(entrada: unknown): OlharArte | null {
     texto_cortado: e.texto_cortado as boolean,
     foto_combina: e.foto_combina as boolean,
     o_que_a_foto_mostra: String(e.o_que_a_foto_mostra ?? "").slice(0, 200),
-    erros_portugues: (Array.isArray(e.erros_portugues) ? e.erros_portugues : [])
-      .filter((x): x is string => typeof x === "string" && x.trim().length > 0)
-      .map((x) => x.slice(0, 120)),
+    erros_portugues: errosReais(e.erros_portugues),
     nota,
     problema_principal: String(e.problema_principal ?? "").slice(0, 200),
   };

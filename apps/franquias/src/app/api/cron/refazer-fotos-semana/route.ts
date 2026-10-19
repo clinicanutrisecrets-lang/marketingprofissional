@@ -41,13 +41,15 @@ const ORCAMENTO_MS = 230_000;
 
 
 /**
- * PROVA DO REVISOR DA ARTE (19/10/2026), uma vez só: o revisor olha 3 artes
- * cortadas do pacote de 18/10 (o resultado esperado é refazer) e 3 refeitas
- * (o esperado é ok). O resultado vai pro log `[prova-revisor-arte]`. Roda só
+ * PROVA DO REVISOR DA ARTE (19/10/2026), uma vez só: o revisor olha 2 artes
+ * cortadas do pacote de 18/10 (o resultado esperado é refazer), o kit e 3
+ * refeitas (o esperado é não refazer). 1ª rodada: 4/6; ajustado e repetido. O resultado vai pro log `[prova-revisor-arte]`. Roda só
  * enquanto não houver custo `prova_revisor_arte` gravado.
  */
 const PROVA = [
-  { esperado: "refazer", path: "2e8d44ec-065b-4247-b3be-47d2a67f7c3a/ai-image/1792314136342_carrossel_1.png", texto: "O seu DNA não é a resposta. A leitura dele é.", assunto: "Consulta Nutrigenética (inclui o teste de DNA)" },
+  // O kit em si não estava cortado: o defeito dessa arte era a faixa do
+  // desenho antigo, que não existe mais. Esperado: não refazer.
+  { esperado: "ok", path: "2e8d44ec-065b-4247-b3be-47d2a67f7c3a/ai-image/1792314136342_carrossel_1.png", texto: "O seu DNA não é a resposta. A leitura dele é.", assunto: "Consulta Nutrigenética (inclui o teste de DNA)" },
   { esperado: "refazer", path: "8af97c61-daed-46be-bdd5-6ffb0def2e70/ai-image/1792314124181_feed_imagem.png", texto: "Seu corpo é uma fábrica / E tem um setor que você nunca olhou", assunto: "Fábrica da Saúde" },
   { esperado: "refazer", path: "ba61aba1-e1da-4ce5-b2e1-d6c81ce379b8/ai-image/1792314084621_carrossel_1.png", texto: "Seu exame normal não explica o cansaço", assunto: "exame de sangue e genética" },
   { esperado: "ok", path: "ba61aba1-e1da-4ce5-b2e1-d6c81ce379b8/ai-image/1792353643958_carrossel_1.png", texto: "Seu exame normal não explica o cansaço", assunto: "exame de sangue e genética" },
