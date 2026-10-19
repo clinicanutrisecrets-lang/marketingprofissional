@@ -22,7 +22,7 @@ const FERRAMENTA = {
       pessoa_cortada: {
         type: "boolean",
         description:
-          "true se alguém aparece cortado de um jeito estranho: rosto ou olhos fora do card, cabeça cortada, ou só um pedaço do corpo (só o cabelo, só um braço, só as mãos sem contexto).",
+          "true SOMENTE se a BORDA do card corta a pessoa de um jeito estranho: parte da cabeça ou do rosto fica fora do card (testa, olhos, queixo cortados), ou só aparece um pedaço do corpo sem a pessoa (só o cabelo, só um braço). Pessoa inteira de costas, de perfil, olhando para baixo ou com o rosto escondido pelo próprio gesto NÃO é cortada.",
       },
       parte_sem_sentido: {
         type: "boolean",
@@ -34,13 +34,21 @@ const FERRAMENTA = {
       foto_combina: {
         type: "boolean",
         description:
-          "true se a foto mostra o assunto do texto de um jeito que a seguidora reconhece (ex.: num post de teste de DNA, dá pra ver que é um kit de coleta ou uma consulta). Arte sem foto: true.",
+          "false SOMENTE se a foto contradiz ou engana sobre o assunto (ex.: post sobre teste de DNA com foto de comida, post de receita com foto de exame). Foto da nutricionista, de consulta, de consultório ou de ambiente de trabalho combina com qualquer post. Arte sem foto: true.",
       },
       o_que_a_foto_mostra: { type: "string", description: "Uma frase curta do que a foto mostra. Vazio se não houver foto." },
       erros_portugues: {
         type: "array",
-        items: { type: "string" },
-        description: "Erros de português ou acento faltando NO TEXTO ESCRITO NA ARTE, copiados como estão. Vazio se não houver.",
+        items: {
+          type: "object",
+          properties: {
+            escrito: { type: "string", description: "A palavra como está na arte." },
+            correto: { type: "string", description: "Como deveria ser escrita." },
+          },
+          required: ["escrito", "correto"],
+        },
+        description:
+          "Erros de português REAIS no texto escrito na arte (palavra errada ou acento faltando). Palavra já escrita certa (cansaço, você, saúde) não é erro. Na dúvida, deixe vazio.",
       },
       nota: { type: "number", description: "De 1 (não publicaria) a 5 (pronta para publicar)." },
       problema_principal: { type: "string", description: "O maior problema, numa frase. Vazio se estiver boa." },

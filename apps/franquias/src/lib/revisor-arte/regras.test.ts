@@ -73,7 +73,15 @@ test("desenho de reserva vira aviso pro time", () => {
 test("leitura torta do modelo é descartada", () => {
   assert.equal(validarOlhar({ pessoa_cortada: "sim" }), null);
   assert.equal(validarOlhar(null), null);
-  const ok = validarOlhar({ ...BOA, nota: 9, erros_portugues: ["", "voce"] });
+  const ok = validarOlhar({ ...BOA, nota: 9, erros_portugues: [{ escrito: "voce", correto: "você" }] });
   assert.equal(ok?.nota, 5);
-  assert.deepEqual(ok?.erros_portugues, ["voce"]);
+  assert.deepEqual(ok?.erros_portugues, ["voce → você"]);
+});
+
+test("erro de português sem correção diferente é descartado (o caso 'cansaço')", () => {
+  const ok = validarOlhar({
+    ...BOA,
+    erros_portugues: [{ escrito: "cansaço", correto: "cansaço" }, "cansaço", { escrito: "saude" }],
+  });
+  assert.deepEqual(ok?.erros_portugues, []);
 });
