@@ -36,6 +36,13 @@ test("só o cabelo (pessoa cortada) manda refazer sem foto", () => {
   assert.equal(decidirAcao(a, { temFoto: true, podeRefazer: true }), "refazer_sem_foto");
 });
 
+test("nota baixa sem campo marcado também refaz (a sala da Mariana na 2ª prova)", () => {
+  const a = achadosDoOlhar({ ...BOA, nota: 1, problema_principal: "recorte mostra só a luminária" });
+  assert.equal(a[0]?.regra, "arte_reprovada");
+  assert.equal(decidirAcao(a, { temFoto: true, podeRefazer: true }), "refazer_sem_foto");
+  assert.deepEqual(achadosDoOlhar({ ...BOA, nota: 3 }), []);
+});
+
 test("texto cortado ou ilegível também é grave", () => {
   assert.equal(decidirAcao(achadosDoOlhar({ ...BOA, texto_cortado: true }), { temFoto: true, podeRefazer: true }), "refazer_sem_foto");
   assert.equal(decidirAcao(achadosDoOlhar({ ...BOA, texto_legivel: false }), { temFoto: true, podeRefazer: true }), "refazer_sem_foto");

@@ -42,6 +42,7 @@ export type AcaoRevisor = "ok" | "refazer_sem_foto" | "sinalizar";
 
 /** Regras que, numa arte com foto, mandam refazer sem foto. */
 export const REGRAS_GRAVES = new Set([
+  "arte_reprovada",
   "pessoa_cortada",
   "parte_sem_sentido",
   "texto_cortado",
@@ -77,11 +78,19 @@ export function achadosMecanicos(p: {
   return achados;
 }
 
+/** Nota (1 a 5) a partir da qual o próprio revisor reprova a arte. */
+export const NOTA_REPROVA = 2;
+
 /** Traduz a leitura da imagem em achados. */
 export function achadosDoOlhar(o: OlharArte): AchadoRevisao[] {
   const achados: AchadoRevisao[] = [];
   const add = (regra: string, gravidade: AchadoRevisao["gravidade"], motivo: string, trecho = "") =>
     achados.push({ regra, gravidade, trecho, motivo });
+  // Nota baixa conta sozinha: na 2ª prova (19/10) o revisor deu nota 1 à
+  // sala recortada da Mariana sem marcar nenhum campo, e a arte passaria.
+  if (o.nota <= NOTA_REPROVA) {
+    add("arte_reprovada", "erro", "O revisor não publicaria esta arte.", o.problema_principal);
+  }
   if (o.pessoa_cortada) add("pessoa_cortada", "erro", "A foto corta a pessoa (rosto, cabeça ou só um pedaço do corpo).");
   if (o.parte_sem_sentido) add("parte_sem_sentido", "erro", "O recorte mostra um pedaço que não se entende.", o.o_que_a_foto_mostra);
   if (o.texto_cortado) add("texto_cortado", "erro", "Há texto saindo do card ou escondido.");

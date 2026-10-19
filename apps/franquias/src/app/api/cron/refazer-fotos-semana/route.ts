@@ -43,7 +43,7 @@ const ORCAMENTO_MS = 230_000;
 /**
  * PROVA DO REVISOR DA ARTE (19/10/2026), uma vez só: o revisor olha 2 artes
  * cortadas do pacote de 18/10 (o resultado esperado é refazer), o kit e 3
- * refeitas (o esperado é não refazer). 1ª rodada: 4/6; ajustado e repetido. O resultado vai pro log `[prova-revisor-arte]`. Roda só
+ * refeitas (o esperado é não refazer). 1ª rodada: 4/6; 2ª: 5/6; ajustado e repetido. O resultado vai pro log `[prova-revisor-arte]`. Roda só
  * enquanto não houver custo `prova_revisor_arte` gravado.
  */
 const PROVA = [
