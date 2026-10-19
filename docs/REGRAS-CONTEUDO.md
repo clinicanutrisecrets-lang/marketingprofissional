@@ -50,6 +50,20 @@ A **estrutura** acima é emprestada de posts que funcionam. O **visual não é.*
   própria profissional sobe — ela escolhe onde a foto entra (topo, base ou ao
   lado do texto) e o tamanho (pequena, média, grande). A foto nunca cobre
   texto: se não cabe, encolhe; se nem assim, o card sai sem ela e a tela avisa.
+  (Isso vale para o editor, onde ELA escolhe lugar e tamanho.)
+- 🔴 **Foto em arte que o SISTEMA gera (capa de carrossel, post único, stories,
+  post fixo): sempre INTEIRA, com a transparência escura embaixo e o texto
+  branco por cima** (Aline, 18/10/2026: *"tem que ser ela inteira e pôr aquela
+  transparência embaixo pra poder pôr o texto"*). Nunca a foto numa faixa ou
+  janela: foi assim que o pacote de 18/10 saiu com o braço do sofá, a cerca e
+  só o cabelo da Juliana. Código: `fotoInteira` (`cardDesigner.ts`) e
+  `capaComFoto` (`editorial.ts`). Retrato mais alto que o card corta 30% da
+  sobra em cima, para não perder os olhos.
+- 🔴 **SVG nunca montado com pedaços de template ligados por `+`**: o
+  minificador do Next 14 come o meio da string e a arte quebra só em produção
+  (em `tsx` e em teste não aparece). Trava:
+  `packages/ai-image/src/svg-sem-concatenacao.test.ts`. Mudança visual se
+  confere desenhando a partir do `next build`, não do `tsx`.
 - Paleta e mini-logo conforme a skill `nutri-secrets-carrossel`
 
 Carrossel em preto e branco puro está **fora do padrão**.
