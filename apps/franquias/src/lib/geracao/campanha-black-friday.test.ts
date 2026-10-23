@@ -81,6 +81,19 @@ test("o bônus é a Leitura Epigenética Funcional para todo mundo; o dela entra
   assert.doesNotMatch(r.slots.map((s) => s.instrucao).join("\n"), /20% de desconto/);
 });
 
+test("o bônus da PÁGINA vence a resposta antiga do Scanner (mesma fonte que a paciente vê)", () => {
+  const prefs = validarPreferenciasScanner({
+    datas: [{ chave: "black_friday-2026", nome: "Black Friday", data: "2026-11-27", escolha: "promocao", condicao: "bônus antigo", produto: "DNA 360" }],
+  });
+  const conta = validarBlackFridayDaConta({ modo: "so_dia", link: null, bonus: "Retorno em 30 dias; E-book de receitas" });
+  const t = aplicarCampanhaBlackFriday(semana(), { semanaRef: "2026-11-16", prefs, conta }).slots.map((s) => s.instrucao).join("\n");
+  assert.match(t, /Retorno em 30 dias; E-book de receitas/);
+  assert.doesNotMatch(t, /bônus antigo/);
+  // Bônus da página escrito como promoção também não entra.
+  const ruim = validarBlackFridayDaConta({ modo: "so_dia", link: null, bonus: "20% de desconto" });
+  assert.doesNotMatch(aplicarCampanhaBlackFriday(semana(), { semanaRef: "2026-11-16", prefs: null, conta: ruim }).slots.map((s) => s.instrucao).join("\n"), /20%/);
+});
+
 test("quem respondeu 'nenhuma' para a Black Friday fica fora", () => {
   const prefs = validarPreferenciasScanner({
     datas: [{ chave: "black_friday-2026", nome: "Black Friday", data: "2026-11-27", escolha: "nenhuma" }],
