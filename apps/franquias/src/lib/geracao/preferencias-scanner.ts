@@ -12,6 +12,8 @@
  * sync. Função pura: roda no teste.
  */
 
+import { validarBlackFridayDaConta, type BlackFridayDaConta } from "./campanha-black-friday.ts";
+
 export type EscolhaDataScanner = "promocao" | "so_posts" | "nenhuma";
 
 export type DataComemorativaEscolhida = {
@@ -27,6 +29,8 @@ export type DataComemorativaEscolhida = {
 export type PreferenciasScanner = {
   grava_videos: boolean | null;
   datas: DataComemorativaEscolhida[];
+  /** A página de Black Friday dela na Loja (forma de vender e link), quando o Scanner manda. */
+  black_friday?: BlackFridayDaConta | null;
 };
 
 const limpo = (v: unknown, max: number): string | null => {
@@ -75,6 +79,7 @@ export function validarPreferenciasScanner(bruto: unknown): PreferenciasScanner 
   return {
     grava_videos: typeof o.grava_videos === "boolean" ? o.grava_videos : null,
     datas,
+    black_friday: validarBlackFridayDaConta(o.black_friday),
   };
 }
 

@@ -80,6 +80,7 @@ import {
   aplicarDataComemorativa,
   frequenciaReelsComVideo,
 } from "@/lib/geracao/preferencias-scanner";
+import { aplicarCampanhaBlackFriday, postsDeBlackFriday } from "./campanha-black-friday";
 import { escreverStoriesFalados } from "@/lib/geracao/stories-falados-gerar";
 import { PAPEIS_STORIES } from "@/lib/geracao/stories-falados";
 import { revisarCopy, resumoRevisao } from "@/lib/claude/revisor-copy";
@@ -250,11 +251,20 @@ export async function gerarPostsDaSemana(
   );
   // Data comemorativa que ela escolheu no painel do Scanner (Aline, 15/10/2026):
   // ação especial com a condição DELA, ou só posts com a data.
-  const { slots: plano, usada: dataComemorativa } = aplicarDataComemorativa(
+  // A Black Friday de 2026 é campanha (lib/geracao/campanha-black-friday.ts):
+  // nas semanas dela, a data não entra de novo pelo caminho da data comemorativa.
+  const campanhaBf = postsDeBlackFriday(semanaRef) > 0;
+  const dataSemana = dataDaSemana(prefsScanner, semanaRef);
+  const { slots: planoComData, usada: dataComemorativa } = aplicarDataComemorativa(
     planoComTema,
-    dataDaSemana(prefsScanner, semanaRef),
+    campanhaBf && dataSemana?.chave.startsWith("black_friday") ? null : dataSemana,
   );
-  if (temaEmAlta || dataComemorativa) {
+  const { slots: plano, posts: postsBf } = aplicarCampanhaBlackFriday(planoComData, {
+    semanaRef,
+    prefs: prefsScanner,
+    conta: prefsScanner?.black_friday ?? null,
+  });
+  if (temaEmAlta || dataComemorativa || postsBf > 0) {
     estrategia.passos = plano.filter((p) => p.tipo !== "stories").map((p) => p.papel);
   }
   {
