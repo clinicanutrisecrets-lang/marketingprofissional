@@ -33,6 +33,11 @@ export type BlackFridayDaConta = {
   modo: ModoBlackFriday;
   /** Link da página de Black Friday, quando ela existe e está no ar. */
   link: string | null;
+  /**
+   * Os presentes DELA escritos na página (Aline 23/10: bônus próprio também no
+   * Consultório). Mesma fonte da página: o post nunca promete o que ela não mostra.
+   */
+  bonus?: string | null;
 };
 
 /** Posts de Black Friday por semana (a chave é a segunda-feira da semana). */
@@ -75,7 +80,8 @@ export function validarBlackFridayDaConta(bruto: unknown): BlackFridayDaConta | 
   const modo: ModoBlackFriday = o.modo === "mes_todo" ? "mes_todo" : "so_dia";
   const link =
     typeof o.link === "string" && /^https:\/\/[^\s"'<>]+$/.test(o.link.trim()) ? o.link.trim().slice(0, 300) : null;
-  return { modo, link };
+  const bonus = typeof o.bonus === "string" ? o.bonus.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, 300) || null : null;
+  return { modo, link, bonus };
 }
 
 type SlotMinimo = {
@@ -160,9 +166,10 @@ export function aplicarCampanhaBlackFriday<S extends SlotMinimo>(
   if (resposta?.escolha === "nenhuma") return { slots, posts: 0 };
   const modo = params.conta?.modo ?? "so_dia";
   const link = params.conta?.link ?? null;
-  // Bônus dela escrito como promoção não entra (mesma régua de dataDaSemana).
-  const bonusDela =
-    resposta?.escolha === "promocao" && resposta.condicao && !temPalavraDePromocao(resposta.condicao) ? resposta.condicao : null;
+  // O bônus dela: o da PÁGINA primeiro (é o que a paciente vê); sem ele, o que
+  // ela respondeu no Scanner. Escrito como promoção não entra (mesma régua de dataDaSemana).
+  const candidato = params.conta?.bonus || (resposta?.escolha === "promocao" ? resposta.condicao : null);
+  const bonusDela = candidato && !temPalavraDePromocao(candidato) ? candidato : null;
 
   const naData = (s: S) => {
     const d = diasAteBlackFriday(dataDoSlot(params.semanaRef, s.dia));
