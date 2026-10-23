@@ -38,13 +38,15 @@ test("ritmo: 1, 1, 2, 3 e 3 posts, do pacote de 25/10 ao de 22/11", () => {
   assert.equal(diasAteBlackFriday("2026-11-24"), 3);
 });
 
-test("semana de 26/10: um post só, o comercial, em antecipação leve", () => {
+test("semana de 26/10: um post só, de conteúdo (o comercial segue o de sempre), em antecipação leve", () => {
   const { slots, posts } = aplicarCampanhaBlackFriday(semana(), { semanaRef: "2026-10-26", prefs: null, conta: null });
   assert.equal(posts, 1);
   const bf = slots.filter((s) => s.papel.startsWith("Black Friday"));
   assert.equal(bf.length, 1);
-  assert.equal(bf[0]!.angulo, "divulgacao_produto");
+  assert.equal(bf[0]!.tipo, "feed_carrossel");
+  assert.notEqual(bf[0]!.angulo, "divulgacao_produto");
   assert.match(bf[0]!.instrucao, /ANTECIPAÇÃO LEVE/);
+  assert.doesNotMatch(bf[0]!.instrucao, /teste genético/);
   assert.match(bf[0]!.instrucao, /INSTRUÇÃO ORIGINAL\n\nPRIORIDADE: neste post vale a regra da BLACK FRIDAY/);
   // Stories só nas duas últimas semanas.
   assert.equal(slots.find((s) => s.tipo === "stories")!.instrucao, "INSTRUÇÃO ORIGINAL");
@@ -67,7 +69,9 @@ test("o bônus é a Leitura Epigenética Funcional para todo mundo; o dela entra
     datas: [{ chave: "black_friday-2026", nome: "Black Friday", data: "2026-11-27", escolha: "promocao", condicao: "bônus de um retorno em 30 dias", produto: "DNA 360" }],
   });
   const { slots } = aplicarCampanhaBlackFriday(semana(), { semanaRef: "2026-11-16", prefs, conta: null });
-  const bf = slots.find((s) => s.papel.startsWith("Black Friday"))!;
+  // Mais perto do dia, o post comercial também leva a Black Friday.
+  const bf = slots.find((s) => s.papel.startsWith("Black Friday") && s.angulo === "divulgacao_produto")!;
+  assert.ok(bf);
   assert.match(bf.instrucao, /Leitura Epigenética Funcional/);
   assert.match(bf.instrucao, /bônus de um retorno em 30 dias/);
   const ruim = validarPreferenciasScanner({

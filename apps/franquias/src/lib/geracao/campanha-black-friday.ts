@@ -104,7 +104,7 @@ export function blocoBlackFriday(params: {
 }): string {
   const { dias, modo, link, bonusDela } = params;
   const bonus =
-    `O bônus da Black Friday é ${LEITURA}. Ele vem para quem começar a consulta com o teste genético.` +
+    `O bônus da Black Friday é ${LEITURA}. Ele vem para quem começar a consulta com o teste nutrigenético.` +
     (bonusDela ? ` Além dele, a profissional oferece este bônus, escrito por ela: "${bonusDela}". Escreva como ela escreveu, sem acrescentar nada.` : "");
   let fase: string;
   if (modo === "mes_todo") {
@@ -122,7 +122,7 @@ export function blocoBlackFriday(params: {
           ? `CONTAGEM REGRESSIVA: faltam ${diasPorExtenso(dias)} para a Black Friday (27 de novembro), o único dia do bônus. Peça para ativar o lembrete e não perder.`
           : dias <= 14
             ? "REVELE O BÔNUS: explique o bônus com calma, em palavras de gente, e diga que ele vale só no dia 27 de novembro."
-            : "ANTECIPAÇÃO LEVE: o post é de CONTEÚDO, sobre o assunto dele. Só no final, avise que no dia 27 de novembro vai ter um bônus especial para quem começar com o teste genético, e peça para ficar de olho. Não revele tudo agora.";
+            : "ANTECIPAÇÃO LEVE: o post é de CONTEÚDO, sobre o assunto dele. Só no final, avise que no dia 27 de novembro vai ter um bônus especial para quem começar a consulta com o teste nutrigenético, e peça para ficar de olho. Não revele tudo agora.";
   }
   const cta = link
     ? `Na legenda, chame para o "link na bio". No campo copy_cta, use EXATAMENTE este link, e nenhum outro: ${link}`
@@ -144,7 +144,7 @@ export function blocoBlackFriday(params: {
  * vence, e vem por último pra não ficar ambíguo.
  */
 export const PRIORIDADE =
-  "PRIORIDADE: neste post vale a regra da BLACK FRIDAY lá em cima. Se alguma instrução pedir preço ou link do catálogo, ignore: sem preço, e o único link é o indicado na regra da Black Friday.";
+  "PRIORIDADE: neste post vale a regra da BLACK FRIDAY lá em cima. Se alguma instrução pedir preço ou link do catálogo, ignore: sem preço, e o único link é o indicado na regra da Black Friday. Se alguma instrução proibir falar de produto, de oferta ou do teste, aqui a Black Friday vence: o aviso do bônus entra, do jeito descrito na regra.";
 
 export function aplicarCampanhaBlackFriday<S extends SlotMinimo>(
   slots: S[],
@@ -170,11 +170,17 @@ export function aplicarCampanhaBlackFriday<S extends SlotMinimo>(
   };
   // Ordem de preferência: o post comercial, os carrosséis, o resto. Nunca
   // stories (eles têm regra própria abaixo) e o tema em alta só no fim.
+  // Na antecipação leve (só no dia, mais de 14 dias antes) o aviso vai num post
+  // de CONTEÚDO: o post comercial da semana segue o de sempre.
   const feed = slots
     .map((s, i) => ({ s, i, d: naData(s) }))
     .filter((x) => x.s.tipo !== "stories" && x.d !== null);
-  const peso = (s: S) => (COMERCIAIS.has(s.angulo) ? 0 : s.tipo === "feed_carrossel" ? 1 : 2) + (ehTemaEmAlta(s) ? 10 : 0);
-  const escolhidos = feed.sort((a, b) => peso(a.s) - peso(b.s) || a.i - b.i).slice(0, quantos);
+  const peso = (s: S, d: number) => {
+    const leve = modo === "so_dia" && d >= 15;
+    const comercial = COMERCIAIS.has(s.angulo) ? (leve ? 3 : 0) : s.tipo === "feed_carrossel" ? 1 : 2;
+    return comercial + (ehTemaEmAlta(s) ? 10 : 0);
+  };
+  const escolhidos = feed.sort((a, b) => peso(a.s, a.d as number) - peso(b.s, b.d as number) || a.i - b.i).slice(0, quantos);
 
   const copia = slots.slice();
   for (const { s, i, d } of escolhidos) {
@@ -191,7 +197,7 @@ export function aplicarCampanhaBlackFriday<S extends SlotMinimo>(
       copia[i] = {
         ...s,
         papel: `Black Friday: contagem regressiva. ${s.papel}`,
-        instrucao: `${blocoBlackFriday({ dias: naData(s) as number, modo, link, bonusDela, stories: true })}\nUse figurinha de contagem regressiva para 27/11 e enquete "Você vai querer o bônus?".\n\n${s.instrucao}`,
+        instrucao: `${blocoBlackFriday({ dias: naData(s) as number, modo, link, bonusDela, stories: true })}\nUse figurinha de contagem regressiva para 27/11 e enquete "Você vai querer o bônus?".\n\n${s.instrucao}\n\n${PRIORIDADE.replace("neste post", "neste stories")} Se a instrução disser "sem oferta", aqui vale o aviso do bônus.`,
       };
     }
   }
