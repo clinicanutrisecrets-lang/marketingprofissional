@@ -4,6 +4,7 @@ import { useState } from "react";
 import { roteiroComoTexto, tempoRoteiro } from "@/lib/videos/marca";
 import type { EstadoVideoMarca } from "@/lib/videos/marca-servidor";
 import { AvisoFaltaVoz } from "./AvisoFaltaVoz";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 /**
  * Vídeos animados na SUA marca: o mesmo vídeo pra todas, com a cor e a logo
@@ -38,13 +39,9 @@ function CartaoVideoMarca({ e }: { e: EstadoVideoMarca }) {
   const v = e.video;
   const [copiado, setCopiado] = useState<"" | "legenda" | "roteiro">("");
   async function copiar(texto: string, qual: "legenda" | "roteiro") {
-    try {
-      await navigator.clipboard?.writeText(texto);
-      setCopiado(qual);
-      setTimeout(() => setCopiado(""), 2000);
-    } catch {
-      // clipboard bloqueado: o texto continua visível pra copiar à mão
-    }
+    if (!(await copiarTexto(texto))) return; // recusado: o texto continua visível pra copiar à mão
+    setCopiado(qual);
+    setTimeout(() => setCopiado(""), 2000);
   }
   const temVideo = !!e.url;
   const teleprompter = `/dashboard/teleprompter?texto=${encodeURIComponent(roteiroComoTexto(v, false))}`;

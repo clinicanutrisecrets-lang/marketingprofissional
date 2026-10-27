@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { PostBibliotecaRow } from "@/lib/biblioteca/gate";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 export type PostBiblioteca = PostBibliotecaRow;
 
@@ -10,13 +11,9 @@ export function PostBibliotecaCard({ post }: { post: PostBiblioteca }) {
   const [aberto, setAberto] = useState(false);
 
   async function copiar() {
-    try {
-      await navigator.clipboard.writeText(post.legenda);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
-    } catch {
-      // clipboard bloqueado
-    }
+    if (!(await copiarTexto(post.legenda))) return; // recusado: a legenda está na tela
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
   }
 
   const arquivo = post.imagem_url?.split("/").pop() ?? "post.jpg";

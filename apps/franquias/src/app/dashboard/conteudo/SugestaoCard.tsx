@@ -5,6 +5,7 @@ import Link from "next/link";
 import { marcarStatusSugestao } from "@/lib/conteudo/actions";
 import { urlEbookNoScanner } from "@/lib/scanner-url";
 import { baixarArquivo } from "@/lib/download-arquivo";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 export type Sugestao = {
   id: string;
@@ -69,13 +70,9 @@ export function SugestaoCard({ sugestao: s }: { sugestao: Sugestao }) {
     .join("\n\n");
 
   async function copiarLegenda() {
-    try {
-      await navigator.clipboard.writeText(legendaCompleta);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
-    } catch {
-      // clipboard bloqueado — usuário pode selecionar manualmente
-    }
+    if (!(await copiarTexto(legendaCompleta))) return; // recusado: a legenda está na tela
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
   }
 
   return (
