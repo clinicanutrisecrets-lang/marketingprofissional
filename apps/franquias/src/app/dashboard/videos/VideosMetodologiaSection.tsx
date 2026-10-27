@@ -7,6 +7,7 @@ import {
   tempoRoteiro,
   type VideoMetodologia,
 } from "@/lib/videos/metodologia";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 /**
  * Vídeos prontos da metodologia: baixar, narrar (ou pôr música), postar e
@@ -35,14 +36,9 @@ function CartaoVideo({ v }: { v: VideoMetodologia }) {
   const [copiado, setCopiado] = useState<"" | "legenda" | "roteiro">("");
 
   async function copiar(texto: string, qual: "legenda" | "roteiro") {
-    try {
-      // `navigator.clipboard` é undefined fora de contexto seguro.
-      await navigator.clipboard?.writeText(texto);
-      setCopiado(qual);
-      setTimeout(() => setCopiado(""), 2000);
-    } catch {
-      // clipboard bloqueado: o texto continua visível pra copiar à mão
-    }
+    if (!(await copiarTexto(texto))) return; // recusado: o texto continua visível pra copiar à mão
+    setCopiado(qual);
+    setTimeout(() => setCopiado(""), 2000);
   }
 
   const teleprompter = `/dashboard/teleprompter?texto=${encodeURIComponent(roteiroComoTexto(v, false))}`;

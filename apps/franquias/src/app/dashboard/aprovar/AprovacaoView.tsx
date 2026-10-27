@@ -17,6 +17,7 @@ import {
 } from "@/lib/posts/actions";
 import { formatDate } from "@/lib/utils";
 import { baixarArquivo } from "@/lib/download-arquivo";
+import { copiarTexto, AVISO_COPIAR_A_MAO } from "@/lib/copiar-texto";
 import { revisarCopy, type AchadoRevisao, type ContextoRevisao } from "@/lib/claude/revisor-copy";
 import {
   legendaParaCopiar,
@@ -424,6 +425,7 @@ function PostCard({
   const [cta, setCta] = useState((post.copy_cta as string) ?? "");
   const [salvando, setSalvando] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  const [avisoCopiar, setAvisoCopiar] = useState(false);
 
   // 🔴 Roda sobre o texto EM EDIÇÃO, não sobre o que está salvo: o aviso tem
   // que sumir no instante em que ela corrige. Aviso que sobra depois do
@@ -484,12 +486,11 @@ function PostCard({
   const [roteiroCopiado, setRoteiroCopiado] = useState(false);
   async function copiarRoteiro() {
     if (!roteiro) return;
-    try {
-      await navigator.clipboard?.writeText(roteiro);
+    const ok = await copiarTexto(roteiro);
+    setAvisoCopiar(!ok);
+    if (ok) {
       setRoteiroCopiado(true);
       setTimeout(() => setRoteiroCopiado(false), 2000);
-    } catch {
-      /* sem clipboard (contexto não seguro): o texto está na tela */
     }
   }
 
@@ -499,12 +500,11 @@ function PostCard({
       copy_cta: cta,
       hashtags: (post.hashtags as string[] | null) ?? null,
     });
-    try {
-      await navigator.clipboard.writeText(texto);
+    const ok = await copiarTexto(texto);
+    setAvisoCopiar(!ok);
+    if (ok) {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
-    } catch {
-      // clipboard bloqueado — a legenda está na tela pra selecionar à mão
     }
   }
 
@@ -645,6 +645,10 @@ function PostCard({
               </button>
             </div>
           </div>
+        )}
+
+        {avisoCopiar && (
+          <p className="mb-2 rounded-md bg-amber-50 px-2 py-1.5 text-xs text-amber-800">{AVISO_COPIAR_A_MAO}</p>
         )}
 
         {achados.length > 0 && <AvisosRevisao achados={achados} />}

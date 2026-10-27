@@ -17,6 +17,7 @@ import { desenharArteDoPostVenda } from "@/lib/posts/arte-venda";
 import { uploadArquivo } from "@/lib/arquivos/actions";
 import { avaliarImagem } from "@/lib/criativo/imagem-upload";
 import { rotuloDeId } from "@/lib/texto/rotulos";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 type PostGerado = {
   headline: string;
@@ -203,13 +204,12 @@ export function PostsVendaClient(props: {
   }
 
   async function copiar(texto: string, chave: string) {
-    try {
-      await navigator.clipboard.writeText(texto);
-      setCopiado(chave);
-      setTimeout(() => setCopiado(null), 2000);
-    } catch {
+    if (!(await copiarTexto(texto))) {
       setErro("Não consegui copiar — seleciona o texto e copia manualmente.");
+      return;
     }
+    setCopiado(chave);
+    setTimeout(() => setCopiado(null), 2000);
   }
 
   return (

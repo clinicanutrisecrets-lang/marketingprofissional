@@ -16,6 +16,7 @@ import {
   type EstiloLegendaId,
   type FiltroId,
 } from "@/lib/corte/opcoes";
+import { copiarTexto } from "@/lib/copiar-texto";
 
 /**
  * Teleprompter com gravação: câmera frontal ao fundo, roteiro rolando por
@@ -382,7 +383,7 @@ export function Teleprompter(props: {
             </a>
             <button
               onClick={() => {
-                void navigator.clipboard.writeText(props.legenda);
+                void copiarTexto(props.legenda);
               }}
               className="rounded-xl bg-white/15 px-4 py-2.5 text-sm font-semibold text-white"
             >
