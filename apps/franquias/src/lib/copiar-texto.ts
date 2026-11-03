@@ -16,15 +16,20 @@
  * pra copiar à mão: nunca mais silêncio.
  */
 export async function copiarTexto(texto: string): Promise<boolean> {
+  // 🔴 O caminho antigo vem PRIMEIRO, ainda dentro do clique (Zulene,
+  // 03/11/2026: "não copia o texto"). No Safari, esperar a recusa do
+  // `navigator.clipboard` gasta o clique, e o `execCommand` que vinha depois
+  // já não valia: os dois falhavam. Síncrono primeiro, moderno de reserva.
+  if (copiarPorSelecao(texto)) return true;
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(texto);
       return true;
     }
   } catch {
-    /* recusado: tenta o caminho antigo abaixo */
+    /* recusado também: a tela avisa pra copiar à mão */
   }
-  return copiarPorSelecao(texto);
+  return false;
 }
 
 function copiarPorSelecao(texto: string): boolean {

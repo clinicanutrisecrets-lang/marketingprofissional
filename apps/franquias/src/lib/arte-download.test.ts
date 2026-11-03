@@ -36,3 +36,30 @@ test("nome de arquivo seguro pro cabeçalho", () => {
   assert.equal(nomeArquivoSeguro(""), "arte.png");
   assert.equal(nomeArquivoSeguro(null), "arte.png");
 });
+
+// Zulene, 03/11/2026: "baixa só uma arte" e "não copia o texto".
+test("zip: só entra arte do Storage do Marketing ou do próprio app, sem nome repetido", async () => {
+  const { itensDoZip } = await import("./arte-download.ts");
+  const base = "https://abc.supabase.co";
+  const itens = itensDoZip(
+    [
+      { u: `${base}/storage/v1/object/sign/franqueadas-assets/x/1.png?token=t`, n: "slide.png" },
+      { u: `${base}/storage/v1/object/sign/franqueadas-assets/x/2.png?token=t`, n: "slide.png" },
+      { u: "/videos-marca/il6.jpg", n: "capa.jpg" },
+      { u: "https://evil.com/x.png", n: "x.png" },
+      { u: "//evil.com/x.png", n: "y.png" },
+    ],
+    base,
+  );
+  assert.deepEqual(itens.map((i) => i.n), ["slide.png", "slide-2.png", "capa.jpg"]);
+});
+
+test("várias artes saem num .zip, e a cópia tenta o caminho síncrono primeiro", async () => {
+  const { readFileSync } = await import("node:fs");
+  const tela = readFileSync(new URL("../app/dashboard/aprovar/AprovacaoView.tsx", import.meta.url), "utf8");
+  assert.match(tela, /baixarVariasArtes\(paraBaixar/);
+  assert.match(tela, /baixarVariasArtes\(itens/);
+  const cp = readFileSync(new URL("./copiar-texto.ts", import.meta.url), "utf8");
+  const corpo = cp.slice(cp.indexOf("export async function copiarTexto"));
+  assert.ok(corpo.indexOf("if (copiarPorSelecao(texto))") >= 0 && corpo.indexOf("if (copiarPorSelecao(texto))") < corpo.indexOf("navigator.clipboard?.writeText"), "o caminho antigo tem que vir antes do await");
+});

@@ -48,3 +48,34 @@ export function enderecoDeDownload(url: string, nome: string): string {
   if (url.startsWith("/") && !url.startsWith("//")) return url;
   return `/api/arte/baixar?u=${encodeURIComponent(url)}&n=${encodeURIComponent(nomeArquivoSeguro(nome))}`;
 }
+
+/**
+ * Várias artes de uma vez (carrossel, "Baixar as N artes") viram UM .zip.
+ *
+ * 🔴 Zulene, 03/11/2026: "baixa só uma arte". Dentro do Scanner (iframe de
+ * outro domínio) o navegador deixa sair o PRIMEIRO download de uma sequência
+ * e bloqueia os seguintes em silêncio, por mais respiro que haja entre eles.
+ * Um arquivo só passa sempre.
+ */
+export type ItemZip = { u: string; n: string };
+
+export const MAX_ITENS_ZIP = 80;
+
+/** Valida o que a tela mandou: só arte do Storage do Marketing ou do próprio app. */
+export function itensDoZip(raw: unknown, supabaseUrl: string | undefined): ItemZip[] {
+  if (!Array.isArray(raw)) return [];
+  const vistos = new Set<string>();
+  const saida: ItemZip[] = [];
+  for (const x of raw.slice(0, MAX_ITENS_ZIP)) {
+    const u = typeof (x as ItemZip)?.u === "string" ? (x as ItemZip).u : "";
+    const propria = u.startsWith("/") && !u.startsWith("//");
+    if (!propria && !urlArtePermitida(u, supabaseUrl)) continue;
+    // Nome repetido dentro do zip sobrescreveria: numera.
+    let n = nomeArquivoSeguro((x as ItemZip).n);
+    let k = 2;
+    while (vistos.has(n)) n = n.replace(/(\.[a-z0-9]+)?$/i, (ext) => `-${k++}${ext}`);
+    vistos.add(n);
+    saida.push({ u, n });
+  }
+  return saida;
+}
