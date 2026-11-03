@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/gerar-semanas",
-      "schedule": "0 9 * * 0"
+      "schedule": "0,30 9-10 * * 0"
     },
     {
       "path": "/api/cron/refazer-fotos-semana",

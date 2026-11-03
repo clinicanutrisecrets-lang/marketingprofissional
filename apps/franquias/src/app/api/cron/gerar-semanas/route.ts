@@ -5,6 +5,7 @@ import { gerarPostsDaSemana } from "@/lib/geracao/semanal";
 import {
   LOTE_PARALELO,
   avisoFilaCortada,
+  semPacoteAinda,
   cabeMaisUmLote,
   filhaIndisponivel,
   lotesDaFila,
@@ -69,13 +70,33 @@ export async function GET(request: Request) {
     return NextResponse.json({ erro: erroLista.message }, { status: 500 });
   }
 
-  const fila = ordenarFila((franqueadas ?? []) as ContaDaFila[]);
+  // Repescagem: o mesmo cron roda mais de uma vez no domingo, e cada rodada
+  // só pega quem ainda está sem post na semana. Erro na leitura = segue com
+  // todas (a geração já pula quem tem a semana montada).
+  const todas = ordenarFila((franqueadas ?? []) as ContaDaFila[]);
+  const idsComPacote = new Set<string>();
+  if (todas.length) {
+    const { data: jaTem, error: erroJaTem } = await admin
+      .from("posts_agendados")
+      .select("franqueada_id")
+      .eq("semana_ref", semanaRef)
+      .in("franqueada_id", todas.map((c) => c.id));
+    if (erroJaTem) {
+      console.error("[gerar-semanas] não deu pra ver quem já tem pacote; segue com todas:", erroJaTem.message);
+    } else {
+      for (const r of (jaTem ?? []) as { franqueada_id: string }[]) idsComPacote.add(r.franqueada_id);
+    }
+  }
+  const fila = semPacoteAinda(todas, idsComPacote);
+  if (idsComPacote.size) {
+    console.log(`[gerar-semanas] ${idsComPacote.size} conta(s) já com pacote de ${semanaRef}; ${fila.length} na fila`);
+  }
   if (fila.length === 0) {
     return NextResponse.json({
       ok: true,
       semanaRef,
       processadas: 0,
-      mensagem: "Nenhuma franqueada ativa",
+      mensagem: idsComPacote.size ? "Todas as contas já têm o pacote da semana" : "Nenhuma franqueada ativa",
     });
   }
 
