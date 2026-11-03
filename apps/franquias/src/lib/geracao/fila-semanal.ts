@@ -126,3 +126,17 @@ export function semanasParaRemontar(agora = new Date()): {
     proxima: segundaDaSemana(agora, 1),
   };
 }
+
+/**
+ * Repescagem (Aline, 03/11/2026): no domingo 01/11 a função acabou antes e 4
+ * contas ficaram sem pacote (Fernanda, Paloma, Mariana Muniz, Zulene), sem
+ * segunda chance. Agora o cron roda de novo no mesmo domingo, e cada rodada
+ * só despacha quem AINDA não tem post na semana. Quem já tem sai da fila
+ * antes do despacho, pra não ocupar vaga de lote.
+ */
+export function semPacoteAinda<T extends ContaDaFila>(
+  fila: readonly T[],
+  idsComPacote: ReadonlySet<string>,
+): T[] {
+  return fila.filter((c) => !idsComPacote.has(c.id));
+}

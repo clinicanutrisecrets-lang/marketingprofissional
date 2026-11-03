@@ -210,3 +210,30 @@ test("o despacho não pode ser cacheado pelo fetch do Next", () => {
   assert.match(src, /fetchCache = "force-no-store"/);
   assert.match(src, /cache: "no-store"/);
 });
+
+// Repescagem (03/11/2026): no domingo 01/11 quatro contas ficaram sem pacote
+// por falta de tempo e não havia segunda rodada.
+test("repescagem: a rodada seguinte só pega quem ainda está sem pacote", async () => {
+  const { semPacoteAinda } = await import("./fila-semanal.ts");
+  const fila = [
+    { id: "a", nome_completo: "A", email: null },
+    { id: "b", nome_completo: "B", email: null },
+    { id: "c", nome_completo: "C", email: null },
+  ];
+  assert.deepEqual(semPacoteAinda(fila, new Set(["a", "c"])).map((c) => c.id), ["b"]);
+});
+
+test("repescagem: o cron roda mais de uma vez no domingo e filtra quem já tem", async () => {
+  const { readFileSync } = await import("node:fs");
+  const vercel = JSON.parse(readFileSync(new URL("../../../vercel.json", import.meta.url), "utf8")) as {
+    crons: { path: string; schedule: string }[];
+  };
+  const c = vercel.crons.find((x) => x.path === "/api/cron/gerar-semanas");
+  assert.ok(c, "o cron de domingo sumiu");
+  const [min, hora, , , dia] = c!.schedule.split(" ");
+  const rodadas = min!.split(",").length * (hora!.includes("-") ? Number(hora!.split("-")[1]) - Number(hora!.split("-")[0]) + 1 : hora!.split(",").length);
+  assert.equal(dia, "0");
+  assert.ok(rodadas >= 3, `só ${rodadas} rodada(s) no domingo`);
+  const rota = readFileSync(new URL("../../app/api/cron/gerar-semanas/route.ts", import.meta.url), "utf8");
+  assert.match(rota, /semPacoteAinda\(/);
+});
