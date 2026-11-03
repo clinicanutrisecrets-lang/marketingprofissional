@@ -10,6 +10,7 @@ import {
 } from "@scanner/ai-image";
 import { ctaDoSlide, semLink, temLink } from "@/lib/criativo/texto-arte";
 import { normalizarFonte } from "@/lib/criativo/fontes";
+import { linkAssinadoOuCaminho } from "@/lib/storage/link-assinado";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -213,10 +214,7 @@ export async function POST(request: Request) {
             .from("franqueadas-assets")
             .upload(path, buffers[i]!, { contentType: "image/png", upsert: false });
           if (upErr) continue;
-          const { data: signed } = await supabase.storage
-            .from("franqueadas-assets")
-            .createSignedUrl(path, 365 * 24 * 60 * 60);
-          const url = signed?.signedUrl ?? path;
+          const url = await linkAssinadoOuCaminho(supabase.storage.from("franqueadas-assets"), path);
           urls.push(url);
           await supabase.from("artes_geradas").insert({
             franqueada_id: f.id,
@@ -266,10 +264,7 @@ export async function POST(request: Request) {
       if (upErr) {
         return NextResponse.json({ erro: `salvar falhou: ${upErr.message}` }, { status: 500 });
       }
-      const { data: signed } = await supabase.storage
-        .from("franqueadas-assets")
-        .createSignedUrl(path, 365 * 24 * 60 * 60);
-      const url = signed?.signedUrl ?? path;
+      const url = await linkAssinadoOuCaminho(supabase.storage.from("franqueadas-assets"), path);
       await supabase.from("artes_geradas").insert({
         franqueada_id: f.id,
         url,

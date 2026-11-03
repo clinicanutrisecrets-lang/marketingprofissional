@@ -13,6 +13,7 @@ import {
   type SlideEditorial,
 } from "@scanner/ai-image";
 import { createAdminClient } from "@/lib/supabase/server";
+import { linkAssinadoOuCaminho } from "@/lib/storage/link-assinado";
 
 const BUCKET = "franqueadas-assets";
 
@@ -74,11 +75,7 @@ export async function gerarEUploadImagem(input: GerarPostInput): Promise<{
 
   if (uploadErr) throw new Error(`upload falhou: ${uploadErr.message}`);
 
-  const { data: signed } = await admin.storage
-    .from(BUCKET)
-    .createSignedUrl(path, 365 * 24 * 60 * 60);
-
-  const url = signed?.signedUrl ?? path;
+  const url = await linkAssinadoOuCaminho(admin.storage.from(BUCKET), path);
 
   return {
     url,
@@ -130,10 +127,7 @@ export async function gerarCarrosselEUpload(input: {
       .from(BUCKET)
       .upload(path, r.buffer, { contentType: "image/png", upsert: false });
     if (error) throw new Error(`upload slide ${i + 1}: ${error.message}`);
-    const { data: signed } = await admin.storage
-      .from(BUCKET)
-      .createSignedUrl(path, 365 * 24 * 60 * 60);
-    urls.push(signed?.signedUrl ?? path);
+    urls.push(await linkAssinadoOuCaminho(admin.storage.from(BUCKET), path));
     custoTotal += r.custoEstimadoUsd;
     tempoTotal += r.tempoMs;
   }
@@ -185,8 +179,7 @@ export async function gerarCarrosselEditorialEUpload(input: {
       .from(BUCKET)
       .upload(path, buffers[i]!, { contentType: "image/png", upsert: false });
     if (error) throw new Error(`upload slide ${i + 1}: ${error.message}`);
-    const { data: signed } = await admin.storage.from(BUCKET).createSignedUrl(path, 365 * 24 * 60 * 60);
-    urls.push(signed?.signedUrl ?? path);
+    urls.push(await linkAssinadoOuCaminho(admin.storage.from(BUCKET), path));
   }
   return { urls };
 }
