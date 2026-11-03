@@ -57,3 +57,47 @@ async function baixarPorBlob(url: string, nome: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Várias artes num .zip só (ver `itensDoZip`). Uma arte só segue no download
+ * de sempre. Envia um formulário escondido: a resposta é anexo, então a tela
+ * não sai do lugar.
+ */
+export async function baixarVariasArtes(
+  itens: { url: string; nome: string }[],
+  nomeZip: string,
+): Promise<boolean> {
+  if (itens.length === 0) return false;
+  if (itens.length === 1) return baixarArquivo(itens[0]!.url, itens[0]!.nome);
+  try {
+    // O formulário vai pra uma moldura escondida: se a rota responder erro,
+    // a tela dela não sai do lugar (o anexo baixa do mesmo jeito).
+    const ALVO = "baixar-zip-alvo";
+    if (!document.querySelector(`iframe[name="${ALVO}"]`)) {
+      const f = document.createElement("iframe");
+      f.name = ALVO;
+      f.style.display = "none";
+      document.body.appendChild(f);
+    }
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/arte/baixar-zip";
+    form.target = ALVO;
+    form.style.display = "none";
+    const campo = (name: string, value: string) => {
+      const i = document.createElement("input");
+      i.type = "hidden";
+      i.name = name;
+      i.value = value;
+      form.appendChild(i);
+    };
+    campo("itens", JSON.stringify(itens.map((x) => ({ u: x.url, n: x.nome }))));
+    campo("nome", nomeZip);
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+    return true;
+  } catch {
+    return false;
+  }
+}

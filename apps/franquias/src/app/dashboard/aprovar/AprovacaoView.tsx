@@ -16,7 +16,7 @@ import {
   gerarPostSubstituto,
 } from "@/lib/posts/actions";
 import { formatDate } from "@/lib/utils";
-import { baixarArquivo } from "@/lib/download-arquivo";
+import { baixarArquivo, baixarVariasArtes } from "@/lib/download-arquivo";
 import { copiarTexto, AVISO_COPIAR_A_MAO } from "@/lib/copiar-texto";
 import { revisarCopy, type AchadoRevisao, type ContextoRevisao } from "@/lib/claude/revisor-copy";
 import {
@@ -149,19 +149,12 @@ export function AprovacaoView({
   async function baixarTudo() {
     if (paraBaixar.length === 0) return;
     setErro(null);
-    let falhou = 0;
-    // Um a um: o navegador engasga com vários downloads simultâneos.
-    for (let i = 0; i < paraBaixar.length; i++) {
-      const a = paraBaixar[i]!;
-      setBaixandoTudo(`${i + 1} de ${paraBaixar.length}`);
-      const ok = await baixarArquivo(a.url, a.nome);
-      if (!ok) falhou++;
-    }
-    setBaixandoTudo(null);
-    if (falhou > 0) {
-      setErro(
-        `${falhou} ${falhou === 1 ? "arte não baixou" : "artes não baixaram"}. Abra o post e use o botão "Baixar arte" dele.`,
-      );
+    // Tudo num .zip: um a um, dentro do Scanner, só a 1ª passava (Zulene, 03/11/2026).
+    setBaixandoTudo(`${paraBaixar.length} artes`);
+    const ok = await baixarVariasArtes(paraBaixar, `artes-semana-${String(aprovacao?.semana_ref ?? "").slice(0, 10)}.zip`);
+    setTimeout(() => setBaixandoTudo(null), 4000);
+    if (!ok) {
+      setErro('As artes não baixaram. Abra o post e use o botão "Baixar arte" dele.');
     }
   }
 
@@ -512,12 +505,9 @@ function PostCard({
     if (!imgUrl || baixando) return;
     setBaixando(true);
     setAvisoDownload(false);
-    let ok = true;
-    for (let i = 0; i < artes.length; i++) {
-      const url = artes[i]!;
-      const certo = await baixarArquivo(url, nomeArquivoDaArte(post, url, ehCarrossel ? i + 1 : undefined));
-      if (!certo) ok = false;
-    }
+    // Carrossel sai num .zip só (dentro do Scanner, só o 1º slide baixava).
+    const itens = artes.map((url, i) => ({ url, nome: nomeArquivoDaArte(post, url, ehCarrossel ? i + 1 : undefined) }));
+    const ok = await baixarVariasArtes(itens, nomeArquivoDaArte(post, artes[0] ?? "").replace(/\.[a-z0-9]+$/i, ".zip"));
     setBaixando(false);
     if (!ok) {
       // Última cartada: abre a arte pra ela salvar com o botão direito.
