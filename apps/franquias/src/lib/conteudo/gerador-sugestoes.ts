@@ -9,6 +9,7 @@ import { acentuarFundo } from "@/lib/texto/acentos-visivel";
 import { renderCard, renderReceita } from "@scanner/ai-image";
 import type { BrandGuidelines, ConteudoPeca, EstiloCapa } from "@scanner/ai-image";
 import { CLAUDE_MODEL_AGENTES } from "@/lib/claude/client";
+import { linkAssinadoOuCaminho } from "@/lib/storage/link-assinado";
 
 const MODEL = CLAUDE_MODEL_AGENTES;
 
@@ -413,10 +414,7 @@ export async function gerarSugestoesSemana(params: {
                 .from("franqueadas-assets")
                 .upload(path, buffer, { contentType: "image/png", upsert: false });
               if (!upErr) {
-                const { data: signed } = await admin.storage
-                  .from("franqueadas-assets")
-                  .createSignedUrl(path, 365 * 24 * 60 * 60);
-                artes.push({ url: signed?.signedUrl ?? path, path, slide: 1 });
+                artes.push({ url: await linkAssinadoOuCaminho(admin.storage.from("franqueadas-assets"), path), path, slide: 1 });
               }
             }
           } catch {
@@ -448,10 +446,7 @@ export async function gerarSugestoesSemana(params: {
             .from("franqueadas-assets")
             .upload(path, buffer, { contentType: "image/png", upsert: false });
           if (!upErr) {
-            const { data: signed } = await admin.storage
-              .from("franqueadas-assets")
-              .createSignedUrl(path, 365 * 24 * 60 * 60);
-            artes.push({ url: signed?.signedUrl ?? path, path, slide: 1 });
+            artes.push({ url: await linkAssinadoOuCaminho(admin.storage.from("franqueadas-assets"), path), path, slide: 1 });
           }
         } else {
           const r = await gerarEUploadImagem({

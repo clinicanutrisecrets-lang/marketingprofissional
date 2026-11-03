@@ -14,6 +14,7 @@ import { validarPublico } from "@/lib/publico/publico";
 import { formatarPrecoBR } from "@/lib/produtos/contexto";
 import { AprovacaoView } from "./AprovacaoView";
 import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
+import { assinarArtesSemLink } from "@/lib/storage/link-assinado";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +102,9 @@ export default async function AprovarPage({
       .eq("aprovacao_semanal_id", escolhida.id)
       .order("data_hora_agendada", { ascending: true });
     posts = (postsData ?? []) as Array<Record<string, unknown>>;
+    // Slide gravado sem link (só o caminho do bucket) aparecia quebrado na
+    // tela (Juliana, 03/11/2026): assina na hora o que estiver sem link.
+    posts = await assinarArtesSemLink(supabase.storage.from("franqueadas-assets"), posts);
     // O vídeo animado ligado ao post ganha o botão de gravar narração.
     const ids = posts.map((p) => p.id as string);
     if (ids.length) {
