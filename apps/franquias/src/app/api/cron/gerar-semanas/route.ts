@@ -49,11 +49,19 @@ export async function GET(request: Request) {
   const inicio = Date.now();
   const admin = createAdminClient();
 
-  // Semana de referência = próxima segunda (da semana que vem)
+  // Semana de referência = próxima segunda (da semana que vem).
+  // `?semana=atual` monta a semana em curso (segunda desta semana): é a
+  // repescagem de quem ficou sem pacote no domingo (03/11/2026). Só quem ainda
+  // não tem post na semana entra, então rodar de novo não duplica nada.
   const d = new Date();
   const dayOfWeek = d.getDay();
-  const diasAteSegunda = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
-  d.setDate(d.getDate() + diasAteSegunda);
+  const semanaAtual = new URL(request.url).searchParams.get("semana") === "atual";
+  if (semanaAtual) {
+    d.setDate(d.getDate() - ((dayOfWeek + 6) % 7));
+  } else {
+    const diasAteSegunda = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
+    d.setDate(d.getDate() + diasAteSegunda);
+  }
   const semanaRef = d.toISOString().slice(0, 10);
 
   // Pega franqueadas ativas com onboarding completo.

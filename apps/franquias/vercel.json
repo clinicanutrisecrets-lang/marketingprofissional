@@ -9,6 +9,10 @@
       "schedule": "0,30 9-10 * * 0"
     },
     {
+      "path": "/api/cron/gerar-semanas?semana=atual",
+      "schedule": "30 17 3 11 *"
+    },
+    {
       "path": "/api/cron/refazer-fotos-semana",
       "schedule": "*/15 * * * *"
     },
