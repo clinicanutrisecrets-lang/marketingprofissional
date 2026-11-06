@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { VIDEOS_METODOLOGIA } from "@/lib/videos/metodologia";
-import { VIDEOS_MARCA } from "@/lib/videos/marca";
+import { buscarVideoMarca } from "@/lib/videos/marca";
 import { pathVideoMarcaPronto } from "@/lib/videos/marca-servidor";
 
 /**
@@ -61,7 +61,7 @@ async function videoDaOrigem(
   }
   if (origem === "marca") {
     // Vídeo na marca dela: o MP4 é dela, no Storage (o molde nunca serve).
-    if (!VIDEOS_MARCA.some((x) => x.id === ref)) return { ok: false, msg: "vídeo não encontrado" };
+    if (!buscarVideoMarca(ref)) return { ok: false, msg: "vídeo não encontrado" };
     const pronto = await pathVideoMarcaPronto(fid, ref);
     if (!pronto) return { ok: false, msg: "o vídeo ainda não ficou pronto" };
     return { ok: true, videoPath: pronto.path };

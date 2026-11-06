@@ -20,3 +20,19 @@ Molde novo: ajustar, copiar pra `public/videos-marca/`, gerar a prévia com
 `packages/video-marca/render.cjs <url> <saida.jpg> --poster <segundo>` e
 acrescentar em `VIDEOS_MARCA` (apps/franquias/src/lib/videos/marca.ts).
 Mudou um molde que já existe: suba `versao`, que refaz o vídeo de todo mundo.
+
+## Vídeos que fecham com o NOME da profissional (Black Friday, 06/11/2026)
+
+- `patch_nome.py <entrada.html> <saida.html>`: para os vídeos feitos com o
+  `video-kit` do Claude Design que trazem `nome`/`crn` nos tweaks (concepção,
+  gestação, nutrigenética). O molde passa a ler `?nome=&registro=` (o
+  registro vem pronto do servidor: "Nutricionista · CRN 10607/PR", ou nada),
+  tira o "Nutricionista" fixo, troca a logo do Scanner pela de `?logo=` (sem
+  logo a pílula some) e desliga o editor. As cores ficam as do vídeo.
+- No catálogo, esses entram em `VIDEOS_BLACK_FRIDAY` com `comNome: true`, e o
+  nome e o CRN passam a fazer parte da assinatura (trocou no cadastro, refaz).
+- `--sem-oferta` (06/11): gera a versão CONTEÚDO do mesmo vídeo (`conteudo-*.html`):
+  a cena da oferta cai para 0,05 s e o fechamento fica sem a linha da Black
+  Friday. O fechamento mora DENTRO da peça da oferta, então some só o miolo.
+- O stories (`bf-stories.html`) tem o nome em dois recursos; o script ajusta os
+  dois e corrige a sobreposição da abertura ("E eu vou te dar um presente").

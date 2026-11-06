@@ -43,6 +43,12 @@ export type VideoMarca = {
    * (lib/geracao/video-marca-semana.ts). Pedaço de palavra vale ("emagrec").
    */
   temas: string[];
+  /**
+   * O molde fecha com o nome e o registro da profissional (`?nome=&registro=`,
+   * scripts/videos-marca/patch_nome.py). Entra na assinatura: trocou o nome
+   * ou o CRN no cadastro, o vídeo é refeito.
+   */
+  comNome?: boolean;
 };
 
 const BASE = "/videos-marca";
@@ -472,6 +478,224 @@ export const VIDEOS_MARCA: VideoMarca[] = [
   },
 ];
 
+/**
+ * Vídeos da Black Friday do Consultório (Aline, 06/11/2026): concepção,
+ * gestação, nutrigenética e um stories de 30 s. Feitos no Claude Design com o nome dela fixo no
+ * fim; o molde agora fecha com o nome e o CRN DE CADA profissional, e com a
+ * logo dela (sem logo, a pílula some). As cores são as do vídeo original.
+ *
+ * Diferente dos de genes acima, NÃO estão em fase de teste: a Aline pediu
+ * para "quem é do Precisão Avançado", e só quem tem o plano de franquia entra
+ * neste app (SSO do Scanner, plano='franquia'), que é o Avançado. Também não
+ * entram no pacote de domingo: são da campanha de novembro.
+ *
+ * O roteiro é a fala da narração, cena por cena, no tempo do vídeo; o texto
+ * escrito já está na tela. Sai no karaokê de /dashboard/narrar.
+ */
+const OFERTA_BF =
+  "Black Friday: no teste nutrigenético de 300 genes, o teste epigenético vem de presente. Ele mostra o que seu corpo precisa agora.";
+const CTA_BF = "Me chama no direct para agendar a sua consulta nutrigenética.";
+
+export const VIDEOS_BLACK_FRIDAY: VideoMarca[] = [
+  {
+    id: "bf-concepcao",
+    titulo: "Epigenética da concepção (Black Friday)",
+    molde: `${BASE}/bf-concepcao.html`,
+    poster: `${BASE}/bf-concepcao.jpg`,
+    versao: 1,
+    duracaoSeg: 82,
+    comNome: true,
+    resumo:
+      "Para o casal que está planejando um bebê: a letra e o volume dos genes, a marca da concepção, o papel da mãe e do pai e a janela de ouro antes da gravidez. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 4, texto: "Planejando um bebê? O cuidado começa antes do positivo." },
+      { de: 4, ate: 10, texto: "Seu filho herda a letra, os genes. E o volume, que dá para cuidar." },
+      { de: 10, ate: 17, texto: "Metade do pai, metade da mãe: a letra é sorteio e não muda. O volume pode mudar." },
+      { de: 17, ate: 24, texto: "Na fecundação, as marcas se apagam. O embrião refaz tudo com o que encontra no ambiente." },
+      { de: 24, ate: 30, texto: "Faltar nutriente na concepção deixou marca por 60 anos. E pode faltar comendo bem." },
+      { de: 30, ate: 38, texto: "Da mãe vêm os tijolos: folato, colina e B12. A genética dela pesa, mesmo que o bebê não herde." },
+      { de: 38, ate: 47, texto: "E o pai? Leva a letra, as marcas e recados da saúde dele. Com sobrepeso, dobra o risco de obesidade no filho." },
+      { de: 47, ate: 55, texto: "Um espermatozoide leva 74 dias para ficar pronto. Por isso, o cuidado do pai começa três meses antes." },
+      { de: 55, ate: 61, texto: "Quanto antes, maior o efeito. A janela de ouro é antes da gravidez." },
+      { de: 61, ate: 68, texto: "Na consulta do casal, olho genes, histórico, sintomas e exames, e monto o plano de cada um." },
+      { de: 68, ate: 77, texto: OFERTA_BF },
+      { de: 77, ate: 82, texto: CTA_BF },
+    ],
+    legenda: [
+      "Vocês estão planejando um bebê? O cuidado começa antes do positivo.",
+      "Seu filho herda de vocês a letra, que são os genes, e o volume, que é a epigenética. A letra é um sorteio. O volume dá para cuidar, e a janela de ouro é antes da gravidez. Vale para os dois: o cuidado do pai começa três meses antes da tentativa.",
+      "Na consulta nutrigenética do casal, eu olho os genes, o histórico, os sintomas e os exames de cada um e monto um plano individual. Serve para quem está tentando e para quem vai fazer FIV.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente. Me chama no direct que eu te explico como funciona a consulta do casal.",
+    ].join("\n\n"),
+    temas: ["concepcao", "fertilidade", "gestac", "bebe", "pre-concepcao", "epigenetic", "black friday"],
+  },
+  {
+    id: "bf-gestacao",
+    titulo: "Genética na gestação (Black Friday)",
+    molde: `${BASE}/bf-gestacao.html`,
+    poster: `${BASE}/bf-gestacao.jpg`,
+    versao: 1,
+    duracaoSeg: 77,
+    comNome: true,
+    resumo:
+      "Para a gestante: o cordão umbilical como memória dos nove meses, gene e ambiente, o que mais mexe no volume dos genes e o que ajuda a cuidar. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 4, texto: "Seu bebê herda seus genes. Mas quem decide como funcionam?" },
+      { de: 4, ate: 9, texto: "A letra, os genes, não muda. O volume dá para cuidar." },
+      { de: 9, ate: 16, texto: "O cordão umbilical guarda as marcas dos nove meses. É como uma foto do bebê ao nascer." },
+      { de: 16, ate: 23, texto: "Não é só gene. Em três de cada quatro regiões que variam, é gene com ambiente." },
+      { de: 23, ate: 30, texto: "O mesmo gene pode ficar quieto num ambiente e ligar em outro. Aí ele passa a importar." },
+      { de: 30, ate: 37, texto: "Contam o peso antes da gestação, glicemia, pressão, cigarro, estresse e idade. Dá para acompanhar e cuidar." },
+      { de: 37, ate: 44, texto: "Um só ponto do cordão explicou mais de um quarto da gordura da criança aos nove anos." },
+      { de: 44, ate: 51, texto: "Em gestantes com diabetes gestacional ou obesidade, esses cuidados suavizaram as marcas no cordão. Cada fase conta." },
+      { de: 51, ate: 58, texto: "Olho seus genes de metilação, inflamação, glicose, saciedade, estresse e sono, e ajusto a cada fase." },
+      { de: 58, ate: 63, texto: "Depois do parto, amamentação, comida, sono e microbiota seguem mexendo no volume." },
+      { de: 63, ate: 72, texto: OFERTA_BF },
+      { de: 72, ate: 77, texto: CTA_BF },
+    ],
+    legenda: [
+      "Seu bebê herda os seus genes. Mas quem decide como eles vão funcionar?",
+      "O cordão umbilical guarda as marcas dos nove meses. Não é só gene, é gene com ambiente. Peso antes da gestação, glicemia, pressão, cigarro e estresse mexem no volume desses genes.",
+      "A boa notícia: dá para acompanhar e cuidar. Começar antes é melhor, mas cada fase conta. Na consulta, eu olho os seus genes, os seus exames e a fase da sua gestação.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente. Me chama no direct que eu te explico como funciona a consulta nutrigenética na gestação.",
+    ].join("\n\n"),
+    temas: ["gestac", "gestante", "gravidez", "bebe", "epigenetic", "black friday"],
+  },
+  {
+    id: "bf-nutrigenetica",
+    titulo: "Nutrigenética: seis genes no seu prato (Black Friday)",
+    molde: `${BASE}/bf-nutrigenetica.html`,
+    poster: `${BASE}/bf-nutrigenetica.jpg`,
+    versao: 1,
+    duracaoSeg: 90,
+    comNome: true,
+    resumo:
+      "Por que a orientação genérica nem sempre funciona: seis genes (MTHFR, TPH1, FADS, FTO, TCF7L2 e os da inflamação) e o ajuste de alimentação de cada um. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 5, texto: "Você já sabe o básico. Então por que nem sempre funciona?" },
+      { de: 5, ate: 10, texto: "Mesmo prato, duas pessoas. Uma tem energia. A outra, inchaço e fome." },
+      { de: 10, ate: 15, texto: "Seus genes respondem à comida. E a comida liga e desliga genes." },
+      { de: 15, ate: 18, texto: "Vou te mostrar seis desses genes." },
+      { de: 18, ate: 26, texto: "O MTHFR ativa o folato. Na variante, ativa menos. Aí entram folhas escuras, ovo, feijão e lentilha." },
+      { de: 26, ate: 34, texto: "O TPH1 transforma triptofano em serotonina. Na variante, isso pode ficar mais lento. Banana, castanhas e grão-de-bico juntos ajudam." },
+      { de: 34, ate: 42, texto: "Os genes FADS convertem o ômega 3 das sementes. Na variante, convertem pouco. Sardinha e salmão já trazem pronto." },
+      { de: 42, ate: 50, texto: "O FTO regula a saciedade. Na variante, o sinal chega fraco. Fibra e proteína em toda refeição ajudam." },
+      { de: 50, ate: 58, texto: "O TCF7L2 cuida da glicose. Na variante, ela sobe mais e demora a baixar. Começar pelos vegetais ajuda." },
+      { de: 58, ate: 66, texto: "IL6 e TNF regulam a inflamação. Na variante, inflama mais e por mais tempo. Cebola, maçã e azeite ajudam." },
+      { de: 66, ate: 71, texto: "A orientação geral é a base. O ajuste vem dos seus genes." },
+      { de: 71, ate: 76, texto: "A letra não muda. O volume muda, e o teste epigenético mostra." },
+      { de: 76, ate: 85, texto: OFERTA_BF },
+      { de: 85, ate: 90, texto: CTA_BF },
+    ],
+    legenda: [
+      "Comer verdura, tomar ômega 3, controlar o açúcar. Você já sabe tudo isso. Então por que nem sempre funciona igual?",
+      "Porque parte da resposta está no seu DNA. Genes como o MTHFR, o FADS e o TCF7L2 mudam o que faz mais sentido no seu prato: o tipo de folato, de onde vem o seu ômega 3, a ordem em que você come.",
+      "A base é a mesma para todo mundo. O ajuste é seu. E o teste epigenético mostra o que está ligado agora no seu corpo.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente. Me chama no direct que eu te explico como funciona a consulta nutrigenética.",
+    ].join("\n\n"),
+    temas: ["nutrigenetic", "genes", "dna", "mthfr", "fto", "black friday"],
+  },
+  {
+    id: "bf-stories",
+    titulo: "Stories da Black Friday (30 segundos)",
+    molde: `${BASE}/bf-stories.html`,
+    poster: `${BASE}/bf-stories.jpg`,
+    versao: 1,
+    duracaoSeg: 30.5,
+    comNome: true,
+    resumo:
+      "Stories de 30 segundos com a oferta da Black Friday: teste nutrigenético de 300 genes, o epigenético de presente e o convite para agendar pelo link ou pelo EU QUERO, fechando com o seu nome.",
+    roteiro: [
+      { de: 0, ate: 4, texto: "Nesta Black Friday, eu tenho um presente para você." },
+      { de: 4, ate: 8.5, texto: "Você come bem e ainda sente incômodos? Pode faltar precisão." },
+      { de: 8.5, ate: 13.5, texto: "O teste nutrigenético olha 300 genes e explica o que você herdou." },
+      { de: 13.5, ate: 19.5, texto: "E ganha de presente o teste epigenético: o que seu corpo precisa agora." },
+      { de: 19.5, ate: 24.5, texto: "Na consulta, junto tudo com seus exames e monto o seu plano." },
+      { de: 24.5, ate: 30.5, texto: "Toque no link e agende sua consulta nutrigenética, ou responda EU QUERO." },
+    ],
+    legenda:
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente. Me chama no direct que eu te explico como funciona a consulta nutrigenética.",
+    temas: ["black friday", "stories", "nutrigenetic"],
+  },
+];
+
+/**
+ * Os mesmos vídeos como CONTEÚDO, sem a Black Friday (Aline, 06/11/2026: "duplica
+ * ele com e sem a Black Friday pra optarem"). O molde é gerado com
+ * `patch_nome.py --sem-oferta`: a cena da oferta cai para 0,05 s e o fechamento
+ * fica só com "Agende sua consulta nutrigenética" e o nome. O roteiro é o da
+ * versão Black Friday sem o trecho da oferta, com o fechamento puxado para cima.
+ */
+function semOferta(v: VideoMarca, id: string, titulo: string, resumo: string, legenda: string): VideoMarca {
+  const i = v.roteiro.findIndex((t) => t.texto === OFERTA_BF);
+  const of = v.roteiro[i]!;
+  const corte = of.ate - of.de - 0.05;
+  const arred = (n: number) => Math.round(n * 100) / 100;
+  const roteiro = v.roteiro
+    .filter((_, k) => k !== i)
+    .map((t, k) => (k < i ? t : { ...t, de: arred(k === i ? of.de : t.de - corte), ate: arred(t.ate - corte) }));
+  return {
+    ...v,
+    id,
+    titulo,
+    resumo,
+    legenda,
+    roteiro,
+    molde: `${BASE}/${id}.html`,
+    poster: v.poster,
+    duracaoSeg: arred(v.duracaoSeg - corte),
+    temas: v.temas.filter((t) => t !== "black friday"),
+  };
+}
+
+const bf = (id: string) => VIDEOS_BLACK_FRIDAY.find((v) => v.id === id)!;
+
+export const VIDEOS_CONTEUDO_NOME: VideoMarca[] = [
+  semOferta(
+    bf("bf-concepcao"),
+    "conteudo-concepcao",
+    "Epigenética da concepção",
+    "Para o casal que está planejando um bebê: a letra e o volume dos genes, a marca da concepção, o papel da mãe e do pai e a janela de ouro antes da gravidez. Fecha com o convite para a consulta e o seu nome.",
+    [
+      "Vocês estão planejando um bebê? O cuidado começa antes do positivo.",
+      "Seu filho herda de vocês a letra, que são os genes, e o volume, que é a epigenética. A letra é um sorteio. O volume dá para cuidar, e a janela de ouro é antes da gravidez. Vale para os dois: o cuidado do pai começa três meses antes da tentativa.",
+      "Na consulta nutrigenética do casal, eu olho os genes, o histórico, os sintomas e os exames de cada um e monto um plano individual. Serve para quem está tentando e para quem vai fazer FIV.",
+      "Me chama no direct que eu te explico como funciona a consulta do casal.",
+    ].join("\n\n"),
+  ),
+  semOferta(
+    bf("bf-gestacao"),
+    "conteudo-gestacao",
+    "Genética na gestação",
+    "Para a gestante: o cordão umbilical como memória dos nove meses, gene e ambiente, o que mais mexe no volume dos genes e o que ajuda a cuidar. Fecha com o convite para a consulta e o seu nome.",
+    [
+      "Seu bebê herda os seus genes. Mas quem decide como eles vão funcionar?",
+      "O cordão umbilical guarda as marcas dos nove meses. Não é só gene, é gene com ambiente. Peso antes da gestação, glicemia, pressão, cigarro e estresse mexem no volume desses genes.",
+      "A boa notícia: dá para acompanhar e cuidar. Começar antes é melhor, mas cada fase conta. Na consulta, eu olho os seus genes, os seus exames e a fase da sua gestação.",
+      "Me chama no direct que eu te explico como funciona a consulta nutrigenética na gestação.",
+    ].join("\n\n"),
+  ),
+  semOferta(
+    bf("bf-nutrigenetica"),
+    "conteudo-nutrigenetica",
+    "Nutrigenética: seis genes no seu prato",
+    "Por que a orientação genérica nem sempre funciona: seis genes (MTHFR, TPH1, FADS, FTO, TCF7L2 e os da inflamação) e o ajuste de alimentação de cada um. Fecha com o convite para a consulta e o seu nome.",
+    [
+      "Comer verdura, tomar ômega 3, controlar o açúcar. Você já sabe tudo isso. Então por que nem sempre funciona igual?",
+      "Porque parte da resposta está no seu DNA. Genes como o MTHFR, o FADS e o TCF7L2 mudam o que faz mais sentido no seu prato: o tipo de folato, de onde vem o seu ômega 3, a ordem em que você come.",
+      "A base é a mesma para todo mundo. O ajuste é seu. E o teste epigenético mostra o que está ligado agora no seu corpo.",
+      "Me chama no direct que eu te explico como funciona a consulta nutrigenética.",
+    ].join("\n\n"),
+  ),
+];
+
+/** Todos os vídeos com molde (genes, Black Friday e conteúdo): narração e busca por id. */
+export const TODOS_VIDEOS_MARCA: VideoMarca[] = [...VIDEOS_MARCA, ...VIDEOS_BLACK_FRIDAY, ...VIDEOS_CONTEUDO_NOME];
+
+export function buscarVideoMarca(id: string | null | undefined): VideoMarca | undefined {
+  return TODOS_VIDEOS_MARCA.find((v) => v.id === id);
+}
+
 /** Fase de teste (Aline, 15/10/2026): só estas contas veem a seção. */
 export const EMAILS_VIDEOS_MARCA = [
   "clinicanutrisecrets@gmail.com",
@@ -484,7 +708,15 @@ export function videosMarcaLiberadosPara(email: string | null | undefined): bool
   return !!e && EMAILS_VIDEOS_MARCA.includes(e);
 }
 
-export type MarcaVideo = { primaria: string; secundaria: string; logoUrl: string | null };
+export type MarcaVideo = {
+  primaria: string;
+  secundaria: string;
+  logoUrl: string | null;
+  /** Só nos moldes `comNome`. Ausente quando o cadastro não tem. */
+  nome?: string;
+  /** "Nutricionista · CRN 10607/PR". Ausente sem CRN: o vídeo fecha só com o nome. */
+  registro?: string;
+};
 
 const HEX = /^#?([0-9a-f]{6})$/i;
 
@@ -508,13 +740,24 @@ export function marcaDoCadastro(f: {
   cor_primaria_hex?: string | null;
   cor_secundaria_hex?: string | null;
   logoUrl?: string | null;
+  nome_completo?: string | null;
+  crn_numero?: string | null;
+  crn_estado?: string | null;
 }): MarcaVideo {
   const logo = (f.logoUrl ?? "").trim();
-  return {
+  const m: MarcaVideo = {
     primaria: corValida(f.cor_primaria_hex) ?? COR_PADRAO.primaria,
     secundaria: corValida(f.cor_secundaria_hex) ?? COR_PADRAO.secundaria,
     logoUrl: /^https:\/\//i.test(logo) ? logo : null,
   };
+  const nome = (f.nome_completo ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
+  if (nome) m.nome = nome;
+  const crn = (f.crn_numero ?? "").trim();
+  const uf = (f.crn_estado ?? "").trim().toUpperCase();
+  // Mesmo formato do rodapé da LP (app/lp/[slug]/LPView.tsx). CRN só existe
+  // para nutricionista; sem ele, nada de profissão inventada.
+  if (crn) m.registro = `Nutricionista · CRN ${crn}${uf ? `/${uf}` : ""}`;
+  return m;
 }
 
 /** Parâmetros que o molde lê do endereço. */
@@ -523,6 +766,8 @@ export function parametrosDoMolde(m: MarcaVideo): string {
   q.set("primaria", m.primaria);
   q.set("secundaria", m.secundaria);
   q.set("logo", m.logoUrl ?? LOGO_VAZIA);
+  if (m.nome) q.set("nome", m.nome);
+  if (m.registro) q.set("registro", m.registro);
   return q.toString();
 }
 
@@ -531,8 +776,12 @@ export function parametrosDoMolde(m: MarcaVideo): string {
  * assinatura e o vídeo é refeito. FNV-1a: curto, estável e sem depender de
  * crypto (roda igual no servidor e no teste).
  */
-export function assinaturaVideoMarca(v: Pick<VideoMarca, "id" | "versao">, m: MarcaVideo): string {
-  const texto = [v.id, v.versao, m.primaria, m.secundaria, m.logoUrl ?? ""].join("|");
+export function assinaturaVideoMarca(v: Pick<VideoMarca, "id" | "versao" | "comNome">, m: MarcaVideo): string {
+  // O nome só entra nos moldes que o mostram: nos de genes, a assinatura
+  // continua a mesma de antes e ninguém tem o vídeo refeito à toa.
+  const partes: Array<string | number> = [v.id, v.versao, m.primaria, m.secundaria, m.logoUrl ?? ""];
+  if (v.comNome) partes.push(m.nome ?? "", m.registro ?? "");
+  const texto = partes.join("|");
   let h = 0x811c9dc5;
   for (let i = 0; i < texto.length; i++) {
     h ^= texto.charCodeAt(i);
