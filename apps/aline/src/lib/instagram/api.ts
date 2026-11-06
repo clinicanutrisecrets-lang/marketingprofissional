@@ -262,3 +262,21 @@ export async function listarConversas(cred: Credenciais, limite = 50): Promise<C
   });
   return r.data ?? [];
 }
+
+export type MensagemDaConversa = { id: string; message?: string; from?: { id: string }; created_time?: string };
+
+/**
+ * As últimas mensagens da conversa da conta com UMA pessoa (pelo IGSID dela).
+ * Serve pra saber se a dona do perfil já conversa com essa pessoa desde
+ * ANTES do robô: o eco só existe pro que sai depois de o webhook estar ligado.
+ */
+export async function mensagensDaConversaCom(cred: Credenciais, igsid: string, limite = 25): Promise<MensagemDaConversa[]> {
+  const r = await chamar<{ data?: Array<{ messages?: { data?: MensagemDaConversa[] } }> }>(cred, `${cred.pathId}/conversations`, {
+    query: {
+      platform: "instagram",
+      user_id: igsid,
+      fields: `messages.limit(${limite}){id,message,from,created_time}`,
+    },
+  });
+  return (r.data ?? []).flatMap((c) => c.messages?.data ?? []);
+}

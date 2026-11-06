@@ -161,6 +161,8 @@ ManyChat cobra mensalidade fixa independente de uso.
 
 ## 7. Estado e bloqueios (medido em 12/10/2026, substitui o de 06/09)
 
+> 🔴 **Estado de 06/11 e a ordem nova pra ligar: `docs/EQUIPE-SOCIAL-MEDIA.md`.** O texto abaixo é de 12/10.
+
 - **O app está publicado e entregando**: chegam comentários, directs e respostas
   de story de seguidoras reais todo dia (só de comentário, 36 "GLP1", 10 "SOMP",
   10 "Bebê" desde setembro).

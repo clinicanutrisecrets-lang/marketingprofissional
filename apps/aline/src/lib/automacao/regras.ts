@@ -309,8 +309,9 @@ export function ehDaPropriaConta(igsid: string, idsDaConta: Array<string | null 
  * Comentário que é pergunta clínica individual não recebe resposta clínica
  * em público: o robô convida pro direct. Lista curta de propósito.
  */
+// "mg" e "ui" só com número antes: "ui que lindo" não é pergunta clínica (06/11).
 const RE_CLINICO =
-  /\b(exame|exames|tomar|tomo|dose|dosagem|suplemento|suplementa|remedio|medicamento|medicacao|diagnostic|doenca|sintoma|posso usar|quanto de|mg|ui|comprimido)\b/;
+  /\b(exame|exames|tomar|tomo|dose|dosagem|suplemento|suplementa|remedio|medicamento|medicacao|diagnostic|doenca|sintoma|posso usar|quanto de|comprimido)\b|\d\s?(mg|ui)\b/;
 
 export function pareceClinico(texto: string): boolean {
   return RE_CLINICO.test(normalizarTexto(texto));
@@ -453,7 +454,8 @@ export function payloadDaOpcao(regraId: string, indice: number): string {
 }
 
 /** regra_id é o id da regra OU "passo:<id do passo de sequência>". */
-export type UltimasOpcoes = { regra_id: string; rotulos: string[] };
+/** `em`: quando a pergunta foi feita. Sem `em` (antes de 06/11) conta como vencida. */
+export type UltimasOpcoes = { regra_id: string; rotulos: string[]; em?: string };
 export const PREFIXO_PASSO = "passo:";
 
 /**

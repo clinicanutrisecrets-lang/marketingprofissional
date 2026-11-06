@@ -8,7 +8,7 @@
  */
 
 import { createAlineClient } from "@/lib/supabase/server";
-import {
+import { mensagensDaConversaCom,
   enviarDm,
   obterPerfilUsuario,
   reagirMensagem,
@@ -49,6 +49,10 @@ import {
   type UltimasOpcoes,
 } from "./regras";
 import { desfechoDaFalha, registroDoDesfecho, type Desfecho } from "./envio";
+import {
+  situacaoDeRisco, TEXTO_CRISE, TEXTO_AGUDO, algumaChaveDeResposta, motivoParaNaoEnviar, opcoesAindaValidas, alineJaEscreveu,
+} from "./seguranca";
+import { semTravessoes } from "@/lib/texto/sem-travessoes";
 import { buscarConhecimentoScanner } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
 import {
@@ -83,9 +87,14 @@ type Contato = {
   ultimas_opcoes: UltimasOpcoes | null;
   /** Quando a Aline escreveu ELA MESMA nesta conversa. Preenchido = robô fora. */
   aline_falou_em: string | null;
+  /** Na fila da Aline ("esperando uma pessoa"): o robô não escreve por conta própria. */
+  precisa_humano: boolean;
+  /** Quando o histórico da conversa foi lido na API (Aline já escrevia antes do robô?). */
+  historico_conferido_em: string | null;
 };
 
-const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes, aline_falou_em";
+// 🔴 historico_conferido_em vem da migração aline/016: aplicar ANTES do deploy.
+const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes, aline_falou_em, precisa_humano, historico_conferido_em";
 const COLS_REGRA =
   "id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade, opcoes";
 const THROTTLE_SAIDA_MS = 20_000;
@@ -150,6 +159,17 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // mensagem da Aline e o robô ofereceu teste genético por cima.)
       if (contato.aline_falou_em) { resumo.ignorados++; continue; }
 
+      // 🔴 A amiga de anos que escreve pela primeira vez depois que o robô
+      // ligou não passou por eco nenhum. Uma vez por contato, o robô lê a
+      // conversa na API: se a Aline já escreveu ali, é conversa dela (06/11).
+      // Comentário não entra: material pedido por palavra-chave vai pra todos.
+      let historicoIncerto = false;
+      if (ev.tipo !== "comentario" && !contato.historico_conferido_em) {
+        const resultado = await conferirHistorico(contato, ev.igsid, cred);
+        if (resultado === "aline") { resumo.ignorados++; continue; }
+        historicoIncerto = resultado === "incerto";
+      }
+
       const config = lerConfig(perfil.automacao_config);
       const orientacoes = blocoOrientacoesDaDona(config);
       const gatilho = ev.tipo as Gatilho;
@@ -163,6 +183,27 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         (usernameContato && config.nao_responder_usernames.includes(usernameContato)) ||
         (nomeContato && config.nao_responder_nomes.includes(nomeContato));
       if (bloqueado) { resumo.ignorados++; continue; }
+
+      // ── Crise ou evento agudo: vence regra, botão, coração e IA ──
+      // 🔴 Nada tratava isso antes de 06/11: a frase de crise recebia
+      // agradecimento simpático em público ou o link de um material. Agora o
+      // robô nunca responde em público, manda UMA mensagem fixa no direct
+      // (CVV 188 / SAMU 192, sem hipótese) e põe a conversa na fila da Aline.
+      const risco = situacaoDeRisco(ev.texto);
+      if (risco) {
+        await marcarPrecisaHumano(contato.id, risco === "crise"
+          ? "🔴 mensagem de sofrimento ou risco à vida: leia agora"
+          : "mensagem de sintoma agudo: o robô orientou procurar atendimento");
+        // Com tudo desligado o robô não fala nem aqui: só avisa a Aline.
+        const roboLigado = algumaChaveDeResposta(config) ||
+          (regrasPorPerfil.get(perfil.id) ?? await carregarRegras(perfil.id)).length > 0;
+        const podeDireto = ev.tipo !== "comentario" || (!!ev.commentId && !ev.parentCommentId);
+        if (roboLigado && podeDireto && !(await saidaRecente(contato.id))) {
+          await entregar({ perfil, cred, contato, ev, texto: risco === "crise" ? TEXTO_CRISE : TEXTO_AGUDO, origem: `risco:${risco}` });
+        }
+        resumo.encaminhados++;
+        continue;
+      }
 
       // Áudio no direct → texto (AssemblyAI). Sem transcrição, segue como "[audio]".
       if (gatilho === "dm" && (!ev.texto || ev.texto.startsWith("["))) {
@@ -190,7 +231,12 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // ── Toque num botão, ou "2", ou o rótulo digitado, ou a frase que quer
       //    dizer um dos botões ("sou farmacêutico" → Outro profissional) ──
       if (gatilho === "dm") {
-        const ultimas = contato.ultimas_opcoes;
+        // 🔴 Pergunta com botões vence em 24 h. Antes nunca vencia, e qualquer
+        // mensagem semanas depois ("paguei e não recebi o acesso") virava a
+        // escolha do botão e recebia o link do material. Toque no botão em si
+        // (payload) continua valendo: é escolha explícita.
+        const ultimas = contato.ultimas_opcoes && opcoesAindaValidas(contato.ultimas_opcoes.em)
+          ? contato.ultimas_opcoes : null;
         const textoLivre = ev.texto.trim() && !ev.texto.startsWith("[") ? ev.texto : "";
         let escolha = casarOpcao(ev, ultimas);
         if (!escolha && ultimas && textoLivre) {
@@ -297,6 +343,13 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           origem = "ia_agradecimento";
         }
         if (!texto) { resumo.erros++; continue; }
+        texto = semTravessoes(texto);
+        const vetoAgradecimento = origem === "ia_agradecimento" ? motivoParaNaoEnviar(texto) : null;
+        if (vetoAgradecimento) {
+          console.warn("[automacao] agradecimento gerado vetado:", vetoAgradecimento);
+          resumo.ignorados++;
+          continue;
+        }
         await responderComentario(cred, ev.commentId!, texto);
         await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem, mediaId: ev.mediaId });
         resumo.agradecimentos++;
@@ -314,6 +367,10 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           resumo.encaminhados++;
           continue;
         }
+
+        // Já está na fila da Aline (ou o histórico não pôde ser lido): o robô
+        // não fala nem curte por conta própria. Material por regra já saiu acima.
+        if (contato.precisa_humano || historicoIncerto) { resumo.ignorados++; continue; }
 
         // ── Modo coração ──
         // 🔴 Em vez de falar em nome dela, o robô só avisa que viu. A Aline
@@ -342,7 +399,21 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           perfil, historico, pergunta: textoPessoa, nomeContato: contato.nome,
           contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
-        if (!resp || !resp.texto) { resumo.erros++; continue; }
+        if (!resp || !resp.texto) {
+          // Sem texto confiável: ninguém fica sem resposta em silêncio.
+          await marcarPrecisaHumano(contato.id, resp?.motivo ?? "o robô não conseguiu responder esta mensagem");
+          resumo.encaminhados++;
+          continue;
+        }
+        const veto = motivoParaNaoEnviar(resp.texto);
+        if (veto) {
+          // 🔴 Prompt é pedido, não garantia: o texto gerado que fala em IA,
+          // afirma diagnóstico, traz dose ou vaza o JSON NÃO sai (06/11).
+          console.warn("[automacao] resposta gerada vetada:", veto);
+          await marcarPrecisaHumano(contato.id, `o robô escreveu uma resposta e segurou (${veto}): responda você`);
+          resumo.encaminhados++;
+          continue;
+        }
         await entregar({ perfil, cred, contato, ev, texto: resp.texto, origem: "ia_scanner" });
         resumo.respostasDm++;
         if (resp.encaminhar) {
@@ -380,7 +451,21 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     const { data } = await aline
       .from("ig_contatos").select("id, aline_falou_em")
       .eq("perfil_id", perfilId).eq("igsid", ev.igsid).maybeSingle();
-    if (!data) return; // ela escreveu pra quem nunca falou com a gente
+    if (!data) {
+      // 🔴 Ela escreveu pra quem o robô ainda não conhece. Antes de 06/11 isto
+      // só voltava, e a pessoa, ao responder, nascia sem trava: o robô
+      // respondia por cima da conversa dela. Eco pra contato desconhecido
+      // nunca é do robô (o robô só escreve pra quem escreveu antes).
+      const agora = new Date().toISOString();
+      const { error } = await aline.from("ig_contatos").insert({
+        perfil_id: perfilId, igsid: ev.igsid, aline_falou_em: agora, historico_conferido_em: agora,
+        ultima_interacao_em: agora,
+      });
+      if (error && !/duplicate key/i.test(error.message)) {
+        console.error("[automacao] não consegui travar a conversa nova da dona do perfil:", error.message);
+      }
+      return;
+    }
     const c = data as { id: string; aline_falou_em: string | null };
     if (c.aline_falou_em) return; // já está travado
 
@@ -568,11 +653,51 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     /** message_id devolvido pela Meta: é o que faz o eco ser reconhecido como NOSSO. */
     externalId?: string | null;
   }) {
-    await aline.from("ig_mensagens").insert({
+    const { error } = await aline.from("ig_mensagens").insert({
       perfil_id: p.perfilId, contato_id: p.contatoId, canal: p.canal, direcao: "saida",
       texto: p.texto, origem: p.origem, regra_id: p.regraId ?? null, media_id: p.mediaId ?? null,
       external_id: p.externalId ?? null,
     });
+    // 🔴 Sem este registro o "uma vez por contato" fica cego (manda de novo) e
+    // o eco do robô é lido como a Aline escrevendo. Falhou: grita no log.
+    if (error) console.error("[automacao] SAÍDA NÃO REGISTRADA (risco de repetir):", p.contatoId, p.origem, error.message);
+  }
+
+  /**
+   * Lê a conversa com a pessoa na API, uma vez por contato.
+   * "aline" = a dona já escreveu ali (contato travado); "livre"; "incerto" =
+   * a leitura falhou (não marca como conferido; tenta no próximo evento, e
+   * nesse meio-tempo o robô não escreve por conta própria).
+   */
+  async function conferirHistorico(contato: Contato, igsid: string, cred: Credenciais): Promise<"aline" | "livre" | "incerto"> {
+    try {
+      const msgs = await mensagensDaConversaCom(cred, igsid);
+      const { data: nossas } = await aline
+        .from("ig_mensagens").select("external_id, texto")
+        .eq("contato_id", contato.id).eq("direcao", "saida");
+      const lista = (nossas ?? []) as Array<{ external_id: string | null; texto: string | null }>;
+      const ids = new Set(lista.map((n) => n.external_id).filter((x): x is string => !!x));
+      const textos = new Set(lista.map((n) => (n.texto ?? "").trim()).filter(Boolean));
+      const agora = new Date().toISOString();
+      const foiEla = alineJaEscreveu(msgs, igsid, ids, textos);
+      const patch: Record<string, unknown> = { historico_conferido_em: agora };
+      if (foiEla) patch.aline_falou_em = agora;
+      const { error } = await aline.from("ig_contatos").update(patch).eq("id", contato.id);
+      if (error) {
+        console.error("[automacao] não gravei a leitura do histórico:", error.message);
+        return foiEla ? "aline" : "incerto";
+      }
+      contato.historico_conferido_em = agora;
+      if (foiEla) {
+        contato.aline_falou_em = agora;
+        console.log("[automacao] a dona já conversava com esta pessoa antes do robô; o robô sai:", contato.id);
+        return "aline";
+      }
+      return "livre";
+    } catch (e) {
+      console.warn("[automacao] não consegui ler o histórico da conversa:", (e as Error).message.slice(0, 300));
+      return "incerto";
+    }
   }
 
   async function aplicarTags(contato: Contato, tags: string[]) {
@@ -603,6 +728,8 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
     /** Botões nativos (quick replies). Sem eles, vai texto puro. */
     botoes?: BotaoRapido[];
   }): Promise<Desfecho> {
+    // Texto fixo (regra, botão, passo) também não sai com travessão.
+    p.texto = semTravessoes(p.texto);
     const porComentario = p.ev.tipo === "comentario" && !!p.ev.commentId;
     let desfecho: Desfecho = "entregue";
     let messageId: string | null = null;
@@ -667,7 +794,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // com o que casar; gravar depois foi o que deixou a resposta da Nara
       // sem destino nenhum.
       if (opcoes.length > 0) {
-        const ultimas: UltimasOpcoes = { regra_id: regra.id, rotulos: opcoes.map((o) => o.rotulo) };
+        const ultimas: UltimasOpcoes = { regra_id: regra.id, rotulos: opcoes.map((o) => o.rotulo), em: new Date().toISOString() };
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", contato.id);
         contato.ultimas_opcoes = ultimas;
       }
@@ -677,7 +804,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       desfechoDireto = await entregar({ perfil, cred, contato, ev, texto, origem: origemRegra, regraId: regra.id, botoes });
     }
     if (ehComentario && regra.resposta_publica && ev.commentId && desfechoDireto !== "recusado") {
-      const texto = preencherTexto(escolherVariante(regra.resposta_publica), vars);
+      const texto = semTravessoes(preencherTexto(escolherVariante(regra.resposta_publica), vars));
       try {
         await responderComentario(cred, ev.commentId, texto);
         await registrarSaida({ perfilId: perfil.id, contatoId: contato.id, canal: "comentario", texto, origem: origemRegra, regraId: regra.id, mediaId: ev.mediaId });

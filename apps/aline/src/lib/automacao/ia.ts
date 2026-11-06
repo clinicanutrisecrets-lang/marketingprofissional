@@ -167,9 +167,11 @@ ${params.contextoScanner.disponivel && params.contextoScanner.blocos
     const bruto = textoDaResposta(msg);
     const json = extrairJson(bruto);
     if (!json) {
-      // Modelo escreveu prosa em vez de JSON: usa a prosa, sem encaminhar.
-      const texto = semContatoInventado(semTravessoes(bruto), contextoDoModelo, "dm").slice(0, 900);
-      return texto ? { texto, encaminhar: false } : null;
+      // 🔴 Fora do formato (JSON quebrado, saída cortada). Antes de 06/11 o
+      // texto bruto ia pra pessoa, e podia sair `{"resposta": ..., "motivo":
+      // "caso individual"}` com o encaminhamento perdido. Agora não sai nada
+      // e a conversa vai pra fila dela.
+      return { texto: "", encaminhar: true, motivo: "o robô não conseguiu montar a resposta: responda você" };
     }
     const texto = semContatoInventado(semTravessoes(String(json.resposta ?? "")).trim(), contextoDoModelo, "dm").slice(0, 900);
     const encaminhar = json.encaminhar === true;

@@ -8,6 +8,8 @@ import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenL
 import { carregarPerfilPorId, credenciaisDoPerfil, salvarTokenRenovado } from "@/lib/instagram/credenciais";
 import { janela24hAberta, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
 import { desfechoDaFalha, registroDoDesfecho, statusNaFila, type Desfecho, type StatusFila } from "./envio";
+import { motivoParaCancelarPasso, proximoHorarioComercial } from "./seguranca";
+import { semTravessoes } from "@/lib/texto/sem-travessoes";
 
 type Passo = { id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null };
 
@@ -125,13 +127,17 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
 
       const { data: contato } = await aline
         .from("ig_contatos")
-        .select("ultima_msg_recebida_em, silenciado")
+        .select("ultima_msg_recebida_em, silenciado, aline_falou_em, precisa_humano")
         .eq("id", item.contato_id)
         .maybeSingle();
-      const c = contato as { ultima_msg_recebida_em: string | null; silenciado: boolean } | null;
+      const c = contato as { ultima_msg_recebida_em: string | null; silenciado: boolean; aline_falou_em: string | null; precisa_humano: boolean } | null;
 
-      if (c?.silenciado) {
-        await marcar(item.id, "cancelado", "contato silenciado");
+      // 🔴 Antes de 06/11 só `silenciado` cancelava: se a Aline entrasse na
+      // conversa depois do material, o "conseguiu ler?" saía por cima dela.
+      const motivoCancelar = motivoParaCancelarPasso(c);
+      if (motivoCancelar) {
+        await marcar(item.id, "cancelado", motivoCancelar);
+        if (item.sequencia_id) await cancelarRestoDaSequencia(item);
         resumo.cancelados++;
         continue;
       }
@@ -143,6 +149,18 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         continue;
       }
 
+      // Passo de sequência é PROATIVO: espera o horário comercial de Brasília
+      // (ROBO-INSTAGRAM.md, seção 2). Se a janela fechar até lá, a próxima
+      // rodada cancela pela regra de cima, como a Meta exige.
+      if (item.sequencia_id) {
+        const agora = new Date();
+        const quando = proximoHorarioComercial(agora);
+        if (quando.getTime() !== agora.getTime()) {
+          await aline.from("ig_fila").update({ enviar_em: quando.toISOString() }).eq("id", item.id).eq("status", "pendente");
+          continue;
+        }
+      }
+
       const opcoes = (item.opcoes ?? []).filter((o) => o.rotulo && o.resposta);
       let botoes: BotaoRapido[] | undefined;
       if (item.tipo === "dm" && opcoes.length > 0 && item.passo_id) {
@@ -150,14 +168,28 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
         botoes = opcoes.map((o, i) => ({ title: o.rotulo, payload: payloadDaOpcao(ref, i) }));
         // 🔴 As opções vão pro contato ANTES do envio: a Meta reclama e
         // entrega do mesmo jeito, e quem responde precisa ter com o que casar.
-        const ultimas: UltimasOpcoes = { regra_id: ref, rotulos: opcoes.map((o) => o.rotulo) };
+        const ultimas: UltimasOpcoes = { regra_id: ref, rotulos: opcoes.map((o) => o.rotulo), em: new Date().toISOString() };
         await aline.from("ig_contatos").update({ ultimas_opcoes: ultimas }).eq("id", item.contato_id);
       }
 
       // A tentativa é contada ANTES de sair, pra que uma função cortada no
       // meio do envio também conte (e caia na guarda de cima na rodada
       // seguinte, em vez de mandar de novo).
-      await aline.from("ig_fila").update({ tentativas: (item.tentativas ?? 0) + 1 }).eq("id", item.id);
+      //
+      // 🔴 E a contagem é a RESERVA da linha: só sobe se ninguém mexeu nela
+      // desde a leitura. Duas rodadas sobrepostas do cron liam a mesma linha e
+      // mandavam o mesmo passo duas vezes; agora a segunda não consegue
+      // reservar e pula. Erro aqui também para: sem contar, não manda.
+      const { data: reservada, error: errReserva } = await aline
+        .from("ig_fila")
+        .update({ tentativas: (item.tentativas ?? 0) + 1 })
+        .eq("id", item.id).eq("status", "pendente").eq("tentativas", item.tentativas ?? 0)
+        .select("id");
+      if (errReserva || !reservada || reservada.length === 0) {
+        if (errReserva) console.error("[automacao/fila] não reservei a linha, não mando:", item.id, errReserva.message);
+        continue;
+      }
+      item.texto = semTravessoes(item.texto);
 
       // Tentativa ÚNICA, e o registro sai mesmo quando a Meta reclama — ver
       // a régua em ./envio.ts (incidente 29/09/2026).
