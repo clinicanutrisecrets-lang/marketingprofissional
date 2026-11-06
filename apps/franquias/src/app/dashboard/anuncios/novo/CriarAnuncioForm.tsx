@@ -148,7 +148,7 @@ export function CriarAnuncioForm({
             <BenchCell label="Ruim" value={benchmark.valor_ruim} cor="text-red-600" />
           </div>
           <p className="mt-2 text-xs text-blue-700">
-            Métrica: {benchmark.metrica.toUpperCase()} — valores em R$ (fonte: Meta Ads BR)
+            Métrica: {benchmark.metrica.toUpperCase()}. Valores em R$ (fonte: Meta Ads BR)
           </p>
         </div>
       )}
@@ -185,7 +185,7 @@ export function CriarAnuncioForm({
       {funis.length === 0 && (
         <div className="rounded-lg border border-dashed border-brand-text/20 p-3 text-xs text-brand-text/60">
           Nenhum funil configurado. Pode usar o link de CTA padrão:{" "}
-          <code className="rounded bg-brand-muted px-1">{linkCtaPadrao ?? "—"}</code>
+          <code className="rounded bg-brand-muted px-1">{linkCtaPadrao ?? "-"}</code>
         </div>
       )}
 
@@ -267,7 +267,7 @@ export function CriarAnuncioForm({
           value={videoUrl}
           onChange={setVideoUrl}
           placeholder="https://..."
-          hint="MP4, MOV ou AVI — até 500MB"
+          hint="MP4, MOV ou AVI, até 500MB"
         />
       </div>
 

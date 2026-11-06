@@ -32,7 +32,7 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
       <h2 className="text-lg font-semibold text-brand-text">🎬 Reels animados</h2>
       <p className="mt-1 text-sm text-brand-text/60">
         Vídeo 9:16 animado no estilo Detetive da Saúde: sintomas, genes,
-        alimentos e exames — gerado do zero pra sua marca. Pronto em ~10 min.
+        alimentos e exames, gerado do zero pra sua marca. Pronto em ~10 min.
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -40,7 +40,7 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
           value={tema}
           onChange={(e) => setTema(e.target.value)}
           maxLength={120}
-          placeholder="Tema — ex.: menopausa, SOP, intestino irritável..."
+          placeholder="Tema, ex.: menopausa, SOP, intestino irritável..."
           className="min-w-56 flex-1 rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
         />
         <select
@@ -107,7 +107,7 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
                 </div>
               ) : r.status === "erro" ? (
                 <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                  erro — tente de novo
+                  erro, tente de novo
                 </span>
               ) : travou(r) ? (
                 // 🔴 "renderizando" eterno é pior que erro: a nutri fica
@@ -116,7 +116,7 @@ export function ReelAnimadoSection({ reels }: { reels: ReelAnimado[] }) {
                 // marca 'erro' no banco — o registro fica em 'gerando' pra
                 // sempre. Passou muito do prazo, a tela assume a falha.
                 <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                  não ficou pronto — gere de novo
+                  não ficou pronto, gere de novo
                 </span>
               ) : (
                 <span className="animate-pulse rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">

@@ -76,7 +76,7 @@ export default async function RevisoesAdsPage() {
                         </span>
                       </div>
                       <p className="line-clamp-2 text-sm text-brand-text/80">
-                        {r.resumo_executivo ?? "—"}
+                        {r.resumo_executivo ?? "-"}
                       </p>
                       <div className="mt-2 flex flex-wrap gap-3 text-xs text-brand-text/60">
                         <span>📊 {r.campanhas_analisadas} campanhas</span>

@@ -120,7 +120,7 @@ export function AuditoriaView({
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-brand-text">20 ideias de conteúdo</h2>
         <p className="mt-1 text-sm text-brand-text/70">
-          Cada uma pronta pra virar post — escolha e envie pro planejador semanal.
+          Cada uma pronta pra virar post. Escolha e envie pro planejador semanal.
         </p>
         <ol className="mt-5 space-y-3">
           {auditoria.ideias_por_gap.map((i) => (
@@ -165,7 +165,7 @@ export function AuditoriaView({
         <ul className="mt-3 space-y-2 text-sm text-brand-text/85">
           {auditoria.erros_recorrentes.map((e, i) => (
             <li key={i}>
-              <strong>{e.erro}</strong> — <span className="text-brand-text/70">{e.impacto}</span>
+              <strong>{e.erro}</strong>: <span className="text-brand-text/70">{e.impacto}</span>
             </li>
           ))}
         </ul>

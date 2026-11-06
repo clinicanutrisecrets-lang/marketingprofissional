@@ -146,17 +146,17 @@ export function StorytellingView({
                   onChange={(e) => setDepoSelecionado(e.target.value || null)}
                   className="mt-1 w-full rounded-lg border border-brand-text/15 px-3 py-2 text-sm"
                 >
-                  <option value="">— Novo depoimento (preencher abaixo) —</option>
+                  <option value="">Novo depoimento (preencher abaixo)</option>
                   {depoimentos.map((d) => (
                     <option key={d.id} value={d.id}>
-                      {d.titulo} — {d.quem_era ?? ""}
+                      {d.titulo}{d.quem_era ? `: ${d.quem_era}` : ""}
                     </option>
                   ))}
                 </select>
               </div>
             ) : (
               <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
-                Você ainda não cadastrou depoimentos. Preencha abaixo — e no futuro use a tela
+                Você ainda não cadastrou depoimentos. Preencha abaixo e, no futuro, use a tela
                 de depoimentos pra salvar casos pra reuso.
               </div>
             )}
@@ -167,7 +167,7 @@ export function StorytellingView({
                 <Campo label="Problema inicial" value={problemaInicial} onChange={setProblemaInicial} textarea />
                 <Campo label="Ponto de ruptura (o que fez procurar)" value={pontoRuptura} onChange={setPontoRuptura} />
                 <Campo label="Solução aplicada" value={solucaoAplicada} onChange={setSolucaoAplicada} textarea />
-                <Campo label="Resultado (qualitativo — sem peso/medida)" value={resultado} onChange={setResultado} textarea />
+                <Campo label="Resultado (qualitativo, sem peso/medida)" value={resultado} onChange={setResultado} textarea />
                 <Campo label="Objeções que ela relatou" value={objecoes} onChange={setObjecoes} textarea />
               </div>
             )}
@@ -237,7 +237,7 @@ export function StorytellingView({
                   </span>
                 </div>
                 <p className="mt-2 line-clamp-3 text-brand-text/80">
-                  {h.versao_post_curto ?? h.versao_post_longo ?? "—"}
+                  {h.versao_post_curto ?? h.versao_post_longo ?? "-"}
                 </p>
               </li>
             ))}

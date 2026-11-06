@@ -76,7 +76,7 @@ export function LPViewNutri({
   const faqAtendimento = soOnline
     ? {
         q: "O atendimento é online?",
-        a: "Sim — o atendimento é 100% online, para pacientes de todo o Brasil (e brasileiros no exterior). Consulta por vídeo, com a mesma profundidade da presencial. No primeiro contato no WhatsApp combinamos tudo.",
+        a: "Sim, o atendimento é 100% online, para pacientes de todo o Brasil (e brasileiros no exterior). Consulta por vídeo, com a mesma profundidade da presencial. No primeiro contato no WhatsApp combinamos tudo.",
       }
     : soPresencial
       ? {
@@ -764,7 +764,7 @@ export function LPViewNutri({
               franqueada.aceita_plano_saude === true
                 ? {
                     q: "Atende plano de saúde?",
-                    a: "Sim, atendo por plano de saúde — confirme no WhatsApp se o seu está entre os aceitos. Também atendo particular, com recibo pra pedir reembolso.",
+                    a: "Sim, atendo por plano de saúde. Confirme no WhatsApp se o seu está entre os aceitos. Também atendo particular, com recibo pra pedir reembolso.",
                   }
                 : {
                     q: "Atende plano de saúde?",

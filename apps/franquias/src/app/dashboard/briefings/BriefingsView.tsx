@@ -202,7 +202,7 @@ export default function BriefingsView({
           {pendentes.length === 0 ? (
             <div className="rounded-2xl bg-white p-6 text-center text-sm text-brand-text/50 shadow-sm">
               Nenhum tema esperando. Os que você já pediu e viraram post estão
-              logo abaixo, no histórico — com o link pra vê-los no Estúdio.
+              logo abaixo, no histórico, com o link pra vê-los no Estúdio.
               Adicione temas acima e eles entram no pacote do próximo domingo.
             </div>
           ) : (
@@ -255,7 +255,7 @@ export default function BriefingsView({
                         ) : b.status === "cancelado" ? (
                           `Cancelado em ${formatarData(b.cancelado_em)}`
                         ) : (
-                          `Expirou — não entrou em nenhuma semana`
+                          `Expirou: não entrou em nenhuma semana`
                         )}
                       </div>
                     </div>
@@ -338,7 +338,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function formatarData(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso).toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",

@@ -186,15 +186,15 @@ export function CalculadoraBudget({ budgetAtual, onChangeBudget }: Props) {
         <div className="font-semibold mb-2">💡 Esse valor é pago direto ao Facebook</div>
         <p className="leading-relaxed">
           O budget que você escolher acima vai <strong>100% pro Meta (Facebook/Instagram)</strong>{" "}
-          como pagamento de mídia. <strong>Scanner não cobra comissão sobre ad spend</strong> —
+          como pagamento de mídia. <strong>Scanner não cobra comissão sobre ad spend</strong>:
           nosso plano de assinatura já cobre o gerenciamento. Você paga só o que o Meta
           consumir.
         </p>
         <p className="mt-2 leading-relaxed">
-          O piso de R$ 1.500-3.000/mês não é nosso interesse — é uma{" "}
+          O piso de R$ 1.500-3.000/mês não é nosso interesse. É uma{" "}
           <strong>limitação técnica do algoritmo do Meta</strong>: abaixo desse volume ele
           não consegue otimizar entrega e custo por conversão fica artificialmente alto.
-          Se você prefere começar sem ads, perfeitamente possível —{" "}
+          Se você prefere começar sem ads, perfeitamente possível:{" "}
           <strong>desmarque a opção acima</strong> e o sistema foca 100% em orgânico.
         </p>
       </div>
@@ -246,22 +246,22 @@ export function CalculadoraBudget({ budgetAtual, onChangeBudget }: Props) {
           </p>
           <ul className="ml-5 list-disc space-y-1">
             <li>
-              <strong>R$ 650</strong> — primeira consulta (100%)
+              <strong>R$ 650</strong>: primeira consulta (100%)
             </li>
             <li>
-              <strong>R$ 400</strong> — comissão do teste nutrigenético (~30% dos casos)
+              <strong>R$ 400</strong>: comissão do teste nutrigenético (~30% dos casos)
             </li>
             <li>
-              <strong>R$ 1.950</strong> — tratamento nutrigenético (3 meses × R$ 650, ~50%
+              <strong>R$ 1.950</strong>: tratamento nutrigenético (3 meses × R$ 650, ~50%
               das pacientes retornam)
             </li>
             <li>
-              <strong>R$ 650</strong> — checkup anual (~40% das pacientes)
+              <strong>R$ 650</strong>: checkup anual (~40% das pacientes)
             </li>
           </ul>
           <p className="font-semibold">LTV médio: ~R$ 2.000 por paciente em 12 meses.</p>
           <p className="text-xs italic text-brand-text/60">
-            💡 Em breve: teste epigenético — novo produto que liberamos no próximo
+            💡 Em breve: teste epigenético, novo produto que liberamos no próximo
             trimestre, com comissão estimada de R$ 600 por paciente. Vai somar ao seu LTV
             quando disponível.
           </p>
@@ -281,7 +281,7 @@ export function CalculadoraBudget({ budgetAtual, onChangeBudget }: Props) {
             <strong>1,5-2x maior</strong> que a média estável.
           </p>
           <p>
-            <strong>Isso não significa que os ads não funcionam</strong> — significa que
+            <strong>Isso não significa que os ads não funcionam</strong>. Significa que
             você está pagando o "treinamento" do algoritmo. Pacientes vêm sim, só são mais
             caros nessa fase.
           </p>

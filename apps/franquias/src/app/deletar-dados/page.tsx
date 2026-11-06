@@ -76,7 +76,7 @@ export default function DeletarDadosPage() {
             </li>
             <li>
               Registros financeiros obrigatórios por lei (notas fiscais, dados
-              contábeis) — retidos por 5 anos conforme legislação
+              contábeis), retidos por 5 anos conforme legislação
             </li>
           </ul>
 
@@ -131,7 +131,7 @@ export default function DeletarDadosPage() {
 
           <div className="mb-4">
             <label className="mb-1 block text-sm font-medium" htmlFor="motivo">
-              Motivo (opcional — ajuda a melhorar o produto)
+              Motivo (opcional, ajuda a melhorar o produto)
             </label>
             <textarea
               id="motivo"

@@ -23,7 +23,7 @@ export function CriarPostForm() {
       const extras: string[] = [];
       extras.push(`Tema sugerido: ${tema}`);
       if (angulo) extras.push(`Ângulo: ${rotuloDeId(angulo)}`);
-      setBriefing(extras.join(" — "));
+      setBriefing(extras.join(". "));
     }
   }, [searchParams]);
   const [legenda, setLegenda] = useState("");
@@ -94,7 +94,7 @@ export function CriarPostForm() {
         legenda_gerada_ia: gerandoIA,
       });
       if (r.ok) {
-        setMsg("Post salvo! Ele fica na sua biblioteca — é só copiar a legenda e publicar no seu Instagram.");
+        setMsg("Post salvo! Ele fica na sua biblioteca. É só copiar a legenda e publicar no seu Instagram.");
         setTimeout(() => router.push("/dashboard/aprovar"), 1500);
       } else {
         setErro(r.erro ?? "Erro");
@@ -147,7 +147,7 @@ export function CriarPostForm() {
         name="briefing"
         value={briefing}
         onChange={setBriefing}
-        placeholder="Ex: quero falar sobre vitamina D e K2 juntas — explicando a sinergia de forma acessível"
+        placeholder="Ex: quero falar sobre vitamina D e K2 juntas, explicando a sinergia de forma acessível"
         rows={2}
         hint="Preencha só se quiser que o Scanner escreva a legenda. Se for escrever você mesma, pule."
       />
@@ -205,7 +205,7 @@ export function CriarPostForm() {
       </button>
       <p className="text-center text-xs leading-relaxed text-brand-text/50">
         O post fica salvo na sua biblioteca. A publicação no Instagram é feita
-        por você — publicar automático depende de uma liberação da Meta que
+        por você. Publicar automático depende de uma liberação da Meta que
         ainda não saiu.
       </p>
     </div>

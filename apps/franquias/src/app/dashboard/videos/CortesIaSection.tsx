@@ -178,14 +178,14 @@ export function CortesIaSection({ cortes }: { cortes: CorteIa[] }) {
                     title={c.erro_msg ?? undefined}
                     className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"
                   >
-                    erro — grave de novo{c.erro_msg ? ` (${c.erro_msg.slice(0, 60)})` : ""}
+                    erro, grave de novo{c.erro_msg ? ` (${c.erro_msg.slice(0, 60)})` : ""}
                   </span>
                   <BotaoApagar corte={c} apagando={apagando === c.id} onApagar={apagar} />
                 </div>
               ) : travou(c) ? (
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                    não ficou pronto — grave de novo
+                    não ficou pronto, grave de novo
                   </span>
                   <BotaoApagar corte={c} apagando={apagando === c.id} onApagar={apagar} />
                 </div>

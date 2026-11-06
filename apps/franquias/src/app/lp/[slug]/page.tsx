@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!franqueada) return { title: "Página não encontrada" };
   const nome = franqueada.nome_comercial || franqueada.nome_completo;
   return {
-    title: `${nome} — Nutrição de Precisão`,
+    title: `${nome} | Nutrição de Precisão`,
     description:
       (franqueada.tagline as string) ||
       (franqueada.descricao_longa as string)?.slice(0, 160),

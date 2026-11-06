@@ -405,7 +405,7 @@ export function Teleprompter(props: {
               {rolando ? "⏸ Pausar rolagem" : "▶️ Rolar roteiro"}
             </button>
             <p className="max-w-xs text-xs text-white/60">
-              Sem câmera aqui — use este aparelho como teleprompter e grave com outro.
+              Sem câmera aqui. Use este aparelho como teleprompter e grave com outro.
             </p>
           </div>
         ) : (

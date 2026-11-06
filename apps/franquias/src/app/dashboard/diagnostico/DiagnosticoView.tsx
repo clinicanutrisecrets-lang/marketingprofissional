@@ -119,7 +119,7 @@ export function DiagnosticoView({ franqueadaId, diagnosticoInicial }: Props) {
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-brand-text">10 mudanças priorizadas</h2>
         <p className="mt-1 text-sm text-brand-text/70">
-          Ordem recomendada — quick wins primeiro.
+          Ordem recomendada: quick wins primeiro.
         </p>
         <ol className="mt-5 space-y-4">
           {diagnostico.mudancas_priorizadas.map((m) => (

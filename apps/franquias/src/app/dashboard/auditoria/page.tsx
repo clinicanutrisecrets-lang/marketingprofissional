@@ -37,7 +37,7 @@ export default async function AuditoriaPage() {
         </h1>
         <p className="mt-1 text-sm text-brand-text/70">
           Análise dos seus últimos posts, identificação de gaps e 20 ideias prontas pra
-          virar post — ordenadas por impacto.
+          virar post, ordenadas por impacto.
         </p>
 
         <AuditoriaView auditoriaInicial={auditoriaAtual as Record<string, unknown> | null} />

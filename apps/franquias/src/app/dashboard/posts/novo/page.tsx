@@ -38,14 +38,14 @@ export default async function NovoPostPage() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">Criar post manual</h1>
           <p className="mt-1 text-sm text-brand-text/70">
-            É pra quando <strong>você já tem a foto ou o vídeo</strong> — tirou
-            no consultório, gravou um story, recebeu do fotógrafo — e quer a
+            É pra quando <strong>você já tem a foto ou o vídeo</strong> (tirou
+            no consultório, gravou um story, recebeu do fotógrafo) e quer a
             legenda pronta em cima dela.
           </p>
           <p className="mt-3 rounded-lg bg-white px-4 py-3 text-sm text-brand-text/70 shadow-sm">
             Sobe a mídia, escreve a legenda (ou pede pra escrever por você), e
             salva. O post fica guardado na sua biblioteca com legenda e
-            hashtags prontas pra copiar — <strong>quem publica no Instagram é
+            hashtags prontas pra copiar. <strong>Quem publica no Instagram é
             você</strong>.
             <br />
             <span className="text-brand-text/50">

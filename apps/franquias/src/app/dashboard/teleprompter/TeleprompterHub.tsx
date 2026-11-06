@@ -15,7 +15,7 @@ export type RoteiroSemana = {
 
 const EXEMPLO = `Você sabia que a resposta do seu corpo à comida está escrita nos seus genes?
 
-Duas pessoas comem exatamente a mesma coisa — uma inflama, a outra não.
+Duas pessoas comem exatamente a mesma coisa: uma inflama, a outra não.
 
 Isso não é sorte. É genética e microbiota.
 

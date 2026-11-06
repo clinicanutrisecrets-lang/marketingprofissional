@@ -433,7 +433,7 @@ function PostCard({
   const data = post.data_hora_agendada
     ? new Date(post.data_hora_agendada as string)
     : null;
-  const diaLabel = data ? `${DIAS_SEMANA[data.getDay()]} · ${data.toLocaleDateString("pt-BR")}` : "—";
+  const diaLabel = data ? `${DIAS_SEMANA[data.getDay()]} · ${data.toLocaleDateString("pt-BR")}` : "-";
   const horaLabel = data ? data.toTimeString().slice(0, 5) : "";
   const status = (post.status as string) ?? "aguardando_aprovacao";
   const artes = artesDoPost(post);

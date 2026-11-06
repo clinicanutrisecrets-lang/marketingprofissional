@@ -66,7 +66,7 @@ export default async function RevisaoDetalhePage({ params }: PageProps) {
             Revisão {formatPeriodo(r.periodo_inicio as string, r.periodo_fim as string)}
           </h1>
           <p className="mt-3 text-base leading-relaxed text-brand-text/80">
-            {(r.resumo_executivo as string) ?? "—"}
+            {(r.resumo_executivo as string) ?? "-"}
           </p>
 
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -81,7 +81,7 @@ export default async function RevisaoDetalhePage({ params }: PageProps) {
               value={
                 r.cpl_medio
                   ? `R$ ${Number(r.cpl_medio).toFixed(2)}`
-                  : "—"
+                  : "-"
               }
             />
           </div>
@@ -108,7 +108,7 @@ export default async function RevisaoDetalhePage({ params }: PageProps) {
           </h2>
           {recomendacoes.length === 0 ? (
             <p className="text-sm text-brand-text/60">
-              Nenhuma ação recomendada agora — siga monitorando.
+              Nenhuma ação recomendada agora. Siga monitorando.
             </p>
           ) : (
             <ol className="space-y-4">

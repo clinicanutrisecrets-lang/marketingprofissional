@@ -56,7 +56,7 @@ export default function LoginPage() {
             tiver expirado, ele pede o login DE LÁ e volta pra cá sozinho. */}
         <div className="mb-6 rounded-lg bg-brand-muted p-4 text-sm leading-relaxed text-brand-text/70">
           <p className="mb-3">
-            Você não tem senha aqui — entra com o{" "}
+            Você não tem senha aqui. Entra com o{" "}
             <strong>mesmo login do Scanner da Saúde</strong>.
           </p>
           <a

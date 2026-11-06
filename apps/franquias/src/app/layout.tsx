@@ -4,7 +4,7 @@ import { RecuperacaoRedirect } from "./RecuperacaoRedirect";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.scannerdasaude.com"),
-  title: "Scanner da Saúde — Marketing Profissional",
+  title: "Scanner da Saúde | Marketing Profissional",
   description:
     "Marketing produzido para nutricionistas do Consultório de Precisão: posts de Instagram no seu tom de voz, semana de conteúdo pronta para aprovar e posts de venda dos seus produtos.",
   openGraph: {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: "https://app.scannerdasaude.com",
     siteName: "Scanner da Saúde",
-    title: "Scanner da Saúde — Marketing Profissional",
+    title: "Scanner da Saúde | Marketing Profissional",
     description:
       "Marketing produzido para nutricionistas do Consultório de Precisão: posts de Instagram no seu tom de voz, semana de conteúdo pronta para aprovar e posts de venda dos seus produtos.",
   },

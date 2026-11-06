@@ -178,7 +178,7 @@ export function emailErroPublicacao(nome: string, erro: string, linkDashboard: s
     </p>
   `;
   return {
-    assunto: "⚠️ Erro ao publicar — ação necessária",
+    assunto: "⚠️ Erro ao publicar: ação necessária",
     html: wrap(conteudo),
     texto: `Erro ao publicar: ${erro}. Veja em: ${linkDashboard}`,
   };
@@ -223,7 +223,7 @@ export function emailRevisaoAdsPronta(params: {
     </p>
   `;
   return {
-    assunto: `📊 Revisão semanal Ads — ${params.statusGeral}`,
+    assunto: `📊 Revisão semanal Ads: ${params.statusGeral}`,
     html: wrap(conteudo),
     texto: `${params.resumoExecutivo}\n\nVer completa: ${params.linkRevisao}`,
   };
@@ -247,7 +247,7 @@ export function emailCriativoProntoParaAprovacao(params: {
     </div>
     <p style="${baseStyles.p}">
       É só escolher a variação que mais combina com você e aprovar. Assim que você aprovar,
-      o sistema lança a campanha automaticamente — público, segmentação e ativação, tudo no piloto automático.
+      o sistema lança a campanha automaticamente: público, segmentação e ativação, tudo no piloto automático.
     </p>
     <p style="margin: 24px 0;">
       <a href="${params.linkAprovar}" style="${baseStyles.button}">Revisar e aprovar criativo →</a>
