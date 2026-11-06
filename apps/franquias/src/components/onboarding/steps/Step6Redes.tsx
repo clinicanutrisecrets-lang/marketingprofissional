@@ -2,24 +2,20 @@
 
 import { useState } from "react";
 import { Field, FormWrapper } from "@/components/ui/Field";
-import { metaAdsAtivo, publerAtivo, publerContasUrl } from "@/lib/features";
+import { metaAdsAtivo } from "@/lib/features";
 import type { StepFormProps } from "../Wizard";
 
 export function Step6Redes({ dados, atualizar }: StepFormProps) {
   // Blocos de Página do Facebook / anúncios só aparecem quando a aprovação
-  // do Meta sair (NEXT_PUBLIC_META_ADS_ATIVO). Publer só quando a workspace
-  // estiver configurada — senão o link de conexão sairia quebrado.
+  // do Meta sair (NEXT_PUBLIC_META_ADS_ATIVO). Não existe conexão do Instagram
+  // para publicar: a nutri aprova, baixa e posta ela mesma (Aline, 06/11/2026).
   const mostrarMetaAds = metaAdsAtivo();
-  const mostrarPubler = publerAtivo();
   const temPagina = !!(dados.facebook_pagina_id || dados.facebook_pagina_url);
-  const temPubler = !!dados.publer_profile_id;
   const [paginaUrl, setPaginaUrl] = useState((dados.facebook_pagina_url as string) ?? "");
   const [salvandoPagina, setSalvandoPagina] = useState(false);
   const [erroPagina, setErroPagina] = useState<string | null>(null);
   const [msgPagina, setMsgPagina] = useState<string | null>(null);
   const [guiaAberto, setGuiaAberto] = useState(false);
-  const [verificandoPubler, setVerificandoPubler] = useState(false);
-  const [msgPubler, setMsgPubler] = useState<string | null>(null);
 
   async function handleVincularPagina() {
     if (!paginaUrl.trim()) {
@@ -63,35 +59,10 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
     }
   }
 
-  async function handleVerificarPubler() {
-    setVerificandoPubler(true);
-    setMsgPubler(null);
-    try {
-      const res = await fetch("/api/publer/accounts");
-      const data = await res.json();
-      if (data.contaVinculada) {
-        atualizar({ publer_profile_id: data.contaVinculada.id });
-        setMsgPubler(`Instagram @${data.contaVinculada.name} encontrado e vinculado!`);
-      } else {
-        setMsgPubler(
-          "Ainda não encontramos seu Instagram conectado. Complete a conexão no link acima e clique aqui novamente.",
-        );
-      }
-    } catch {
-      setMsgPubler("Erro ao verificar. Tente novamente.");
-    } finally {
-      setVerificandoPubler(false);
-    }
-  }
-
   return (
     <FormWrapper
       title="Redes sociais"
-      descricao={
-        mostrarPubler
-          ? "Onde seu conteúdo vive. Se quiser, conecte o Instagram pra publicação automática."
-          : "Onde seu conteúdo vive. Usamos essas informações no seu conteúdo e na sua página."
-      }
+      descricao="Onde seu conteúdo vive. Usamos essas informações no seu conteúdo e na sua página."
     >
       {/* Campos de redes */}
       <Field
@@ -147,7 +118,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
         {guiaAberto && (
           <div className="border-t border-brand-text/10 px-4 py-4 space-y-3">
             <p className="text-xs text-brand-text/60">
-              O Instagram Profissional precisa estar vinculado a uma Página do Facebook para publicação automática e anúncios. Siga os passos:
+              O Instagram Profissional precisa estar vinculado a uma Página do Facebook para os anúncios. Siga os passos:
             </p>
             <ol className="space-y-2 text-sm text-brand-text">
               <li className="flex gap-2">
@@ -233,50 +204,6 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
       </div>
 
       </>
-      )}
-
-      {/* ── Conectar Instagram para publicação (Publer) ── */}
-      {mostrarPubler && (
-      <div className={`rounded-xl border-2 p-5 ${temPubler ? "border-green-200 bg-green-50" : "border-dashed border-purple-200 bg-purple-50/50"}`}>
-        <div className="mb-1 text-sm font-semibold text-brand-text">
-          {temPubler ? "✅ Instagram conectado para publicação" : "📲 Conectar Instagram para publicação automática"}
-        </div>
-        {temPubler ? (
-          <p className="text-xs text-brand-text/70">
-            Seu Instagram está pronto para receber posts automáticos aprovados por você.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-xs text-brand-text/60">
-              Clique no link abaixo, faça login no Facebook e conecte sua conta Instagram.
-              Depois volte aqui e clique em "Verificar conexão".
-            </p>
-            <a
-              href={publerContasUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
-            >
-              Conectar Instagram →
-            </a>
-            <div>
-              <button
-                type="button"
-                onClick={handleVerificarPubler}
-                disabled={verificandoPubler}
-                className="text-xs text-brand-primary hover:underline disabled:opacity-60"
-              >
-                {verificandoPubler ? "Verificando..." : "Já conectei, verificar conexão"}
-              </button>
-              {msgPubler && (
-                <p className={`mt-1 text-xs ${msgPubler.includes("encontrado") ? "text-green-700" : "text-amber-700"}`}>
-                  {msgPubler}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
       )}
     </FormWrapper>
   );

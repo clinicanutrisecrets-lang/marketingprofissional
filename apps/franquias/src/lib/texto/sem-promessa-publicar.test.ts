@@ -8,11 +8,10 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 const SRC = new URL("../../", import.meta.url);
 const ALVOS = ["app", "components", "lib/emails/templates.ts", "lib/onboarding/concluir.ts"];
 const FORA = /\/admin\/|\/en\/|app\/termos\/|app\/privacidade\/|app\/api\/|\.test\.tsx?$/;
-// Conexão do Instagram pelo Publer no onboarding: só aparece com a workspace
-// do Publer configurada. Decisão da Aline pendente sobre manter a função.
-const PENDENTE = new Set(["components/onboarding/steps/Step6Redes.tsx"]);
+// Aline, 06/11/2026: "não tem nada de conectar Instagram para publicação
+// automática do Publer, não existe isso". Nenhuma tela oferece essa conexão.
 const PROMESSA =
-  /publicamos|public(a|am|ado|ados)? (sozinh|automaticamente|no horário)|publicação automática|publicar automático|posts automáticos|sai logo em seguida|agendad[oa] (para|pra) publicar|o Scanner (também )?publica/i;
+  /publicamos|public(a|am|ado|ados)? (sozinh|automaticamente|no horário)|publicação automática|publicar automático|posts automáticos|sai logo em seguida|agendad[oa] (para|pra) publicar|o Scanner (também )?publica|conectar instagram (pra|para) publica|instagram conectado para publica|\bpubler\b/i;
 
 function arquivos(rel: string): string[] {
   const u = new URL(rel, SRC);
@@ -27,7 +26,7 @@ const semComentarios = (s: string) =>
 test("e-mails e telas da cliente: nada promete que o Scanner publica", () => {
   const achados: string[] = [];
   for (const rel of ALVOS.flatMap(arquivos)) {
-    if (FORA.test(rel) || PENDENTE.has(rel)) continue;
+    if (FORA.test(rel)) continue;
     semComentarios(readFileSync(new URL(rel, SRC), "utf8"))
       .split("\n")
       .forEach((l, i) => {
