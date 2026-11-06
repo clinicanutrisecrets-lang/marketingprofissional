@@ -112,7 +112,7 @@ Retorne JSON com este schema:
     });
 
     const block = resp.content[0];
-    if (!block || block.type !== "text") return { ok: false, erro: "Resposta inesperada da IA" };
+    if (!block || block.type !== "text") return { ok: false, erro: "Não foi possível gerar o roteiro agora. Tente de novo." };
 
     const jsonLimpo = block.text
       .replace(/^```json\s*/, "")

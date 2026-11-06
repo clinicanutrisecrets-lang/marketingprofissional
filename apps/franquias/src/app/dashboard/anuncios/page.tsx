@@ -101,7 +101,7 @@ export default async function AnunciosPage() {
                   {pendingApproval.length} criativo{pendingApproval.length > 1 ? "s" : ""} aguardando aprovação
                 </h2>
                 <p className="text-xs text-amber-700">
-                  A IA gerou variações de copy. Escolha a melhor pra lançar no Meta Ads.
+                  O Scanner gerou variações de copy. Escolha a melhor pra lançar no Meta Ads.
                 </p>
               </div>
             </div>

@@ -52,7 +52,7 @@ export function emailBoasVindas(nome: string, linkOnboarding: string): { html: s
     </p>
     <p style="${baseStyles.p}">
       São cerca de 10 minutos pra preencher (pode salvar e voltar depois). Depois disso
-      a IA começa a planejar sua primeira semana.
+      o Scanner começa a planejar sua primeira semana.
     </p>
     <p style="margin: 24px 0;">
       <a href="${linkOnboarding}" style="${baseStyles.button}">Completar onboarding →</a>
@@ -85,8 +85,9 @@ export function emailSemanaProntaAprovacao(nome: string, totalPosts: number, lin
       e com os temas em alta hoje no nicho de saúde integrativa.
     </p>
     <p style="${baseStyles.p}">
-      Dá uma olhada, ajusta o que quiser e aprova. Se não aprovar até <strong>${deadline}</strong>,
-      publicamos do jeito que está (melhor publicar bom do que perder a semana).
+      Dá uma olhada, ajusta o que quiser e aprova até <strong>${deadline}</strong>.
+      Nada é publicado sem a sua aprovação: enquanto você não aprovar, os posts ficam
+      esperando por você em Aprovar semana.
     </p>
     <p style="margin: 24px 0;">
       <a href="${linkAprovar}" style="${baseStyles.button}">Revisar e aprovar →</a>
@@ -107,16 +108,20 @@ export function emailDeadlineAproximando(nome: string, horasRestantes: number, l
   const conteudo = `
     <h1 style="${baseStyles.h1}">⏰ Faltam ${horasRestantes}h pra aprovar sua semana</h1>
     <p style="${baseStyles.p}">
-      Oi, ${nome}. Seus posts ainda tão aguardando aprovação. Depois do prazo,
-      publicamos automaticamente com o que tá lá — então se quiser ajustar alguma coisa,
-      é agora.
+      Oi, ${nome}. Seus posts ainda estão esperando a sua aprovação.
+      Nada é publicado sem ela. Se o prazo passar, os posts continuam guardados em
+      Aprovar semana até você aprovar.
+    </p>
+    <p style="${baseStyles.p}">
+      Se você aprovar depois do horário de algum post e a sua publicação automática
+      estiver ligada, esse post sai logo em seguida.
     </p>
     <p style="margin: 24px 0;">
       <a href="${linkAprovar}" style="${baseStyles.button}">Revisar agora →</a>
     </p>
   `;
   return {
-    assunto: `⏰ Faltam ${horasRestantes}h — sua semana aguarda aprovação`,
+    assunto: `⏰ Faltam ${horasRestantes}h pra aprovar sua semana`,
     html: wrap(conteudo),
     texto: `Faltam ${horasRestantes}h pra aprovar sua semana: ${linkAprovar}`,
   };
@@ -128,7 +133,7 @@ export function emailPostPublicado(nome: string, tipoPost: string, linkPost: str
   assunto: string;
 } {
   const conteudo = `
-    <h1 style="${baseStyles.h1}">✨ Seu ${tipoPost} foi publicado</h1>
+    <h1 style="${baseStyles.h1}">✅ Seu ${tipoPost} foi publicado</h1>
     <p style="${baseStyles.p}">
       ${nome}, seu post foi pro Instagram agora.
     </p>
@@ -140,7 +145,7 @@ export function emailPostPublicado(nome: string, tipoPost: string, linkPost: str
     </p>
   `;
   return {
-    assunto: `✨ Seu ${tipoPost} foi publicado`,
+    assunto: `✅ Seu ${tipoPost} foi publicado`,
     html: wrap(conteudo),
     texto: `Seu ${tipoPost} foi publicado: ${linkPost}`,
   };
@@ -199,7 +204,7 @@ export function emailRevisaoAdsPronta(params: {
   const conteudo = `
     <h1 style="${baseStyles.h1}">📊 Revisão semanal das suas campanhas</h1>
     <p style="${baseStyles.p}">
-      Oi, ${params.nome}. Seu gestor de tráfego IA acabou de revisar suas campanhas dos últimos 7 dias.
+      Oi, ${params.nome}. O gestor de tráfego do Scanner acabou de revisar suas campanhas dos últimos 7 dias.
     </p>
     <div style="background: ${cor}20; border-left: 4px solid ${cor}; padding: 16px; border-radius: 8px; margin: 20px 0;">
       <div style="font-size: 12px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Status geral</div>
@@ -233,7 +238,7 @@ export function emailCriativoProntoParaAprovacao(params: {
   const conteudo = `
     <h1 style="${baseStyles.h1}">🎨 ${params.qtdVariacoes} criativos prontos pra aprovar</h1>
     <p style="${baseStyles.p}">
-      Oi, ${params.nome}! Seu gestor de tráfego IA criou ${params.qtdVariacoes} variações de anúncio
+      Oi, ${params.nome}! O gestor de tráfego do Scanner criou ${params.qtdVariacoes} variações de anúncio
       angularmente diferentes, todas dentro do compliance CFN.
     </p>
     <div style="background: #0BB8A820; border-left: 4px solid #0BB8A8; padding: 16px; border-radius: 8px; margin: 20px 0;">

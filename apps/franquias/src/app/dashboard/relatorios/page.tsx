@@ -41,7 +41,7 @@ export default async function RelatoriosPage() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-brand-text">Relatórios semanais</h1>
           <p className="text-sm text-brand-text/60">
-            Performance dos seus posts + análise IA
+            Performance dos seus posts + análise do Scanner
           </p>
         </header>
 

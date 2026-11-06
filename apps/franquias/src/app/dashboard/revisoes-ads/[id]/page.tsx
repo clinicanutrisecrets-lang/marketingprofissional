@@ -139,7 +139,7 @@ export default async function RevisaoDetalhePage({ params }: PageProps) {
         </section>
 
         <p className="mt-6 text-center text-xs text-brand-text/40">
-          Análise gerada por IA com base nos dados do Meta Ads dos últimos 7 dias.
+          Análise gerada pelo Scanner com base nos dados do Meta Ads dos últimos 7 dias.
           As ações requerem confirmação no painel do Meta.
         </p>
       </div>

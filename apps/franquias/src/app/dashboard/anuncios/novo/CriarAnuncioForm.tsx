@@ -161,7 +161,7 @@ export function CriarAnuncioForm({
         placeholder='Ex: "Entenda como escalar sua clínica sem sacrificar qualidade. Formulário rápido + vídeo demo personalizado."'
         rows={3}
         required
-        hint="Mais específico = IA gera copy melhor"
+        hint="Mais específico = o Scanner gera uma copy melhor"
       />
 
       {funis.length > 0 && (
@@ -259,7 +259,7 @@ export function CriarAnuncioForm({
         </div>
         <p className="mb-3 text-xs text-brand-text/60">
           Cole a URL de um vídeo (ex: do Google Drive, Supabase Storage ou CDN) para usar como
-          criativo no lugar da imagem gerada pela IA.
+          criativo no lugar da imagem gerada pelo Scanner.
         </p>
         <Field
           label="URL do vídeo"
@@ -273,7 +273,7 @@ export function CriarAnuncioForm({
 
       {/* Roteiro de vídeo com IA */}
       <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
-        <div className="mb-2 text-sm font-semibold text-purple-900">🎬 Roteiro de vídeo (IA)</div>
+        <div className="mb-2 text-sm font-semibold text-purple-900">🎬 Roteiro de vídeo</div>
         <p className="mb-3 text-xs text-purple-700">
           Gere um roteiro profissional para gravar um vídeo criativo baseado no tema acima.
         </p>
@@ -283,7 +283,7 @@ export function CriarAnuncioForm({
           disabled={gerandoRoteiro || !tema}
           className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
         >
-          {gerandoRoteiro ? "Gerando roteiro..." : "✨ Gerar roteiro com IA"}
+          {gerandoRoteiro ? "Gerando roteiro..." : "Gerar roteiro"}
         </button>
         {roteiroErro && <p className="mt-2 text-xs text-red-600">{roteiroErro}</p>}
         {roteiro && (

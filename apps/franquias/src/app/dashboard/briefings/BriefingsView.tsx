@@ -92,7 +92,7 @@ export default function BriefingsView({
           </h1>
           <p className="mt-2 text-brand-text/70">
             Coloca aqui os temas que você quer ver na sua agenda. Domingo de
-            manhã sua equipe de IA monta o pacote da semana priorizando esses
+            manhã o time do Scanner monta o pacote da semana priorizando esses
             pedidos.{" "}
             <span className="font-medium text-brand-text">
               Próxima geração: domingo, {dataProximoDomingo}.
@@ -165,7 +165,7 @@ export default function BriefingsView({
               <textarea
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
-                placeholder="Detalhes que ajudam a IA: público específico, gancho, exemplo que você quer usar..."
+                placeholder="Detalhes que ajudam o time do Scanner: público específico, gancho, exemplo que você quer usar..."
                 rows={2}
                 className="w-full rounded-lg border border-brand-text/10 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
               />
