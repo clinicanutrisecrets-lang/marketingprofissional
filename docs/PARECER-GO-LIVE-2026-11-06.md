@@ -47,8 +47,9 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
 
 1. **E-mail de alerta**: `RESEND_API_KEY` (e `RELATORIO_INSTAGRAM_EMAIL`) na Vercel do `studio-aline`.
    Sem isso não chega o relatório da manhã nem o aviso de crise. Só ela/o time consegue pôr.
-2. **Quem olha a fila "esperando uma pessoa"** todo dia, inclusive fim de semana (Helô?). Sem dono, o
-   robô encaminha pra ninguém.
+2. ✅ **Quem olha a fila**: a Aline, todo dia, pelo **painel de conversas** do Estúdio
+   (`/perfis/nutrisecrets/conversas`, construído em 06/11). Crise também chega por e-mail na hora (depende
+   do item 1).
 3. ✅ **Porta do profissional — decidida (06/11):** tudo sai pelo **@nutri_secrets** (o @scannerdasaude
    fica de lado por enquanto) e **todo CTA de profissional leva ao Scanner da Saúde** (teste grátis de
    14 dias ou login). A jornada de setembro (material → Formação) fica substituída nesse ponto. Já
@@ -87,7 +88,12 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
   ao post de origem): pergunta "profissional ou mãe?"; profissional recebe o material e o teste do Scanner;
   mãe recebe carinho, sem material técnico, e a Helô com a mensagem "quero saber da consulta para o meu
   bebê" já escrita. O catálogo do direct também sabe que o time atende todas as idades.
-- Lótus: o que vem junto e quem responde dúvida no direct (aberta).
+- ✅ **Retorno em 3 meses e, até lá, tira-dúvidas pelo WhatsApp com o time** (pequenos ajustes de
+  cardápio e rotina). No catálogo do direct.
+- ✅ **Lótus**: o agente lê o que a página `/lotus` promete (5 fases, 73 dias, consulta com o time,
+  e-books, Vera, combo com o epigenético e retorno em 3 meses). Aluna com dúvida vai pela plataforma do
+  curso (`tratamentos.scannerdasaude.com/app/lotus`). O "10x de R$ 276,45" é o parcelamento com juros dos
+  R$ 2.497, não erro.
 
 ## 6. Ordem pra ligar (depois do OK)
 
