@@ -8,7 +8,7 @@ import { enviarDm, respostaPrivadaComentario, responderComentario, renovarTokenL
 import { carregarPerfilPorId, credenciaisDoPerfil, salvarTokenRenovado } from "@/lib/instagram/credenciais";
 import { janela24hAberta, payloadDaOpcao, preencherTexto, PREFIXO_PASSO, type Opcao, type UltimasOpcoes } from "./regras";
 import { desfechoDaFalha, registroDoDesfecho, statusNaFila, type Desfecho, type StatusFila } from "./envio";
-import { motivoParaCancelarPasso, proximoHorarioComercial } from "./seguranca";
+import { motivoParaCancelarPasso, quandoMandarPasso } from "./seguranca";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
 
 type Passo = { id: string; ordem: number; atraso_minutos: number; texto: string; opcoes: Opcao[] | null };
@@ -154,7 +154,8 @@ export async function processarFila(limite = 40): Promise<{ enviados: number; ca
       // rodada cancela pela regra de cima, como a Meta exige.
       if (item.sequencia_id) {
         const agora = new Date();
-        const quando = proximoHorarioComercial(agora);
+        const fecha = c?.ultima_msg_recebida_em ? new Date(new Date(c.ultima_msg_recebida_em).getTime() + 24 * 3600_000) : null;
+        const quando = quandoMandarPasso(agora, fecha);
         if (quando.getTime() !== agora.getTime()) {
           await aline.from("ig_fila").update({ enviar_em: quando.toISOString() }).eq("id", item.id).eq("status", "pendente");
           continue;

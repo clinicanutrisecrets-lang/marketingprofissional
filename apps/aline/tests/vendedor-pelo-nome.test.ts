@@ -47,3 +47,11 @@ test("parceria só conta com abordagem fria, e isso não mudou", () => {
   assert.equal(pareceAbordagemComercial("queria propor uma parceria", { nome: "Ana Nutri" }), false);
   assert.equal(pareceAbordagemComercial("gostei do seu perfil, quero fechar uma parceria"), true);
 });
+
+test("06/11: os vendedores reais de outubro são reconhecidos; paciente pedindo consulta não", () => {
+  assert.equal(pareceAbordagemComercial("Oi, *Dra Aline!* Tudo bem? Sou do time da VENDÍ. Estamos lançando o VENDÍ Clínicas, a primeira plataforma AI first do Brasil para clínicas."), true);
+  assert.equal(pareceAbordagemComercial("Olá, Aline! Meu nome é Sofia, sou nutricionista da Selvs, e é com muita alegria que iniciamos um novo ciclo de visitação online!"), true);
+  assert.equal(pareceAbordagemComercial("Bom Dia! Como faço pra agendar uma consulta ?"), false);
+  assert.equal(pareceAbordagemComercial("Vc mora em Curitiba, atende pela Unimed"), false);
+  assert.equal(pareceAbordagemComercial("Fiz os exames todos aqui para a gineco, me avisa que marco um horário com você."), false);
+});

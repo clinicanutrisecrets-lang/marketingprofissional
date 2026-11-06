@@ -291,7 +291,13 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       // ela concorreria olhando só nome e 160 caracteres, que não bastam pra
       // separar ataque de curiosidade. Só a peneira de duas etapas acima a
       // dispara.
-      const regrasComuns = regras.filter((r) => !contatoJaAcusou(r.tags_adicionar));
+      // 🔴 Direct e resposta de story de VENDEDOR não disparam regra (06/11):
+      // na varredura de setembro/outubro, duas plataformas oferecendo serviço
+      // ("VENDÍ Clínicas", "visitação online") casavam "atendimento" e
+      // levariam a resposta de agendamento com o WhatsApp da Helô. Comentário
+      // com palavra-chave continua recebendo material, como sempre.
+      const vendedorNoDirect = gatilho !== "comentario" && pareceAbordagemComercial(ev.texto, quemEscreve);
+      const regrasComuns = regras.filter((r) => !contatoJaAcusou(r.tags_adicionar) && !vendedorNoDirect);
 
       let regra = selecionarRegra({ gatilho, texto: ev.texto, mediaId: ev.mediaId }, regrasComuns, jaAplicadas);
       let porIntencao = false;

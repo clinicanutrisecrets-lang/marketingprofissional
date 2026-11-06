@@ -153,3 +153,20 @@ test("'ui que lindo' não é pergunta clínica; '500 mg' é", () => {
   assert.equal(pareceClinico("posso tomar 500mg?"), true);
   assert.equal(pareceClinico("quanto de magnésio?"), true);
 });
+
+import { quandoMandarPasso } from "../src/lib/automacao/seguranca.ts";
+
+test("🔴 segurar até as 9h nunca custa a janela de 24 h: se fecharia, sai agora", () => {
+  // 02:00 de Brasília (05:00 UTC); janela fecha 03:00 de Brasília → sai agora
+  const agora = new Date("2026-11-06T05:00:00Z");
+  assert.equal(quandoMandarPasso(agora, new Date("2026-11-06T06:00:00Z")).getTime(), agora.getTime());
+  // janela fecha 15:00 de Brasília → espera as 9h
+  assert.equal(quandoMandarPasso(agora, new Date("2026-11-06T18:00:00Z")).toISOString(), "2026-11-06T12:00:00.000Z");
+  // em horário comercial, sai na hora
+  const tarde = new Date("2026-11-06T18:00:00Z");
+  assert.equal(quandoMandarPasso(tarde, null).getTime(), tarde.getTime());
+});
+
+test("vendedor no direct não dispara regra (AGENDAR mandava o WhatsApp da Helô pra agência)", () => {
+  assert.match(processar, /const vendedorNoDirect = gatilho !== "comentario" && pareceAbordagemComercial/);
+});

@@ -152,6 +152,20 @@ export function proximoHorarioComercial(quando: Date): Date {
   return new Date(alvo.getTime() - OFFSET_BRT_H * 3600_000);
 }
 
+/**
+ * 🔴 Segurar até as 9h não pode custar a mensagem. O "conseguiu ler?" de 23 h
+ * depois cai de madrugada pra quem tocou no botão entre 22h e 10h; esperar as
+ * 9h passava das 24 h da Meta e a fila CANCELAVA o passo (o convite pro teste
+ * do software se perdia pra metade do dia). Regra: segura só se ainda der
+ * tempo; se esperar fecharia a janela, sai agora (melhor de madrugada que nunca).
+ */
+export function quandoMandarPasso(agora: Date, janelaFechaEm: Date | null, folgaMs = 15 * 60_000): Date {
+  const comercial = proximoHorarioComercial(agora);
+  if (comercial.getTime() === agora.getTime()) return agora;
+  if (janelaFechaEm && comercial.getTime() > janelaFechaEm.getTime() - folgaMs) return agora;
+  return comercial;
+}
+
 /* ── 5. Quem o robô não procura de novo pela fila ─────────────────────── */
 
 export type EstadoDoContato = {

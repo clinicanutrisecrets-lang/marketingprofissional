@@ -356,6 +356,10 @@ const OFICIOS_QUE_ABORDAM = [
   "investimento", "day trade", "renda extra", "marketing digital",
   "designer grafico", "designer", "criacao de site", "direcao de arte", "copywriter", "assessoria de imprensa",
   "aumentar seu faturamento", "escalar seu negocio", "captar mais clientes",
+  // 06/11: os dois vendedores reais de out/2026 que passavam (plataforma e
+  // propaganda de laboratório). Frases de quem OFERECE, não de quem pede.
+  "sou do time da", "estamos lancando", "nossa plataforma", "nossa empresa", "plataforma para clinicas",
+  "para clinicas", "visitacao online", "ciclo de visitacao", "representante comercial", "propagandista",
 ];
 
 /** Frases de abordagem fria: sozinhas não bastam, somam com o ofício. */
