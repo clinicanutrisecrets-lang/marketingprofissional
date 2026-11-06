@@ -170,3 +170,14 @@ test("🔴 segurar até as 9h nunca custa a janela de 24 h: se fecharia, sai ago
 test("vendedor no direct não dispara regra (AGENDAR mandava o WhatsApp da Helô pra agência)", () => {
   assert.match(processar, /const vendedorNoDirect = gatilho !== "comentario" && pareceAbordagemComercial/);
 });
+
+test("crise avisa a Aline na hora por e-mail, sem esperar o relatório da manhã", () => {
+  const i = processar.indexOf("situacaoDeRisco(ev.texto)");
+  const trecho = processar.slice(i, i + 2500);
+  assert.match(trecho, /if \(risco === "crise"\) \{\s*\/\/[^\n]*\n\s*await avisarAlineAgora/);
+});
+
+test("revisão de 06/11: o texto de crise não promete retorno; o de agudo manda ligar 192 agora", () => {
+  assert.ok(!/vai falar com você/.test(TEXTO_CRISE));
+  assert.match(TEXTO_AGUDO, /^Isso precisa de atendimento agora\. Ligue 192/);
+});

@@ -73,7 +73,7 @@ ${vozDoPerfil(params.perfil)}
 ${params.orientacoes ? `\n${params.orientacoes}\n` : ""}
 ${REGRAS_COMUNS}
 FORMATO: uma ou duas frases, no máximo 220 caracteres. Só o texto da resposta, sem aspas.
-Se o comentário for uma pergunta clínica individual (exame, dose, remédio, "posso tomar"), NÃO responda a pergunta: agradeça e diga que responde melhor no direct.
+Se o comentário for uma pergunta clínica individual (exame, dose, remédio, "posso tomar"), NÃO responda a pergunta: agradeça e convide a pessoa a chamar no direct.
 Se for elogio ou reação, agradeça citando algo do comentário. Se for pergunta geral sobre o tema, responda em uma frase útil e convide pra ver mais.
 ${blocoRespeitoAoProfissional(params.comentario)}`;
 
@@ -120,12 +120,12 @@ export async function responderDmComScanner(params: {
   orientacoes?: string;
 }): Promise<RespostaDm | null> {
   const claude = createClaude();
-  const system = `Você responde mensagens diretas (DM) do Instagram em nome do perfil, como a equipe do perfil responderia.
+  const system = `Você responde mensagens diretas (DM) do Instagram em primeira pessoa, como a dona do perfil (a Aline) responderia.
 ${vozDoPerfil(params.perfil)}
 ${params.orientacoes ? `\n${params.orientacoes}\n` : ""}
 ${REGRAS_COMUNS}
 
-FONTE DE VERDADE: a seção BASE DO SCANNER abaixo. Use SÓ o que está lá para afirmar qualquer coisa técnica. Se a base não cobre a pergunta, responda de forma geral e educativa sem inventar dado, e diga que a equipe confirma o detalhe.
+FONTE DE VERDADE: a seção BASE DO SCANNER abaixo. Use SÓ o que está lá para afirmar qualquer coisa técnica. Se a base não cobre a pergunta, responda de forma geral e educativa sem inventar dado. Se o detalhe importa pra ela, diga que a Helô confirma no WhatsApp (link do catálogo), ou marque encaminhar=true. Nunca prometa que "alguém volta aqui" sem encaminhar.
 
 ENCAMINHE PARA UMA PESSOA (encaminhar=true) quando a mensagem:
 - traz caso individual: resultado de exame, medicação em uso, dose, "o que eu tomo", sintoma pessoal pedindo conduta;

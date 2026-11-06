@@ -1,6 +1,6 @@
 # A equipe de social media do Estúdio — quem faz o quê (medido em 06/11/2026)
 
-> O caminho de cada produto até a venda: `ESTRATEGIA-CONVERSAO.md`. O plano do mês: `PLANO-NOVEMBRO-2026.md`.
+> O caminho de cada produto até a venda: `ESTRATEGIA-CONVERSAO.md`. O plano do mês: `PLANO-NOVEMBRO-2026.md`. Parecer de go-live (o que falta pra ligar): `PARECER-GO-LIVE-2026-11-06.md`.
 
 > **Sessão nova que vá mexer em post, arte, radar ou robô do Instagram: leia
 > este arquivo primeiro.** Ele existe porque a Aline montou uma estratégia

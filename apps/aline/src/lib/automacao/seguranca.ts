@@ -68,15 +68,15 @@ export function algumaChaveDeResposta(c: { agradecer_comentarios?: boolean; resp
 }
 
 export const TEXTO_CRISE =
-  "Obrigada por me contar, de verdade. Você não está sozinha nisso 💛\n\n" +
+  "Obrigada por me contar, de verdade. Você não está só nisso 💛\n\n" +
   "Agora o mais importante é você conversar com alguém. O CVV atende 24 horas, de graça, pelo telefone 188 ou pelo chat em cvv.org.br. " +
   "Se você estiver em perigo agora, ligue 192.\n\n" +
-  "Eu li a sua mensagem e alguém do meu time vai falar com você por aqui.";
+  "A sua mensagem chegou até mim.";
 
+// Revisão de 06/11: dor no peito e falta de ar pedem ação clara, não "vale procurar".
 export const TEXTO_AGUDO =
-  "Isso precisa de um olhar presencial, não de ajuste na alimentação. Vale procurar um pronto atendimento ou o seu médico pra fazer a checagem que só lá dá pra fazer. " +
-  "Se for forte ou não passar, ligue 192.\n\n" +
-  "Quando você tiver esse retorno, se quiser voltar aqui pra parte alimentar, eu te ajudo com prazer 💛";
+  "Isso precisa de atendimento agora. Ligue 192 ou vá a um pronto atendimento.\n\n" +
+  "Depois, se quiser cuidar da parte alimentar, o meu time te ajuda por aqui 💛";
 
 /* ── 2. Texto GERADO que não pode sair ───────────────────────────────── */
 
