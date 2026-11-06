@@ -105,7 +105,9 @@ export async function videosMarcaDaFranqueada(f: { id: string; email: string | n
  * (lib/geracao/video-marca-da-semana.ts).
  */
 export async function dispararVideoMarca(p: {
-  franqueadaId: string;
+  /** Dono: franqueada deste app OU parceira do Tratamentos (043_videos_parceiras). */
+  franqueadaId: string | null;
+  parceiraChave?: string;
   video: VideoMarca;
   marca: MarcaVideo;
   assinatura: string;
@@ -115,7 +117,14 @@ export async function dispararVideoMarca(p: {
   const admin = createAdminClient();
   const { data: nova, error: errIns } = await admin
     .from("videos_marca")
-    .insert({ franqueada_id: p.franqueadaId, video_id: p.video.id, assinatura: p.assinatura, status: "gerando" } as never)
+    // 🔴 A coluna parceira_chave (043) só vai quando é parceira: assim a
+    // franqueada segue gravando igual mesmo se o deploy chegar antes da migração.
+    .insert({
+      ...(p.parceiraChave ? { franqueada_id: null, parceira_chave: p.parceiraChave } : { franqueada_id: p.franqueadaId }),
+      video_id: p.video.id,
+      assinatura: p.assinatura,
+      status: "gerando",
+    } as never)
     .select("id")
     .single();
   if (errIns || !nova) {
@@ -133,7 +142,7 @@ export async function dispararVideoMarca(p: {
         registro_id: rid,
         molde: p.video.molde.split("/").pop(),
         parametros: parametrosDoMolde(p.marca),
-        destino_path: `${p.franqueadaId}/videos-marca/${p.assinatura}.mp4`,
+        destino_path: `${p.parceiraChave ? `parceiras/${p.parceiraChave}` : p.franqueadaId}/videos-marca/${p.assinatura}.mp4`,
         post_id: p.postId ?? "",
         supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
         supabase_key: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
