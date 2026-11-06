@@ -61,7 +61,7 @@ export function Step10Revisao({ dados, onFinalizar }: Props) {
 
       {!tudoOk && (
         <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
-          Você pode finalizar mesmo com campos faltando — a equipe completa o
+          Você pode finalizar mesmo com campos faltando. A equipe completa o
           que está pendente durante a reunião de onboarding.
         </div>
       )}

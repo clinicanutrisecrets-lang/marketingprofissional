@@ -32,12 +32,12 @@ export default async function TracaoPage() {
           ← Dashboard
         </a>
         <h1 className="mt-2 text-2xl font-bold text-brand-text">
-          Tração de Conteúdo — Crescimento Qualificado
+          Tração de Conteúdo: Crescimento Qualificado
         </h1>
         <p className="mt-1 text-sm text-brand-text/70">
           Skill 7 do Agente Orgânico. Foco: ganhar seguidor qualificado (que vira paciente),
           não volume. Proporção 70% autoridade + 30% tração. Vocabulário personalizado
-          (nunca usa "protocolo" — a gente é sinergias, não receita de bolo).
+          (nunca usa "protocolo": a gente é sinergias, não receita de bolo).
         </p>
 
         <TracaoView

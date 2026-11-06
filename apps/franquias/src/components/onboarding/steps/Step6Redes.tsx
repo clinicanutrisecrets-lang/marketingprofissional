@@ -89,7 +89,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
       title="Redes sociais"
       descricao={
         mostrarPubler
-          ? "Onde seu conteúdo vive — e, se quiser, conecte o Instagram pra publicação automática."
+          ? "Onde seu conteúdo vive. Se quiser, conecte o Instagram pra publicação automática."
           : "Onde seu conteúdo vive. Usamos essas informações no seu conteúdo e na sua página."
       }
     >
@@ -266,7 +266,7 @@ export function Step6Redes({ dados, atualizar }: StepFormProps) {
                 disabled={verificandoPubler}
                 className="text-xs text-brand-primary hover:underline disabled:opacity-60"
               >
-                {verificandoPubler ? "Verificando..." : "Já conectei — verificar conexão"}
+                {verificandoPubler ? "Verificando..." : "Já conectei, verificar conexão"}
               </button>
               {msgPubler && (
                 <p className={`mt-1 text-xs ${msgPubler.includes("encontrado") ? "text-green-700" : "text-amber-700"}`}>

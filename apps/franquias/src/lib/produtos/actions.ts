@@ -170,7 +170,7 @@ export async function gerarPostVendaAction(params: {
     .eq("ativo", true)
     .maybeSingle();
   if (pErr) return { ok: false, erro: pErr.message };
-  if (!p) return { ok: false, erro: "Produto não encontrado — atualiza a lista e tenta de novo." };
+  if (!p) return { ok: false, erro: "Produto não encontrado. Atualiza a lista e tenta de novo." };
 
   const produto = p as {
     nome: string;

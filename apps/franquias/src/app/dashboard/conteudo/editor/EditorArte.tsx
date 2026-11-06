@@ -278,7 +278,7 @@ export function EditorArte(props: {
               </div>
               <p className="mt-1 text-[11px] text-brand-text/40">
                 Suba a foto no campo &ldquo;Sua foto&rdquo; abaixo. Ela entra só no slide
-                escolhido — nos demais o carrossel segue tipográfico.
+                escolhido. Nos demais, o carrossel segue tipográfico.
               </p>
             </div>
           </Campo>
@@ -346,7 +346,7 @@ export function EditorArte(props: {
           </div>
         </Campo>
 
-        <Campo label="Sua logo (opcional — topo do card)">
+        <Campo label="Sua logo (opcional, no topo do card)">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -436,7 +436,7 @@ export function EditorArte(props: {
                 ))}
               </div>
               <p className="mt-1 text-[11px] text-brand-text/40">
-                A foto nunca cobre o texto: se não couber, ela encolhe — e se nem
+                A foto nunca cobre o texto: se não couber, ela encolhe. E se nem
                 assim couber, a arte sai sem ela e a gente avisa aqui.
               </p>
             </Campo>

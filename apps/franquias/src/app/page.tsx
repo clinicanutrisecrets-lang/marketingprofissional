@@ -27,7 +27,7 @@ export default function Home() {
           <p className="mx-auto max-w-2xl text-lg text-brand-text/70">
             Seu marketing produzido pra você: posts de Instagram no seu tom de
             voz, semana de conteúdo pronta pra aprovar e posts de venda dos seus
-            produtos — exclusivo do Consultório de Precisão Avançado.
+            produtos. Exclusivo do Consultório de Precisão Avançado.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export default function Home() {
             Pelo menu do Scanner da Saúde
           </h2>
           <p className="mb-6 text-sm leading-relaxed text-brand-text/70">
-            Você usa <strong>o mesmo login do Scanner</strong> — não existe senha
+            Você usa <strong>o mesmo login do Scanner</strong>. Não existe senha
             separada aqui. Entre em scannerdasaude.com e, no menu lateral, abra{" "}
             <strong>Crescimento Profissional → Marketing Profissional</strong>.
           </p>
@@ -53,8 +53,8 @@ export default function Home() {
             Já tem acesso e prefere entrar por aqui?{" "}
             <Link href="/login" className="text-brand-primary hover:underline">
               Entrar com e-mail e senha
-            </Link>{" "}
-            — só funciona se você já cadastrou uma senha; o caminho normal é pelo
+            </Link>.{" "}
+            Só funciona se você já cadastrou uma senha; o caminho normal é pelo
             Scanner.
           </p>
         </div>

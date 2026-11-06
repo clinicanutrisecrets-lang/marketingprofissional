@@ -62,7 +62,7 @@ export function Step9Automacao({ dados, atualizar }: StepFormProps) {
         </label>
         <p className="mb-2 text-xs text-brand-text/50">
           Isso define quantos posts produzimos por semana pra você. Toque nos dias pra
-          marcar ou desmarcar — dá pra mudar depois.
+          marcar ou desmarcar. Dá pra mudar depois.
         </p>
         <div className="flex flex-wrap gap-2">
           {DIAS.map((d) => (

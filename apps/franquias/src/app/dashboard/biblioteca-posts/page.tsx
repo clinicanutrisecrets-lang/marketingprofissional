@@ -123,8 +123,8 @@ export default async function BibliotecaPostsPage() {
           <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
             Posts profissionais criados pela equipe Scanner. Nos modelos do
             Canva, clique em <strong>Editar no Canva</strong> pra trocar a logo
-            pela sua e baixar. Nas artes prontas, é só <strong>Baixar a arte</strong>{" "}
-            — a legenda você copia aqui do lado.
+            pela sua e baixar. Nas artes prontas, é só <strong>Baixar a arte</strong>.
+            A legenda você copia aqui do lado.
           </p>
         </header>
 
@@ -166,7 +166,7 @@ export default async function BibliotecaPostsPage() {
             </strong>{" "}
             Os posts de venda do teste nutrigenético (DNA 360 e Consulta
             Nutrigenética) aparecem aqui assim que o produto estiver ativo na
-            sua Loja do Scanner Tratamentos — é de lá que sai o link de
+            sua Loja do Scanner Tratamentos. É de lá que sai o link de
             checkout do post.{" "}
             <a
               href={PAINEL_TRATAMENTOS}

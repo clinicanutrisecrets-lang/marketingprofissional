@@ -45,8 +45,6 @@ type Props = {
   /** true = a nutri já aprovou: sem edição, só baixar e postar. */
   fechada: boolean;
   historico: SemanaChip[];
-  /** Instagram ligado (token ou Publer). Hoje: nenhuma conta tem. */
-  publicacaoAutomatica: boolean;
   /**
    * O que o revisor de copy precisa saber desta nutri: o que ela não atende,
    * as palavras que ela vetou e os preços reais dela. A revisão roda AQUI, no
@@ -70,7 +68,6 @@ export function AprovacaoView({
   posts,
   fechada,
   historico,
-  publicacaoAutomatica,
   revisao,
 }: Props) {
   const router = useRouter();
@@ -175,9 +172,6 @@ export function AprovacaoView({
             Aprovada quer dizer que você não vai mais mudar nada aqui. Agora é
             baixar as artes, copiar as legendas e postar no seu Instagram.
             Está tudo nos botões de cada post.
-            {publicacaoAutomatica
-              ? " Como o seu Instagram está conectado, o Scanner também publica no horário agendado."
-              : ""}
           </p>
           {aprovacao.aprovada_em && (
             <p className="mt-1 text-xs text-green-900/60">
@@ -261,7 +255,6 @@ export function AprovacaoView({
       {confirmando && (
         <ModalConfirmarAprovacao
           quantos={pendentes.length}
-          publicacaoAutomatica={publicacaoAutomatica}
           onCancelar={() => setConfirmando(false)}
           onConfirmar={handleAprovarTudo}
         />
@@ -317,12 +310,10 @@ function HistoricoSemanas({
  */
 export function ModalConfirmarAprovacao({
   quantos,
-  publicacaoAutomatica,
   onCancelar,
   onConfirmar,
 }: {
   quantos: number;
-  publicacaoAutomatica: boolean;
   onCancelar: () => void;
   onConfirmar: () => void;
 }) {
@@ -339,9 +330,6 @@ export function ModalConfirmarAprovacao({
         <p className="mt-2 text-sm text-brand-text/80">
           Depois de aprovar, a semana continua aqui nesta tela, pronta pra você
           baixar as artes, copiar as legendas e postar no seu Instagram.
-          {publicacaoAutomatica
-            ? " Como o seu Instagram está conectado, o Scanner também publica no horário agendado."
-            : ""}
         </p>
         <p className="mt-2 text-xs text-brand-text/60">
           Quer mudar alguma coisa antes? Volte e use o ✎ Editar do post.
@@ -433,7 +421,7 @@ function PostCard({
   const data = post.data_hora_agendada
     ? new Date(post.data_hora_agendada as string)
     : null;
-  const diaLabel = data ? `${DIAS_SEMANA[data.getDay()]} · ${data.toLocaleDateString("pt-BR")}` : "—";
+  const diaLabel = data ? `${DIAS_SEMANA[data.getDay()]} · ${data.toLocaleDateString("pt-BR")}` : "-";
   const horaLabel = data ? data.toTimeString().slice(0, 5) : "";
   const status = (post.status as string) ?? "aguardando_aprovacao";
   const artes = artesDoPost(post);

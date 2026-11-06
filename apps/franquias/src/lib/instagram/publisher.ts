@@ -103,8 +103,8 @@ export async function publicarPost(
     // simplesmente não tem por onde publicar (Meta sem aprovação, Publer não
     // configurado). Sem isso o cron marcava o post como "erro", e a nutri via
     // vermelho num post que está perfeito — só esperando ela publicar.
-    if (!temTokenDireto) return { ok: false, semCanal: true, erro: "Publicação automática não está ativa nesta conta — baixe a arte e a legenda e publique direto no seu Instagram." };
-    if (tokenExpirado) return { ok: false, erro: "Token Instagram expirado — reconecte no painel." };
+    if (!temTokenDireto) return { ok: false, semCanal: true, erro: "Publicação automática não está ativa nesta conta. Baixe a arte e a legenda e publique direto no seu Instagram." };
+    if (tokenExpirado) return { ok: false, erro: "Token Instagram expirado. Reconecte no painel." };
   }
 
   let pageToken: string;

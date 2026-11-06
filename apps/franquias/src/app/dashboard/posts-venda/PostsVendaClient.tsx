@@ -205,7 +205,7 @@ export function PostsVendaClient(props: {
 
   async function copiar(texto: string, chave: string) {
     if (!(await copiarTexto(texto))) {
-      setErro("Não consegui copiar — seleciona o texto e copia manualmente.");
+      setErro("Não consegui copiar. Seleciona o texto e copia manualmente.");
       return;
     }
     setCopiado(chave);
@@ -245,7 +245,7 @@ export function PostsVendaClient(props: {
           {props.temVinculo ? (
             <>
               Seus produtos do Scanner Tratamentos aparecem aqui. Clica em{" "}
-              <strong>“Atualizar produtos”</strong> pra buscar seu catálogo — se
+              <strong>“Atualizar produtos”</strong> pra buscar seu catálogo. Se
               continuar vazio, confere no painel do Tratamentos se os produtos estão
               ativos.
             </>
@@ -291,7 +291,7 @@ export function PostsVendaClient(props: {
       {produtoAtivo && (
         <div className="rounded-2xl border border-brand-text/10 bg-white p-5">
           <p className="text-sm font-bold text-brand-text">
-            Gerar post de venda — {produtoAtivo.nome}
+            Gerar post de venda: {produtoAtivo.nome}
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -455,8 +455,7 @@ export function PostsVendaClient(props: {
                 <p className="basis-full text-[11px] text-brand-text/50">
                   Sem imagem anexada, a arte é desenhada nas suas cores, como no pacote da
                   semana. O post fica salvo na sua biblioteca pra você copiar e publicar no seu
-                  Instagram quando quiser. Publicar automático depende de uma liberação da
-                  Meta que ainda não saiu.
+                  Instagram quando quiser.
                 </p>
               </div>
             </div>

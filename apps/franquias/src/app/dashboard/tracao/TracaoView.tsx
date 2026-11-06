@@ -57,7 +57,7 @@ export function TracaoView({
   const [erro, setErro] = useState<string | null>(null);
 
   const [objetivoCrescimento, setObjetivoCrescimento] = useState(
-    "crescimento orgânico — foco em compartilhamentos",
+    "crescimento orgânico, foco em compartilhamentos",
   );
   const [assuntoEspecifico, setAssuntoEspecifico] = useState("");
   const [formatoAlvo, setFormatoAlvo] = useState<"carrossel" | "reels" | "post_longo">("carrossel");

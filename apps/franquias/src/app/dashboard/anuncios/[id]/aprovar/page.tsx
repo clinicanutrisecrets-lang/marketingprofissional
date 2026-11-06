@@ -79,20 +79,20 @@ export default async function AprovarAnuncioPage({
             Campanha
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <InfoCell label="Nome" value={(anuncio.nome as string) || "—"} />
+            <InfoCell label="Nome" value={(anuncio.nome as string) || "-"} />
             <InfoCell
               label="Objetivo"
-              value={rotuloDeId(anuncio.objetivo_negocio as string) || "—"}
+              value={rotuloDeId(anuncio.objetivo_negocio as string) || "-"}
             />
             <InfoCell
               label="Budget diário"
               value={
-                anuncio.budget_diario ? formatCurrency(anuncio.budget_diario as number) : "—"
+                anuncio.budget_diario ? formatCurrency(anuncio.budget_diario as number) : "-"
               }
             />
             <InfoCell
               label="Público"
-              value={(anuncio.publico_descricao as string) || "—"}
+              value={(anuncio.publico_descricao as string) || "-"}
             />
           </div>
         </div>

@@ -104,7 +104,7 @@ export async function lancarCampanha(anuncioId: string): Promise<LancarResultado
   const modalidade = franq.modalidade_atendimento ?? "presencial";
   const cidade = franq.cidade ?? "";
   if (!cidade && modalidade !== "online") {
-    return await abortar(anuncioId, "Cidade da franqueada ausente — geo targeting impossível");
+    return await abortar(anuncioId, "Cidade da franqueada ausente: não dá pra segmentar por região");
   }
 
   // --- Variação aprovada ---

@@ -178,7 +178,7 @@ export async function POST(request: Request) {
       // frase de CTA) — avisar, nunca sumir com a foto em silêncio.
       const temSlideFinal = conteudos.length > 1 && !!cta;
       if (fotoBuffer && fotoCarrossel === "fim" && !temSlideFinal) {
-        avisoFoto = "Escreva a frase manuscrita pra existir o slide final — sem ela a foto não entrou.";
+        avisoFoto = "Escreva a frase manuscrita pra existir o slide final. Sem ela, a foto não entrou.";
       }
       for (let i = 0; i < conteudos.length; i++) {
         const ehCapa = i === 0;

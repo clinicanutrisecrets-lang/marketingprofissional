@@ -173,7 +173,7 @@ async function disparoEmailPrimeiraSemana(f: {
     <div style="font-family:Georgia,serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#1F1D1A;">
       <h1 style="font-weight:400;font-size:28px;margin-bottom:16px;">Sua primeira semana de conteúdo está pronta.</h1>
       <p style="line-height:1.6;color:#4A4843;">
-        ${primeiroNome}, montamos a primeira semana de posts no seu tom, com sua história e respeitando seus pilares de conteúdo. Dá uma olhada e aprova o que faz sentido — ajusta o que não fizer.
+        ${primeiroNome}, montamos a primeira semana de posts no seu tom, com sua história e respeitando seus pilares de conteúdo. Dá uma olhada e aprova o que faz sentido. Ajusta o que não fizer.
       </p>
       <p style="margin:32px 0;">
         <a href="${linkAprovar}" style="background:#2F5D50;color:#fff;padding:14px 24px;border-radius:999px;text-decoration:none;font-weight:500;">Aprovar a semana</a>

@@ -38,7 +38,7 @@ export async function criarAdAccount(params: {
 }): Promise<AdAccountResult> {
   const bmId = getBmId();
   const token = getSystemToken();
-  const nome = `${params.nomeFranqueada} — Scanner`;
+  const nome = `${params.nomeFranqueada} | Scanner`;
 
   const body = new URLSearchParams({
     name: nome,

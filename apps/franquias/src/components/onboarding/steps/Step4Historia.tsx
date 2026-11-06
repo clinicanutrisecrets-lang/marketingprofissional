@@ -14,7 +14,7 @@ export function Step4Historia({ dados, atualizar }: StepFormProps) {
         name="historia_pessoal"
         value={dados.historia_pessoal as string}
         onChange={(v) => atualizar({ historia_pessoal: v })}
-        placeholder="Escreva com suas palavras — motivação, trajetória, o que te move hoje"
+        placeholder="Escreva com suas palavras: motivação, trajetória, o que te move hoje"
         rows={5}
         required
       />
@@ -41,7 +41,7 @@ export function Step4Historia({ dados, atualizar }: StepFormProps) {
         name="descricao_longa"
         value={dados.descricao_longa as string}
         onChange={(v) => atualizar({ descricao_longa: v })}
-        placeholder="Versão mais longa e cuidada — pode ser em terceira pessoa"
+        placeholder="Versão mais longa e cuidada. Pode ser em terceira pessoa"
         rows={6}
       />
     </FormWrapper>

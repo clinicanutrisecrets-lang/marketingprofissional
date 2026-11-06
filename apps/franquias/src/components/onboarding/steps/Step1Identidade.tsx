@@ -8,7 +8,7 @@ export function Step1Identidade({ dados, atualizar }: StepFormProps) {
   return (
     <FormWrapper
       title="Sobre você"
-      descricao="Comece com seus dados básicos — tudo salva automaticamente."
+      descricao="Comece com seus dados básicos. Tudo salva automaticamente."
     >
       <Field
         label="Nome completo"

@@ -87,7 +87,7 @@ export default async function VideosHubPage() {
           <div className="text-3xl">🎞️</div>
           <h2 className="mt-3 font-bold text-brand-text">Vídeo animado</h2>
           <p className="mt-1 text-sm text-brand-text/60">
-            Animação estilo Detetive da Saúde (sintomas, genes, alimentos) —
+            Animação estilo Detetive da Saúde (sintomas, genes, alimentos),
             gerada do zero, sem você aparecer.
           </p>
           <span className="mt-3 inline-block text-sm font-semibold text-brand-primary">

@@ -32,7 +32,7 @@ export function LPView({ franqueada, lp, logoUrl, fotoUrl }: Props) {
     titulo: "Meu método",
     pilares: [
       { titulo: "Diagnóstico completo", descricao: "Análise profunda antes de qualquer prescrição." },
-      { titulo: "Protocolo personalizado", descricao: "Zero receita de bolo — cada caso é único." },
+      { titulo: "Protocolo personalizado", descricao: "Zero receita de bolo: cada caso é único." },
       { titulo: "Acompanhamento próximo", descricao: "Você não fica sozinho no processo." },
     ],
   };

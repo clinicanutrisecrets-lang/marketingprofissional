@@ -86,8 +86,7 @@ export function emailSemanaProntaAprovacao(nome: string, totalPosts: number, lin
     </p>
     <p style="${baseStyles.p}">
       Dá uma olhada, ajusta o que quiser e aprova até <strong>${deadline}</strong>.
-      Nada é publicado sem a sua aprovação: enquanto você não aprovar, os posts ficam
-      esperando por você em Aprovar semana.
+      Depois é só baixar as artes, copiar as legendas e postar no seu Instagram.
     </p>
     <p style="margin: 24px 0;">
       <a href="${linkAprovar}" style="${baseStyles.button}">Revisar e aprovar →</a>
@@ -109,12 +108,8 @@ export function emailDeadlineAproximando(nome: string, horasRestantes: number, l
     <h1 style="${baseStyles.h1}">⏰ Faltam ${horasRestantes}h pra aprovar sua semana</h1>
     <p style="${baseStyles.p}">
       Oi, ${nome}. Seus posts ainda estão esperando a sua aprovação.
-      Nada é publicado sem ela. Se o prazo passar, os posts continuam guardados em
-      Aprovar semana até você aprovar.
-    </p>
-    <p style="${baseStyles.p}">
-      Se você aprovar depois do horário de algum post e a sua publicação automática
-      estiver ligada, esse post sai logo em seguida.
+      Aprove, baixe as artes, copie as legendas e poste no seu Instagram.
+      Se quiser ajustar alguma coisa, é só abrir e editar.
     </p>
     <p style="margin: 24px 0;">
       <a href="${linkAprovar}" style="${baseStyles.button}">Revisar agora →</a>
@@ -171,14 +166,14 @@ export function emailErroPublicacao(nome: string, erro: string, linkDashboard: s
     <ul style="font-size: 14px; color: #374151; line-height: 1.7;">
       <li>Token Instagram expirou → reconecta em <a href="${linkDashboard}" style="color: #0BB8A8;">Integrações</a></li>
       <li>Imagem ou vídeo fora do padrão do Instagram</li>
-      <li>Rate limit (publicamos automático em 30min)</li>
+      <li>Limite de envios do Instagram: tente de novo em 30 minutos</li>
     </ul>
     <p style="margin: 24px 0;">
       <a href="${linkDashboard}" style="${baseStyles.button}">Abrir dashboard →</a>
     </p>
   `;
   return {
-    assunto: "⚠️ Erro ao publicar — ação necessária",
+    assunto: "⚠️ Erro ao publicar: ação necessária",
     html: wrap(conteudo),
     texto: `Erro ao publicar: ${erro}. Veja em: ${linkDashboard}`,
   };
@@ -223,7 +218,7 @@ export function emailRevisaoAdsPronta(params: {
     </p>
   `;
   return {
-    assunto: `📊 Revisão semanal Ads — ${params.statusGeral}`,
+    assunto: `📊 Revisão semanal Ads: ${params.statusGeral}`,
     html: wrap(conteudo),
     texto: `${params.resumoExecutivo}\n\nVer completa: ${params.linkRevisao}`,
   };
@@ -247,7 +242,7 @@ export function emailCriativoProntoParaAprovacao(params: {
     </div>
     <p style="${baseStyles.p}">
       É só escolher a variação que mais combina com você e aprovar. Assim que você aprovar,
-      o sistema lança a campanha automaticamente — público, segmentação e ativação, tudo no piloto automático.
+      o sistema lança a campanha automaticamente: público, segmentação e ativação, tudo no piloto automático.
     </p>
     <p style="margin: 24px 0;">
       <a href="${params.linkAprovar}" style="${baseStyles.button}">Revisar e aprovar criativo →</a>

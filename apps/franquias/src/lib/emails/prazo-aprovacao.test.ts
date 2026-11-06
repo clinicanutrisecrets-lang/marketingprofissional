@@ -2,10 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { emailDeadlineAproximando, emailSemanaProntaAprovacao } from "./templates.ts";
 
-// Aline, 06/11/2026: o e-mail prometia publicar sozinho depois do prazo, e o
-// sistema não faz isso. Post só vai pra publicação depois que ela aprova; se o
-// prazo passa, ele continua esperando em Aprovar semana.
-const PROMESSA = /public(amos|a|ado|ados)? (automaticamente|do jeito que est)|sai(em)? mesmo sem|depois do prazo,? public/i;
+// Aline, 06/11/2026: o app não publica nada por ninguém (não tem a permissão
+// da Meta). A nutri aprova, baixa a arte, copia a legenda e posta ela mesma.
+const PROMESSA = /publicamos|public(a|ado|ados)? (automaticamente|sozinh|do jeito que est)|publicação automática|sai(em)? mesmo sem|sai logo em seguida|depois do prazo,? public/i;
 
 for (const [nome, tpl] of [
   ["semana pronta", emailSemanaProntaAprovacao("Marina", 8, "https://x/aprovar", "domingo, 22h")],
@@ -16,6 +15,7 @@ for (const [nome, tpl] of [
       assert.doesNotMatch(parte, PROMESSA);
       assert.doesNotMatch(parte, /—|\bIA\b/);
     }
-    assert.match(tpl.html, /Nada é publicado sem a sua aprovação|Nada é publicado sem ela/);
+    assert.match(tpl.html, /baix(e|ar) as artes/);
+    assert.match(tpl.html, /post(e|ar) no seu Instagram/);
   });
 }

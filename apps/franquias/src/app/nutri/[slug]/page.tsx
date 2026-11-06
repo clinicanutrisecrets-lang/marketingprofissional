@@ -87,7 +87,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!franqueada) return { title: "Página não encontrada" };
   const nome = franqueada.nome_comercial || franqueada.nome_completo;
   return {
-    title: `${nome} — Nutrição de Precisão`,
+    title: `${nome} | Nutrição de Precisão`,
     description: `Existe um mapa do seu metabolismo. Quando você o enxerga, a melhor versão da sua saúde aparece.`,
   };
 }

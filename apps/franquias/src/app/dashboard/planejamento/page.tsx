@@ -33,7 +33,7 @@ export default async function PlanejamentoPage() {
         </a>
         <h1 className="mt-2 text-2xl font-bold text-brand-text">Planejamento Estratégico</h1>
         <p className="mt-1 text-sm text-brand-text/70">
-          3 frentes de planejamento estratégico — rodar trimestralmente ou quando o produto/oferta muda.
+          3 frentes de planejamento estratégico. Rodar trimestralmente ou quando o produto/oferta muda.
         </p>
 
         <PlanejamentoView

@@ -175,7 +175,7 @@ export default async function AnunciosPage() {
             value={
               franqueada.budget_anuncio_mensal
                 ? formatCurrency(franqueada.budget_anuncio_mensal)
-                : "—"
+                : "-"
             }
           />
         </div>
@@ -233,7 +233,7 @@ export default async function AnunciosPage() {
                     <Metric label="Leads" value={((a.leads as number) ?? 0).toString()} />
                     <Metric
                       label="CPL"
-                      value={a.cpl ? formatCurrency(a.cpl as number) : "—"}
+                      value={a.cpl ? formatCurrency(a.cpl as number) : "-"}
                       tag={avaliacaoTag(avaliacao)}
                     />
                   </div>
