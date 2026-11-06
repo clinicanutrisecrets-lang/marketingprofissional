@@ -29,6 +29,24 @@ Perfis: `nutrisecrets` (paciente) e `scannerdasaude` (profissional).
 | **Relatório da manhã** (o que espera ela) | `/api/cron/relatorio-instagram` | cron 8h | ❌ **nunca foi enviado**: falta `RESEND_API_KEY` (e opcional `RELATORIO_INSTAGRAM_EMAIL`) na Vercel do `studio-aline`. O log diz "NÃO ENVIADO" todo dia |
 | **Material da isca** (o que vai no direct) | páginas em `guias.scannerdasaude.com` (repo do Scanner, `public/guias/` + 1 linha no `middleware.ts`) | `MATERIAIS-E-LINKS.md` | ✅ página, não PDF. GLP-1, bebê, intestino e sono no ar |
 
+## A vendedora do direct (06/11)
+
+Pedido da Aline: *"como a minha Sofia, que entende dos meus produtos: preço, condições, bônus, link,
+pra conversar, não só mandar o link"*. Quando a chave **"responder direct"** está ligada e nenhuma regra
+casou, o robô conversa como consultora: descobre se é paciente ou profissional e o que ela quer, indica UM
+produto, explica o que inclui, fala preço e condição quando perguntam e manda a página ou o link de
+pagamento. Regras de conversa: `blocoVendedora` em `lib/automacao/ia.ts`.
+
+- **Os fatos vêm do Scanner, nunca do Estúdio**: `scannerdasaude.com/api/integrations/marketing/catalogo`
+  monta o catálogo da vitrine da loja da Clínica Nutri Secrets (`cursos.ofertas` + `cursos.combos`) na hora
+  (cache de 10 min). Mudou preço na loja, o direct muda junto. Código: `lib/direct-catalogo.ts` (Scanner).
+- Sem catálogo (rede, segredo): não fala preço nem link de compra, manda pra Helô.
+- Desconto, Black Friday, cupom, agenda: sempre a Helô. Nunca inventa bônus, prazo nem escassez.
+- **Testar antes de ligar**: tela de automações → simulador. Desde 06/11 ele simula a vendedora mesmo com a
+  chave desligada e avisa se a resposta seria segurada pelo veto.
+- Fora do direct até a Aline decidir: "Acompanhamento Individualizado por Mensagem" (é ela atendendo, e o
+  direct diz que ela está de licença).
+
 ## Auditoria do atendimento (06/11, antes de desligar o ManyChat)
 
 Consertado no PR de 06/11 (`tests/robo-seguranca.test.ts`, visto vermelho sem o conserto):

@@ -100,6 +100,41 @@ ${blocoRespeitoAoProfissional(params.comentario)}`;
   }
 }
 
+/* ── A vendedora do direct (Aline, 06/11/2026) ─────────────────────────── */
+
+/**
+ * *"Como se fosse a minha Sofia que entende dos meus produtos: preço,
+ * condições, bônus, link, pra poder conversar, não só mandar o link."*
+ *
+ * As regras de conversa são daqui; os FATOS (preço, o que inclui, link) vêm
+ * só do catálogo do Scanner. Sem catálogo, ela não fala preço nem link de
+ * compra: manda pra Helô, que tem a resposta certa.
+ */
+export function blocoVendedora(catalogo?: { blocos: string; disponivel: boolean }): string {
+  if (!catalogo?.disponivel || !catalogo.blocos.trim()) {
+    return `PRODUTOS: o catálogo não carregou agora. NÃO diga preço, condição nem link de compra de cabeça.
+Se perguntarem de produto, preço ou agenda, diga que a Helô, assistente que organiza a agenda e os testes, responde com os valores certinhos: https://wa.me/5541998702966`;
+  }
+  return `VOCÊ TAMBÉM VENDE, COMO UMA BOA CONSULTORA (não como vendedora de loja):
+1. Descubra antes de oferecer: a pessoa é paciente (cuida da própria saúde) ou profissional de saúde? E o que ela quer resolver? Uma pergunta por vez.
+2. Indique UM produto do CATÁLOGO que combina com o que ela contou e explique, em duas ou três frases, o que ela RECEBE (use a lista "Inclui"). Depois, se ela quiser, preço e condição.
+3. Como escolher entre os produtos de paciente:
+   - Consulta Nutrigenética: o mapa genético, feito uma vez na vida, com consulta, cardápios e suplementação. É o mais completo.
+   - Teste Epigenético: mostra como o estilo de vida está agindo no corpo AGORA, pode ser repetido. É a porta de entrada mais acessível.
+   - Combo dos dois: quando ela quer o retrato completo (genética + momento atual).
+   - Lótus: para quem quer seguir um método de alimentação no próprio ritmo, com consulta inclusa.
+4. Preço pode ser dito quando ela perguntar ou quando ela já mostrou interesse, SEMPRE junto do que inclui e da condição de pagamento, exatamente como está no catálogo.
+5. Link: mande a "Página com tudo explicado" quando ela ainda está conhecendo; mande o "Link de pagamento" quando ela disser que quer. Copie o link exatamente do catálogo. Nunca outro.
+6. Dúvida de agenda, data de consulta, forma de pagamento que o catálogo não traz, ou qualquer condição especial (Black Friday, desconto, cupom): a Helô responde, no link de WhatsApp do catálogo. NUNCA invente desconto, bônus, brinde, prazo, vaga ou escassez.
+7. Profissional de saúde: ofereça primeiro o material técnico e o teste grátis do software; Consultório de Precisão só para quem já atende e quer estrutura, com a página e a conversa com o comercial. Nunca fale do Básico.
+8. Nunca prometa resultado ("vai emagrecer", "vai resolver"). O teste mostra tendências e ajuda a priorizar; não diagnostica.
+9. Termine sempre com uma pergunta curta ou um próximo passo claro.
+10. "Vou pensar", "está caro": valide, pergunte qual parte ainda deixa dúvida, responda só ela. Sem pressão.
+Fale em primeira pessoa, como a Aline: "eu estou de licença maternidade, quem atende é o meu time".
+
+${catalogo.blocos.slice(0, 9000)}`;
+}
+
 /* ── Resposta de DM com a base do Scanner ─────────────────────────────── */
 
 export type RespostaDm = { texto: string; encaminhar: boolean; motivo?: string };
@@ -110,6 +145,8 @@ export async function responderDmComScanner(params: {
   pergunta: string;
   nomeContato?: string | null;
   contextoScanner: { blocos: string; disponivel: boolean };
+  /** Catálogo da loja (preço, condição, o que inclui, link), montado pelo Scanner. */
+  catalogo?: { blocos: string; disponivel: boolean };
   textoEncaminharHumano: string;
   /** blocoOrientacoesDaDona(config): voz, ética e direcionamentos escritos por ela */
   orientacoes?: string;
@@ -127,14 +164,12 @@ ENCAMINHE PARA UMA PESSOA (encaminhar=true) quando a mensagem:
 - é sobre reembolso, reclamação, problema de acesso ou pagamento que deu errado;
 - pede explicitamente falar com alguém, ou pergunta se está falando com uma pessoa.
 
-🔴 PREÇO E AGENDAMENTO NÃO ENCAMINHAM SOZINHOS. Mandam as instruções do perfil
-acima: se elas trazem o valor e o contato de quem agenda, responda na hora, com
-o que a pessoa ganha e uma pergunta de triagem. Encaminhar quem só queria saber
-quanto custa perde a conversa e entope a fila de gente.
 Nesses casos a "resposta" deve ser curta, acolhedora, sem tratar o caso, e pode dizer que alguém da equipe continua a conversa.
 
+${blocoVendedora(params.catalogo)}
+
 FORMATO DE SAÍDA: JSON puro, sem markdown:
-{"resposta": "<texto da DM, até 600 caracteres, parágrafos curtos>", "encaminhar": true|false, "motivo": "<uma frase, só se encaminhar>"}
+{"resposta": "<texto da DM, até 700 caracteres, parágrafos curtos>", "encaminhar": true|false, "motivo": "<uma frase, só se encaminhar>"}
 
 ${blocoRespeitoAoProfissional(params.pergunta)}
 ${params.contextoScanner.disponivel && params.contextoScanner.blocos

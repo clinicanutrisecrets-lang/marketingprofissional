@@ -35,3 +35,42 @@ export async function buscarConhecimentoScanner(pergunta: string): Promise<Conte
     return { blocos: "", totalRegistros: 0, disponivel: false };
   }
 }
+
+/* ── Catálogo de produtos (a vendedora do direct, 06/11/2026) ─────────── */
+
+/**
+ * Produtos, preços, condições, o que inclui e links da Clínica Nutri Secrets,
+ * montados pelo SCANNER a partir da loja (`/api/integrations/marketing/catalogo`).
+ * O Estúdio não guarda preço: mudou na loja, muda aqui.
+ *
+ * Cache de 10 minutos por instância: uma conversa animada não bate na loja a
+ * cada mensagem. Falhou: devolve vazio, e o prompt manda NÃO falar de preço
+ * nem de link de compra sem catálogo (a pessoa vai pra Helô).
+ */
+let cacheCatalogo: { em: number; blocos: string } | null = null;
+const CATALOGO_TTL_MS = 10 * 60_000;
+
+export async function buscarCatalogoScanner(agora = Date.now()): Promise<{ blocos: string; disponivel: boolean }> {
+  if (cacheCatalogo && agora - cacheCatalogo.em < CATALOGO_TTL_MS) return { blocos: cacheCatalogo.blocos, disponivel: true };
+  const base = (process.env.SCANNER_API_URL ?? "https://scannerdasaude.com").replace(/\/$/, "");
+  const secret = process.env.STUDIO_CONHECIMENTO_SECRET ?? process.env.MARKETING_WEBHOOK_SECRET;
+  if (!secret) return { blocos: "", disponivel: false };
+  try {
+    const res = await fetch(`${base}/api/integrations/marketing/catalogo`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      console.error("[automacao/catalogo] o Scanner respondeu", res.status, (await res.text()).slice(0, 200));
+      return { blocos: "", disponivel: false };
+    }
+    const json = (await res.json()) as { blocos?: string };
+    const blocos = (json.blocos ?? "").trim();
+    if (!blocos) return { blocos: "", disponivel: false };
+    cacheCatalogo = { em: agora, blocos };
+    return { blocos, disponivel: true };
+  } catch (e) {
+    console.error("[automacao/catalogo] falha ao buscar o catálogo:", (e as Error).message);
+    return { blocos: "", disponivel: false };
+  }
+}

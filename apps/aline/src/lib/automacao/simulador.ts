@@ -23,7 +23,8 @@ import {
   type Regra,
 } from "./regras";
 import { suspeitaDeAcusacao, acaoParaLeitura, contatoJaAcusou } from "./acusacao";
-import { buscarConhecimentoScanner } from "./scanner-conhecimento";
+import { buscarConhecimentoScanner, buscarCatalogoScanner } from "./scanner-conhecimento";
+import { motivoParaNaoEnviar } from "./seguranca";
 
 export type ResultadoSimulacao = {
   regra: string | null;
@@ -179,15 +180,20 @@ export async function simularEvento(params: {
         avisos: [...avisos, "O modo coração está ligado. Enquanto ele estiver, o robô nunca escreve no direct por conta própria."],
       };
     }
-    if (!config.responder_dm_scanner) return { regra: null, acoes: ["Nada: nenhuma regra casou e a chave 'responder direct' está desligada."], avisos };
-    const contexto = await buscarConhecimentoScanner(params.texto);
+    // A vendedora precisa ser testada ANTES de ligar: com a chave desligada a
+    // simulação roda do mesmo jeito e avisa que, no ar, nada sairia.
+    if (!config.responder_dm_scanner) avisos.push("A chave 'responder direct' está DESLIGADA: no ar, esta resposta NÃO sairia. Simulando pra você conferir antes de ligar.");
+    const [contexto, catalogo] = await Promise.all([buscarConhecimentoScanner(params.texto), buscarCatalogoScanner()]);
+    avisos.push(catalogo.disponivel ? "Catálogo de produtos carregado da loja." : "Catálogo de produtos NÃO carregou: a resposta não fala preço nem link de compra.");
     if (!contexto.disponivel) avisos.push("Base do Scanner indisponível nesta simulação (segredo ou rede). A resposta saiu sem ela.");
     else avisos.push(`Base do Scanner: ${contexto.totalRegistros} registro(s) encontrados pra esta pergunta.`);
     const resp = await responderDmComScanner({
       perfil, historico: [], pergunta: params.texto, nomeContato: vars.nome,
-      contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
+      contextoScanner: contexto, catalogo, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
     });
     if (!resp) return { regra: null, acoes: [], avisos: [...avisos, "A geração da resposta falhou. Veja o log da Vercel."] };
+    const veto = resp.texto ? motivoParaNaoEnviar(resp.texto) : null;
+    if (veto) avisos.push(`No ar esta resposta seria SEGURADA (${veto}) e iria pra sua fila.`);
     acoes.push(`Manda no direct: "${resp.texto}"`);
     if (resp.encaminhar) acoes.push(`Marca o contato como "esperando uma pessoa"${resp.motivo ? ` (${resp.motivo})` : ""}.`);
     return { regra: null, acoes, avisos };

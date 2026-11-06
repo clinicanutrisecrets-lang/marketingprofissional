@@ -53,7 +53,7 @@ import {
   situacaoDeRisco, TEXTO_CRISE, TEXTO_AGUDO, algumaChaveDeResposta, motivoParaNaoEnviar, opcoesAindaValidas, alineJaEscreveu,
 } from "./seguranca";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
-import { buscarConhecimentoScanner } from "./scanner-conhecimento";
+import { buscarConhecimentoScanner, buscarCatalogoScanner } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
 import {
   decidirAposAcusacao, contatoJaAcusou, TAG_ACUSACAO,
@@ -394,10 +394,12 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
         if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
-        const [historico, contexto] = await Promise.all([historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa)]);
+        const [historico, contexto, catalogo] = await Promise.all([
+          historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa), buscarCatalogoScanner(),
+        ]);
         const resp = await responderDmComScanner({
           perfil, historico, pergunta: textoPessoa, nomeContato: contato.nome,
-          contextoScanner: contexto, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
+          contextoScanner: contexto, catalogo, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
         if (!resp || !resp.texto) {
           // Sem texto confiável: ninguém fica sem resposta em silêncio.
