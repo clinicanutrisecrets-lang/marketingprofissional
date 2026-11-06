@@ -31,7 +31,10 @@ A escada: o **epigenético é a porta de entrada** (o mais barato, coleta em cas
 nutrigenética é o carro-chefe**, e o **Lótus** é para quem quer fazer sozinha com método. Post de paciente
 nunca termina em "procure um profissional": termina no que é da consulta (`CALENDARIO-EDITORIAL.md`).
 
-### @scannerdasaude — profissional
+### Profissional — também pelo @nutri_secrets (decisão da Aline, 06/11)
+
+> Todo material de profissional sai pelo @nutri_secrets e **todo CTA leva ao Scanner da Saúde** (teste
+> grátis ou login). O @scannerdasaude fica de lado por enquanto.
 
 | Produto | Preço | Isca | Palavra-chave | Quem fecha |
 |---|---|---|---|---|
@@ -42,9 +45,7 @@ nunca termina em "procure um profissional": termina no que é da consulta (`CALE
 Ordem de `JORNADA-CLIENTE.md`: material técnico → Formação → Avançado. O trial é para quem já atende
 paciente. **Nunca oferecer o Básico** (descontinuado em 05/11).
 
-🔴 **O @scannerdasaude NÃO está conectado ao robô** (`instagram_user_id` vazio). Hoje todas as regras de
-profissional rodam no @nutri_secrets. Ligar o segundo perfil é passo próprio (app antigo da Meta foi
-recusado em abril; o caminho é o login direto, como o da Nutri Secrets).
+O @scannerdasaude não está conectado ao robô, e por decisão de 06/11 não precisa estar agora.
 
 ## Medição: o que dá pra saber hoje e o que falta
 

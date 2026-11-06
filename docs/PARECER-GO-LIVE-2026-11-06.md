@@ -40,7 +40,7 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
 | SOMP, privada | 🔴 "Ahh que bom" sem pergunta antes, "vitalício", não separa paciente/profissional; "diagnóstico nutricional" | `Oi, {primeiro_nome}! Aqui está o guia clínico da SOMP que eu montei… [link] Depois me conta o que achou. E me diz: você atende pacientes ou está cuidando da sua saúde?` |
 | BEBÊ, privada | 🔴 fala com profissional e com mãe ao mesmo tempo; ✨ | `Esse é o material da minha aula de microbiota e genética na alimentação infantil depois dos 6 meses. Foi feito para profissionais de saúde e não substitui o acompanhamento do seu bebê. Toca no botão que eu te mando o link.` |
 | CANETA e DESMAME | 🟡 uma variação só na resposta pública; DESMAME sem caminho de paciente | 3 variações; repetir a pergunta "você cuida de você ou atende pacientes?" |
-| POST ANTIGO, nutri | 🔴 cinco links + teste grátis juntos (uma oferta por vez) | tirar o teste grátis e fechar com `Qual desses temas mais aparece no seu consultório hoje?` |
+| POST ANTIGO, nutri | 🔴 cinco links + teste grátis juntos | com a decisão de 06/11 o teste grátis É o CTA: deixar 2 materiais (GLP-1 e intestino) e fechar com o teste grátis do Scanner como único próximo passo |
 | QUADRO DE SAÚDE | 🔴 palavras amplas ("cansaço", "exame") roubam a conversa da closer e das respostas de story | **desligar a regra e deixar a closer conversar**; texto novo só se ela quiser manter |
 
 ## 3. Pendências operacionais (bloqueiam)
@@ -49,14 +49,18 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
    Sem isso não chega o relatório da manhã nem o aviso de crise. Só ela/o time consegue pôr.
 2. **Quem olha a fila "esperando uma pessoa"** todo dia, inclusive fim de semana (Helô?). Sem dono, o
    robô encaminha pra ninguém.
-3. **Porta do profissional**: a jornada escrita em setembro diz material → **Formação** → Avançado; os
-   follow-ups e a closer oferecem o **teste grátis do software**. Escolher um.
+3. ✅ **Porta do profissional — decidida (06/11):** tudo sai pelo **@nutri_secrets** (o @scannerdasaude
+   fica de lado por enquanto) e **todo CTA de profissional leva ao Scanner da Saúde** (teste grátis de
+   14 dias ou login). A jornada de setembro (material → Formação) fica substituída nesse ponto. Já
+   aplicado: catálogo e regra da closer; guias de profissional (intestino, sono, bebê) com botão pro
+   cadastro. Falta (outros repositórios, fora desta sessão): `glp1.scannerdasaude.com` leva à home sem
+   UTM e o `somp.scannerdasaude.com` não tem botão pro Scanner.
 
 ## 4. Estratégia (as linhas do departamento)
 
 | Linha | Situação | Recomendação |
 |---|---|---|
-| Posicionamento por perfil | @nutri_secrets = paciente; @scannerdasaude = profissional, **mas o @scannerdasaude não está ligado ao robô** e os materiais de profissional são entregues no perfil de paciente | curto prazo: aceitar; médio: conectar o @scannerdasaude e mover GLP1/SOMP pra lá |
+| Posicionamento por perfil | ✅ decidido 06/11: tudo pelo @nutri_secrets, paciente e profissional; profissional sempre termina no Scanner da Saúde | o robô separa na 1ª pergunta (paciente × profissional) |
 | Escada de produto | epigenético (entrada) → nutrigenética (principal) → Lótus (método) | certo; a closer já respeita quem já tem genético |
 | Semana 1 do plano (09/11, epigenético) | 🔴 sem regra CABELO e sem guia: quem comentar fica sem trilho | adiar a semana do epigenético pra 16/11 e abrir com INTESTINO/SONO, que já têm guia |
 | Stories "responde só o número" | 🟡 não tem mapa número → tema; "responde SIM que eu te conto" é promessa | trocar por perguntas abertas curtas ("qual é o seu maior incômodo hoje?") que a closer sabe conduzir |
