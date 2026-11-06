@@ -20,3 +20,14 @@ Molde novo: ajustar, copiar pra `public/videos-marca/`, gerar a prévia com
 `packages/video-marca/render.cjs <url> <saida.jpg> --poster <segundo>` e
 acrescentar em `VIDEOS_MARCA` (apps/franquias/src/lib/videos/marca.ts).
 Mudou um molde que já existe: suba `versao`, que refaz o vídeo de todo mundo.
+
+## Vídeos que fecham com o NOME da profissional (Black Friday, 06/11/2026)
+
+- `patch_nome.py <entrada.html> <saida.html>`: para os vídeos feitos com o
+  `video-kit` do Claude Design que trazem `nome`/`crn` nos tweaks (concepção,
+  gestação, nutrigenética). O molde passa a ler `?nome=&registro=` (o
+  registro vem pronto do servidor: "Nutricionista · CRN 10607/PR", ou nada),
+  tira o "Nutricionista" fixo, troca a logo do Scanner pela de `?logo=` (sem
+  logo a pílula some) e desliga o editor. As cores ficam as do vídeo.
+- No catálogo, esses entram em `VIDEOS_BLACK_FRIDAY` com `comNome: true`, e o
+  nome e o CRN passam a fazer parte da assinatura (trocou no cadastro, refaz).

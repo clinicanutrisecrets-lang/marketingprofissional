@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/server";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import {
+  VIDEOS_BLACK_FRIDAY,
   VIDEOS_MARCA,
   assinaturaVideoMarca,
   marcaDoCadastro,
@@ -27,16 +28,28 @@ export type EstadoVideoMarca = {
   status: "gerando" | "pronto" | "erro" | "indisponivel";
   url: string | null;
   semLogo: boolean;
+  /** O cadastro tem CRN (os vídeos `comNome` fecham com ele). */
+  temRegistro?: boolean;
 };
 
 type Linha = LinhaVideoMarca & { id: string; url: string | null };
 
+/**
+ * Os de genes seguem em fase de teste (EMAILS_VIDEOS_MARCA); os da Black
+ * Friday valem para toda conta deste app, que é só do Precisão Avançado
+ * (Aline, 06/11/2026).
+ */
 export async function videosMarcaDaFranqueada(f: { id: string; email: string | null }): Promise<EstadoVideoMarca[] | null> {
-  if (!videosMarcaLiberadosPara(f.email)) return null;
+  const catalogo = [...(videosMarcaLiberadosPara(f.email) ? VIDEOS_MARCA : []), ...VIDEOS_BLACK_FRIDAY];
+  if (!catalogo.length) return null;
   const admin = createAdminClient();
 
   const [{ data: cad, error: errCad }, logoUrl] = await Promise.all([
-    admin.from("franqueadas").select("cor_primaria_hex, cor_secundaria_hex").eq("id", f.id).maybeSingle(),
+    admin
+      .from("franqueadas")
+      .select("cor_primaria_hex, cor_secundaria_hex, nome_completo, crn_numero, crn_estado")
+      .eq("id", f.id)
+      .maybeSingle(),
     buscarArquivoUrl(admin, f.id, "logo_principal"),
   ]);
   if (errCad) {
@@ -59,29 +72,29 @@ export async function videosMarcaDaFranqueada(f: { id: string; email: string | n
 
   const token = process.env.GITHUB_ACTIONS_TOKEN || process.env.GITHUB_TOKEN;
   const out: EstadoVideoMarca[] = [];
-  for (const v of VIDEOS_MARCA) {
+  for (const v of catalogo) {
     const assinatura = assinaturaVideoMarca(v, marca);
     const atual = linhas.find((l) => l.video_id === v.id && l.assinatura === assinatura) ?? null;
     // O pronto anterior (outra cor/logo) segue na tela enquanto o novo nasce.
     const prontoAnterior = linhas.find((l) => l.video_id === v.id && l.status === "pronto") ?? null;
 
     if (!precisaGerar(atual, assinatura)) {
-      out.push({ video: v, status: atual!.status, url: atual!.url, semLogo: !marca.logoUrl });
+      out.push({ video: v, status: atual!.status, url: atual!.url, semLogo: !marca.logoUrl, temRegistro: !!marca.registro });
       continue;
     }
     if (!token) {
       console.error("[videos-marca] falta GITHUB_ACTIONS_TOKEN");
-      out.push({ video: v, status: prontoAnterior ? "pronto" : "indisponivel", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
+      out.push({ video: v, status: prontoAnterior ? "pronto" : "indisponivel", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl, temRegistro: !!marca.registro });
       continue;
     }
 
     const disp = await dispararVideoMarca({ franqueadaId: f.id, video: v, marca, assinatura, token });
     if (!disp.ok) {
-      out.push({ video: v, status: "erro", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
+      out.push({ video: v, status: "erro", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl, temRegistro: !!marca.registro });
       continue;
     }
     console.log("[videos-marca] geração disparada", f.id, v.id, assinatura);
-    out.push({ video: v, status: "gerando", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl });
+    out.push({ video: v, status: "gerando", url: prontoAnterior?.url ?? null, semLogo: !marca.logoUrl, temRegistro: !!marca.registro });
   }
   return out;
 }

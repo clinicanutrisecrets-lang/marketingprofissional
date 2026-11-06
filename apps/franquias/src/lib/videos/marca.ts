@@ -43,6 +43,12 @@ export type VideoMarca = {
    * (lib/geracao/video-marca-semana.ts). Pedaço de palavra vale ("emagrec").
    */
   temas: string[];
+  /**
+   * O molde fecha com o nome e o registro da profissional (`?nome=&registro=`,
+   * scripts/videos-marca/patch_nome.py). Entra na assinatura: trocou o nome
+   * ou o CRN no cadastro, o vídeo é refeito.
+   */
+  comNome?: boolean;
 };
 
 const BASE = "/videos-marca";
@@ -472,6 +478,132 @@ export const VIDEOS_MARCA: VideoMarca[] = [
   },
 ];
 
+/**
+ * Vídeos da Black Friday do Consultório (Aline, 06/11/2026): concepção,
+ * gestação e nutrigenética. Feitos no Claude Design com o nome dela fixo no
+ * fim; o molde agora fecha com o nome e o CRN DE CADA profissional, e com a
+ * logo dela (sem logo, a pílula some). As cores são as do vídeo original.
+ *
+ * Diferente dos de genes acima, NÃO estão em fase de teste: a Aline pediu
+ * para "quem é do Precisão Avançado", e só quem tem o plano de franquia entra
+ * neste app (SSO do Scanner, plano='franquia'), que é o Avançado. Também não
+ * entram no pacote de domingo: são da campanha de novembro.
+ *
+ * O roteiro é a fala da narração, cena por cena, no tempo do vídeo; o texto
+ * escrito já está na tela. Sai no karaokê de /dashboard/narrar.
+ */
+const OFERTA_BF =
+  "Black Friday: faça o teste nutrigenético de 300 genes e ganhe de presente o teste epigenético, que mostra o que o seu corpo precisa agora.";
+const CTA_BF = "Me chama para agendar a sua consulta nutrigenética.";
+
+export const VIDEOS_BLACK_FRIDAY: VideoMarca[] = [
+  {
+    id: "bf-concepcao",
+    titulo: "Epigenética da concepção (Black Friday)",
+    molde: `${BASE}/bf-concepcao.html`,
+    poster: `${BASE}/bf-concepcao.jpg`,
+    versao: 1,
+    duracaoSeg: 82,
+    comNome: true,
+    resumo:
+      "Para o casal que está planejando um bebê: a letra e o volume dos genes, a marca da concepção, o papel da mãe e do pai e a janela de ouro antes da gravidez. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 4, texto: "Vocês estão planejando um bebê? O cuidado começa antes do positivo." },
+      { de: 4, ate: 10, texto: "Seu filho recebe duas coisas: a letra, os genes, e o volume, a epigenética." },
+      { de: 10, ate: 17, texto: "A letra é um sorteio entre pai e mãe. Ela não muda, mas o volume pode mudar." },
+      { de: 17, ate: 24, texto: "Na fecundação, o DNA aperta o reset. As marcas são refeitas, e as primeiras semanas são as mais sensíveis." },
+      { de: 24, ate: 30, texto: "Sessenta anos depois, a marca ainda estava no DNA. Hoje o comum é a fome oculta." },
+      { de: 30, ate: 38, texto: "Da mãe vêm os doadores de metil, como folato, B12 e colina. E a genética dela também pesa, como no MTHFR." },
+      { de: 38, ate: 47, texto: "E o pai? Também programa o bebê. O espermatozoide leva DNA, metilação e pequenos RNAs. Com sobrepeso, ele dobra o risco de obesidade no filho." },
+      { de: 47, ate: 55, texto: "A fábrica do espermatozoide leva 74 dias. As últimas semanas são as mais sensíveis. O cuidado do pai começa três meses antes." },
+      { de: 55, ate: 61, texto: "A janela de ouro é antes da gravidez, para a mãe e para o pai." },
+      { de: 61, ate: 68, texto: "Na consulta nutrigenética do casal, montamos o plano de cada um, para quem está tentando ou vai fazer FIV." },
+      { de: 68, ate: 77, texto: OFERTA_BF },
+      { de: 77, ate: 82, texto: CTA_BF },
+    ],
+    legenda: [
+      "Vocês estão planejando um bebê? O cuidado começa antes do positivo.",
+      "A letra dos genes vem de um sorteio entre pai e mãe. O volume, que é a epigenética, dá para cuidar. E a janela de ouro é antes da gravidez, para os dois.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente.",
+      "Me chama no direct que eu te explico como funciona a consulta nutrigenética do casal.",
+    ].join("\n\n"),
+    temas: ["concepcao", "fertilidade", "gestac", "bebe", "pre-concepcao", "epigenetic", "black friday"],
+  },
+  {
+    id: "bf-gestacao",
+    titulo: "Genética na gestação (Black Friday)",
+    molde: `${BASE}/bf-gestacao.html`,
+    poster: `${BASE}/bf-gestacao.jpg`,
+    versao: 1,
+    duracaoSeg: 77,
+    comNome: true,
+    resumo:
+      "Para a gestante: o cordão umbilical como memória dos nove meses, gene e ambiente, o que mais mexe no volume dos genes e o que ajuda a cuidar. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 4, texto: "Seu bebê herda seus genes. Mas quem decide como funcionam?" },
+      { de: 4, ate: 9, texto: "Na gestação existem duas coisas: a letra, os genes, e o volume, a epigenética." },
+      { de: 9, ate: 16, texto: "O cordão umbilical guarda a memória dos nove meses. É como uma fotografia do bebê ao nascer." },
+      { de: 16, ate: 23, texto: "Em três de cada quatro regiões do DNA que variam, a diferença vem do gene com o ambiente." },
+      { de: 23, ate: 30, texto: "Um gene que parece quieto num ambiente pode acordar em outro e se tornar importante." },
+      { de: 30, ate: 37, texto: "O que mais mexe no volume: peso, glicemia, pressão, cigarro, estresse e idade da mãe." },
+      { de: 37, ate: 44, texto: "Um único ponto medido no cordão explicou mais de 25% da gordura corporal da criança aos nove anos." },
+      { de: 44, ate: 51, texto: "Dá para cuidar: dieta mediterrânea, baixo índice glicêmico, atividade física e glicemia sob controle suavizaram essas marcas." },
+      { de: 51, ate: 58, texto: "Na prática, olhamos os genes da gestante: metilação, inflamação, glicose e saciedade, estresse e sono." },
+      { de: 58, ate: 63, texto: "E depois do nascimento, amamentação, alimentação, sono e microbiota continuam ajustando o volume." },
+      { de: 63, ate: 72, texto: OFERTA_BF },
+      { de: 72, ate: 77, texto: CTA_BF },
+    ],
+    legenda: [
+      "Seu bebê herda os seus genes. Mas quem decide como eles vão funcionar?",
+      "O cordão umbilical guarda a memória dos nove meses: não é só gene, é gene e ambiente. E dá para cuidar durante a gestação, porque cada fase conta.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente.",
+      "Me chama no direct que eu te explico como funciona a consulta nutrigenética na gestação.",
+    ].join("\n\n"),
+    temas: ["gestac", "gestante", "gravidez", "bebe", "epigenetic", "black friday"],
+  },
+  {
+    id: "bf-nutrigenetica",
+    titulo: "Nutrigenética: seis genes no seu prato (Black Friday)",
+    molde: `${BASE}/bf-nutrigenetica.html`,
+    poster: `${BASE}/bf-nutrigenetica.jpg`,
+    versao: 1,
+    duracaoSeg: 90,
+    comNome: true,
+    resumo:
+      "Por que a orientação genérica nem sempre funciona: seis genes (MTHFR, TPH1, FADS, FTO, TCF7L2 e os da inflamação) e o ajuste de alimentação de cada um. Fecha com a oferta da Black Friday e o seu nome.",
+    roteiro: [
+      { de: 0, ate: 5, texto: "Você já sabe o básico. Então por que nem sempre funciona igual?" },
+      { de: 5, ate: 10, texto: "Mesmo prato, resultados diferentes. Uma tem energia, a outra inchaço e fome." },
+      { de: 10, ate: 15, texto: "A resposta também está no seu DNA. É o que a nutrigenética estuda." },
+      { de: 15, ate: 18, texto: "Seis genes que mudam o seu prato." },
+      { de: 18, ate: 26, texto: "O MTHFR ativa o folato. Na variante, ativa menos e o ácido fólico pode não bastar. Entram folhas verdes, ovo e feijão." },
+      { de: 26, ate: 34, texto: "O TPH1 transforma triptofano em serotonina. Com a variante fica mais lento. Banana, castanhas e grão-de-bico juntos fazem sinergia." },
+      { de: 34, ate: 42, texto: "Os genes FADS convertem ômega 3 vegetal em EPA e DHA. Com a variante convertem pouco, então entram sardinha e salmão." },
+      { de: 42, ate: 50, texto: "O FTO regula a saciedade. Com a variante, o sinal chega mais fraco. Fibras e proteína em toda refeição ajudam." },
+      { de: 50, ate: 58, texto: "O TCF7L2 participa do controle da glicose. Com a variante ela sobe mais. Fibras e vegetais antes do carboidrato mudam a curva." },
+      { de: 58, ate: 66, texto: "Os genes da inflamação controlam a intensidade da resposta. Com a variante o corpo inflama mais. Entram cebola, maçã, azeite e cúrcuma." },
+      { de: 66, ate: 71, texto: "A base é a mesma para todos. O ajuste é para os seus genes." },
+      { de: 71, ate: 76, texto: "Seus genes são a letra. O que está ligado agora é o volume." },
+      { de: 76, ate: 85, texto: OFERTA_BF },
+      { de: 85, ate: 90, texto: CTA_BF },
+    ],
+    legenda: [
+      "Comer verduras, tomar ômega 3, controlar o açúcar. Você já sabe tudo isso. Então por que nem sempre funciona igual?",
+      "Porque a resposta também está no seu DNA. Seis genes, como o MTHFR, o FTO e o TCF7L2, mudam o que vai no seu prato. A base é a mesma; o ajuste é seu.",
+      "Nesta Black Friday, o teste nutrigenético de 300 genes vem com o teste epigenético de presente.",
+      "Me chama no direct que eu te explico como funciona a consulta nutrigenética.",
+    ].join("\n\n"),
+    temas: ["nutrigenetic", "genes", "dna", "mthfr", "fto", "black friday"],
+  },
+];
+
+/** Todos os vídeos com molde (genes + Black Friday): narração e busca por id. */
+export const TODOS_VIDEOS_MARCA: VideoMarca[] = [...VIDEOS_MARCA, ...VIDEOS_BLACK_FRIDAY];
+
+export function buscarVideoMarca(id: string | null | undefined): VideoMarca | undefined {
+  return TODOS_VIDEOS_MARCA.find((v) => v.id === id);
+}
+
 /** Fase de teste (Aline, 15/10/2026): só estas contas veem a seção. */
 export const EMAILS_VIDEOS_MARCA = [
   "clinicanutrisecrets@gmail.com",
@@ -484,7 +616,15 @@ export function videosMarcaLiberadosPara(email: string | null | undefined): bool
   return !!e && EMAILS_VIDEOS_MARCA.includes(e);
 }
 
-export type MarcaVideo = { primaria: string; secundaria: string; logoUrl: string | null };
+export type MarcaVideo = {
+  primaria: string;
+  secundaria: string;
+  logoUrl: string | null;
+  /** Só nos moldes `comNome`. Ausente quando o cadastro não tem. */
+  nome?: string;
+  /** "Nutricionista · CRN 10607/PR". Ausente sem CRN: o vídeo fecha só com o nome. */
+  registro?: string;
+};
 
 const HEX = /^#?([0-9a-f]{6})$/i;
 
@@ -508,13 +648,24 @@ export function marcaDoCadastro(f: {
   cor_primaria_hex?: string | null;
   cor_secundaria_hex?: string | null;
   logoUrl?: string | null;
+  nome_completo?: string | null;
+  crn_numero?: string | null;
+  crn_estado?: string | null;
 }): MarcaVideo {
   const logo = (f.logoUrl ?? "").trim();
-  return {
+  const m: MarcaVideo = {
     primaria: corValida(f.cor_primaria_hex) ?? COR_PADRAO.primaria,
     secundaria: corValida(f.cor_secundaria_hex) ?? COR_PADRAO.secundaria,
     logoUrl: /^https:\/\//i.test(logo) ? logo : null,
   };
+  const nome = (f.nome_completo ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
+  if (nome) m.nome = nome;
+  const crn = (f.crn_numero ?? "").trim();
+  const uf = (f.crn_estado ?? "").trim().toUpperCase();
+  // Mesmo formato do rodapé da LP (app/lp/[slug]/LPView.tsx). CRN só existe
+  // para nutricionista; sem ele, nada de profissão inventada.
+  if (crn) m.registro = `Nutricionista · CRN ${crn}${uf ? `/${uf}` : ""}`;
+  return m;
 }
 
 /** Parâmetros que o molde lê do endereço. */
@@ -523,6 +674,8 @@ export function parametrosDoMolde(m: MarcaVideo): string {
   q.set("primaria", m.primaria);
   q.set("secundaria", m.secundaria);
   q.set("logo", m.logoUrl ?? LOGO_VAZIA);
+  if (m.nome) q.set("nome", m.nome);
+  if (m.registro) q.set("registro", m.registro);
   return q.toString();
 }
 
@@ -531,8 +684,12 @@ export function parametrosDoMolde(m: MarcaVideo): string {
  * assinatura e o vídeo é refeito. FNV-1a: curto, estável e sem depender de
  * crypto (roda igual no servidor e no teste).
  */
-export function assinaturaVideoMarca(v: Pick<VideoMarca, "id" | "versao">, m: MarcaVideo): string {
-  const texto = [v.id, v.versao, m.primaria, m.secundaria, m.logoUrl ?? ""].join("|");
+export function assinaturaVideoMarca(v: Pick<VideoMarca, "id" | "versao" | "comNome">, m: MarcaVideo): string {
+  // O nome só entra nos moldes que o mostram: nos de genes, a assinatura
+  // continua a mesma de antes e ninguém tem o vídeo refeito à toa.
+  const partes: Array<string | number> = [v.id, v.versao, m.primaria, m.secundaria, m.logoUrl ?? ""];
+  if (v.comNome) partes.push(m.nome ?? "", m.registro ?? "");
+  const texto = partes.join("|");
   let h = 0x811c9dc5;
   for (let i = 0; i < texto.length; i++) {
     h ^= texto.charCodeAt(i);

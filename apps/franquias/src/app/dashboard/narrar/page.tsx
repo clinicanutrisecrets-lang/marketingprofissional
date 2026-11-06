@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { VIDEOS_METODOLOGIA } from "@/lib/videos/metodologia";
-import { VIDEOS_MARCA } from "@/lib/videos/marca";
+import { buscarVideoMarca } from "@/lib/videos/marca";
 import { pathVideoMarcaPronto } from "@/lib/videos/marca-servidor";
 import { trechosDoReel, type Trecho } from "@/lib/narracao/roteiro";
 import { listarNarracoesAction, type OrigemNarracao } from "@/lib/narracao/actions";
@@ -45,7 +45,7 @@ export default async function NarrarPage({
       trechos = v.roteiro.map((t) => ({ de: t.de, ate: t.ate, texto: t.texto }));
     }
   } else if (origem === "marca") {
-    const v = VIDEOS_MARCA.find((x) => x.id === ref);
+    const v = buscarVideoMarca(ref);
     if (v) {
       titulo = v.titulo;
       const pronto = await pathVideoMarcaPronto((f as { id: string }).id, v.id);
