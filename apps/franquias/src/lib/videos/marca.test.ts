@@ -5,6 +5,7 @@ import { join } from "node:path";
 import {
   VIDEOS_MARCA,
   VIDEOS_BLACK_FRIDAY,
+  VIDEOS_CONTEUDO_NOME,
   TODOS_VIDEOS_MARCA,
   LOGO_VAZIA,
   assinaturaVideoMarca,
@@ -146,7 +147,7 @@ test("vídeos de marca: o cron diário deixa os vídeos prontos pras contas da f
 });
 
 test("Black Friday: o molde fecha com o nome e o CRN DE QUEM ABRE, nunca com o da Aline (06/11)", () => {
-  assert.equal(VIDEOS_BLACK_FRIDAY.length, 3);
+  assert.equal(VIDEOS_BLACK_FRIDAY.length, 4);
   for (const v of VIDEOS_BLACK_FRIDAY) {
     assert.ok(v.comNome, `${v.id}: sem comNome`);
     const html = readFileSync(join(PUBLIC, v.molde), "utf8");
@@ -181,10 +182,21 @@ test("Black Friday: nome e CRN vão no endereço e na assinatura; nos de genes a
 
 test("Black Friday: liberado pra toda conta do app (Avançado), fora do pacote de domingo", () => {
   const srv = readFileSync(join(import.meta.dirname, "marca-servidor.ts"), "utf8");
-  assert.match(srv, /\.\.\.VIDEOS_BLACK_FRIDAY\]/);
+  assert.match(srv, /\.\.\.VIDEOS_BLACK_FRIDAY, \.\.\.VIDEOS_CONTEUDO_NOME\]/);
   const semana = readFileSync(join(import.meta.dirname, "../geracao/video-marca-da-semana.ts"), "utf8");
-  assert.ok(!semana.includes("VIDEOS_BLACK_FRIDAY") && !semana.includes("TODOS_VIDEOS_MARCA"));
+  assert.ok(!semana.includes("VIDEOS_BLACK_FRIDAY") && !semana.includes("TODOS_VIDEOS_MARCA") && !semana.includes("VIDEOS_CONTEUDO_NOME"));
   for (const arq of ["../../app/dashboard/narrar/page.tsx", "../narracao/actions.ts"]) {
     assert.match(readFileSync(join(import.meta.dirname, arq), "utf8"), /buscarVideoMarca\(ref\)/, arq);
+  }
+});
+
+test("conteúdo sem Black Friday: duplicado, sem a oferta no roteiro, na legenda nem no molde", () => {
+  assert.equal(VIDEOS_CONTEUDO_NOME.length, 3);
+  for (const v of VIDEOS_CONTEUDO_NOME) {
+    const tudo = [v.titulo, v.resumo, v.legenda, roteiroComoTexto(v)].join("\n");
+    assert.ok(!/black friday|300 genes|de presente/i.test(tudo), `${v.id}: sobrou oferta no texto`);
+    const html = readFileSync(join(PUBLIC, v.molde), "utf8");
+    assert.match(html, /window\.__VM_SEM_OFERTA = true/, `${v.id}: molde sem a chave de conteúdo`);
+    assert.match(html, /\\"name\\":\\"Oferta\\",\\"dur\\":0\.05/, `${v.id}: a cena da oferta não foi encurtada`);
   }
 });

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { buscarArquivoUrl } from "@/lib/arquivos/url-asset";
 import {
   VIDEOS_BLACK_FRIDAY,
+  VIDEOS_CONTEUDO_NOME,
   VIDEOS_MARCA,
   assinaturaVideoMarca,
   marcaDoCadastro,
@@ -40,7 +41,7 @@ type Linha = LinhaVideoMarca & { id: string; url: string | null };
  * (Aline, 06/11/2026).
  */
 export async function videosMarcaDaFranqueada(f: { id: string; email: string | null }): Promise<EstadoVideoMarca[] | null> {
-  const catalogo = [...(videosMarcaLiberadosPara(f.email) ? VIDEOS_MARCA : []), ...VIDEOS_BLACK_FRIDAY];
+  const catalogo = [...(videosMarcaLiberadosPara(f.email) ? VIDEOS_MARCA : []), ...VIDEOS_BLACK_FRIDAY, ...VIDEOS_CONTEUDO_NOME];
   if (!catalogo.length) return null;
   const admin = createAdminClient();
 

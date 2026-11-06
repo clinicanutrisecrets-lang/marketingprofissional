@@ -28,15 +28,18 @@ export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {
  * Black Friday (Aline, 06/11/2026): três vídeos que fecham com o nome e o CRN
  * de cada profissional. Mesma gravação em karaokê dos outros.
  */
-export function VideosBlackFridaySection({ videos }: { videos: EstadoVideoMarca[] }) {
+export function VideosBlackFridaySection({ videos, conteudo = false }: { videos: EstadoVideoMarca[]; conteudo?: boolean }) {
   const semCrn = videos.length > 0 && !videos.some((v) => v.temRegistro);
   return (
-    <section id="videos-black-friday" className="mb-8">
-      <h2 className="text-xl font-bold text-brand-text">🛍️ Vídeos da Black Friday com o seu nome</h2>
+    <section id={conteudo ? "videos-conteudo-nome" : "videos-black-friday"} className="mb-8">
+      <h2 className="text-xl font-bold text-brand-text">
+        {conteudo ? "🧬 Os mesmos vídeos, sem a Black Friday" : "🛍️ Vídeos da Black Friday com o seu nome"}
+      </h2>
       <p className="mt-1 max-w-2xl text-sm text-brand-text/60">
-        Concepção, gestação e nutrigenética, terminando com a oferta da Black Friday (teste nutrigenético de 300
-        genes com o epigenético de presente), o seu nome e o seu CRN. Eles vêm sem voz: toque em gravar e leia o
-        roteiro, que acende estilo karaokê no ritmo do vídeo.
+        {conteudo
+          ? "Concepção, gestação e nutrigenética como conteúdo, sem oferta: terminam com o convite para a consulta nutrigenética, o seu nome e o seu CRN. Servem para o ano todo."
+          : "Concepção, gestação, nutrigenética e um stories de 30 segundos, terminando com a oferta da Black Friday (teste nutrigenético de 300 genes com o epigenético de presente), o seu nome e o seu CRN."}{" "}
+        Eles vêm sem voz: toque em gravar e leia o roteiro, que acende estilo karaokê no ritmo do vídeo.
       </p>
       {semCrn && (
         <p className="mt-3 max-w-2xl rounded-lg bg-amber-50 p-3 text-sm text-amber-900">

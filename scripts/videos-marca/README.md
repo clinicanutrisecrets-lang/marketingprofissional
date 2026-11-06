@@ -31,3 +31,8 @@ Mudou um molde que já existe: suba `versao`, que refaz o vídeo de todo mundo.
   logo a pílula some) e desliga o editor. As cores ficam as do vídeo.
 - No catálogo, esses entram em `VIDEOS_BLACK_FRIDAY` com `comNome: true`, e o
   nome e o CRN passam a fazer parte da assinatura (trocou no cadastro, refaz).
+- `--sem-oferta` (06/11): gera a versão CONTEÚDO do mesmo vídeo (`conteudo-*.html`):
+  a cena da oferta cai para 0,05 s e o fechamento fica sem a linha da Black
+  Friday. O fechamento mora DENTRO da peça da oferta, então some só o miolo.
+- O stories (`bf-stories.html`) tem o nome em dois recursos; o script ajusta os
+  dois e corrige a sobreposição da abertura ("E eu vou te dar um presente").

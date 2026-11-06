@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { assinaturaConfere } from "@/lib/integracoes/tratamentos-assinatura";
+import { createAdminClient } from "@/lib/supabase/server";
 import {
   chaveValida,
   montarNarracaoParceira,
@@ -17,7 +18,9 @@ import {
  *
  * Auth: HMAC SHA256 do corpo com VIDEOS_PARCEIRAS_SECRET, em hex, no header
  * `x-tratamentos-signature`. O MESMO valor fica no Vercel do Tratamentos
- * (projeto cursos-scanner). Sem a variável, fecha (503).
+ * (projeto cursos-scanner). Sem a variável, o mesmo valor é lido de
+ * `integracao_segredos` (migração 044: tabela trancada, só o servidor lê).
+ * Sem nenhum dos dois, fecha (503).
  *
  * Corpo: { acao, chave, ... }
  *   estado    { nome, registro, logoUrl } → { videos, narracoes }
@@ -26,8 +29,20 @@ import {
  */
 export const dynamic = "force-dynamic";
 
+async function segredo(): Promise<string> {
+  const env = (process.env.VIDEOS_PARCEIRAS_SECRET ?? "").trim();
+  if (env) return env;
+  const { data, error } = await createAdminClient()
+    .from("integracao_segredos")
+    .select("valor")
+    .eq("chave", "VIDEOS_PARCEIRAS_SECRET")
+    .maybeSingle();
+  if (error) console.error("[videos-bf] não li o segredo do banco", error.message);
+  return String((data as { valor?: string } | null)?.valor ?? "").trim();
+}
+
 export async function POST(req: NextRequest) {
-  const secret = process.env.VIDEOS_PARCEIRAS_SECRET;
+  const secret = await segredo();
   if (!secret) return NextResponse.json({ erro: "em configuração" }, { status: 503 });
   const raw = await req.text();
   if (!assinaturaConfere(raw, req.headers.get("x-tratamentos-signature") ?? "", secret)) {
