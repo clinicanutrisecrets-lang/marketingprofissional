@@ -69,13 +69,24 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
 | Medição | comentário e direct medidos; abertura de página e venda não | link rastreado e mensagem pré-escrita no WhatsApp da Helô também nos links do direct (hoje só os guias têm) |
 | Prova social | regra: só depoimento real aprovado | criar o banco de depoimentos aprovados antes das semanas de venda |
 
-## 5. Dúvidas de produto (só ela responde)
+## 5. Dúvidas de produto — respondidas pela Aline em 06/11
 
-- Consulta Nutrigenética: retorno em **60 dias** (lista da loja) ou **3 meses** (descrição)?
-- Acompanhamento por mensagem (R$ 800) com ela atendendo, durante a licença: segue à venda?
-- "Supervisão da Aline" sobre o time: é verdade operacional hoje? (o catálogo diz isso)
-- Existe versão do guia do bebê para mães?
-- Lótus: o que vem junto (consulta inclusa?) e quem responde dúvida do Lótus no direct.
+- ✅ **Retorno da Consulta Nutrigenética: em até 3 meses.** Corrigido na lista "o que inclui" da oferta dela
+  na loja (era "60 dias"). 🔴 **Mas o modelo de página da Consulta Nutrigenética escreve "retorno em até 60
+  dias" fixo** (`consulta-nutrigenetica-lp.html` e `-direta-lp.html`, repo consultorio-de-precisao), e esse
+  modelo é usado por **18 ofertas, 17 de outras profissionais**. A página dela mostra hoje "60 dias" no texto
+  e "3 meses" na lista. Pela regra de modelo de muitas profissionais, o prazo do retorno precisa virar campo
+  da oferta, com o painel no mesmo PR; não dá pra trocar o texto fixo pra todas. Duas FAQs aprovadas da
+  Fernanda dizem "60 dias" e quatro dizem "3 meses".
+- ✅ **Acompanhamento por mensagem** segue à venda, conduzido pelo time durante a licença, com a supervisão
+  dela. Voltou ao catálogo do direct com descrição própria (a da loja fala "ela analisa o seu caso").
+- ✅ **Supervisão**: "eu supervisiono o time, só não faço a consulta". Agente e catálogo falam assim.
+- ✅ **Instagram do Scanner**: @scannerdasaude (o agente responde se perguntarem).
+- **Guia do bebê para mães: não existe.** O PDF do lactente também é técnico (gramas de HMO, espécies, doses,
+  genótipos) e leva à aula de profissional. Proposta: a regra BEBÊ pergunta "você é profissional ou mãe?" e,
+  pra mãe, responde com carinho sem o material técnico. Falta decidir o que a mãe recebe (o time atende
+  bebê? um guia de mãe vira pauta do mês?).
+- Lótus: o que vem junto e quem responde dúvida no direct (aberta).
 
 ## 6. Ordem pra ligar (depois do OK)
 
