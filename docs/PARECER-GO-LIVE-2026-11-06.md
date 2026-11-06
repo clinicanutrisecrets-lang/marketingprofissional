@@ -82,10 +82,11 @@ Legenda: 🔴 bloqueia ir ao ar · 🟡 melhora.
   dela. Voltou ao catálogo do direct com descrição própria (a da loja fala "ela analisa o seu caso").
 - ✅ **Supervisão**: "eu supervisiono o time, só não faço a consulta". Agente e catálogo falam assim.
 - ✅ **Instagram do Scanner**: @scannerdasaude (o agente responde se perguntarem).
-- **Guia do bebê para mães: não existe.** O PDF do lactente também é técnico (gramas de HMO, espécies, doses,
-  genótipos) e leva à aula de profissional. Proposta: a regra BEBÊ pergunta "você é profissional ou mãe?" e,
-  pra mãe, responde com carinho sem o material técnico. Falta decidir o que a mãe recebe (o time atende
-  bebê? um guia de mãe vira pauta do mês?).
+- ✅ **Guia do bebê para mães: não existe** (o PDF do lactente também é técnico). **O time atende todas as
+  idades e condições, com especialidades distintas** (Aline, 06/11). Regra BEBÊ refeita (desligada, presa
+  ao post de origem): pergunta "profissional ou mãe?"; profissional recebe o material e o teste do Scanner;
+  mãe recebe carinho, sem material técnico, e a Helô com a mensagem "quero saber da consulta para o meu
+  bebê" já escrita. O catálogo do direct também sabe que o time atende todas as idades.
 - Lótus: o que vem junto e quem responde dúvida no direct (aberta).
 
 ## 6. Ordem pra ligar (depois do OK)
