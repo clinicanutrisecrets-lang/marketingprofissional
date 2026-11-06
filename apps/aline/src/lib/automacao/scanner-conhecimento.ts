@@ -74,3 +74,38 @@ export async function buscarCatalogoScanner(agora = Date.now()): Promise<{ bloco
     return { blocos: "", disponivel: false };
   }
 }
+
+/* ── Já é cliente? (a closer do direct, 06/11/2026) ───────────────────── */
+
+export type SituacaoCliente =
+  | { confirmado: false }
+  | { confirmado: true; paciente: boolean; tem_genetico: boolean; tem_epigenetico: boolean; comprou_lotus: boolean };
+
+/**
+ * Pergunta ao Scanner se o e-mail que a pessoa digitou no direct é de
+ * cliente, conferindo também o primeiro nome do Instagram (régua de LGPD em
+ * scanner-saude/lib/direct-cliente.ts). Falhou a consulta: null (a conversa
+ * segue como pessoa nova, que é o lado seguro).
+ */
+export async function conferirCliente(p: { email: string; nome?: string | null; username?: string | null }): Promise<SituacaoCliente | null> {
+  const base = (process.env.SCANNER_API_URL ?? "https://scannerdasaude.com").replace(/\/$/, "");
+  const secret = process.env.STUDIO_CONHECIMENTO_SECRET ?? process.env.MARKETING_WEBHOOK_SECRET;
+  if (!secret) return null;
+  try {
+    const res = await fetch(`${base}/api/integrations/marketing/cliente`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify(p),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      console.error("[automacao/cliente] o Scanner respondeu", res.status);
+      return null;
+    }
+    const j = (await res.json()) as SituacaoCliente;
+    return typeof j?.confirmado === "boolean" ? j : null;
+  } catch (e) {
+    console.error("[automacao/cliente] falha ao conferir:", (e as Error).message);
+    return null;
+  }
+}

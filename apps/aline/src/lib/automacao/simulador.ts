@@ -23,8 +23,8 @@ import {
   type Regra,
 } from "./regras";
 import { suspeitaDeAcusacao, acaoParaLeitura, contatoJaAcusou } from "./acusacao";
-import { buscarConhecimentoScanner, buscarCatalogoScanner } from "./scanner-conhecimento";
-import { motivoParaNaoEnviar } from "./seguranca";
+import { buscarConhecimentoScanner, buscarCatalogoScanner, conferirCliente } from "./scanner-conhecimento";
+import { motivoParaNaoEnviar, emailNoTexto } from "./seguranca";
 
 export type ResultadoSimulacao = {
   regra: string | null;
@@ -184,12 +184,18 @@ export async function simularEvento(params: {
     // simulação roda do mesmo jeito e avisa que, no ar, nada sairia.
     if (!config.responder_dm_scanner) avisos.push("A chave 'responder direct' está DESLIGADA: no ar, esta resposta NÃO sairia. Simulando pra você conferir antes de ligar.");
     const [contexto, catalogo] = await Promise.all([buscarConhecimentoScanner(params.texto), buscarCatalogoScanner()]);
+    // Pra testar a closer com cliente de verdade: ponha o e-mail do cadastro na mensagem.
+    const emailSim = emailNoTexto(params.texto);
+    const cliente = emailSim ? await conferirCliente({ email: emailSim, nome: vars.nome, username: vars.username }) : null;
+    if (emailSim) avisos.push(cliente?.confirmado
+      ? `Cliente confirmada: genético ${cliente.tem_genetico ? "sim" : "não"}, epigenético ${cliente.tem_epigenetico ? "sim" : "não"}, Lótus ${cliente.comprou_lotus ? "sim" : "não"}.`
+      : "E-mail não confirmado como cliente (ou o nome do perfil simulado não bate com o cadastro).");
     avisos.push(catalogo.disponivel ? "Catálogo de produtos carregado da loja." : "Catálogo de produtos NÃO carregou: a resposta não fala preço nem link de compra.");
     if (!contexto.disponivel) avisos.push("Base do Scanner indisponível nesta simulação (segredo ou rede). A resposta saiu sem ela.");
     else avisos.push(`Base do Scanner: ${contexto.totalRegistros} registro(s) encontrados pra esta pergunta.`);
     const resp = await responderDmComScanner({
       perfil, historico: [], pergunta: params.texto, nomeContato: vars.nome,
-      contextoScanner: contexto, catalogo, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
+      contextoScanner: contexto, catalogo, cliente, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
     });
     if (!resp) return { regra: null, acoes: [], avisos: [...avisos, "A geração da resposta falhou. Veja o log da Vercel."] };
     const veto = resp.texto ? motivoParaNaoEnviar(resp.texto) : null;

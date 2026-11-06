@@ -50,10 +50,10 @@ import {
 } from "./regras";
 import { desfechoDaFalha, registroDoDesfecho, type Desfecho } from "./envio";
 import {
-  situacaoDeRisco, TEXTO_CRISE, TEXTO_AGUDO, algumaChaveDeResposta, motivoParaNaoEnviar, opcoesAindaValidas, alineJaEscreveu,
+  situacaoDeRisco, TEXTO_CRISE, TEXTO_AGUDO, algumaChaveDeResposta, emailNoTexto, motivoParaNaoEnviar, opcoesAindaValidas, alineJaEscreveu,
 } from "./seguranca";
 import { semTravessoes } from "@/lib/texto/sem-travessoes";
-import { buscarConhecimentoScanner, buscarCatalogoScanner } from "./scanner-conhecimento";
+import { buscarConhecimentoScanner, buscarCatalogoScanner, conferirCliente, type SituacaoCliente } from "./scanner-conhecimento";
 import { transcreverAudio } from "./transcrever-audio";
 import {
   decidirAposAcusacao, contatoJaAcusou, TAG_ACUSACAO,
@@ -91,10 +91,13 @@ type Contato = {
   precisa_humano: boolean;
   /** Quando o histórico da conversa foi lido na API (Aline já escrevia antes do robô?). */
   historico_conferido_em: string | null;
+  /** Bandeiras do Scanner: já é cliente? tem genético? (migração aline/017) */
+  cliente_situacao: SituacaoCliente | null;
+  cliente_conferido_em: string | null;
 };
 
 // 🔴 historico_conferido_em vem da migração aline/016: aplicar ANTES do deploy.
-const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes, aline_falou_em, precisa_humano, historico_conferido_em";
+const COLS_CONTATO = "id, username, nome, tags, silenciado, ultimas_opcoes, aline_falou_em, precisa_humano, historico_conferido_em, cliente_situacao, cliente_conferido_em";
 const COLS_REGRA =
   "id, nome, ativa, gatilho, palavras_chave, media_ids, resposta_publica, resposta_privada, sequencia_id, tags_adicionar, uma_vez_por_contato, prioridade, opcoes";
 const THROTTLE_SAIDA_MS = 20_000;
@@ -356,7 +359,10 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
         continue;
       }
 
-      if (gatilho === "dm") {
+      // 🔴 Resposta de story também é conversa (abre a janela de 24 h igual à DM).
+      // Antes de 06/11 ela só tinha regra por palavra; sem regra, ficava sem
+      // resposta. Agora cai na mesma closer, sabendo a que story ela respondeu.
+      if (gatilho === "dm" || gatilho === "story_reply") {
         const textoPessoa = ev.texto.trim();
 
         // ── É pra ELA ler (convite, imprensa, cliente com problema) ──
@@ -394,12 +400,31 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
 
         if (!config.responder_dm_scanner || !textoPessoa || textoPessoa.startsWith("[") || pareceAbordagemComercial(textoPessoa, quemEscreve)) { resumo.ignorados++; continue; }
         if (await saidaRecente(contato.id)) { resumo.ignorados++; continue; }
+        // ── Já é cliente? Só com o e-mail que ELA digitou + o nome do perfil ──
+        const emailDigitado = emailNoTexto(textoPessoa);
+        // Uma conferência por hora por contato: ninguém fica testando e-mails
+        // alheios pra descobrir quem é paciente.
+        const conferiuHaPouco = !!contato.cliente_conferido_em &&
+          Date.now() - new Date(contato.cliente_conferido_em).getTime() < 60 * 60_000;
+        if (emailDigitado && !contato.cliente_situacao?.confirmado && !conferiuHaPouco) {
+          const situacao = await conferirCliente({ email: emailDigitado, nome: contato.nome, username: contato.username ?? ev.username });
+          if (situacao) {
+            const { error: errCli } = await aline.from("ig_contatos")
+              .update({ cliente_situacao: situacao, cliente_conferido_em: new Date().toISOString() }).eq("id", contato.id);
+            if (errCli) console.error("[automacao] não gravei a situação de cliente:", errCli.message);
+            contato.cliente_situacao = situacao;
+          }
+        }
+
         const [historico, contexto, catalogo] = await Promise.all([
           historicoDm(contato.id), buscarConhecimentoScanner(textoPessoa), buscarCatalogoScanner(),
         ]);
         const resp = await responderDmComScanner({
-          perfil, historico, pergunta: textoPessoa, nomeContato: contato.nome,
-          contextoScanner: contexto, catalogo, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
+          perfil, historico, nomeContato: contato.nome,
+          pergunta: gatilho === "story_reply"
+            ? `(ela respondeu a um story${await legendaDoStory(perfil.id, ev.mediaId)}) ${textoPessoa}`
+            : textoPessoa,
+          contextoScanner: contexto, catalogo, cliente: contato.cliente_situacao, textoEncaminharHumano: config.texto_encaminhar_humano, orientacoes,
         });
         if (!resp || !resp.texto) {
           // Sem texto confiável: ninguém fica sem resposta em silêncio.
@@ -637,6 +662,12 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
       .reverse()
       .filter((m) => m.texto)
       .map((m) => ({ direcao: m.direcao, texto: m.texto! }));
+  }
+
+  /** ' cujo texto era: "..."' quando o story saiu do Estúdio; vazio quando não se sabe. */
+  async function legendaDoStory(perfilId: string, mediaId?: string | null): Promise<string> {
+    const leg = await legendaDoPost(perfilId, mediaId ?? undefined);
+    return leg ? ` cujo texto era: "${leg.replace(/\s+/g, " ").slice(0, 300)}"` : "";
   }
 
   async function legendaDoPost(perfilId: string, mediaId?: string): Promise<string | null> {

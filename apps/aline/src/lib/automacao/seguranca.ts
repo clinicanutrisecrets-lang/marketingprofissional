@@ -200,3 +200,10 @@ export function alineJaEscreveu(
     return true;
   });
 }
+
+/* ── 7. E-mail digitado no direct (pra conferir se já é cliente) ──────── */
+
+export function emailNoTexto(texto: string): string | null {
+  const m = (texto ?? "").match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+  return m ? m[0].toLowerCase() : null;
+}
