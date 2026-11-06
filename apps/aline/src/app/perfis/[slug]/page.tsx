@@ -103,6 +103,12 @@ export default async function PerfilPage({ params, searchParams }: PageProps) {
                 🗓️ Planejamento do feed
               </Link>
               <Link
+                href={`/perfis/${perfil.slug as string}/conversas`}
+                className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900 hover:bg-amber-200"
+              >
+                💬 Conversas de hoje
+              </Link>
+              <Link
                 href={`/perfis/${perfil.slug as string}/automacoes`}
                 className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 hover:bg-purple-200"
               >

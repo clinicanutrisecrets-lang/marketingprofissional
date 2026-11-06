@@ -29,6 +29,16 @@ Perfis: `nutrisecrets` (paciente) e `scannerdasaude` (profissional).
 | **Relatório da manhã** (o que espera ela) | `/api/cron/relatorio-instagram` | cron 8h | ❌ **nunca foi enviado**: falta `RESEND_API_KEY` (e opcional `RELATORIO_INSTAGRAM_EMAIL`) na Vercel do `studio-aline`. O log diz "NÃO ENVIADO" todo dia |
 | **Material da isca** (o que vai no direct) | páginas em `guias.scannerdasaude.com` (repo do Scanner, `public/guias/` + 1 linha no `middleware.ts`) | `MATERIAIS-E-LINKS.md` | ✅ página, não PDF. GLP-1, bebê, intestino e sono no ar |
 
+## O painel de conversas (06/11)
+
+*"Eu olho as conversas todo dia, tem que fazer um painel pra mim no Studio"* (Aline). Em
+`/perfis/<slug>/conversas` (botão "💬 Conversas de hoje" no perfil): **Urgente** (sofrimento; o robô
+mandou o CVV e avisou por e-mail), **Esperando você**, **Ninguém respondeu** (fora as conversas que ela
+mesma conduz) e **O robô respondeu** (últimas 24 h, pra revisão). Cada cartão mostra as últimas mensagens,
+quanto falta da janela de 24 h, se é cliente (genético, epigenético, Lótus), e os botões "Abrir no
+Instagram" (ig.me), "Resolvi" e "Desligar robô pra ela". Ela responde pelo app do Instagram, não pelo
+painel. Lógica em `lib/automacao/painel.ts` (testada); erro de leitura mostra erro, nunca painel vazio.
+
 ## A vendedora do direct (06/11)
 
 Pedido da Aline: *"como a minha Sofia, que entende dos meus produtos: preço, condições, bônus, link,

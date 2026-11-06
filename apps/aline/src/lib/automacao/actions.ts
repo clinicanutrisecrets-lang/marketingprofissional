@@ -188,15 +188,19 @@ export async function excluirSequencia(slug: string, id: string): Promise<void> 
 export async function marcarContatoAtendido(slug: string, contatoId: string): Promise<void> {
   await exigirSessao();
   const aline = createAlineClient();
-  await aline.from("ig_contatos").update({ precisa_humano: false, precisa_humano_motivo: null }).eq("id", contatoId);
+  const { error } = await aline.from("ig_contatos").update({ precisa_humano: false, precisa_humano_motivo: null }).eq("id", contatoId);
+  if (error) throw new Error(`Não consegui marcar como resolvido: ${error.message}`);
   revalidatePath(`/perfis/${slug}/automacoes`);
+  revalidatePath(`/perfis/${slug}/conversas`);
 }
 
 export async function alternarSilenciarContato(slug: string, contatoId: string, silenciado: boolean): Promise<void> {
   await exigirSessao();
   const aline = createAlineClient();
-  await aline.from("ig_contatos").update({ silenciado }).eq("id", contatoId);
+  const { error } = await aline.from("ig_contatos").update({ silenciado }).eq("id", contatoId);
+  if (error) throw new Error(`Não consegui mudar o robô pra este contato: ${error.message}`);
   revalidatePath(`/perfis/${slug}/automacoes`);
+  revalidatePath(`/perfis/${slug}/conversas`);
 }
 
 export type EstadoSimulacao = { resultado?: import("./simulador").ResultadoSimulacao; erro?: string } | null;

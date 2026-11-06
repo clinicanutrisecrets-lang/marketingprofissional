@@ -123,6 +123,7 @@ export default async function AutomacoesPage({ params, searchParams }: PageProps
             <div>
               <h1 className="text-2xl font-bold text-aline-text">Robô do Instagram</h1>
               <p className="text-sm text-aline-text/60">Comentários, stories e direct da @{perfil.instagram_handle}, sem ManyChat.</p>
+              <Link href={`/perfis/${slug}/conversas`} className="mt-1 inline-block text-sm font-medium underline">Ver as conversas de hoje</Link>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
               <Pill ok={conectadoDireto && !tokenVencido} label={conectadoDireto ? (tokenVencido ? "Token vencido" : "Login do Instagram ok") : "Precisa conectar pelo login do Instagram"} />

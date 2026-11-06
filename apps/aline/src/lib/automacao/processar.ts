@@ -202,7 +202,7 @@ export async function processarWebhook(payload: unknown): Promise<ResumoProcessa
           // Não espera o relatório da manhã: e-mail na hora, com o @ e o texto.
           await avisarAlineAgora({
             assunto: `🔴 Instagram: mensagem de sofrimento de @${contato.username ?? ev.username ?? "desconhecida"}`,
-            texto: `Chegou agora no ${ev.tipo === "comentario" ? "comentário" : "direct"} do @${perfil.instagram_handle ?? perfil.slug}:\n\n"${ev.texto.slice(0, 800)}"\n\nO robô ${ev.tipo === "comentario" ? "não respondeu em público" : "mandou só a mensagem fixa com o CVV 188 e o 192"} e marcou a conversa como esperando uma pessoa. Abra o direct no app do Instagram.`,
+            texto: `Chegou agora no ${ev.tipo === "comentario" ? "comentário" : "direct"} do @${perfil.instagram_handle ?? perfil.slug}:\n\n"${ev.texto.slice(0, 800)}"\n\nO robô ${ev.tipo === "comentario" ? "não respondeu em público" : "mandou só a mensagem fixa com o CVV 188 e o 192"} e marcou a conversa como esperando uma pessoa. Abra o direct no app do Instagram.\n\nPainel: https://studio.scannerdasaude.com/perfis/${perfil.slug}/conversas`,
           });
         }
         // Com tudo desligado o robô não fala nem aqui: só avisa a Aline.
