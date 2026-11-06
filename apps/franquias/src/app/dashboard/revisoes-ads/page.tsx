@@ -49,7 +49,7 @@ export default async function RevisoesAdsPage() {
             Revisões de tráfego
           </h1>
           <p className="mt-2 text-sm text-brand-text/60">
-            Seu gestor de tráfego IA revisa todas suas campanhas Meta Ads automaticamente
+            O gestor de tráfego do Scanner revisa todas suas campanhas Meta Ads automaticamente
             às segundas e quintas.
           </p>
         </header>

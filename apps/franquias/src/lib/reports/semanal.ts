@@ -127,8 +127,8 @@ Retorne APENAS JSON:
         insight_manual_vs_ia:
           manual.length > 0 && ia.length > 0
             ? manual_eng > ia_eng
-              ? `Posts manuais performaram ${Math.round(((manual_eng - ia_eng) / ia_eng) * 100)}% melhor que IA`
-              : `Posts IA performaram ${Math.round(((ia_eng - manual_eng) / manual_eng) * 100)}% melhor que manuais`
+              ? `Posts manuais performaram ${Math.round(((manual_eng - ia_eng) / ia_eng) * 100)}% melhor que os gerados pelo Scanner`
+              : `Posts gerados pelo Scanner performaram ${Math.round(((ia_eng - manual_eng) / manual_eng) * 100)}% melhor que manuais`
             : null,
         analise_claude: analise,
         recomendacoes,
