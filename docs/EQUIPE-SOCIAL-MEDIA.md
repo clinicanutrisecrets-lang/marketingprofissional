@@ -1,5 +1,7 @@
 # A equipe de social media do Estúdio — quem faz o quê (medido em 06/11/2026)
 
+> O caminho de cada produto até a venda: `ESTRATEGIA-CONVERSAO.md`.
+
 > **Sessão nova que vá mexer em post, arte, radar ou robô do Instagram: leia
 > este arquivo primeiro.** Ele existe porque a Aline montou uma estratégia
 > inteira e cada sessão sabia um pedaço: *"teve uma sessão que soube, outra não
@@ -58,12 +60,11 @@ Consertado no PR de 06/11 (`tests/robo-seguranca.test.ts`, visto vermelho sem o 
 
 ## Textos das regras que precisam da Aline antes de ligar
 
-- **"Estou de licença maternidade"** aparece em AGENDAR (direct e story), QUADRO DE SAÚDE (direct e story) e
-  no botão "Não, sou paciente" do GLP1. Confirmar se ainda vale.
-- **GLP1 → "Não, sou paciente"** manda pra Helô. Existe o guia de paciente
-  (`guias.scannerdasaude.com/glp1`), que já termina no teste nutrigenético.
-- **POST ANTIGO** pergunta "você é nutri, outra profissional ou paciente?" sem botão e ninguém responde
-  depois (chaves gerais desligadas): beco sem saída.
+- ✅ 06/11: **"Estou de licença maternidade" continua valendo** (Aline).
+- ✅ 06/11: **GLP1 → "Não, sou paciente"** agora manda o guia de paciente (`guias.scannerdasaude.com/glp1`)
+  e chama pro teste nutrigenético com o time, pela Helô.
+- ✅ 06/11: **POST ANTIGO** ganhou 3 botões (Sou nutri / Outra profissional / Cuido da minha saúde), cada
+  um com os materiais certos; profissional recebe também o trial do software, paciente o teste pela Helô.
 - **"Entender o pedido sem a palavra"** está desligada (era o defeito do ManyChat que motivou a troca).
 - ✅ 06/11: BEBÊ trocada do PDF para `guias.scannerdasaude.com/bebe-pro`.
 
