@@ -205,8 +205,7 @@ export function CriarPostForm() {
       </button>
       <p className="text-center text-xs leading-relaxed text-brand-text/50">
         O post fica salvo na sua biblioteca. A publicação no Instagram é feita
-        por você. Publicar automático depende de uma liberação da Meta que
-        ainda não saiu.
+        por você.
       </p>
     </div>
   );

@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import {
   aprovacaoFechada,
   escolherAprovacao,
-  publicacaoAutomaticaLigada,
   semanasVisiveis,
   semanasPendentesAnteriores,
   rotuloSemanaCurto,
@@ -35,7 +34,7 @@ export default async function AprovarPage({
   const { data: franqueada } = await supabase
     .from("franqueadas")
     .select(
-      "id, nome_comercial, aprovacao_modo, instagram_conta_id, instagram_access_token, instagram_token_expiry, publer_profile_id, palavras_evitar, publico_briefing",
+      "id, nome_comercial, aprovacao_modo, palavras_evitar, publico_briefing",
     )
     .eq("auth_user_id", user.id)
     .maybeSingle();
@@ -222,12 +221,6 @@ export default async function AprovarPage({
           fechada={aprovacaoFechada(escolhida?.status)}
           historico={historico}
           revisao={revisao}
-          publicacaoAutomatica={publicacaoAutomaticaLigada({
-            instagram_conta_id: f.instagram_conta_id as string | null,
-            instagram_access_token: f.instagram_access_token as string | null,
-            instagram_token_expiry: f.instagram_token_expiry as string | null,
-            publer_profile_id: f.publer_profile_id as string | null,
-          })}
         />
       </div>
     </main>

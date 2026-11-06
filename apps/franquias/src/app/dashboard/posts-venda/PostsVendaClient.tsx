@@ -455,8 +455,7 @@ export function PostsVendaClient(props: {
                 <p className="basis-full text-[11px] text-brand-text/50">
                   Sem imagem anexada, a arte é desenhada nas suas cores, como no pacote da
                   semana. O post fica salvo na sua biblioteca pra você copiar e publicar no seu
-                  Instagram quando quiser. Publicar automático depende de uma liberação da
-                  Meta que ainda não saiu.
+                  Instagram quando quiser.
                 </p>
               </div>
             </div>
