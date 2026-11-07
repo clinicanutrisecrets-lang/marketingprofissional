@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { roteiroComoTexto, tempoRoteiro } from "@/lib/videos/marca";
 import type { EstadoVideoMarca } from "@/lib/videos/marca-servidor";
-import { AvisoFaltaVoz } from "./AvisoFaltaVoz";
+import { AvisoVozDoVideo } from "./AvisoVozDoVideo";
 import { copiarTexto } from "@/lib/copiar-texto";
 
 /**
@@ -11,7 +11,7 @@ import { copiarTexto } from "@/lib/copiar-texto";
  * de cada profissional. Saem sem voz e com a legenda escrita, pra narrar por
  * cima (roteiro em karaokê) ou postar com música.
  */
-export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {
+export function VideosMarcaSection({ videos, prontas }: { videos: EstadoVideoMarca[]; prontas?: Record<string, string> }) {
   return (
     <section id="videos-marca" className="mb-8">
       <h2 className="text-xl font-bold text-brand-text">🧬 Vídeos animados com a sua marca</h2>
@@ -19,7 +19,7 @@ export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {
         Vídeos explicando os genes, montados com a sua logo e as suas cores. Eles vêm sem voz: grave a sua
         narração lendo o roteiro, ou poste só com música, escolhida no próprio Instagram ao publicar.
       </p>
-      <Grade videos={videos} />
+      <Grade videos={videos} prontas={prontas} />
     </section>
   );
 }
@@ -28,7 +28,15 @@ export function VideosMarcaSection({ videos }: { videos: EstadoVideoMarca[] }) {
  * Black Friday (Aline, 06/11/2026): três vídeos que fecham com o nome e o CRN
  * de cada profissional. Mesma gravação em karaokê dos outros.
  */
-export function VideosBlackFridaySection({ videos, conteudo = false }: { videos: EstadoVideoMarca[]; conteudo?: boolean }) {
+export function VideosBlackFridaySection({
+  videos,
+  conteudo = false,
+  prontas,
+}: {
+  videos: EstadoVideoMarca[];
+  conteudo?: boolean;
+  prontas?: Record<string, string>;
+}) {
   const semCrn = videos.length > 0 && !videos.some((v) => v.temRegistro);
   return (
     <section id={conteudo ? "videos-conteudo-nome" : "videos-black-friday"} className="mb-8">
@@ -47,12 +55,12 @@ export function VideosBlackFridaySection({ videos, conteudo = false }: { videos:
           seu CRN e o estado pelo suporte: quando entrar no cadastro, o vídeo é refeito sozinho.
         </p>
       )}
-      <Grade videos={videos} />
+      <Grade videos={videos} prontas={prontas} />
     </section>
   );
 }
 
-function Grade({ videos }: { videos: EstadoVideoMarca[] }) {
+function Grade({ videos, prontas }: { videos: EstadoVideoMarca[]; prontas?: Record<string, string> }) {
   return (
     <>
       {videos.some((v) => v.semLogo) && (
@@ -64,14 +72,14 @@ function Grade({ videos }: { videos: EstadoVideoMarca[] }) {
       )}
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         {videos.map((e) => (
-          <CartaoVideoMarca key={e.video.id} e={e} />
+          <CartaoVideoMarca key={e.video.id} e={e} prontas={prontas} />
         ))}
       </div>
     </>
   );
 }
 
-function CartaoVideoMarca({ e }: { e: EstadoVideoMarca }) {
+function CartaoVideoMarca({ e, prontas }: { e: EstadoVideoMarca; prontas?: Record<string, string> }) {
   const v = e.video;
   const [copiado, setCopiado] = useState<"" | "legenda" | "roteiro">("");
   async function copiar(texto: string, qual: "legenda" | "roteiro") {
@@ -108,7 +116,7 @@ function CartaoVideoMarca({ e }: { e: EstadoVideoMarca }) {
 
       {temVideo && (
         <div className="mt-3">
-          <AvisoFaltaVoz href={`/dashboard/narrar?origem=marca&ref=${v.id}`} />
+          <AvisoVozDoVideo refVideo={v.id} prontas={prontas} />
         </div>
       )}
 

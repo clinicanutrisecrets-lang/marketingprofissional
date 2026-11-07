@@ -11,6 +11,7 @@ import { listarAcervo } from "@/lib/videos/acervo";
 import { VideosMetodologiaSection } from "./VideosMetodologiaSection";
 import { VideosBlackFridaySection, VideosMarcaSection } from "./VideosMarcaSection";
 import { videosMarcaDaFranqueada } from "@/lib/videos/marca-servidor";
+import { narracoesProntasMarcaAction } from "@/lib/narracao/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,10 @@ export default async function VideosHubPage() {
     .order("criado_em", { ascending: false })
     .limit(10);
   const reels = (reelsData ?? []) as ReelAnimado[];
-  const videosMarca = await videosMarcaDaFranqueada(franqueada as { id: string; email: string | null });
+  const [videosMarca, prontas] = await Promise.all([
+    videosMarcaDaFranqueada(franqueada as { id: string; email: string | null }),
+    narracoesProntasMarcaAction(),
+  ]);
   const videosBf = (videosMarca ?? []).filter((e) => e.video.id.startsWith("bf-"));
   const videosConteudo = (videosMarca ?? []).filter((e) => e.video.id.startsWith("conteudo-"));
   const videosGenes = (videosMarca ?? []).filter((e) => !e.video.comNome);
@@ -118,9 +122,9 @@ export default async function VideosHubPage() {
         )}
       </div>
 
-      {videosBf.length > 0 && <VideosBlackFridaySection videos={videosBf} />}
-      {videosConteudo.length > 0 && <VideosBlackFridaySection videos={videosConteudo} conteudo />}
-      {videosGenes.length > 0 && <VideosMarcaSection videos={videosGenes} />}
+      {videosBf.length > 0 && <VideosBlackFridaySection videos={videosBf} prontas={prontas} />}
+      {videosConteudo.length > 0 && <VideosBlackFridaySection videos={videosConteudo} conteudo prontas={prontas} />}
+      {videosGenes.length > 0 && <VideosMarcaSection videos={videosGenes} prontas={prontas} />}
       <VideosMetodologiaSection />
 
       {corteIa && <VideoCurtoSection biblioteca={biblioteca} acervo={acervo} />}
