@@ -85,8 +85,10 @@ test("vídeo animado sem voz tem o recado de que falta a voz, e a narração exp
   const aviso = fonte("../../app/dashboard/videos/AvisoFaltaVoz.tsx");
   assert.match(aviso, /falta a sua voz/);
   assert.match(aviso, /karaokê/);
+  // O recado sai pelo AvisoVozDoVideo, que só troca para o baixar quando a voz já está pronta (pronta.test.ts).
+  assert.match(fonte("../../app/dashboard/videos/AvisoVozDoVideo.tsx"), /<AvisoFaltaVoz/);
   for (const tela of ["../../app/dashboard/videos/VideosMarcaSection.tsx", "../../app/dashboard/aprovar/AprovacaoView.tsx"]) {
-    assert.match(fonte(tela), /<AvisoFaltaVoz/, `${tela} sem o recado`);
+    assert.match(fonte(tela), /<AvisoVozDoVideo/, `${tela} sem o recado`);
   }
   const grav = fonte("../../app/dashboard/narrar/GravadorNarracao.tsx");
   assert.match(grav, /Como funciona a gravação/);

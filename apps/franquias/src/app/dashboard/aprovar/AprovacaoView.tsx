@@ -3,7 +3,7 @@
 import { GuiaDaSemana } from "./GuiaDaSemana";
 import { TextoDaArte } from "./TextoDaArte";
 import { VisorArtes } from "./VisorArtes";
-import { AvisoFaltaVoz } from "../videos/AvisoFaltaVoz";
+import { AvisoVozDoVideo } from "../videos/AvisoVozDoVideo";
 import { lerEstrategia } from "@/lib/aprovacao/estrategia";
 import { acentuarVisivel } from "@/lib/texto/acentos-visivel";
 import { useMemo, useState, useTransition } from "react";
@@ -40,6 +40,8 @@ type SemanaChip = {
 
 type Props = {
   franqueadaId: string;
+  /** Narração pronta de cada vídeo de marca (ref → url): troca o aviso "falta a sua voz" pelo baixar. */
+  narracoesProntas?: Record<string, string>;
   aprovacao: Record<string, unknown> | null;
   posts: Array<Record<string, unknown>>;
   /** true = a nutri já aprovou: sem edição, só baixar e postar. */
@@ -69,6 +71,7 @@ export function AprovacaoView({
   fechada,
   historico,
   revisao,
+  narracoesProntas,
 }: Props) {
   const router = useRouter();
   const [postsState, setPostsState] = useState(posts);
@@ -243,6 +246,7 @@ export function AprovacaoView({
             key={post.id as string}
             post={post}
             revisao={revisao}
+            narracoesProntas={narracoesProntas}
             onUpdate={(updated) =>
               setPostsState((prev) =>
                 prev.map((p) => (p.id === updated.id ? updated : p)),
@@ -396,10 +400,12 @@ function PostCard({
   post,
   onUpdate,
   revisao,
+  narracoesProntas,
 }: {
   post: Record<string, unknown>;
   onUpdate: (p: Record<string, unknown>) => void;
   revisao: ContextoRevisao;
+  narracoesProntas?: Record<string, string>;
 }) {
   const [editando, setEditando] = useState(false);
   const [copy, setCopy] = useState((post.copy_legenda as string) ?? "");
@@ -564,7 +570,7 @@ function PostCard({
             <video src={videoPronto} controls playsInline className="max-h-80 w-full rounded bg-black" />
             {typeof post.video_marca_id === "string" && (
               <div className="mt-1.5">
-                <AvisoFaltaVoz href={`/dashboard/narrar?origem=marca&ref=${post.video_marca_id}`} compacto />
+                <AvisoVozDoVideo refVideo={post.video_marca_id} prontas={narracoesProntas} compacto />
               </div>
             )}
             <div className="mt-1.5 flex flex-wrap gap-1.5">

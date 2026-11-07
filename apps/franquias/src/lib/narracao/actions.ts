@@ -5,6 +5,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { VIDEOS_METODOLOGIA } from "@/lib/videos/metodologia";
 import { buscarVideoMarca } from "@/lib/videos/marca";
 import { pathVideoMarcaPronto } from "@/lib/videos/marca-servidor";
+import { narracoesProntasPorRef, type LinhaNarracao } from "./pronta";
 
 /**
  * Narração gravada por cima do vídeo (Aline, 13/10/2026). Fluxo:
@@ -195,4 +196,28 @@ export async function listarNarracoesAction(origem: OrigemNarracao, ref: string)
     .order("criado_em", { ascending: false })
     .limit(5);
   return (data ?? []) as Narracao[];
+}
+
+/**
+ * A narração pronta mais nova de cada vídeo de marca da profissional (ref →
+ * url). Os cartões da aba Vídeos e do Aprovar semana usam para trocar o aviso
+ * "falta a sua voz" pelo botão de baixar. Erro de leitura = mapa vazio (o
+ * cartão volta ao aviso de sempre, nunca quebra a tela).
+ */
+export async function narracoesProntasMarcaAction(): Promise<Record<string, string>> {
+  const fid = await franqueadaId();
+  if (!fid) return {};
+  const { data, error } = await createClient()
+    .from("narracoes_video")
+    .select("ref, status, url, criado_em")
+    .eq("franqueada_id", fid)
+    .eq("origem", "marca")
+    .eq("status", "pronto")
+    .order("criado_em", { ascending: false })
+    .limit(100);
+  if (error) {
+    console.error("[narracao] não li as narrações prontas", fid, error.message);
+    return {};
+  }
+  return narracoesProntasPorRef((data ?? []) as LinhaNarracao[]);
 }

@@ -12,6 +12,7 @@ import {
 import { validarPublico } from "@/lib/publico/publico";
 import { formatarPrecoBR } from "@/lib/produtos/contexto";
 import { AprovacaoView } from "./AprovacaoView";
+import { narracoesProntasMarcaAction } from "@/lib/narracao/actions";
 import { TIPOS_FOTO_BANCO } from "@/lib/geracao/fotos-banco";
 import { assinarArtesSemLink } from "@/lib/storage/link-assinado";
 
@@ -125,6 +126,9 @@ export default async function AprovarPage({
   // que ela vetou e os preços REAIS. Sem o catálogo carregado o revisor não
   // acusa preço nenhum, de propósito: falta de informação não é prova de
   // invenção.
+  // Vídeo de marca já narrado: o cartão troca "falta a sua voz" pelo baixar.
+  const narracoesProntas = posts.some((p) => typeof p.video_marca_id === "string") ? await narracoesProntasMarcaAction() : {};
+
   const { data: produtosReais } = await supabase
     .from("produtos_scanner")
     .select("preco_centavos")
@@ -221,6 +225,7 @@ export default async function AprovarPage({
           fechada={aprovacaoFechada(escolhida?.status)}
           historico={historico}
           revisao={revisao}
+          narracoesProntas={narracoesProntas}
         />
       </div>
     </main>
